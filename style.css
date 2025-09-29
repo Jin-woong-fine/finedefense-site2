@@ -1,0 +1,29 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+.logo {
+  display: block;
+  margin-left: 0; /* 왼쪽 정렬 */
+  width: 200px;   /* 이미지 크기 */
+  cursor: pointer; /* 마우스 올렸을 때 클릭 느낌 */
+}
+
+.banner-container {
+  text-align: center;       /* 가운데 배치 */
+  background-color: black;  /* 이미지 좌우 여백 검은색 */
+}
+
+
+.banner1 {
+  display: block;        /* 블록으로 만들어야 margin으로 정렬 가능 */
+  margin: 0 auto;        /* 상하 0, 좌우 자동 → 가운데 정렬 */
+  width: 1800px;          /* 이미지 크기 */
+  cursor: pointer;       /* 클릭 느낌 */
+}
+
+
+h1 {
+  padding: 20px;
+}
