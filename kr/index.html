@@ -69,58 +69,46 @@
       &copy; FINE DEFENSE INC. All Rights Reserved.
     </footer>
 
-    <script>
-    const langBtn = document.querySelector(".lang-btn");
-    const dropdown = document.querySelector(".dropdown");
-    const langItems = document.querySelectorAll(".lang-item");
+      <script>
+      const langBtn = document.querySelector(".lang-btn");
+      const dropdown = document.querySelector(".dropdown");
+      const langItems = document.querySelectorAll(".lang-item");
 
-    // 클릭 시 드롭다운 열기/닫기
-    langBtn.addEventListener("click", e => {
-      e.preventDefault();
-      dropdown.classList.toggle("show");
-    });
-
-    // 드롭다운 밖 클릭 시 닫기
-    document.addEventListener("click", e => {
-      if (!e.target.closest(".language")) {
-        dropdown.classList.remove("show");
-      }
-    });
-
-    // 언어 선택 시 폴더 이동
-    langItems.forEach(item => {
-      item.addEventListener("click", e => {
+      // 클릭 시 드롭다운 열기/닫기
+      langBtn.addEventListener("click", e => {
         e.preventDefault();
-        const lang = item.getAttribute("data-lang"); // kor 또는 eng
-        if (lang === "kor") {
-          window.location.href = "/kr/index.html";
-        } else if (lang === "eng") {
-          window.location.href = "/eng/index.html";
+        dropdown.classList.toggle("show");
+      });
+
+      // 드롭다운 밖 클릭 시 닫기
+      document.addEventListener("click", e => {
+        if (!e.target.closest(".language")) {
+          dropdown.classList.remove("show");
         }
       });
-    });
 
-    const isGithub = location.hostname.includes("github.io");
+      // 로컬 / GitHub Pages 경로 처리
+      const isGithub = location.hostname.includes("github.io");
 
-    langItems.forEach(item => {
-      item.addEventListener("click", e => {
-        e.preventDefault();
-        const lang = item.dataset.lang;
+      // 언어 선택 시 폴더 이동
+      langItems.forEach(item => {
+        item.addEventListener("click", e => {
+          e.preventDefault();
+          const lang = item.dataset.lang;
 
-        let path = "";
-        if (lang === "kor") path = "kr/index.html";
-        else if (lang === "eng") path = "eng/index.html";
+          let path = "";
+          if (lang === "kor") path = "kr/index.html";
+          else if (lang === "eng") path = "eng/index.html";
 
-        if (isGithub) {
-          window.location.href = path; // GitHub Pages 상대경로
-        } else {
-          window.location.href = "/" + path; // 로컬 테스트용
-        }
+          if (isGithub) {
+            window.location.href = path;       // GitHub Pages
+          } else {
+            window.location.href = "/" + path; // 로컬 테스트
+          }
+        });
       });
-    });
+      </script>
 
 
-
-    </script>
   </body>
 </html>
