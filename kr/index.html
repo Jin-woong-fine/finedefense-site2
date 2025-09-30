@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="description" content="화인디펜스, 임시 홈페이지, 테스트 홈페이지">
+
+      <title>화인디펜스</title>
+
+      <link rel="stylesheet" href="style.css">
+      <link rel="stylesheet" href="features.css">
+  </head>
+
+  <body>
+    <header class="header-inner">
+      <div class="header-left">
+        <a href="#"><img src="img/logo_transparent_finedefense.png" alt="로고" class="logo"></a>
+        <ul class="main-menu">
+          <li>
+            <a href="#">회사소개</a>
+              <ul class="submenu">
+                <li><a href="#">기업개요</a></li>
+                <li><a href="#">CEO인사말</a></li>
+                <li><a href="#">연혁</a></li>
+                <li><a href="#">기업이념 및 비전</a></li>
+                <li><a href="#">조직도</a></li>
+                <li><a href="#">찾아오시는길</a></li>
+            </ul>
+          </li>
+
+          <li><a href="#">사업영역</a></li>
+          <li><a href="#">제품소개</a></li>
+          <li><a href="#">홍보센터</a></li>
+          <li><a href="#">고객지원</a></li>
+        </ul>
+      </div>
+
+      <div class="header-right">
+        <div class="language">
+          <a href="#" class="lang-btn">Language ▼</a>
+          <ul class="dropdown">
+            <li><a href="#" class="lang-item" data-lang="kor">Korean</a></li>
+            <li><a href="#" class="lang-item" data-lang="eng">English</a></li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    <div class="banner-container">
+      <img src="img/finedefense_banner_1.jpg" alt="배너 이미지" class="banner1">
+    </div>
+
+<section class="business-area">
+  <h2>사업영역</h2>
+  <div class="features">
+    <div class="feature-card" style="background-image: url('icons/underwater-cable.png');">
+      <h3>수중케이블</h3>
+    </div>
+    <div class="feature-card" style="background-image: url('icons/connector.png');">
+      <h3>수중커넥터</h3>
+    </div>
+    <div class="feature-card" style="background-image: url('icons/custom.png');">
+      <h3>커스텀 메이드 케이블</h3>
+    </div>
+  </div>
+</section>
+
+    <footer>
+      &copy; FINE DEFENSE INC. All Rights Reserved.
+    </footer>
+
+    <script>
+    const langBtn = document.querySelector(".lang-btn");
+    const dropdown = document.querySelector(".dropdown");
+    const langItems = document.querySelectorAll(".lang-item");
+
+    // 클릭 시 드롭다운 열기/닫기
+    langBtn.addEventListener("click", e => {
+      e.preventDefault();
+      dropdown.classList.toggle("show");
+    });
+
+    // 드롭다운 밖 클릭 시 닫기
+    document.addEventListener("click", e => {
+      if (!e.target.closest(".language")) {
+        dropdown.classList.remove("show");
+      }
+    });
+
+    // 언어 선택 시 폴더 이동
+    langItems.forEach(item => {
+      item.addEventListener("click", e => {
+        e.preventDefault();
+        const lang = item.getAttribute("data-lang"); // kor 또는 eng
+        if (lang === "kor") {
+          window.location.href = "/kr/index.html";
+        } else if (lang === "eng") {
+          window.location.href = "/eng/index.html";
+        }
+      });
+    });
+    </script>
+  </body>
+</html>
