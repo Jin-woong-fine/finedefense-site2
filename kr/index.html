@@ -99,11 +99,9 @@
           else if (lang === "eng") path = "eng/index.html";
 
           if (isGithub) {
-            // GitHub Pages: 레포 이름 포함
-            window.location.href = "/" + repoName + "/" + path;
+            window.location.href = "/" + repoName + "/" + path; // Pages용
           } else {
-            // 로컬 테스트
-            window.location.href = "/" + path;
+            window.location.href = "/" + path; // 로컬용
           }
         });
       });
