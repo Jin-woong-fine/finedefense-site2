@@ -99,6 +99,28 @@
         }
       });
     });
+
+    const isGithub = location.hostname.includes("github.io");
+
+    langItems.forEach(item => {
+      item.addEventListener("click", e => {
+        e.preventDefault();
+        const lang = item.dataset.lang;
+
+        let path = "";
+        if (lang === "kor") path = "kr/index.html";
+        else if (lang === "eng") path = "eng/index.html";
+
+        if (isGithub) {
+          window.location.href = path; // GitHub Pages 상대경로
+        } else {
+          window.location.href = "/" + path; // 로컬 테스트용
+        }
+      });
+    });
+
+
+
     </script>
   </body>
 </html>
