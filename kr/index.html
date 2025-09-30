@@ -69,44 +69,31 @@
       &copy; FINE DEFENSE INC. All Rights Reserved.
     </footer>
 
-    <script>
-      const langBtn = document.querySelector(".lang-btn");
-      const dropdown = document.querySelector(".dropdown");
-      const langItems = document.querySelectorAll(".lang-item");
+      <script>
+        const langItems = document.querySelectorAll(".lang-item");
+        const langBtn = document.querySelector(".lang-btn");
+        const dropdown = document.querySelector(".dropdown");
 
-      // 드롭다운 열기/닫기
-      langBtn.addEventListener("click", e => {
-        e.preventDefault();
-        dropdown.classList.toggle("show");
-      });
-
-      document.addEventListener("click", e => {
-        if (!e.target.closest(".language")) dropdown.classList.remove("show");
-      });
-
-      // GitHub Pages인지 체크
-      const isGithub = location.hostname.includes("github.io");
-      const repoName = "finedefense-site2"; // 레포 이름 입력
-
-      // 언어 선택 시 이동
-      langItems.forEach(item => {
-        item.addEventListener("click", e => {
+        // 드롭다운 토글
+        langBtn.addEventListener("click", e => {
           e.preventDefault();
-          const lang = item.dataset.lang;
-          let path = "";
-
-          if (lang === "kor") path = "kr/index.html";
-          else if (lang === "eng") path = "eng/index.html";
-
-          if (isGithub) {
-            window.location.href = "/" + repoName + "/" + path; // Pages용
-          } else {
-            window.location.href = "/" + path; // 로컬용
-          }
+          dropdown.classList.toggle("show");
         });
-      });
-    </script>
 
+        document.addEventListener("click", e => {
+          if (!e.target.closest(".language")) dropdown.classList.remove("show");
+        });
+
+        // 언어 선택
+        langItems.forEach(item => {
+          item.addEventListener("click", e => {
+            e.preventDefault();
+            const lang = item.dataset.lang;
+            const path = lang === "kor" ? "/kr/index.html" : "/eng/index.html";
+            window.location.href = path; // 로컬 기준 상대경로
+          });
+        });
+      </script>
 
   </body>
 </html>
