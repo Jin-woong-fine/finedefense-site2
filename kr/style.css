@@ -1,0 +1,202 @@
+/* 전체 body */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+/* 헤더 전체 */
+.header-inner {
+  display: flex;
+  justify-content: space-between; /* 좌: 로고, 우: 언어 */
+  align-items: center;
+  height: 60px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  position: relative; /* 이미 있을 수도 있음 */
+  z-index: 10;        /* 배너보다 높게 */
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 50px; /* 로고와 메뉴 간격 */
+}
+
+.header-right {
+  flex: 0 0 auto;
+}
+
+
+.header-left .logo {
+  width: 160px;       /* 필요에 맞게 조절 */
+  height: auto;       /* 비율 유지 */
+}
+
+.header-left .logo img {
+  height: auto;       /* 비율 유지 */
+  max-height: 60px;   /* 최대 높이 */
+  width: auto;        /* 가로 비율 유지 */
+}
+
+/* 메인 메뉴 */
+.main-menu {
+  position: absolute;
+  left: 52%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 50px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  white-space: nowrap;
+}
+
+.main-menu li a {
+  text-decoration: none;
+  color: #333;             /* 기본 검정 */
+  font-weight: 550;
+  padding: 8px 12px;
+  transition: color 0.3s ease;
+}
+
+.main-menu li a:hover {
+  color: #0f2679;          /* hover 시 파란색 */
+  background-color: transparent; /* 배경 변화 제거 */
+}
+
+/* 메인 메뉴 li 기준으로 하위 메뉴 위치 */
+.main-menu li {
+  position: relative; /* 이거 없으면 화면 전체 기준으로 나옴 */
+}
+
+
+/* 하위 메뉴 숨김 */
+.submenu {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px); /* 살짝 아래에서 시작 */
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  position: absolute;
+  top: 140%;
+  left: 50%;
+  transform: translate(-50%, 10px); /* X축 가운데 + Y축 딜레이 */
+  background-color: #fff;
+  border: 1px solid #eeeeee17;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  min-width: 150px;
+  z-index: 100;
+  text-align: center;
+}
+
+/* 하위 메뉴 항목 스타일 */
+.submenu li a {
+  display: block;
+  padding: 8px 15px;
+  color: #555;             /* 기본 진한 회색 */
+  text-decoration: none;
+  font-size: 13.5px;    /* 🔹 글씨 크기 조절 */
+  font-weight: 500;    /* 🔹 굵기 (400=보통, 600=Semi-Bold, 700=Bold) */
+  transition: color 0.3s ease;
+}
+
+.submenu li a:hover {
+  color: #0f2679;             /* hover 시 흰색 */
+  background-color: transparent; /* 배경 변화 제거 */
+}
+
+/* 메인 메뉴 li 호버 시 하위 메뉴 보이기 */
+.main-menu li:hover > .submenu {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0); /* 원래 위치로 올라옴 */
+
+  display: block;
+  transition: 0.3s ease;
+}
+
+
+
+/* 언어 선택 오른쪽 */
+.language {
+  position: relative;
+  font-size: 14px;
+}
+
+/* 드롭다운 */
+.lang-btn {
+  text-decoration: none;
+  color: #333;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+.dropdown {
+  display: none;
+  position: absolute;
+  right: 0;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  min-width: 120px;
+  z-index: 100;
+  padding: 5px 0;
+}
+
+.dropdown li {
+  list-style: none;
+}
+
+.dropdown li a {
+  display: block;
+  padding: 5px 15px;
+  text-decoration: none;
+  color: #333;
+}
+
+.dropdown li a:hover {
+  background-color: #eee;
+}
+
+.dropdown.show {
+  display: block;
+}
+
+/* main, footer 여백은 여기서만 적용 */
+main, footer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* 배너 */
+.banner-container {
+  width: 100%;
+  height: 400px;       /* 원하는 높이 */
+  overflow: hidden;    /* 넘치는 부분 숨김 */
+  position: relative;
+}
+
+.banner1 {
+  width: 100%;         /* 가로 화면에 맞춤 */
+  height: auto;        /* 세로 비율 유지 */
+  object-fit: cover;   /* 컨테이너에 맞춰 잘림 처리 */
+  display: block;
+  z-index: 1;
+}
+
+h1 {
+  padding: 20px;
+}
+
+footer {
+  background-color: #f0f0f0;
+  text-align: center;
+  padding: 20px 0;
+  font-size: 14px;
+  color: #333;
+  border-top: 1px solid #ccc;
+}
