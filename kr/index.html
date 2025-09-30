@@ -69,45 +69,45 @@
       &copy; FINE DEFENSE INC. All Rights Reserved.
     </footer>
 
-      <script>
+    <script>
       const langBtn = document.querySelector(".lang-btn");
       const dropdown = document.querySelector(".dropdown");
       const langItems = document.querySelectorAll(".lang-item");
 
-      // 클릭 시 드롭다운 열기/닫기
+      // 드롭다운 열기/닫기
       langBtn.addEventListener("click", e => {
         e.preventDefault();
         dropdown.classList.toggle("show");
       });
 
-      // 드롭다운 밖 클릭 시 닫기
       document.addEventListener("click", e => {
-        if (!e.target.closest(".language")) {
-          dropdown.classList.remove("show");
-        }
+        if (!e.target.closest(".language")) dropdown.classList.remove("show");
       });
 
-      // 로컬 / GitHub Pages 경로 처리
+      // GitHub Pages인지 체크
       const isGithub = location.hostname.includes("github.io");
+      const repoName = "homepage_V0.1.1_250930"; // 레포 이름 입력
 
-      // 언어 선택 시 폴더 이동
+      // 언어 선택 시 이동
       langItems.forEach(item => {
         item.addEventListener("click", e => {
           e.preventDefault();
           const lang = item.dataset.lang;
-
           let path = "";
+
           if (lang === "kor") path = "kr/index.html";
           else if (lang === "eng") path = "eng/index.html";
 
           if (isGithub) {
-            window.location.href = path;       // GitHub Pages
+            // GitHub Pages: 레포 이름 포함
+            window.location.href = "/" + repoName + "/" + path;
           } else {
-            window.location.href = "/" + path; // 로컬 테스트
+            // 로컬 테스트
+            window.location.href = "/" + path;
           }
         });
       });
-      </script>
+    </script>
 
 
   </body>
