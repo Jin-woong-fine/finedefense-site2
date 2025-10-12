@@ -9,6 +9,7 @@
 
       <link rel="stylesheet" href="style.css">
       <link rel="stylesheet" href="features.css">
+      <link rel="stylesheet" href="banner.css">
   </head>
 
   <body>
@@ -28,10 +29,35 @@
             </ul>
           </li>
 
-          <li><a href="#">사업영역</a></li>
-          <li><a href="#">제품소개</a></li>
-          <li><a href="#">홍보센터</a></li>
-          <li><a href="#">고객지원</a></li>
+          <li>
+            <a href="#">제품소개</a>
+              <ul class="submenu">
+              <li><a href="#">수중이동형케이블</a></li>
+              <li><a href="#">수중고정형케이블</a></li>
+              <li><a href="#">수중커넥터</a></li>
+              <li><a href="#">EPD케이블</a></li>
+              <li><a href="#">커스텀케이블</a></li>
+            </ul>
+          </li>
+
+          <li>
+            <a href="#">홍보센터</a>
+              <ul class="submenu">
+                <li><a href="#">뉴스룸</a></li>
+                <li><a href="#">갤러리</a></li>
+                <li><a href="#">홍보영상</a></li>
+                <li><a href="#">카탈로그</a></li>
+              </ul>
+          </li>
+
+          <li>
+            <a href="#">고객지원</a>
+              <ul class="submenu">
+                <li><a href="#">1:1 문의</a></li>
+                <li><a href="#">다운로드 센터</a></li>
+              </ul>
+          </li>
+
         </ul>
       </div>
 
@@ -46,9 +72,36 @@
       </div>
     </header>
 
-    <div class="banner-container">
-      <img src="img/finedefense_banner_1.jpg" alt="배너 이미지" class="banner1">
+    <div class="banner-slider">
+      <div class="slides">
+
+        <div class="slide">
+          <img src="banner/banner_warship2.jpg" alt="배너 1">
+          <div class="banner-text">  Underwater Tow Cable & Connector<br>
+          for Towed Sonar</div>
+        </div>
+
+        <div class="slide">
+          <img src="banner/banner_submarine3.jpg" alt="배너 2">
+          <div class="banner-text">Submarine Sonar Cable</div>
+        </div>
+
+        <div class="slide">
+          <img src="banner/banner_manufacturing3.jpg" alt="배너 3">
+          <div class="banner-text">Underwater Cable Manufacturing Facility</div>
+        </div>
+
+        <div class="slide">
+          <img src="banner/banner_waterpressuretester2.jpg" alt="배너 4">
+          <div class="banner-text">Underwater Cable Test Facility</div>
+        </div>
+
+      </div>
+
+      <button class="prev">&#10094;</button>
+      <button class="next">&#10095;</button>
     </div>
+
 
 <section class="business-area">
   <h2>사업영역</h2>
@@ -56,11 +109,11 @@
     <div class="feature-card" style="background-image: url('icons/underwater-cable.png');">
       <h3>수중케이블</h3>
     </div>
-    <div class="feature-card" style="background-image: url('icons/connector.png');">
+    <div class="feature-card" style="background-image: url('icons/custom.png');">
       <h3>수중커넥터</h3>
     </div>
     <div class="feature-card" style="background-image: url('icons/custom.png');">
-      <h3>커스텀 메이드 케이블</h3>
+      <h3>커스텀케이블</h3>
     </div>
   </div>
 </section>
@@ -93,7 +146,39 @@
             window.location.href = path; // 로컬 기준 상대경로
           });
         });
+
+
+        
+        // 배너 슬라이드 설정
+        const slides = document.querySelector('.slides');
+        const slideCount = document.querySelectorAll('.slide').length;
+        const prevBtn = document.querySelector('.prev');
+        const nextBtn = document.querySelector('.next');
+
+        let currentIndex = 0;
+
+        // 슬라이드 이동 함수
+        function showSlide(index) {
+          if (index < 0) index = slideCount - 1;
+          if (index >= slideCount) index = 0;
+          slides.style.transform = `translateX(-${index * 100}%)`;
+          currentIndex = index;
+        }
+
+        // 화살표 이벤트
+        prevBtn.addEventListener('click', () => showSlide(currentIndex - 1));
+        nextBtn.addEventListener('click', () => showSlide(currentIndex + 1));
+
+        // 자동 슬라이드
+        setInterval(() => {
+          showSlide(currentIndex + 1);
+        }, 5000); // 5초마다
+
+
+
+
       </script>
+
 
   </body>
 </html>
