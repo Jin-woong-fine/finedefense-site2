@@ -99,6 +99,9 @@
 
       <button class="prev">&#10094;</button>
       <button class="next">&#10095;</button>
+
+        <!-- 페이지네이션 (점 표시) -->
+      <div class="swiper-pagination"></div>
     </div>
 
 
@@ -117,67 +120,87 @@
   </div>
 </section>
 
-    <footer>
-      &copy; FINE DEFENSE INC. All Rights Reserved.
-    </footer>
+  <footer>
+    &copy; FINE DEFENSE INC. All Rights Reserved.
+  </footer>
 
-      <script>
-        const langItems = document.querySelectorAll(".lang-item");
-        const langBtn = document.querySelector(".lang-btn");
-        const dropdown = document.querySelector(".dropdown");
+<script>
+  // 🔹 언어 선택 드롭다운
+  const langItems = document.querySelectorAll(".lang-item");
+  const langBtn = document.querySelector(".lang-btn");
+  const dropdown = document.querySelector(".dropdown");
 
-        // 드롭다운 토글
-        langBtn.addEventListener("click", e => {
-          e.preventDefault();
-          dropdown.classList.toggle("show");
-        });
+  langBtn.addEventListener("click", e => {
+    e.preventDefault();
+    dropdown.classList.toggle("show");
+  });
 
-        document.addEventListener("click", e => {
-          if (!e.target.closest(".language")) dropdown.classList.remove("show");
-        });
+  document.addEventListener("click", e => {
+    if (!e.target.closest(".language")) dropdown.classList.remove("show");
+  });
 
-        // 언어 선택
-        langItems.forEach(item => {
-          item.addEventListener("click", e => {
-            e.preventDefault();
-            const lang = item.dataset.lang;
-            const path = lang === "kor" ? "/kr/index.html" : "/eng/index.html";
-            window.location.href = path; // 로컬 기준 상대경로
-          });
-        });
+  langItems.forEach(item => {
+    item.addEventListener("click", e => {
+      e.preventDefault();
+      const lang = item.dataset.lang;
+      const path = lang === "kor" ? "/kr/index.html" : "/eng/index.html";
+      window.location.href = path;
+    });
+  });
 
+  // 🔹 배너 슬라이드 (양방향 루프)
+  const slides = document.querySelector('.slides');
+  const slideItems = document.querySelectorAll('.slide');
+  const prevBtn = document.querySelector('.prev');
+  const nextBtn = document.querySelector('.next');
+  const totalSlides = slideItems.length;
 
-        
-        // 배너 슬라이드 설정
-        const slides = document.querySelector('.slides');
-        const slideCount = document.querySelectorAll('.slide').length;
-        const prevBtn = document.querySelector('.prev');
-        const nextBtn = document.querySelector('.next');
+  // 👉 첫 번째, 마지막 슬라이드 복제 (무한루프용)
+  const firstClone = slideItems[0].cloneNode(true);
+  const lastClone = slideItems[totalSlides - 1].cloneNode(true);
+  slides.appendChild(firstClone);
+  slides.insertBefore(lastClone, slideItems[0]);
 
-        let currentIndex = 0;
+  let index = 1;
+  const slideWidth = 100;
+  slides.style.transform = `translateX(-${index * slideWidth}%)`;
 
-        // 슬라이드 이동 함수
-        function showSlide(index) {
-          if (index < 0) index = slideCount - 1;
-          if (index >= slideCount) index = 0;
-          slides.style.transform = `translateX(-${index * 100}%)`;
-          currentIndex = index;
-        }
+  function moveToSlide(i) {
+    slides.style.transition = 'transform 0.6s ease-in-out';
+    slides.style.transform = `translateX(-${i * slideWidth}%)`;
+  }
 
-        // 화살표 이벤트
-        prevBtn.addEventListener('click', () => showSlide(currentIndex - 1));
-        nextBtn.addEventListener('click', () => showSlide(currentIndex + 1));
+  nextBtn.addEventListener('click', () => {
+    index++;
+    moveToSlide(index);
+  });
 
-        // 자동 슬라이드
-        setInterval(() => {
-          showSlide(currentIndex + 1);
-        }, 5000); // 5초마다
+  prevBtn.addEventListener('click', () => {
+    index--;
+    moveToSlide(index);
+  });
 
+  slides.addEventListener('transitionend', () => {
+    // 👉 마지막 클론 → 첫 슬라이드
+    if (index === totalSlides + 1) {
+      slides.style.transition = 'none';
+      index = 1;
+      slides.style.transform = `translateX(-${index * slideWidth}%)`;
+    }
+    // 👉 첫 번째 클론 → 마지막 슬라이드
+    if (index === 0) {
+      slides.style.transition = 'none';
+      index = totalSlides;
+      slides.style.transform = `translateX(-${index * slideWidth}%)`;
+    }
+  });
 
-
-
-      </script>
-
+  // 🔹 자동 슬라이드
+  setInterval(() => {
+    index++;
+    moveToSlide(index);
+  }, 5000);
+</script>
 
   </body>
 </html>
