@@ -125,37 +125,13 @@
   </footer>
 
 <script>
-  // 🔹 언어 선택 드롭다운
-  const langItems = document.querySelectorAll(".lang-item");
-  const langBtn = document.querySelector(".lang-btn");
-  const dropdown = document.querySelector(".dropdown");
-
-  langBtn.addEventListener("click", e => {
-    e.preventDefault();
-    dropdown.classList.toggle("show");
-  });
-
-  document.addEventListener("click", e => {
-    if (!e.target.closest(".language")) dropdown.classList.remove("show");
-  });
-
-  langItems.forEach(item => {
-    item.addEventListener("click", e => {
-      e.preventDefault();
-      const lang = item.dataset.lang;
-      const path = lang === "kor" ? "/kr/index.html" : "/eng/index.html";
-      window.location.href = path;
-    });
-  });
-
-  // 🔹 배너 슬라이드 (양방향 루프)
   const slides = document.querySelector('.slides');
   const slideItems = document.querySelectorAll('.slide');
   const prevBtn = document.querySelector('.prev');
   const nextBtn = document.querySelector('.next');
   const totalSlides = slideItems.length;
 
-  // 👉 첫 번째, 마지막 슬라이드 복제 (무한루프용)
+  // 복제 생성
   const firstClone = slideItems[0].cloneNode(true);
   const lastClone = slideItems[totalSlides - 1].cloneNode(true);
   slides.appendChild(firstClone);
@@ -163,13 +139,19 @@
 
   let index = 1;
   const slideWidth = 100;
+  let isTransitioning = false;
+
   slides.style.transform = `translateX(-${index * slideWidth}%)`;
 
   function moveToSlide(i) {
+    if (isTransitioning) return;
+    isTransitioning = true;
+
     slides.style.transition = 'transform 0.6s ease-in-out';
     slides.style.transform = `translateX(-${i * slideWidth}%)`;
   }
 
+  // 방향 버튼
   nextBtn.addEventListener('click', () => {
     index++;
     moveToSlide(index);
@@ -181,25 +163,47 @@
   });
 
   slides.addEventListener('transitionend', () => {
-    // 👉 마지막 클론 → 첫 슬라이드
     if (index === totalSlides + 1) {
-      slides.style.transition = 'none';
-      index = 1;
-      slides.style.transform = `translateX(-${index * slideWidth}%)`;
-    }
-    // 👉 첫 번째 클론 → 마지막 슬라이드
-    if (index === 0) {
-      slides.style.transition = 'none';
-      index = totalSlides;
-      slides.style.transform = `translateX(-${index * slideWidth}%)`;
+      requestAnimationFrame(() => {
+        slides.style.transition = 'none';
+        index = 1;
+        slides.style.transform = `translateX(-${index * slideWidth}%)`;
+        requestAnimationFrame(() => {
+          slides.style.transition = 'transform 0.6s ease-in-out';
+          isTransitioning = false;
+        });
+      });
+    } else if (index === 0) {
+      requestAnimationFrame(() => {
+        slides.style.transition = 'none';
+        index = totalSlides;
+        slides.style.transform = `translateX(-${index * slideWidth}%)`;
+        requestAnimationFrame(() => {
+          slides.style.transition = 'transform 0.6s ease-in-out';
+          isTransitioning = false;
+        });
+      });
+    } else {
+      isTransitioning = false;
     }
   });
 
-  // 🔹 자동 슬라이드
+  // ✅ 자동 슬라이드 (복귀 시 인덱스 강제 보정)
   setInterval(() => {
     index++;
+    if (index > totalSlides + 1) index = 2;  // ❗️이 부분이 핵심
     moveToSlide(index);
   }, 5000);
+
+  // ✅ 페이지 복귀 시 인덱스 리셋
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+      // 페이지 돌아올 때 index가 범위 밖이면 안전하게 리셋
+      if (index > totalSlides) index = 1;
+      slides.style.transition = 'none';
+      slides.style.transform = `translateX(-${index * slideWidth}%)`;
+    }
+  });
 </script>
 
   </body>
