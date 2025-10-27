@@ -1,0 +1,203 @@
+/* 전체 body */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+/* 헤더 전체 */
+.header-inner {
+  display: flex;
+  justify-content: space-between; /* 좌: 로고, 우: 언어 */
+  align-items: center;
+  width: 100%;                  /* 화면 전체 가로폭 */
+  height: auto;                  /* 고정 높이 제거 */
+  padding: clamp(0.5rem, 1.5vw, 1.5rem) 2vw; /* 상하좌우 유동적 패딩 */
+  box-sizing: border-box; /* 필수: padding 포함 width 계산 */
+  margin: 0 auto;
+  position: relative;
+  z-index: 10;
+
+  background-color: #fff; /* 헤더 배경 흰색 */
+  border-bottom: 1px solid #e0e0e0; /* 구분선 */
+}
+
+/* 헤더 내부 구조 */
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 3vw, 3rem);
+}
+.header-right {
+  flex: 0 0 auto;
+}
+
+/* 로고 */
+.header-left .logo {
+  width: clamp(120px, 12vw, 160px); /* 화면 비율에 따라 크기 조절 */
+  height: auto;
+}
+
+/* 메뉴 중앙 정렬 */
+.main-menu-container {
+  flex: 1;
+  display: flex;
+  justify-content: center; /* 메뉴 중앙 */
+}
+
+
+/* 메인 메뉴 */
+.main-menu {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: clamp(40px, 5vw, 150px); /* 메뉴 항목 간격 유동적 */
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  
+ 
+  white-space: nowrap;
+}
+
+.main-menu li a {
+  text-decoration: none;
+  color: #000;
+  font-weight: 550;
+  padding: clamp(4px, 0.5vw, 8px) clamp(8px, 1vw, 12px);
+  font-size: clamp(14px, 1vw, 18px); /* 화면에 따라 글씨 크기 조정 */
+  transition: color 0.3s ease;
+}
+
+.main-menu li a:hover {
+  color: #0f2679;
+  background-color: transparent;
+}
+
+/* 하위 메뉴 위치 */
+.main-menu li {
+  position: relative;
+
+}
+
+.main-menu li::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 100%;           /* 부모 글씨 바로 아래부터 */
+  width: 100%;
+  height: 50px;        /* 하위 메뉴 높이 정도 */
+  pointer-events: auto; /* 마우스 감지 가능 */
+}
+
+
+/* 하위 메뉴 숨김 */
+.submenu {
+  list-style: none; /* 불릿 제거 */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  position: absolute;
+  top: 210%;
+  left: 50%;
+  transform: translate(-50%, 10px);
+  background-color: #fff;
+  border: 2px solid #0000006e;
+  padding: 0;
+  margin: 0;
+  min-width: 150px;
+  z-index: 100;
+  text-align: center;
+}
+
+/* 하위 메뉴 항목 */
+.submenu li a {
+  display: block;
+  padding: 8px 15px;
+  color: #000;
+  text-decoration: none;
+  font-size: clamp(12px, 1vw, 16px);
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.submenu li a:hover {
+  color: #0f2679;
+  background-color: transparent;
+}
+
+/* 메인 메뉴 li 호버 시 하위 메뉴 보이기 */
+.main-menu li:hover > .submenu {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+  display: block;
+  transition: 0.3s ease;
+}
+
+/* 언어 선택 오른쪽 */
+.language {
+  position: relative;
+  font-size: clamp(12px, 1vw, 16px);
+}
+
+/* 드롭다운 */
+.lang-btn {
+  text-decoration: none;
+  color: #333;
+  cursor: pointer;
+  padding: clamp(3px, 0.5vw, 6px) clamp(6px, 1vw, 12px);
+  border-radius: 5px;
+}
+
+.dropdown {
+  display: none;
+  position: absolute;
+  right: 0;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  min-width: 120px;
+  z-index: 100;
+  padding: 5px 0;
+}
+
+.dropdown li {
+  list-style: none;
+}
+
+.dropdown li a {
+  display: block;
+  padding: 5px 15px;
+  text-decoration: none;
+  color: #333;
+}
+
+.dropdown li a:hover {
+  background-color: #eee;
+}
+
+.dropdown.show {
+  display: block;
+}
+
+/* main, footer 여백 */
+main, footer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+h1 {
+  padding: 20px;
+}
+
+footer {
+  background-color: #f0f0f0;
+  text-align: center;
+  padding: 20px 0;
+  font-size: 14px;
+  color: #333;
+  border-top: 1px solid #ccc;
+}
