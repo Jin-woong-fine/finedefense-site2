@@ -9,6 +9,7 @@ body {
   display: flex;
   justify-content: space-between; /* 좌: 로고, 우: 언어 */
   align-items: center;
+<<<<<<< HEAD
   width: 100%;                  /* 화면 전체 가로폭 */
   height: auto;                  /* 고정 높이 제거 */
   padding: clamp(0.5rem, 1.5vw, 1.5rem) 2vw; /* 상하좌우 유동적 패딩 */
@@ -27,10 +28,27 @@ body {
   align-items: center;
   gap: clamp(1rem, 3vw, 3rem);
 }
+=======
+  height: 60px;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 0 20px;
+  position: relative; /* 이미 있을 수도 있음 */
+  z-index: 10;        /* 배너보다 높게 */
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 50px; /* 로고와 메뉴 간격 */
+}
+
+>>>>>>> 72bf483a1966b171e7601f55af630d47ff359c33
 .header-right {
   flex: 0 0 auto;
 }
 
+<<<<<<< HEAD
 /* 로고 */
 .header-left .logo {
   width: clamp(120px, 12vw, 160px); /* 화면 비율에 따라 크기 조절 */
@@ -57,19 +75,50 @@ body {
   padding: 0;
   
  
+=======
+
+.header-left .logo {
+  width: 160px;       /* 필요에 맞게 조절 */
+  height: auto;       /* 비율 유지 */
+}
+
+.header-left .logo img {
+  height: auto;       /* 비율 유지 */
+  max-height: 60px;   /* 최대 높이 */
+  width: auto;        /* 가로 비율 유지 */
+}
+
+/* 메인 메뉴 */
+.main-menu {
+  position: absolute;
+  left: 52%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 100px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+>>>>>>> 72bf483a1966b171e7601f55af630d47ff359c33
   white-space: nowrap;
 }
 
 .main-menu li a {
   text-decoration: none;
+<<<<<<< HEAD
   color: #000;
   font-weight: 550;
   padding: clamp(4px, 0.5vw, 8px) clamp(8px, 1vw, 12px);
   font-size: clamp(14px, 1vw, 18px); /* 화면에 따라 글씨 크기 조정 */
+=======
+  color: #333;             /* 기본 검정 */
+  font-weight: 550;
+  padding: 8px 12px;
+>>>>>>> 72bf483a1966b171e7601f55af630d47ff359c33
   transition: color 0.3s ease;
 }
 
 .main-menu li a:hover {
+<<<<<<< HEAD
   color: #0f2679;
   background-color: transparent;
 }
@@ -88,11 +137,21 @@ body {
   width: 100%;
   height: 50px;        /* 하위 메뉴 높이 정도 */
   pointer-events: auto; /* 마우스 감지 가능 */
+=======
+  color: #0f2679;          /* hover 시 파란색 */
+  background-color: transparent; /* 배경 변화 제거 */
+}
+
+/* 메인 메뉴 li 기준으로 하위 메뉴 위치 */
+.main-menu li {
+  position: relative; /* 이거 없으면 화면 전체 기준으로 나옴 */
+>>>>>>> 72bf483a1966b171e7601f55af630d47ff359c33
 }
 
 
 /* 하위 메뉴 숨김 */
 .submenu {
+<<<<<<< HEAD
   list-style: none; /* 불릿 제거 */
   opacity: 0;
   visibility: hidden;
@@ -104,6 +163,19 @@ body {
   transform: translate(-50%, 10px);
   background-color: #fff;
   border: 2px solid #0000006e;
+=======
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px); /* 살짝 아래에서 시작 */
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  position: absolute;
+  top: 140%;
+  left: 50%;
+  transform: translate(-50%, 10px); /* X축 가운데 + Y축 딜레이 */
+  background-color: #fff;
+  border: 5px solid #eeeeee17;
+  list-style: none;
+>>>>>>> 72bf483a1966b171e7601f55af630d47ff359c33
   padding: 0;
   margin: 0;
   min-width: 150px;
@@ -111,6 +183,7 @@ body {
   text-align: center;
 }
 
+<<<<<<< HEAD
 /* 하위 메뉴 항목 */
 .submenu li a {
   display: block;
@@ -119,27 +192,56 @@ body {
   text-decoration: none;
   font-size: clamp(12px, 1vw, 16px);
   font-weight: 500;
+=======
+/* 하위 메뉴 항목 스타일 */
+.submenu li a {
+  display: block;
+  padding: 8px 15px;
+  color: #555;             /* 기본 진한 회색 */
+  text-decoration: none;
+  font-size: 13.5px;    /* 🔹 글씨 크기 조절 */
+  font-weight: 500;    /* 🔹 굵기 (400=보통, 600=Semi-Bold, 700=Bold) */
+>>>>>>> 72bf483a1966b171e7601f55af630d47ff359c33
   transition: color 0.3s ease;
 }
 
 .submenu li a:hover {
+<<<<<<< HEAD
   color: #0f2679;
   background-color: transparent;
+=======
+  color: #0f2679;             /* hover 시 흰색 */
+  background-color: transparent; /* 배경 변화 제거 */
+>>>>>>> 72bf483a1966b171e7601f55af630d47ff359c33
 }
 
 /* 메인 메뉴 li 호버 시 하위 메뉴 보이기 */
 .main-menu li:hover > .submenu {
   opacity: 1;
   visibility: visible;
+<<<<<<< HEAD
   transform: translate(-50%, 0);
+=======
+  transform: translate(-50%, 0); /* 원래 위치로 올라옴 */
+
+>>>>>>> 72bf483a1966b171e7601f55af630d47ff359c33
   display: block;
   transition: 0.3s ease;
 }
 
+<<<<<<< HEAD
 /* 언어 선택 오른쪽 */
 .language {
   position: relative;
   font-size: clamp(12px, 1vw, 16px);
+=======
+
+
+/* 언어 선택 오른쪽 */
+.language {
+  position: relative;
+  font-size: 14px;
+>>>>>>> 72bf483a1966b171e7601f55af630d47ff359c33
 }
 
 /* 드롭다운 */
@@ -147,7 +249,11 @@ body {
   text-decoration: none;
   color: #333;
   cursor: pointer;
+<<<<<<< HEAD
   padding: clamp(3px, 0.5vw, 6px) clamp(6px, 1vw, 12px);
+=======
+  padding: 5px 10px;
+>>>>>>> 72bf483a1966b171e7601f55af630d47ff359c33
   border-radius: 5px;
 }
 
@@ -182,13 +288,21 @@ body {
   display: block;
 }
 
+<<<<<<< HEAD
 /* main, footer 여백 */
+=======
+/* main, footer 여백은 여기서만 적용 */
+>>>>>>> 72bf483a1966b171e7601f55af630d47ff359c33
 main, footer {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 72bf483a1966b171e7601f55af630d47ff359c33
 h1 {
   padding: 20px;
 }
