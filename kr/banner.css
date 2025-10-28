@@ -35,16 +35,53 @@
   display: block;
 }
 
-/* 배너 텍스트 화면 비율에 맞게 조정 */
 .banner-text {
   position: absolute;
-  top: 10%;
-  left: 10%;
-  color: #fff;
-  /* background: rgba(0,0,0,0.5); */
-  padding: 0.5rem 1rem;
-  border-radius: 5px;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  
+  width: 80%;
+  max-width: 1400px;
+  min-width: 320px;
+  
+  color: #000000ee;
+  background: rgba(255, 255, 255, 0.514);
+  padding: 2rem;
+  border-radius: 8px;
   font-size: clamp(1rem, 2vw, 2rem);
+  font-weight: 800;
+  text-align: center;
+  white-space: normal;
+  word-break: keep-all;
+}
+
+/* ✅ 서브텍스트 — 동일한 폭과 정렬 유지 */
+.banner-subtext {
+  margin-top: 10px;
+  width: 100%; /* 부모 폭(=배너의 80%)에 맞춤 */
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: #000000ee;
+  opacity: 0.9;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.137);
+  text-align: center;
+  white-space: normal;
+  word-break: keep-all;
+}
+
+/* ✅ 모바일일 때 — 폭과 폰트 크기 자동 조정 */
+@media (max-width: 768px) {
+  .banner-text {
+    width: 90%;
+    padding: 1rem;
+    font-size: clamp(0.9rem, 3.5vw, 1.6rem);
+  }
+
+  .banner-subtext {
+    font-size: clamp(0.8rem, 3vw, 1.2rem);
+    line-height: 1.4;
+  }
 }
 
 /* 이전/다음 버튼 */
