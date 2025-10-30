@@ -365,7 +365,7 @@ h1 {
 
 .contact-cta {
   position: relative;
-  background: url("banner/contact_banner.jpg") center/cover no-repeat; /* 🔹 배경 이미지 경로 */
+  background: url("banner/contact_banner.png") center/cover no-repeat; /* 🔹 배경 이미지 경로 */
   color: #fff;
   text-align: center;
   padding: 120px 5%;
