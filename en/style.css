@@ -136,20 +136,111 @@ body {
   transition: 0.3s ease;
 }
 
-/* 언어 선택 오른쪽 */
-.language {
+
+
+
+
+
+
+/* 🌐 Fine Defense 스타일 언어 선택 */
+.language-dropdown {
   position: relative;
-  font-size: clamp(12px, 1vw, 16px);
 }
 
-/* 드롭다운 */
-.lang-btn {
+/* 토글 버튼 */
+.lang-toggle {
+  background: #ffffff;
+  border: 1px solid #d0d0d0;
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 0.95rem;
+  font-weight: 700; /* 🔹 글씨 굵게 */
+  color: #222;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.lang-toggle:hover {
+  background: #f2f4ff;
+  border-color: #0f2679;
+  color: #0f2679;
+  box-shadow: 0 2px 8px rgba(15,38,121,0.1);
+}
+
+/* divider 스타일 (|) */
+.lang-toggle .divider {
+  color: #aaa;
+  font-weight: 300;
+}
+
+/* 화살표 */
+.lang-toggle .arrow {
+  font-size: 0.8rem;
+  transition: transform 0.2s ease;
+  margin-left: 4px;
+}
+
+.language-dropdown.open .arrow {
+  transform: rotate(180deg);
+}
+
+/* 드롭다운 목록 */
+.lang-list {
+  display: none;
+  position: absolute;
+  top: 120%;
+  right: 0;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+  list-style: none;
+  margin: 0;
+  padding: 6px 0;
+  width: 90px;   /* 고정폭 */
+  min-width: unset; /* 최소폭 해제 */
+  z-index: 100;
+  animation: fadeIn 0.2s ease;
+}
+
+.language-dropdown.open .lang-list {
+  display: block;
+}
+
+/* 언어 항목 */
+.lang-list li a {
+  display: block;
+  text-align: center;  /* 🔹 글자 중앙 정렬 */
+  padding: 8px 0;      /* 🔹 좌우 여백 줄임 */
   text-decoration: none;
   color: #333;
-  cursor: pointer;
-  padding: clamp(3px, 0.5vw, 6px) clamp(6px, 1vw, 12px);
-  border-radius: 5px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: background 0.2s ease, color 0.2s ease;
 }
+
+.lang-list li a:hover {
+  background-color: #f2f4ff;
+  color: #0f2679;
+}
+
+/* 등장 애니메이션 */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-3px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
+
+
+
+
+
+
 
 .dropdown {
   display: none;

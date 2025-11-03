@@ -15,17 +15,19 @@
   <body>
     <header class="header-inner">
       <div class="header-left">
-        <a href="#"><img src="img/logo_transparent_finedefense.png" alt="로고" class="logo"></a>
+        <a href="/kr/index.html"><img src="/img/logo_transparent_finedefense.png" alt="Logo" class="logo"></a>
+
+
         <ul class="main-menu">
           <li>
             <a href="#">회사소개</a>
-              <ul class="submenu">
-                <li><a href="#">기업개요</a></li>
-                <li><a href="#">CEO인사말</a></li>
-                <li><a href="#">연혁</a></li>
-                <li><a href="#">기업이념 및 비전</a></li>
-                <li><a href="#">조직도</a></li>
-                <li><a href="#">찾아오시는길</a></li>
+            <ul class="submenu">
+              <li><a href="/kr/sub/company/overview.html">기업개요</a></li>
+              <li><a href="/kr/sub/company/ceo.html">CEO인사말</a></li>
+              <li><a href="/kr/sub/company/history.html">연혁</a></li>
+              <li><a href="/kr/sub/company/vision.html">기업이념 및 비전</a></li>
+              <li><a href="/kr/sub/company/organization.html">조직도</a></li>
+              <li><a href="/kr/sub/company/location.html">찾아오시는길</a></li>
             </ul>
           </li>
 
@@ -61,16 +63,25 @@
         </ul>
       </div>
 
+
+
+      <!-- 언어 선택 -->
       <div class="header-right">
-        <div class="language">
-          <a href="#" class="lang-btn">Language ▼</a>
-          <ul class="dropdown">
-            <li><a href="#" class="lang-item" data-lang="kor">Korean</a></li>
-            <li><a href="#" class="lang-item" data-lang="eng">English</a></li>
+        <div class="language-dropdown">
+          <button class="lang-toggle">KOR <span class="arrow">▼</span></button>
+          <ul class="lang-list">
+            <li><a href="#" data-lang="kor">KOR</a></li>
+            <li><a href="#" data-lang="eng">ENG</a></li>
           </ul>
         </div>
       </div>
-    </header>
+
+
+
+
+      
+    </header>  <!-- ✅ 여기 추가!! -->
+
 
     <div class="banner-slider">
       <div class="slides">
@@ -284,9 +295,12 @@
 
     </footer>
 
+    <script src="js/banner.js"></script>
+    <script src="js/language.js"></script>
+
+
+
   </body>
 
-<script src="js/banner.js"></script>
-<script src="js/language.js"></script>
 
 </html>
