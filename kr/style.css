@@ -136,20 +136,56 @@ body {
   transition: 0.3s ease;
 }
 
-/* 언어 선택 오른쪽 */
+
+
+
+
+
+
 .language {
   position: relative;
-  font-size: clamp(12px, 1vw, 16px);
 }
 
-/* 드롭다운 */
-.lang-btn {
-  text-decoration: none;
-  color: #333;
-  cursor: pointer;
-  padding: clamp(3px, 0.5vw, 6px) clamp(6px, 1vw, 12px);
-  border-radius: 5px;
+.language .dropdown {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 120%;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 8px;
+  min-width: 140px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  z-index: 50;
 }
+
+.language .dropdown li {
+  list-style: none;
+}
+
+.language .dropdown a {
+  display: block;
+  padding: 8px 14px;
+  color: #333;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.language .dropdown a:hover {
+  background: #f2f4ff;
+}
+
+.language.open .dropdown {
+  display: block;
+}
+
+
+
+
+
+
+
+
 
 .dropdown {
   display: none;
