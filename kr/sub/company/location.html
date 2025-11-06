@@ -1,69 +1,100 @@
 <!DOCTYPE html>
 <html lang="ko">
-  <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta name="description" content="화인디펜스 CEO 인사말">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>찾아오시는 길 | 화인디펜스</title>
 
-      <title>CEO 인사말 | 화인디펜스</title>
 
-      <!-- ✅ 경로는 ceo.html 기준으로 맞춤 -->
-      <link rel="stylesheet" href="/css/style.css">
-      <link rel="stylesheet" href="/css/features.css">
-      <link rel="stylesheet" href="/css/banner.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/features.css">
+    <link rel="stylesheet" href="/css/banner.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-      <style>
-        .ceo-section {
-          max-width: 1000px;
-          margin: 120px auto 80px;
-          padding: 60px 40px;
-          background: #fff;
-          border-radius: 12px;
-          box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-          line-height: 1.8;
-          color: #333;
-        }
+  <style>
+      body {
+        margin: 0;
+        font-family: "Noto Sans KR", sans-serif;
+        background: #ffffff;
+        color: #333;
+      }
 
-        .ceo-section h1 {
+      .page-header {
           text-align: center;
-          font-size: 2rem;
+          background: #ffffff;
+          padding: 100px 20px 60px;
+          border-bottom: 1px solid #e4e8f0;
+          margin-top: 50px;
+      }
+
+      .page-header h1 {
+          font-size: 2.4rem;
           color: #0f2679;
-          margin-bottom: 40px;
-        }
+          margin-bottom: 10px;
+      }
 
-        .ceo-message {
-          font-size: 1.3rem;
-          font-weight: 500;
-          margin-bottom: 40px;
-        }
-
-        .ceo-signature {
-          text-align: right;
-          font-weight: bold;
-          color: #222;
+      .page-header p {
           font-size: 1.4rem;
-        }
+          color: #666;
+          opacity: 0.8;
+          margin: 0;
+      }
 
-        body {
-          background-image: url("/img/finedefense_symbol.png"); /* 🔹 심볼 이미지 경로 */
-          background-repeat: no-repeat;
-          background-position: center 200px;  /* 🔹 세로 위치 조절 (예: 상단에서 200px 아래) */
-          background-size: 600px auto;        /* 🔹 크기 조절 */
-          opacity: 1;                         /* 🔹 body 자체는 투명도 조절 금지 */
-          background-attachment: scroll;
-        }
 
-        .ceo-section {
-          position: relative;
-          z-index: 1; /* 🔹 내용이 배경 위에 보이도록 */
-          background: rgba(255, 255, 255, 0.808); /* 🔹 내용은 살짝 반투명 흰색 배경 */
-          border-radius: 12px;
-        }
+    /* ===== 본문 ===== */
+    .location-section {
+      max-width: 1100px;
+      margin: 80px auto;
+      padding: 60px 40px;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
 
-      </style>
-  </head>
+    .location-section h2 {
+      font-size: 1.6rem;
+      color: #0f2679;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-  <body>
+    .location-section p {
+      font-size: 1rem;
+      color: #444;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .map-container {
+      width: 100%;
+      height: 400px;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 60px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    /* ===== 반응형 ===== */
+    @media (max-width: 768px) {
+      .location-section {
+        padding: 40px 20px;
+      }
+      .map-container {
+        height: 300px;
+      }
+    }
+  </style>
+</head>
+
+<body>
     <header class="header-inner">
       <div class="header-left">
         <!-- ✅ 경로 수정 -->
@@ -125,32 +156,44 @@
       </div>
     </header>
 
-    <section class="ceo-section">
-      <h1>CEO 인사말</h1>
 
-      <div class="ceo-message">
-        <p>안녕하십니까?<br>
-        (주)화인디펜스 홈페이지를 방문해주신 여러분께 진심으로 감사드립니다.</p>
-        <p>
-        ㈜화인디펜스 는 고객의 다양한 요구에 대응하여 소나시스템, 자기장시스템, 전기장시스템의
-        고정형, 이동형 해저케이블 및 해양 탐사 케이블을 용도별 최적의 엔지니어링으로
-        설계제조하는 강소 전문기업입니다.
-        </p>
-        <p>
-        해저환경에 적합한 핵심 설계기술과 재료기술, 양산제조기술 및 평가기술 등을 인정받아
-        수행한 국가 R&D 사업을 성공적으로 완료 수입제품을 국산화하여 군수시장에 진입하였고,
-        민수시장에서도 높은 품질과 고객만족으로 시장을 확대해 나가고 있습니다. 그동안
-        축적되고 검증된 기술로 고객 맞춤형 솔루션을 제공하는 동반성장을 추구하겠습니다.
-        </p>
-        <p>여러분의 지속적인 관심과 성원을 부탁드립니다.</p>
-        <p>감사합니다.</p>
-      </div>
 
-    <div class="ceo-signature">
-    (주)화인디펜스 직원 일동
+
+  <section class="page-header">
+    <h1>찾아오시는 길</h1>
+  </section>
+
+  <section class="location-section">
+    <h2><i class="fas fa-building"></i> 본사</h2>
+    <p>경기도 안양시 동안구 학의로 250, 902호 (관양동, 관양두산벤처다임)</p>
+    <div class="map-container">
+      <iframe 
+        src="https://www.google.com/maps?q=경기도%20안양시%20동안구%20학의로%20250&output=embed"
+        allowfullscreen=""
+        loading="lazy">
+      </iframe>
     </div>
 
-    </section>
+    <h2><i class="fas fa-industry"></i> 옥천 제1공장</h2>
+    <p>충청북도 옥천군 이원면 이원농공로 48</p>
+    <div class="map-container">
+      <iframe 
+        src="https://www.google.com/maps?q=충청북도%20옥천군%20이원면%20이원농공로%2048&output=embed"
+        allowfullscreen=""
+        loading="lazy">
+      </iframe>
+    </div>
+
+    <h2><i class="fas fa-industry"></i> 옥천 제2공장</h2>
+    <p>충청북도 옥천군 동이면 평산길 183</p>
+    <div class="map-container">
+      <iframe 
+        src="https://www.google.com/maps?q=충청북도%20옥천군%20동이면%20평산길%20183&output=embed"
+        allowfullscreen=""
+        loading="lazy">
+      </iframe>
+    </div>
+  </section>
 
     <footer>
       <div class="footer-container">
@@ -189,5 +232,5 @@
     <!-- ✅ js 경로 수정 -->
     <script src="/js/banner.js"></script>
     <script src="/js/language.js"></script>
-  </body>
+</body>
 </html>

@@ -7,10 +7,258 @@
 
       <title>FINE DEFENSE</title>
 
-      <link rel="stylesheet" href="style.css">
-      <link rel="stylesheet" href="features.css">
-      <link rel="stylesheet" href="banner.css">
+      <link rel="stylesheet" href="/css/style.css">
+      <link rel="stylesheet" href="/css/banner.css">
+      <link rel="stylesheet" href="/css/features.css">
+
+      <style>
+        .facilities {
+        padding: 80px 5%;
+        background: #f8f9fa; /* 밝은 회색 배경 */
+        text-align: center;
+      }
+
+      .facilities h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: #222;
+      }
+
+      .facilities p {
+        max-width: 1400px;
+        margin: 0 auto 40px;
+        font-size: 1.2rem;
+        font-weight: 500;
+        line-height: 1.6;
+        color: #555;
+      }
+
+      /* 카드 전체 레이아웃 */
+      .facility-grid {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;  /* ✅ 줄바뀌어도 항상 가운데 */
+        gap: 25px;
+      }
+
+      /* 카드 스타일 (콤팩트형) */
+      .facility-card {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        text-align: center;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        cursor: default;
+
+        width: 100%;
+        max-width: 300px;  /* 🔽 가로 줄임 */
+      }
+
+      /* 이미지 */
+      .facility-card img {
+        width: 100%;
+        height: 200px; /* 🔽 기존 180 → 150으로 세로 축소 */
+        object-fit: cover;
+        display: block;
+      }
+
+      /* 카드 제목 */
+      .facility-card h3 {
+        margin: 20px 0 20px; /* 🔽 위아래 여백 축소 */
+        font-size: 1.4rem;
+        color: #222;
+      }
+
+      /* 카드 설명 */
+      .facility-card p {
+        font-size: 1.2rem;  /* 🔽 조금 작게 */
+        color: #555;
+        padding: 0 15px 15px; /* 🔽 패딩 축소 */
+        line-height: 1.4;
+      }
+
+      /* hover 효과 */
+      .facility-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+      }
+
+
+
+
+
+      .news {
+        padding: 80px 5%;
+        background: #fff;
+        text-align: center;
+      }
+
+      .news h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #222;
+        margin-bottom: 1rem;
+      }
+
+      .news p {
+        max-width: 800px;
+        margin: 0 auto 60px;
+        font-size: 1.2rem;
+        font-weight: 500;
+        color: #555;
+        line-height: 1.6;
+      }
+
+      .news-grid {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 30px;
+      }
+
+      .news-card {
+        background: #f9f9f9;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        text-align: left;
+        width: 320px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .news-card img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+      }
+
+      .news-card h3 {
+        font-size: 1.2rem;
+        color: #222;
+        margin: 15px 20px 10px;
+      }
+
+      .news-card p {
+        font-size: 1.00rem;
+        color: #555;
+        margin: 0 20px 15px;
+        line-height: 1.5;
+      }
+
+      .news-card .date {
+        display: block;
+        font-size: 1.00rem;
+        color: #888;
+        margin: 0 20px 20px;
+      }
+
+      .news-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      }
+
+      .news-more {
+        display: inline-block;
+        margin-top: 40px;
+        font-size: 1.4rem;
+        text-decoration: none;
+        color: #0f2679;
+        font-weight: 600;
+        transition: color 0.3s ease;
+      }
+
+      .news-more:hover {
+        color: #001a66;
+      }
+
+      /* 반응형 */
+      @media (max-width: 768px) {
+        .news-card {
+          width: 90%;
+        }
+      }
+
+      .contact-cta {
+        position: relative;
+        background: url("../img/banners/contact_banner2.png") center/cover no-repeat; /* 🔹 배경 이미지 경로 */
+        color: #fff;
+        text-align: center;
+        padding: 120px 5%;
+        overflow: hidden;
+      }
+
+      /* 반투명 오버레이 */
+      .contact-cta::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 20, 50, 0.55); /* 🔹 어두운 반투명 오버레이 */
+        z-index: 0;
+      }
+
+      .contact-inner {
+        position: relative;
+        z-index: 1;
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      .contact-cta h2 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+      }
+
+      .contact-cta p {
+        font-size: 1.1rem;
+        font-weight: 500;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+        opacity: 0.95;
+      }
+
+      .contact-btn {
+        display: inline-block;
+        background: #ffffffcc; /* 🔹 살짝 투명한 흰색 버튼 */
+        font-size: 1.2rem;        
+        font-weight: 500;
+        color: #0f2679;
+        text-decoration: none;
+        padding: 14px 28px;
+        border-radius: 6px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+
+      .contact-btn:hover {
+        background: #fff;
+        color: #001a66;
+        box-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
+      }
+
+      /* 반응형 */
+      @media (max-width: 768px) {
+        .contact-cta {
+          padding: 80px 5%;
+          background-position: center;
+        }
+        .contact-cta h2 {
+          font-size: 1.6rem;
+        }
+        .contact-cta p {
+          font-size: 1rem;
+        }
+      }
+
+      </style>
   </head>
+
+
+
 
   <body>
     <header class="header-inner">
@@ -85,7 +333,7 @@
       <div class="slides">
 
         <div class="slide">
-          <img src="banner/banner_warship3.jpg" alt="배너 1">
+          <img src="../img/banners/banner_warship4.jpg" alt="배너 1">
           <div class="banner-text">
             Complete Sonar Cable Assembly Solutions for Naval Defense
             <div class="banner-subtext">
@@ -95,7 +343,7 @@
         </div>
 
         <div class="slide">
-          <img src="banner/banner_submarine3.jpg" alt="배너 2">
+          <img src="/img/banners/banner_submarine4.jpg" alt="배너 2">
           <div class="banner-text">
             High-Pressure Submarine Sonar Assemblies – Designed to Endure the Depths
             <div class="banner-subtext">
@@ -105,7 +353,7 @@
         </div>
 
         <div class="slide">
-          <img src="banner/banner_manufacturing3.jpg" alt="배너 3">
+          <img src="/img/banners/banner_manufacturing4.jpg" alt="배너 3">
           <div class="banner-text">engineering Strength Beneath the Surface
             <div class="banner-subtext">
               Refined armoring technology ensures strength and reliability in every underwater cable we manufacture.
@@ -114,7 +362,7 @@
         </div>
 
         <div class="slide">
-          <img src="banner/banner_waterpressuretester2.jpg" alt="배너 4">
+          <img src="/img/banners/banner_waterpressuretester4.jpg" alt="배너 4">
           <div class="banner-text">Testing the Depths of Reliability
             <div class="banner-subtext">
               Equipped with 60-bar hydrostatic chambers, we ensure every underwater cable performs flawlessly under ocean pressure.
@@ -142,13 +390,13 @@
         Our integrated production system ensures reliability, performance, and innovation across every product line.
       </p>
       <div class="features">
-        <div class="feature-card" style="background-image: url('icons/underwater-cable.png');">
+        <div class="feature-card" style="background-image: url('/img/card_businessareas/underwater-cable2.jpg');">
           <h3>Underwater Cable</h3>
         </div>
-        <div class="feature-card" style="background-image: url('icons/ai_termination.png');">
+        <div class="feature-card" style="background-image: url('/img/card_businessareas/ai_termination2.jpg');">
           <h3>Connector&Termination</h3>
         </div>
-        <div class="feature-card" style="background-image: url('icons/custom_cable.png');">
+        <div class="feature-card" style="background-image: url('/img/card_businessareas/custom_cable2.jpg');">
           <h3>Customized Cable</h3>
         </div>
       </div>
@@ -166,37 +414,37 @@
 
         <!-- 1. 연선기 -->
         <div class="facility-card">
-          <img src="img/facility_stranding.jpg" alt="Stranding Machine">
+          <img src="/img/card_manufature&test/card_stranding4.jpg" alt="Stranding Machine">
           <h3>Stranding Machine</h3>
-          <p>Core wire stranding system ensuring uniform tension and precision alignment for multi-conductor subsea cables.</p>
+          <p>Core wire stranding system ensuring uniform tension and precision alignment for multi-conductor underwater cables.</p>
         </div>
 
         <!-- 2. 강선 외장기 -->
         <div class="facility-card">
-          <img src="img/facility_armoring.jpg" alt="Steel Wire Armoring Line">
+          <img src="/img/card_manufature&test/card_armoringline4.jpg" alt="Steel Wire Armoring Line">
           <h3>Steel Wire Armoring Line</h3>
           <p>Reinforcing cable structure with precision steel wire armoring for superior mechanical strength and durability.</p>
         </div>
 
         <!-- 3. 압출기 -->
         <div class="facility-card">
-          <img src="img/facility_extrusion.jpg" alt="Extrusion Line">
+          <img src="/img/card_manufature&test/card_extrusion4.jpg" alt="Extrusion Line">
           <h3>Extrusion Line</h3>
           <p>Advanced extrusion equipment for consistent insulation and sheathing across all cable types.</p>
         </div>
 
         <!-- 4. 기계·환경시험설비 -->
         <div class="facility-card">
-          <img src="img/facility_mechanical.jpg" alt="Mechanical & Environmental Test Facility">
+          <img src="/img/card_manufature&test/card_mechanicaltest4.jpg" alt="Mechanical & Environmental Test Facility">
           <h3>Mechanical & Environmental Test Facility</h3>
-          <p>Integrated systems for hydrostatic, tensile, bending, vibration, and temperature testing to ensure reliability under real-world conditions.</p>
+          <p>Integrated systems for hydrostatic, tensile, bending, and temperature testing to ensure reliability under real-world conditions.</p>
         </div>
 
         <!-- 5. 전기·광학 시험장비 -->
         <div class="facility-card">
-          <img src="img/facility_electrical.jpg" alt="Electrical & Optical Test Equipment">
+          <img src="/img/card_manufature&test/card_electricaltest4.jpg" alt="Electrical & Optical Test Equipment">
           <h3>Electrical & Optical Test Equipment</h3>
-          <p>Portable instruments for continuity, insulation resistance, and optical loss verification in subsea cable systems.</p>
+          <p>Instruments for continuity, insulation resistance, communication, and optical loss verification in underwater cable systems.</p>
         </div>
 
       </div>
@@ -259,7 +507,7 @@
         <div class="footer-left">
           <div class="footer-links">
             <a href="#">About Us</a>
-            <a href="privacy.html">Privacy Policy</a>
+            <a href="/en/sub/privacy/privacy.html">Privacy Policy</a>
             <a href="#">Contact</a>
             <a href="#">Download Center</a>
           </div>
@@ -291,8 +539,8 @@
 
 
 
-    <script src="js/banner.js"></script>
-    <script src="js/language.js"></script>
+    <script src="../js/banner.js"></script>
+    <script src="../js/language.js"></script>
 
 
 
