@@ -1,5 +1,5 @@
 .business-area {
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 80px auto;
   padding: 0 20px;
   text-align: center;
@@ -8,7 +8,7 @@
 .business-area h2 {
   font-size: 2.0rem;
   font-weight: 700;
-  color: #000000; /* 좀 더 깊은 블루 */
+  color: #000000;
   margin-bottom: 20px;
 }
 
@@ -29,7 +29,8 @@
 
 .feature-card {
   position: relative;
-  height: 320px;
+  width: 300px;
+  height: 300px;
   border-radius: 14px;
   background-size: cover;
   background-position: center;

@@ -67,13 +67,13 @@
       /* 카드 제목 */
       .facility-card h3 {
         margin: 20px 0 20px; /* 🔽 위아래 여백 축소 */
-        font-size: 1.4rem;
+        font-size: 1.3rem;
         color: #222;
       }
 
       /* 카드 설명 */
       .facility-card p {
-        font-size: 1.2rem;  /* 🔽 조금 작게 */
+        font-size: 1.0rem;  /* 🔽 조금 작게 */
         color: #555;
         padding: 0 15px 15px; /* 🔽 패딩 축소 */
         line-height: 1.4;
@@ -254,7 +254,6 @@
         }
       }
 
-
       </style>
 
   </head>
@@ -263,76 +262,7 @@
 
 
   <body>
-    <header class="header-inner">
-      <div class="header-left">
-        <a href="/kr/index.html"><img src="/img/logo_transparent_finedefense.png" alt="Logo" class="logo"></a>
-
-
-        <ul class="main-menu">
-          <li>
-            <a href="#">회사소개</a>
-            <ul class="submenu">
-              <li><a href="/kr/sub/company/overview.html">기업개요</a></li>
-              <li><a href="/kr/sub/company/ceo.html">CEO인사말</a></li>
-              <li><a href="/kr/sub/company/history.html">연혁</a></li>
-              <li><a href="/kr/sub/company/vision.html">기업이념 및 비전</a></li>
-              <li><a href="/kr/sub/company/organization.html">조직도</a></li>
-              <li><a href="/kr/sub/company/location.html">찾아오시는길</a></li>
-            </ul>
-          </li>
-
-          <li>
-            <a href="#">제품소개</a>
-              <ul class="submenu">
-              <li><a href="#">수중이동형케이블</a></li>
-              <li><a href="#">수중고정형케이블</a></li>
-              <li><a href="#">수중커넥터</a></li>
-              <li><a href="#">EPD케이블</a></li>
-              <li><a href="#">커스텀케이블</a></li>
-            </ul>
-          </li>
-
-          <li>
-            <a href="#">홍보센터</a>
-              <ul class="submenu">
-                <li><a href="#">뉴스룸</a></li>
-                <li><a href="#">갤러리</a></li>
-                <li><a href="#">홍보영상</a></li>
-                <li><a href="#">인증</a></li>
-                <li><a href="#">카탈로그</a></li>
-              </ul>
-          </li>
-
-          <li>
-            <a href="#">고객지원</a>
-              <ul class="submenu">
-                <li><a href="#">1:1 문의</a></li>
-                <li><a href="#">다운로드 센터</a></li>
-              </ul>
-          </li>
-
-        </ul>
-      </div>
-
-
-
-      <!-- 언어 선택 -->
-      <div class="header-right">
-        <div class="language-dropdown">
-          <button class="lang-toggle">KOR <span class="arrow">▼</span></button>
-          <ul class="lang-list">
-            <li><a href="#" data-lang="kor">KOR</a></li>
-            <li><a href="#" data-lang="eng">ENG</a></li>
-          </ul>
-        </div>
-      </div>
-
-
-
-
-      
-    </header>  <!-- ✅ 여기 추가!! -->
-
+    <div id="header"></div>
 
     <div class="banner-slider">
       <div class="slides">
@@ -391,19 +321,27 @@
       <h2>사업 영역</h2>
       <p>
         화인디펜스는 수중 통신 및 전력 전송 분야에서 설계, 제작, 시험평가에 이르는 전 공정 통합 솔루션을 제공합니다.
-        통합 생산 체계를 기반으로 모든 제품의 신뢰성과 성능, 혁신을 보장합니다.
+        <br>통합 생산 체계를 기반으로 모든 제품의 신뢰성과 성능, 혁신을 보장합니다.
       </p>
+
       <div class="features">
-        <div class="feature-card" style="background-image: url('/img/card_businessareas/underwater-cable2.jpg');">
+        <a href="/kr/sub/product/towed-cable.html" class="feature-card" 
+          style="background-image: url('/img/card_businessareas/underwater-cable2.jpg');">
           <h3>수중케이블</h3>
-        </div>
-        <div class="feature-card" style="background-image: url('/img/card_businessareas/ai_termination2.jpg');">
+        </a>
+
+        <a href="/kr/sub/product/underwater-connector.html" class="feature-card" 
+          style="background-image: url('/img/card_businessareas/ai_termination2.jpg');">
           <h3>수중커넥터&터미네이션</h3>
-        </div>
-        <div class="feature-card" style="background-image: url('/img/card_businessareas/custom_cable2.jpg');">
+        </a>
+
+        <a href="/kr/sub/product/custom-cable.html" class="feature-card" 
+          style="background-image: url('/img/card_businessareas/custom_cable2.jpg');">
           <h3>케이블 커스터마이징</h3>
-        </div>
+        </a>
       </div>
+
+
     </section>
 
     <section class="facilities">
@@ -499,56 +437,36 @@
     </section>
 
 
+    <div id="footer"></div>
 
 
 
+    <script>
+      // ✅ header 불러오기
+      fetch("/kr/components/header.html")
+        .then(res => res.text())
+        .then(data => {
+          document.getElementById("header").innerHTML = data;
 
+          // ✅ header가 DOM에 완전히 반영된 후 language.js 로드
+          setTimeout(() => {
+            const langScript = document.createElement("script");
+            langScript.src = "/js/language.js";
+            document.body.appendChild(langScript);
+          }, 300);
+        })
+        .catch(err => console.error("❌ header load error:", err));
 
+      // ✅ footer 불러오기
+      fetch("/kr/components/footer.html")
+        .then(res => res.text())
+        .then(data => {
+          document.getElementById("footer").innerHTML = data;
+        })
+        .catch(err => console.error("❌ footer load error:", err));
+    </script>
 
-    <footer>
-        <div class="footer-container">
-          <!-- 왼쪽: 로고 + 회사소개 -->
-          <div class="footer-left">
-            <div class="footer-links">
-              <a href="#">회사소개</a>
-              <a href="/kr/sub/privacy/privacy.html">개인정보취급방침</a>
-              <a href="#">1:1 문의</a>
-              <a href="#">다운로드 센터</a>
-            </div>
-          </div>
-
-          <!-- 가운데: 회사정보 -->
-          <div class="footer-info">
-            <p><strong>주식회사 화인디펜스 (FINE DEFENSE INC.)</strong></p>
-            <p class="spacer"></p> <!-- 여기에 클래스 지정 -->
-            <p>주소: 경기도 안양시 동안구 학의로 250, 902호 (관양동, 관양두산벤처다임)</p>
-            <p>전화: 031-8068-6103 | 팩스: 070-4325-6116</p>
-            <p>대표메일: finedefense@finedefense.co.kr</p>
-            <p>옥천1공장: 충청북도 옥천군 이원면 이원농공로 48</p>
-            <p>옥천2공장: 충청북도 옥천군 동이면 평산길 183</p>
-          </div>
-
-          <!-- 오른쪽: 패밀리사이트 -->
-          <div class="footer-right">
-            <p class="family-title">FAMILY COMPANY ▼</p>
-            <ul class="family-links">
-              <li><a href="#">화인</a></li>
-              <li><a href="#">우방전선</a></li>
-            </ul>
-          </div>
-
-          <div class="footer-copy">
-            &copy; 2025 FINE DEFENSE INC. All Rights Reserved.
-          </div>
-        </div>
-
-    </footer>
-
-    <script src="../js/banner.js"></script>
-    <script src="../js/language.js"></script>
-
-
-
+    <script src="/js/banner.js"></script>
   </body>
 
 

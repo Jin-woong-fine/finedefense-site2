@@ -1,63 +1,57 @@
 // ------------------------------------------
-// 🌐 NAVER-style Language Dropdown Switch
+// 🌐 Fine Defense Language Dropdown Switch
 // ------------------------------------------
 
-const langDropdown = document.querySelector('.language-dropdown');
-const langToggle = document.querySelector('.lang-toggle');
-const langLinks = document.querySelectorAll('.lang-list a');
+function initLanguageDropdown() {
+  const dropdown = document.querySelector('.language-dropdown');
+  const toggle = document.querySelector('.lang-toggle');
+  const links = document.querySelectorAll('.lang-list a');
 
-// ▼ 열기 / 닫기
-if (langToggle) {
-  langToggle.addEventListener('click', (e) => {
+  if (!dropdown || !toggle || links.length === 0) return false;
+
+  // 🔹 토글 클릭 시 열기/닫기
+  toggle.addEventListener('click', (e) => {
     e.preventDefault();
-    langDropdown.classList.toggle('open');
+    e.stopPropagation();
+    dropdown.classList.toggle('open');
   });
+
+  // 🔹 외부 클릭 시 닫기
+  document.addEventListener('click', (e) => {
+    if (!dropdown.contains(e.target)) dropdown.classList.remove('open');
+  });
+
+  // 🔹 언어 전환 처리
+  links.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const lang = link.dataset.lang;
+      changeLanguage(lang);
+    });
+  });
+
+  console.log("✅ Language dropdown initialized");
+  return true;
 }
 
-// ▼ 외부 클릭 시 닫기
-document.addEventListener('click', (e) => {
-  if (!langDropdown.contains(e.target)) {
-    langDropdown.classList.remove('open');
-  }
-});
-
-// ▼ 언어 전환
-langLinks.forEach(link => {
-  link.addEventListener('click', (e) => {
-    e.preventDefault();
-    const targetLang = link.dataset.lang;
-    changeLanguage(targetLang);
-  });
-});
+// ✅ fetch된 header 로드 후 반복 확인
+const langInitTimer = setInterval(() => {
+  if (initLanguageDropdown()) clearInterval(langInitTimer);
+}, 200);
 
 function changeLanguage(lang) {
   const path = window.location.pathname;
-  let file = path.substring(path.lastIndexOf('/') + 1);
-  if (file === '' || file === '/') file = 'index.html';
+  const segments = path.split("/");
 
-  const parts = path.split('/');
-  parts.pop(); // 파일명 제거
-  parts.pop(); // 언어 폴더 제거
-  const base = parts.join('/') || '/';
-
-  let newUrl = '';
-  if (lang === 'kor') {
-    newUrl = `${base}/kr/${file}`;
+  // kr/en 폴더 교체 로직
+  if (segments.includes("kr")) {
+    segments[segments.indexOf("kr")] = lang;
+  } else if (segments.includes("en")) {
+    segments[segments.indexOf("en")] = lang;
   } else {
-    newUrl = `${base}/en/${file}`;
+    segments.splice(1, 0, lang);
   }
 
-  newUrl = newUrl.replace(/\/+/g, '/');
+  const newUrl = segments.join("/");
   window.location.href = newUrl;
 }
-
-
-document.querySelectorAll('.lang-list a').forEach(langLink => {
-  langLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    const lang = langLink.dataset.lang;
-
-    if (lang === 'kor') window.location.href = '/kr/index.html';
-    if (lang === 'eng') window.location.href = '/en/index.html';
-  });
-});
