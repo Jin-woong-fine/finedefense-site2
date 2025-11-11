@@ -37,13 +37,23 @@ function showSideTabs(tabList, target) {
       } else if (current.includes("/support/") && href.includes("/support/")) {
         a.classList.add("active");
       }
-    } else {
-      // ✅ 하위탭 강조 (현재 경로가 href와 완전히 일치하면 active)
-      const absHref = new URL(href, location.origin).pathname.toLowerCase();
-      if (current === absHref) {
-        a.classList.add("active");
+      } else {
+        const absHref = new URL(href, location.origin).pathname.toLowerCase();
+
+        // ✅ 조건 1: URL 완전 일치 → 기존 active
+        if (current === absHref) {
+          a.classList.add("active");
+        }
+
+        // ✅ 조건 2: post_ 상세글일 때 → 뉴스룸 링크 active
+        else if (
+          current.includes("/pr/newsroom/") &&
+          current.includes("post_") &&
+          href.includes("/pr/newsroom/newsroom.html")
+        ) {
+          a.classList.add("active");
+        }
       }
-    }
   });
 
   // 위치 계산
