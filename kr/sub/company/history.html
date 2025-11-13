@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="화인디펜스 연혁" />
+    <title>연혁 | 화인디펜스</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+      <link rel="stylesheet" href="/css/style.css">
+      <link rel="stylesheet" href="/css/sub-banner.css">
+      <link rel="stylesheet" href="../../nav/company-nav.css">
+
+    <style>
+      .history-section {
+        max-width: 1000px;
+        margin: 20px auto;
+        padding: 20px 40px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      }
+
+      .history-section h1 {
+        text-align: center;
+        font-size: 2.2rem;
+        color: #0f2679;
+        margin-bottom: 60px;
+      }
+
+      /* ✅ 전체 타임라인 레이아웃 */
+      .timeline {
+        display: flex;
+        flex-direction: column;
+        gap: 60px; /* 🔹 구간 간격 */
+        position: relative;
+      }
+
+      /* ✅ 연도 구간 블록 */
+      .year-group {
+        display: flex;
+        align-items: flex-start;
+        gap: 40px;
+        position: relative;
+      }
+
+      .group-year {
+        flex: 0 0 160px;
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: #0f2679;
+        text-align: right;
+        padding-top: 8px;
+        border-right: 3px solid #d0d8ff; /* 🔹 왼쪽 세로선 */
+        padding-right: 20px;
+      }
+
+      /* ✅ 오른쪽 세부 항목 */
+      .group-events {
+        flex: 1;
+        position: relative;
+        padding-left: 20px; /* ← 선 대신 약간의 여백만 */
+      }
+
+      .group-events::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 8px;
+        bottom: 8px;
+        width: 2px;
+        background: #e0e5ff; /* 🔹 연한 블루 라인 */
+      }
+
+      .timeline-item {
+        position: relative;
+        padding-bottom: 25px;
+        margin-bottom: 25px;
+        border-bottom: 1px solid #f0f2fa; /* ✅ 항목 간 구분선 */
+      }
+
+      .timeline-item:last-child {
+        border-bottom: none; /* 마지막 항목은 선 제거 */
+      }
+
+      .timeline-item .year {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #0f2679;
+        margin-bottom: 8px;
+      }
+
+      .events p {
+        margin: 5px 0;
+        font-size: 1.0rem;
+        font-weight: 500;
+        color: #333;
+        line-height: 1.6;
+        padding-left: 16px;
+        position: relative;
+      }
+
+      .events p::before {
+        content: "•";
+        position: absolute;
+        left: 0;
+        color: #0f2679;
+        font-weight: 900;
+      }
+
+
+
+      @media (max-width: 768px) {
+        .year-group {
+          flex-direction: column;
+        }
+        .group-year {
+          text-align: left;
+          border-right: none;
+          border-left: 3px solid #d0d8ff;
+          padding-left: 15px;
+          margin-bottom: 20px;
+        }
+        .group-events {
+          padding-left: 20px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- ✅ 1. 헤더 (공통) -->
+    <div id="header"></div>
+
+    <!-- ✅ 2. 섹션 전용 배너 -->
+    <section class="sub-banner">
+      <img src="/img/sub-banners/occheon-plant2-3.jpg" alt="회사소개 배너">
+      <div class="banner-text">
+        <h1>회사소개</h1>
+        <p>화인디펜스는 기술로 해양을 연결합니다.</p>
+      </div>
+    </section>
+
+    <!-- breadcrumb -->
+    <div class="breadcrumb">
+      <a href="/">홈</a> &gt;
+      <span class="crumb crumb-level1">회사소개</span> &gt;
+      <span class="crumb crumb-level2">연혁</span>
+
+      <!-- ✅ 이 위치로 옮기기 -->
+      <div id="side-tabs" class="side-tabs hidden"></div>
+    </div>
+
+    <section class="history-section">
+    <h1>연혁</h1>
+
+    <div class="timeline">
+
+        <div class="year-group">
+          <div class="group-year">
+            2023 ~ 2020
+                <div class="year-icon">
+                  <i class="fas fa-chart-line"></i> <!-- 성장 아이콘 -->
+                </div>
+          </div>
+
+          <div class="group-events">
+
+            <div class="timeline-item">
+            <div class="year">2023</div>
+            <div class="events">
+                <p>㈜한화에어로스페이스 : KDX-3 Batch-2 / 2번함, 3번함 수주</p>
+                <p>해군군수사 : KDX 소나돔 윈도우 및 수중 케이블 조립체 정비사업 수주 (2척)</p>
+                <p>산업통상자원부 NEP (New Excellent Product) 신제품 인증 : 수중 이동형 예인 중 ∙경량 케이블</p>
+                <p>"주식회사 화인디펜스"로 사명 변경</p>
+            </div>
+            </div>
+
+            <div class="timeline-item">
+
+            <div class="year">2022</div>
+            <div class="events">
+                <p>KSQ/ISO 9001 : 2015 인증획득 (QA INTERNATIONAL/UKAS)</p>
+                <p>해군군수사 : KDX 소나돔 윈도우 및 수중 케이블 조립체 정비사업 수행 (1척)</p>
+                <p>국무총리상 수상 : 2022년 과학·정보통신의 날</p>
+                <p>터키 ASELSAN 수중 이동형 예인케이블 (FOTC, FOCC) 수출</p>
+            </div>
+            </div>
+
+            <div class="timeline-item">
+
+            <div class="year">2021</div>
+            <div class="events">
+                <p>LIG Nex1 국방과학연구소(ADD), KDDX 통합 소나 체계용 케이블 조립체 개발 수주</p>
+                <p>해군군수사령부 엄브리칼 케이블 조립체 부품 개발 협약
+                  <br>→ 장비명 : 유도탄 함상 발사장비, 시스패로우</p>
+                <p>국방기술진흥연구소 무기체계 부품 국산화 개발지원 사업 협약
+                  <br>→ 과제명 : KSS-II 잠수함용 선체부착배열소나 케이블 배선장치 (금액 25억, 3년)
+                  <br>→ 과제명 : 잠수함용 수중 이동형 예인케이블 조립체 3종 (금액 76억, 3년)
+                </p>
+            </div>
+            </div>
+
+            <div class="timeline-item">
+
+            <div class="year">2020</div>
+            <div class="events">
+                <p>기품원 무기체계 개조개발 지원사업 선정 (금액 34억, 3년)
+                  <br>→ 과제명 : 터키향 수중이동형 예인케이블 및 잠수함 수중케이블 개발</p>
+                <p>국방부장관 표창 : 우수방산업체</p>
+                <p>KIOST(한국해양과학기술원) : 음원압력보상 시스템 예인 케이블 납품</p>
+            </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="year-group">
+          <div class="group-year">
+            2010 ~ 2019
+                <div class="year-icon">
+                  <i class="fas fa-seedling"></i> <!-- 성장 아이콘 -->
+                </div>
+          </div>
+
+          <div class="group-events">
+
+              <div class="timeline-item">
+              <div class="year">2019</div>
+              <div class="events">
+                  <p>미국 NORTHROP GRUMMAN과 차기 소해함 무인수상정(USV) AQS-24 와 NDA(Non-Disclosure Agreement) 체결</p>
+                  <p>NICE 평가정보 2019년 기술평가 우수기업 인증</p>
+                  <p>화인 Group 편입</p>
+              </div>
+              </div>
+
+              <div class="timeline-item">
+              <div class="year">2018</div>
+              <div class="events">
+                  <p>해양수산부 NET(New Excellent Technology) 신기술 인정 획득
+                    <br>→ 기술명 : 수중 이동형 예인 케이블 제작 기술</p>
+                  <p>터키 ASELSAN와 NDA(Non-Disclosure Agreement) 체결</p>
+                  <p>터키 AOSAN과 Agent Agreement 체결</p>
+              </div>
+              </div>
+
+
+              <div class="timeline-item">
+              <div class="year">2017</div>
+              <div class="events">
+                  <p>[주]한화 광개토-Ⅲ B-Ⅱ(KDX-3, Batch-2) 통합 소나 체계용 케이블 조립체 수주 27억원</p>
+                  <p>수중 중량 예인케이블 제조방법에 대한 특허 획득 (등록번호 : 10-1736878호)</p>
+                  <p>해저복합케이블1 특허 획득 (등록번호 : 10-1768004호)</p>
+                  <p>해저복합케이블2 특허 획득 (등록번호 : 10-1772559호)</p>
+              </div>
+              </div>
+
+
+
+              <div class="timeline-item">
+              <div class="year">2016</div>
+              <div class="events">
+                  <p>Buoy형 Project 개발 수주[4.8억원]
+                    <br>→ 센서용, 신호전송용 케이블[Back Bone Cable] 조립체 및 Fairing 개발 완료 후 초도 납품</p>
+                  <p>국방기술품질원[DTaQ]의 핵심부품 국산화 개발 지원사업 주관기업 선정 [48억원/3년]
+                    <br>→ “예인 음탐기용 광통신 방식 중·경량 케이블 조립체”</p>
+              </div>
+              </div>
+
+
+              <div class="timeline-item">
+              <div class="year">2015</div>
+              <div class="events">
+                  <p>수중 예인케이블용 2,000PSI 케이블 접속 터미네이션 개발</p>
+                  <p>수중 예인케이블 양산용 제조설비 및 환경시험 장비 구축
+                      <br>→ 케이블 코어부 수밀을 위한 이액형 토출 시스템 장비 구축
+                      <br>→ 고장력 외장 충진을 위한 RAM Cart Assembly Kit 장비 구축
+                      <br>→ 고장력 외장 Preforming Cart Assembly M/C 장비 구축
+                      <br>→ 2,000PSI 내수압 측정 장비 구축</p>
+              </div>
+              </div>
+
+              <div class="timeline-item">
+              <div class="year">2014</div>
+              <div class="events">
+                  <p>	국방과학연구소[ADD],민군 겸용기술 개발 과제 사업[45억원/3년]획득
+                      <br>→ 과제명 : “수중 이동형 예인 케이블 개발”
+                      <br>→ 2014.06~2017.06 개발 완료</p>
+
+              </div>
+              </div>
+
+              <div class="timeline-item">
+              <div class="year">2013</div>
+              <div class="events">
+                  <p>	우방전선㈜ (충북 옥천 소재) 자회사 편입</p>
+                  <p>	울릉도 독도 프로젝트 : KIOST/한화 와 다목적 해양 감시시스템 사업 참여
+                      <br>[다목적 해저 광·전 복합 케이블 및 수중 센서케이블 개발]</p>
+              </div>
+              </div>
+
+              <div class="timeline-item">
+              <div class="year">2012</div>
+              <div class="events">
+                  <p>	Venture 기업인증, INNO BIZ인증, 부설연구소 설립인가</p>
+              </div>
+              </div>
+
+              <div class="timeline-item">
+              <div class="year">2010</div>
+              <div class="events">
+                  <p>고정형 양산 설비 구축 / 해저 케이블 양산 기술 개발 완료[Copper Tubing 기술 완성]</p>
+                  <p>UzErae Cable Automotive Wire Plant 수출 및 제조기술 지원</p>
+              </div>
+              </div>
+
+          </div>
+        </div>
+
+
+        <div class="year-group">
+          <div class="group-year">
+            2005 ~ 2009<br>
+            <i class="fas fa-building"></i>
+          </div>
+
+          <div class="group-events">
+
+            <!-- 🔹 2009~2006 구간 -->
+            <div class="timeline-item">
+              <div class="year">2009 ~ 2006</div>
+              <div class="events">
+                <p>㈜한화와 ADD주관 NAIMS[Naval Acoustic Information Management System] 프로젝트 개발 완료</p>
+                <p>기상청 주관 울릉도 프로젝트 참여 — 지진, 해일 감시시스템용 해저 광·전 복합 케이블 개발 완료</p>
+                <p>우즈베키스탄 Navoiy시 Uz Erae Cable Automotive Wire Plant 제조기술 수출 (600만$)</p>
+              </div>
+            </div>
+
+            <!-- 🔹 2005 -->
+            <div class="timeline-item">
+              <div class="year">2005</div>
+              <div class="events">
+                <p>주식회사 킴스유비큐 설립</p>
+                <p>음향 정보 관리 체계[NAIMS : Naval Acoustic Information Management System] 프로젝트 수행 —  
+                  대잠 작전에 필수적인 음향 정보를 체계적으로 지원 및 관리하기 위한 시스템</p>
+                <p>수중 음향 정보[Acoustic Intelligence] 및 수중 음향 감시 체계 개발 —  
+                  해저·해중 고정형 및 이동형 탐지기를 통한 수중 음향 정보 획득</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+
+
+
+    </div>
+    </section>
+
+    <div id="footer"></div>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // ✅ header 불러오기
+      fetch("../../components/header.html")
+        .then(res => res.text())
+        .then(html => {
+          document.getElementById("header").innerHTML = html;
+
+          // ✅ header 삽입 후 language.js 재로드 (언어 버튼 클릭 정상 작동)
+          const langScript = document.createElement("script");
+          langScript.src = "/js/language.js";
+          document.body.appendChild(langScript);
+        });
+
+      // ✅ company-nav 불러오기
+      fetch("../../nav/company-nav.html")
+        .then(res => res.text())
+        .then(html => {
+          document.getElementById("company-nav").innerHTML = html;
+          const current = window.location.pathname.split("/").pop();
+          document.querySelectorAll(".company-nav a").forEach(a => {
+            if (a.href.includes(current)) a.classList.add("active");
+          });
+        });
+
+      // ✅ footer 불러오기
+      fetch("../../components/footer.html")
+        .then(res => res.text())
+        .then(html => document.getElementById("footer").innerHTML = html);
+    });
+    </script>
+
+    <!-- ✅ 공통 네비 관련 스크립트 -->
+    <script src="/js/nav.js"></script>
+
+  </body>
+</html>

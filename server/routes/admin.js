@@ -1,0 +1,31 @@
+import express from "express";
+import fs from "fs";
+import path from "path";
+import multer from "multer";
+
+const router = express.Router();
+const upload = multer({ dest: "server/uploads/downloads/" });
+
+router.post("/upload-download", upload.single("file"), async (req, res) => {
+  try {
+    const { lang, title, desc, date } = req.body;
+    const filePath = `/uploads/downloads/${req.file.filename}_${req.file.originalname}`;
+    const jsonFile = path.join("data", `downloads_${lang}.json`);
+
+    const newItem = { title, desc, date, file: filePath };
+
+    let data = [];
+    if (fs.existsSync(jsonFile)) {
+      data = JSON.parse(fs.readFileSync(jsonFile, "utf8"));
+    }
+    data.unshift(newItem); // 최신순 정렬
+
+    fs.writeFileSync(jsonFile, JSON.stringify(data, null, 2));
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Upload failed" });
+  }
+});
+
+export default router;

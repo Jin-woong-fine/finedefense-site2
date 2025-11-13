@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>다운로드 자료 업로드 | 관리자</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f9fa;
+      margin: 0;
+      padding: 40px;
+    }
+    .upload-container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #2742a1;
+      margin-bottom: 30px;
+    }
+    label {
+      display: block;
+      margin-top: 20px;
+      font-weight: bold;
+      color: #333;
+    }
+    input[type="text"], input[type="date"], select, textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      margin-top: 6px;
+      font-size: 14px;
+    }
+    input[type="file"] {
+      margin-top: 10px;
+    }
+    button {
+      display: block;
+      width: 100%;
+      margin-top: 30px;
+      padding: 12px;
+      background: #2742a1;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #1d3180;
+    }
+    .result {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 14px;
+      color: green;
+    }
+  </style>
+</head>
+<body>
+  <div class="upload-container">
+    <h1>📂 다운로드 자료 업로드</h1>
+
+    <form id="uploadForm" enctype="multipart/form-data">
+      <label for="lang">언어 선택</label>
+      <select id="lang" name="lang">
+        <option value="kr">한국어 (downloads_kr.json)</option>
+        <option value="en">영어 (downloads_en.json)</option>
+      </select>
+
+      <label for="title">제목</label>
+      <input type="text" id="title" name="title" placeholder="자료 제목을 입력하세요" required>
+
+      <label for="desc">설명</label>
+      <textarea id="desc" name="desc" rows="3" placeholder="간단한 설명을 입력하세요" required></textarea>
+
+      <label for="date">날짜</label>
+      <input type="date" id="date" name="date" required>
+
+      <label for="file">첨부파일</label>
+      <input type="file" id="file" name="file" required>
+
+      <button type="submit">업로드</button>
+    </form>
+
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    document.getElementById("uploadForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData();
+      const lang = document.getElementById("lang").value;
+      formData.append("lang", lang);
+      formData.append("title", document.getElementById("title").value);
+      formData.append("desc", document.getElementById("desc").value);
+      formData.append("date", document.getElementById("date").value);
+      formData.append("file", document.getElementById("file").files[0]);
+
+      const res = await fetch("/api/admin/upload-download", {
+        method: "POST",
+        body: formData
+      });
+
+      const result = document.getElementById("result");
+      if (res.ok) {
+        result.style.color = "green";
+        result.textContent = "✅ 업로드 완료! JSON 및 파일이 저장되었습니다.";
+        document.getElementById("uploadForm").reset();
+      } else {
+        result.style.color = "red";
+        result.textContent = "❌ 업로드 실패. 서버 로그를 확인하세요.";
+      }
+    });
+  </script>
+</body>
+</html>

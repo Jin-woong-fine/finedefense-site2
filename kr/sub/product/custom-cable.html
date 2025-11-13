@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="커스텀케이블 제품소개" />
+    <title>커스텀케이블 제품소개</title>
+
+    <!-- ✅ 공통 CSS -->
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/sub-banner.css" />
+
+    <style>
+      /* ===== 제품소개 본문 ===== */
+      .product-section {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 20px 40px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      }
+
+      .product-section h1 {
+        font-size: 2rem;
+        color: #0f2679;
+        margin-bottom: 16px;
+        text-align: center;
+      }
+
+      .product-section p {
+        color: #444;
+        font-size: 1.1rem;
+        margin-bottom: 50px;
+        line-height: 1.7;
+        text-align: center;
+      }
+
+      /* ===== 가로형 카드 ===== */
+      /* ===== 2열 가로형 카드 레이아웃 ===== */
+      .product-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); /* 2열 자동 정렬 */
+        gap: 30px;
+        margin: 40px 0 80px;
+      }
+
+      /* 카드 전체 */
+      .product-card {
+        display: flex;
+        align-items: stretch;
+        background: #fff;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        text-decoration: none;
+        transition: transform .25s ease, box-shadow .25s ease;
+      }
+
+      .product-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      }
+
+      /* 왼쪽 이미지 */
+      .product-card .card-image {
+        flex: 0 0 40%;
+        background: #ddd center/cover no-repeat;
+        background-image: var(--bg);
+        min-height: 200px;
+      }
+
+      /* 오른쪽 설명 */
+      .product-card .card-content {
+        flex: 1;
+        padding: 24px 28px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        color: #222;
+      }
+
+      .product-card .card-content h3 {
+        font-size: 1.1rem;
+        color: #0f2679;
+        margin-bottom: 10px;
+        line-height: 1.5;
+      }
+
+      .product-card .card-content p {
+        font-size: 0.95rem;
+        color: #555;
+        line-height: 1.6;
+        margin: 0;
+      }
+
+      /* 반응형 (모바일에서는 1열로 자동 전환) */
+      @media (max-width: 768px) {
+        .product-cards {
+          grid-template-columns: 1fr;
+        }
+        .product-card {
+          flex-direction: column;
+        }
+        .product-card .card-image {
+          width: 100%;
+          height: 200px;
+        }
+      }
+
+
+    </style>
+  </head>
+
+  <body>
+    <!-- ✅ 1. 헤더 -->
+    <div id="header"></div>
+
+    <!-- ✅ 2. 배너 -->
+    <section class="sub-banner">
+      <img src="/img/sub-banners/cable.jpg" alt="제품소개 배너" />
+      <div class="banner-text">
+        <h1>제품소개</h1>
+        <p>해양 방산 현장을 연결하는 케이블 솔루션</p>
+      </div>
+    </section>
+
+    <!-- ✅ 3. breadcrumb -->
+    <div class="breadcrumb">
+      <a href="/">홈</a> &gt;
+      <span class="crumb crumb-level1">제품소개</span> &gt;
+      <span class="crumb crumb-level2">커스텀케이블</span>
+      <div id="side-tabs" class="side-tabs"></div>
+    </div>
+
+    <!-- ✅ 4. 본문 -->
+    <section class="product-section">
+      <h1>커스텀 케이블</h1>
+        <p>
+        ㈜화인디펜스는 다양한 운용 환경과 시스템 요구사항에 맞추어 <strong>맞춤형(Custom) 케이블</strong>을 설계·제작합니다.  
+        특히 <strong>Mil-Spec Wire & Cable</strong>을 적용하여 신뢰성과 내환경성이 요구되는  
+        군용 및 방위산업용 케이블을 공급하고 있습니다.
+
+        시스패로우(Sparrow) 발사장치, 미사일, 잠수함, 수중센서 등 고신뢰 장비에 적용되는  
+        특수 케이블부터, 산업 및 민간 분야의 맞춤형 제품까지 고객 요구에 따라 개발합니다.  
+
+        설계부터 제조, 시험평가까지 전 과정을 자체 수행하여  
+        극한 환경에서도 안정적 성능을 보장합니다.
+        </p>
+
+      <div class="product-cards">
+
+        <!-- 카드 1 -->
+        <a class="product-card" href="../product/sub-epd-cable.html">
+          <div class="card-image" style="--bg:url('../../../img/products/epd-cable-1.png')"></div>
+          <div class="card-content">
+            <h3>EPD Cable</h3>
+            <p>
+              Signal·Power·Data를 하나의 케이블로 통합한 복합형 케이블로,  
+              특수 소재 적용으로 극한 환경에서도 안정적인 성능을 제공합니다.  
+              Torpedo Launch System, Sea Sparrow, ESSM 등 군용 시스템에 사용됩니다.
+            </p>
+          </div>
+        </a>
+
+        <!-- 카드 2 -->
+        <a class="product-card" href="#">
+          <div class="card-image" style="--bg:url('../../../img/products/image-placeholder.png')"></div>
+          <div class="card-content">
+            <h3>(준비중) 60 bar 수밀 케이블<br> (Longitudinal Watertight Cable)</h3>
+            <p>고압 수중 환경에서 내부 침수를 완벽히 차단하도록 설계된 <strong>60 bar급 수밀 케이블</strong>입니다.
+              길이방향으로의 수분 침투를 방지하기 위한 <strong>특수 충전 및 절연 구조</strong>를 적용하여,
+              수중 운용 장비와 함정 시스템 등 고신뢰 환경에서 안정적인 성능을 제공합니다.</p>
+          </div>
+        </a>
+
+      </div>
+
+    </section>
+
+    <!-- ✅ 5. 푸터 -->
+    <div id="footer"></div>
+
+
+    <!-- ✅ 공통 네비 관련 스크립트 -->
+    <script src="/js/nav.js"></script>
+    <script src="/js/language.js"></script>
+
+
+  </body>
+</html>

@@ -1,0 +1,12 @@
+[
+  {
+    "id": 1731335754183,
+    "name": "홍길동",
+    "email": "hong@example.com",
+    "subject": "제품 견적 문의",
+    "category": "제품문의",
+    "message": "FD2308 케이블 견적 요청드립니다.",
+    "file": "1731335738122_FD_catalog.pdf",
+    "date": "2025-11-11"
+  }
+]

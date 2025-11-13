@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>카탈로그 | 화인디펜스</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/sub-banner.css">
+  <style>
+    .catalog-section {max-width:1000px;margin:60px auto;padding:30px;background:#fff;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,0.05);}
+    .catalog-item {display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ddd;padding:15px 0;}
+    .catalog-item a.download {background:#0f2679;color:#fff;padding:8px 16px;border-radius:6px;text-decoration:none;}
+    .catalog-item a.download:hover {background:#1a3ca3;}
+  </style>
+</head>
+<body>
+  <div id="header"></div>
+  <section class="sub-banner">
+    <img src="/img/sub-banners/pr-1_v2.jpg" alt="카탈로그 배너">
+    <div class="banner-text">
+      <h1>홍보센터</h1>
+      <p>화인디펜스의 혁신 기술과 주요 활동 소식을 만나보세요.</p>
+    </div>
+  </section>
+
+  <!-- ✅ 3. breadcrumb -->
+  <div class="breadcrumb">
+    <a href="/">홈</a> &gt;
+    <span class="crumb crumb-level1">홍보센터</span> &gt;
+    <span class="crumb crumb-level2">카탈로그</span>
+
+    <!-- ✅ breadcrumb 내부에 탭 1개만 -->
+    <div id="side-tabs" class="side-tabs"></div>
+  </div>
+
+
+
+
+
+  <section class="catalog-section">
+    <h1>카탈로그</h1>
+    <div id="catalogList"><p>불러오는 중...</p></div>
+  </section>
+  <div id="footer"></div>
+
+  <script src="/js/nav.js"></script>
+  <script>
+    const API_URL="http://localhost:3000";
+    async function loadCatalogs(){
+      const res=await fetch(`${API_URL}/api/posts/catalog?lang=kr`);
+      const data=await res.json();
+      const list=document.getElementById("catalogList");
+      if (!data.length) {
+        list.innerHTML = "<p style='text-align:center;color:#777;'>등록된 카탈로그가 없습니다.</p>";
+        return;
+      }
+      list.innerHTML=data.map(c=>`
+        <div class="catalog-item">
+          <div>
+            <strong>${c.title}</strong><br>
+            <span>${new Date(c.created_at).toLocaleDateString()}</span>
+          </div>
+          <a href="${API_URL}${c.file_path || c.main_image}" target="_blank" class="download">다운로드</a>
+        </div>`).join("");
+    }
+    loadCatalogs();
+  </script>
+</body>
+</html>

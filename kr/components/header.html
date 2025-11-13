@@ -1,0 +1,96 @@
+<!-- header.html -->
+<header class="header-inner">
+  <div class="header-left">
+    <a href="/kr/index.html">
+      <img src="/img/logo_transparent_finedefense.png" alt="Logo" class="logo">
+    </a>
+
+    <!-- ✅ 햄버거 버튼 -->
+    <div class="hamburger" id="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+
+    <ul class="main-menu top-nav"></ul>
+
+    <ul class="main-menu">
+      <li>
+        <a href="#">회사소개</a>
+        <ul class="submenu">
+          <li><a href="/kr/sub/company/overview.html">기업개요</a></li>
+          <li><a href="/kr/sub/company/ceo.html">CEO인사말</a></li>
+          <li><a href="/kr/sub/company/history.html">연혁</a></li>
+          <li><a href="/kr/sub/company/vision.html">기업이념 및 비전</a></li>
+          <li><a href="/kr/sub/company/organization.html">조직도</a></li>
+          <li><a href="/kr/sub/company/location.html">찾아오시는길</a></li>
+        </ul>
+      </li>
+
+      <li>
+        <a href="#">제품소개</a>
+        <ul class="submenu">
+          <li><a href="/kr/sub/product/towed-cable.html">수중이동형케이블</a></li>
+          <li><a href="/kr/sub/product/underwater-fixed-cable.html">수중고정형케이블</a></li>
+          <li><a href="/kr/sub/product/underwater-connector.html">수중커넥터</a></li>
+          <li><a href="/kr/sub/product/custom-cable.html">커스텀케이블</a></li>
+        </ul>
+      </li>
+
+      <li>
+        <a href="#">홍보센터</a>
+        <ul class="submenu">
+          <li><a href="#">공지사항</a></li>
+          <li><a href="/kr/sub/pr/newsroom/newsroom.html">뉴스룸</a></li>
+          <li><a href="#">갤러리</a></li>
+          <li><a href="#">인증 및 특허</a></li>
+          <li><a href="#">카탈로그</a></li>
+        </ul>
+      </li>
+
+      <li>
+        <a href="#">고객지원</a>
+        <ul class="submenu">
+          <li><a href="#">1:1 문의</a></li>
+          <li><a href="#">다운로드 센터</a></li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <!-- ✅ 언어 선택 영역 (header-right로 분리) -->
+  <div class="header-right">
+    <div class="language-dropdown">
+      <button class="lang-toggle" type="button">
+        KOR <span class="arrow">▼</span>
+      </button>
+      <ul class="lang-list">
+        <li><a href="#" data-lang="kr">KOR</a></li>
+        <li><a href="#" data-lang="en">ENG</a></li>
+      </ul>
+    </div>
+  </div>
+</header>
+
+<!-- ✅ 반응형 메뉴 스크립트 -->
+<script>
+  const hamburger = document.getElementById('hamburger');
+  const mainMenu = document.querySelector('.main-menu');
+  const menuItems = document.querySelectorAll('.main-menu > li');
+
+  if (hamburger && mainMenu) {
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('active');
+      mainMenu.classList.toggle('show');
+    });
+  }
+
+  menuItems.forEach(li => {
+    li.addEventListener('click', e => {
+      if (window.innerWidth <= 1024) {
+        e.stopPropagation();
+        li.classList.toggle('open');
+      }
+    });
+  });
+</script>

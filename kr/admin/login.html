@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>관리자 로그인 | Fine Defense</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body { font-family: 'Noto Sans KR', sans-serif; background: #f2f5fa; display: flex; align-items: center; justify-content: center; height: 100vh; }
+    .login-box { background: #fff; padding: 40px 50px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 400px; }
+    h2 { text-align: center; margin-bottom: 30px; color: #0f2679; }
+    input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 8px; font-size: 15px; }
+    button { width: 100%; padding: 12px; background: #0f2679; color: white; font-size: 16px; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+    button:hover { background: #1b348f; }
+    .error { color: crimson; text-align: center; margin-top: 10px; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <h2>관리자 로그인</h2>
+    <input type="text" id="username" placeholder="아이디">
+    <input type="password" id="password" placeholder="비밀번호">
+    <button id="loginBtn">로그인</button>
+    <p id="errorMsg" class="error"></p>
+  </div>
+
+  <script>
+    const API_URL = "http://localhost:3000";
+
+    document.getElementById("loginBtn").addEventListener("click", async () => {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const errorMsg = document.getElementById("errorMsg");
+
+      if (!username || !password) {
+        errorMsg.textContent = "아이디와 비밀번호를 입력하세요.";
+        return;
+      }
+
+      const res = await fetch(`${API_URL}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.role === "admin") {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("role", data.role);
+        localStorage.setItem("name", data.name);
+        location.href = "/kr/admin/dashboard.html";
+      } else {
+        errorMsg.textContent = "로그인 실패: 관리자 권한이 없습니다.";
+      }
+    });
+  </script>
+</body>
+</html>
