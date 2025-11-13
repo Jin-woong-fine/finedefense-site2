@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>다운로드센터 | 화인디펜스</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/sub-banner.css">
+
+  <style>
+    body {
+      font-family: "Noto Sans KR", sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+    }
+
+    .downloads-container {
+      max-width: 1000px;
+      margin: 120px auto;
+      background: #fff;
+      padding: 40px 50px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    h2 {
+      font-size: 28px;
+      text-align: center;
+      color: #1c2a57;
+      margin-bottom: 40px;
+    }
+
+    .download-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .download-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 22px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      transition: 0.2s;
+    }
+
+    .download-item:hover {
+      background-color: #f2f5ff;
+    }
+
+    .download-info h3 {
+      margin: 0;
+      font-size: 18px;
+      color: #2742a1;
+    }
+
+    .download-info p {
+      margin: 6px 0 0;
+      font-size: 14px;
+      color: #555;
+    }
+
+    .download-date {
+      font-size: 13px;
+      color: #888;
+      margin-top: 4px;
+    }
+
+    .download-btn {
+      background-color: #2742a1;
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: 0.25s;
+    }
+
+    .download-btn:hover {
+      background-color: #1d337b;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="header"></div>
+
+  <section class="sub-banner">
+    <img src="/img/sub-banners/subbanner_support_3_V3.jpg" alt="고객지원 배너" />
+    <div class="banner-text">
+      <h1>고객지원</h1>
+      <p>제품 자료 및 기술문서를 손쉽게 다운로드하세요.</p>
+    </div>
+  </section>
+
+  <!-- ✅ breadcrumb -->
+  <div class="breadcrumb">
+    <a href="/">홈</a> &gt;
+    <span class="crumb crumb-level1">고객지원</span> &gt;
+    <span class="crumb crumb-level2">다운로드센터</span>
+
+    <!-- ✅ 사이드 탭 영역 -->
+    <div id="side-tabs" class="side-tabs"></div>
+  </div>
+
+  <section class="downloads-container">
+    <h2>다운로드센터</h2>
+    <div id="downloadList" class="download-list">
+      <p style="text-align:center;color:#777;">자료를 불러오는 중입니다...</p>
+    </div>
+  </section>
+
+  <div id="footer"></div>
+
+  <script>
+    const list = document.getElementById('downloadList');
+    const jsonPath = '/data/downloads_kr.json'; // 📄 언어별 JSON
+
+    fetch(jsonPath)
+      .then(res => res.json())
+      .then(data => {
+        if (!data.length) {
+          list.innerHTML = "<p style='text-align:center;color:#777;'>등록된 자료가 없습니다.</p>";
+          return;
+        }
+        list.innerHTML = data.map(item => `
+          <div class="download-item">
+            <div class="download-info">
+              <h3>${item.title}</h3>
+              <p>${item.desc}</p>
+              <div class="download-date">${item.date}</div>
+            </div>
+            <a class="download-btn" href="${item.file}" download>다운로드</a>
+          </div>
+        `).join('');
+      })
+      .catch(() => {
+        list.innerHTML = `<p style='text-align:center;color:#777;'>자료를 불러오는 중 오류가 발생했습니다.</p>`;
+      });
+  </script>
+
+  <!-- ✅ 공통 스크립트 -->
+  <script src="/js/nav.js"></script>
+  <script src="/js/language.js"></script>
+
+</body>
+</html>

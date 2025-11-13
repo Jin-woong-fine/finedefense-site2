@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="description" content="화인디펜스, 임시 홈페이지, 테스트 홈페이지">
+
+      <title>화인디펜스</title>
+
+      <link rel="stylesheet" href="/css/style.css">
+      <link rel="stylesheet" href="/css/banner.css">
+      <link rel="stylesheet" href="/css/features.css">
+
+      <style>
+        .facilities {
+        padding: 80px 5%;
+        background: #f8f9fa; /* 밝은 회색 배경 */
+        text-align: center;
+      }
+
+      .facilities h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: #222;
+      }
+
+      .facilities p {
+        max-width: 1400px;
+        margin: 0 auto 40px;
+        font-size: 1.2rem;
+        font-weight: 500;
+        line-height: 1.6;
+        color: #555;
+      }
+
+      /* 카드 전체 레이아웃 */
+      .facility-grid {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;  /* ✅ 줄바뀌어도 항상 가운데 */
+        gap: 25px;
+      }
+
+      /* 카드 스타일 (콤팩트형) */
+      .facility-card {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        text-align: center;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        cursor: default;
+
+        width: 100%;
+        max-width: 300px;  /* 🔽 가로 줄임 */
+      }
+
+      /* 이미지 */
+      .facility-card img {
+        width: 100%;
+        height: 200px; /* 🔽 기존 180 → 150으로 세로 축소 */
+        object-fit: cover;
+        display: block;
+      }
+
+      /* 카드 제목 */
+      .facility-card h3 {
+        margin: 20px 0 20px; /* 🔽 위아래 여백 축소 */
+        font-size: 1.3rem;
+        color: #222;
+      }
+
+      /* 카드 설명 */
+      .facility-card p {
+        font-size: 1.0rem;  /* 🔽 조금 작게 */
+        color: #555;
+        padding: 0 15px 15px; /* 🔽 패딩 축소 */
+        line-height: 1.4;
+      }
+
+      /* hover 효과 */
+      .facility-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+      }
+
+
+
+
+
+      .news {
+        padding: 80px 5%;
+        background: #fff;
+        text-align: center;
+      }
+
+      .news h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #222;
+        margin-bottom: 1rem;
+      }
+
+      .news p {
+        max-width: 800px;
+        margin: 0 auto 60px;
+        font-size: 1.2rem;
+        font-weight: 500;
+        color: #555;
+        line-height: 1.6;
+      }
+
+      .news-grid {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 30px;
+      }
+
+      .news-card {
+        background: #f9f9f9;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        text-align: left;
+        width: 320px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .news-card img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+      }
+
+      .news-card h3 {
+        font-size: 1.2rem;
+        color: #222;
+        margin: 15px 20px 10px;
+      }
+
+      .news-card p {
+        font-size: 1.00rem;
+        color: #555;
+        margin: 0 20px 15px;
+        line-height: 1.5;
+      }
+
+      .news-card .date {
+        display: block;
+        font-size: 1.00rem;
+        color: #888;
+        margin: 0 20px 20px;
+      }
+
+      .news-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      }
+
+      .news-more {
+        display: inline-block;
+        margin-top: 40px;
+        font-size: 1.4rem;
+        text-decoration: none;
+        color: #0f2679;
+        font-weight: 600;
+        transition: color 0.3s ease;
+      }
+
+      .news-more:hover {
+        color: #001a66;
+      }
+
+      /* 반응형 */
+      @media (max-width: 768px) {
+        .news-card {
+          width: 90%;
+        }
+      }
+
+      .contact-cta {
+        position: relative;
+        background: url("../img/banners/contact_banner2.png") center/cover no-repeat; /* 🔹 배경 이미지 경로 */
+        color: #fff;
+        text-align: center;
+        padding: 120px 5%;
+        overflow: hidden;
+      }
+
+      /* 반투명 오버레이 */
+      .contact-cta::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 20, 50, 0.55); /* 🔹 어두운 반투명 오버레이 */
+        z-index: 0;
+      }
+
+      .contact-inner {
+        position: relative;
+        z-index: 1;
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      .contact-cta h2 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+      }
+
+      .contact-cta p {
+        font-size: 1.1rem;
+        font-weight: 500;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+        opacity: 0.95;
+      }
+
+      .contact-btn {
+        display: inline-block;
+        background: #ffffffcc; /* 🔹 살짝 투명한 흰색 버튼 */
+        font-size: 1.2rem;        
+        font-weight: 500;
+        color: #0f2679;
+        text-decoration: none;
+        padding: 14px 28px;
+        border-radius: 6px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+
+      .contact-btn:hover {
+        background: #fff;
+        color: #001a66;
+        box-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
+      }
+
+      /* 반응형 */
+      @media (max-width: 768px) {
+        .contact-cta {
+          padding: 80px 5%;
+          background-position: center;
+        }
+        .contact-cta h2 {
+          font-size: 1.6rem;
+        }
+        .contact-cta p {
+          font-size: 1rem;
+        }
+      }
+
+      </style>
+
+  </head>
+
+
+
+
+  <body>
+    <div id="header"></div>
+
+    <div class="banner-slider">
+      <div class="slides">
+
+        <div class="slide">
+          <img src="/img/banners/banner_warship4.jpg" alt="배너 1">
+          <div class="banner-text">
+           해양 방위체계를 위한 소나 케이블조립체 통합 제작 솔루션
+            <div class="banner-subtext">
+              첨단 소나 응용 분야의 신뢰성 있는 성능을 위한 케이블·커넥터·터미네이션 통합 시스템을 제공
+            </div>
+          </div>
+        </div>
+
+        <div class="slide">
+          <img src="../img/banners/banner_submarine4.jpg" alt="배너 2">
+          <div class="banner-text">
+            잠수함의 극한 수심 환경을 위한 소나 케이블조립체 통합 제작 솔루션
+            <div class="banner-subtext">
+              극한 심해 압력 환경에 대응하는 잠수함 소나 케이블·커넥터·배선 통합 시스템을 제공
+            </div>
+          </div>
+        </div>
+
+        <div class="slide">
+          <img src="../img/banners/banner_manufacturing4.jpg" alt="배너 3">
+          <div class="banner-text">극한 해양 환경에 대응하는 통합 기술 인프라
+            <div class="banner-subtext">
+              설계부터 연선, 아머링, 피복까지 — 정교한 공정 기술로 완성되는 수중케이블의 강도와 신뢰성
+            </div>
+          </div>
+        </div>
+
+        <div class="slide">
+          <img src="../img/banners/banner_waterpressuretester4.jpg" alt="배너 4">
+          <div class="banner-text">수중케이블 신뢰성을 위한 통합 시험 인프라
+            <div class="banner-subtext">
+              60 bar 수압 챔버를 비롯해 인장·굴곡·전기·광 시험까지 — 수중케이블 신뢰성 시험장비 보유
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <button class="prev">&#10094;</button>
+      <button class="next">&#10095;</button>
+
+      <!-- 페이지네이션 -->
+      <div class="pagination"></div>
+
+    </div>
+
+
+
+    <section class="business-area">
+      <h2>사업 영역</h2>
+      <p>
+        화인디펜스는 수중 통신 및 전력 전송 분야에서 설계, 제작, 시험평가에 이르는 전 공정 통합 솔루션을 제공합니다.
+        <br>통합 생산 체계를 기반으로 모든 제품의 신뢰성과 성능, 혁신을 보장합니다.
+      </p>
+
+      <div class="features">
+        <a href="/kr/sub/product/towed-cable.html" class="feature-card" 
+          style="background-image: url('/img/card_businessareas/underwater-cable2.jpg');">
+          <h3>수중케이블</h3>
+        </a>
+
+        <a href="/kr/sub/product/underwater-connector.html" class="feature-card" 
+          style="background-image: url('/img/card_businessareas/ai_termination2.jpg');">
+          <h3>수중커넥터&터미네이션</h3>
+        </a>
+
+        <a href="/kr/sub/product/custom-cable.html" class="feature-card" 
+          style="background-image: url('/img/card_businessareas/custom_cable2.jpg');">
+          <h3>케이블 커스터마이징</h3>
+        </a>
+      </div>
+
+
+    </section>
+
+    <section class="facilities">
+      <h2>제조 및 신뢰성 시험 인프라</h2>
+      <p>
+        연선, 아머링, 피복 압출부터 신뢰성 시험까지 —
+        화인디펜스는 전 공정을 자체 시설에서 수행하여 모든 케이블의 품질과 신뢰성을 보장합니다.
+      </p>
+
+      <div class="facility-grid">
+
+        <!-- 1. 연선기 -->
+        <div class="facility-card">
+          <img src="/img/card_manufature&test/card_stranding4.jpg" alt="Stranding Machine">
+          <h3>연선 라인</h3>
+          <p>다심 수중케이블의 균일한 장력과 정밀 배열을 보장하는 Planetary 연선라인 보유</p>
+        </div>
+
+        <!-- 2. 강선 외장기 -->
+        <div class="facility-card">
+          <img src="/img/card_manufature&test/card_armoringline4.jpg" alt="Steel Wire Armoring Line">
+          <h3>외장 라인</h3>
+          <p>정밀한 강선 아머링을 위한 Planetary 강선외장라인 보유</p>
+        </div>
+
+        <!-- 3. 압출기 -->
+        <div class="facility-card">
+          <img src="/img/card_manufature&test/card_extrusion4.jpg" alt="Extrusion Line">
+          <h3>압출 라인</h3>
+          <p>균일한 절연·피복 품질을 구현하는 압출 기술 및 설비 보유</p>
+        </div>
+
+        <!-- 4. 기계·환경시험설비 -->
+        <div class="facility-card">
+          <img src="/img/card_manufature&test/card_mechanicaltest4.jpg" alt="Mechanical & Environmental Test Facility">
+          <h3>환경 시험설비</h3>
+          <p>수압·인장·굴곡·온도 시험을 통합 수행하여 실제 환경에서의 신뢰성을 보장하는 시험평가 시스템 구축</p>
+        </div>
+
+        <!-- 5. 전기·광학 시험장비 -->
+        <div class="facility-card">
+          <img src="/img/card_manufature&test/card_electricaltest4.jpg" alt="Electrical & Optical Test Equipment">
+          <h3>전기, 광, 통신 시험장비</h3>
+            <p>수중케이블의 광·전기 및 통신 특성 측정을 위한 최신 검증 장비 보유</p>
+        </div>
+
+      </div>
+    </section>
+
+
+
+    <section class="news">
+      <h2>공지 및 뉴스</h2>
+      <p>화인디펜스의 최신 소식, 성과, 인증현황을 전해드립니다.</p>
+
+      <div class="news-grid">
+        <div class="news-card">
+          <img src="img/news_exhibition.jpg" alt="Exhibition Participation">
+          <h3>Participation in Naval Defense Exhibition 2025</h3>
+          <p>FINE DEFENSE showcased its advanced underwater cable and connector solutions at the 2025 Naval Defense Expo.</p>
+          <span class="date">October 15, 2025</span>
+        </div>
+
+        <div class="news-card">
+          <img src="img/news_facility.jpg" alt="New Facility">
+          <h3>New Extrusion Line Installed at Okcheon Plant</h3>
+          <p>A new insulation and sheathing extrusion line has been installed to enhance in-house cable production capacity.</p>
+          <span class="date">September 3, 2025</span>
+        </div>
+
+        <div class="news-card">
+          <img src="img/news_certification.jpg" alt="Certification">
+          <h3>ISO 9001 & ISO 14001 Certifications Renewed</h3>
+          <p>FINE DEFENSE continues to maintain international quality and environmental management standards.</p>
+          <span class="date">August 1, 2025</span>
+        </div>
+      </div>
+
+      <a href="#" class="news-more">전체 뉴스 보기 →</a>
+    </section>
+
+
+
+    <section class="contact-cta">
+      <div class="contact-inner">
+        <h2>연락 및 문의</h2>
+        <p>
+          수중케이블 솔루션에 대한 기술 상담이나 견적이 필요하신가요?<br>
+          화인디펜스의 기술연구소 및 영업팀으로 문의해 주세요.
+        </p>
+        <a href="contact.html" class="contact-btn">문의 페이지로 이동 →</a>
+      </div>
+    </section>
+
+
+    <div id="footer"></div>
+
+
+
+    <script>
+      // ✅ header 불러오기
+      fetch("/kr/components/header.html")
+        .then(res => res.text())
+        .then(data => {
+          document.getElementById("header").innerHTML = data;
+
+          // ✅ header가 DOM에 완전히 반영된 후 language.js 로드
+          setTimeout(() => {
+            const langScript = document.createElement("script");
+            langScript.src = "/js/language.js";
+            document.body.appendChild(langScript);
+          }, 300);
+        })
+        .catch(err => console.error("❌ header load error:", err));
+
+      // ✅ footer 불러오기
+      fetch("/kr/components/footer.html")
+        .then(res => res.text())
+        .then(data => {
+          document.getElementById("footer").innerHTML = data;
+        })
+        .catch(err => console.error("❌ footer load error:", err));
+    </script>
+
+    <script src="/js/banner.js"></script>
+  </body>
+
+
+</html>

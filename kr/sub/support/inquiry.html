@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1:1 문의 | 화인디펜스</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/sub-banner.css">
+
+  <style>
+    body {
+      font-family: "Noto Sans KR", sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 0;
+    }
+
+    .inquiry-container {
+      max-width: 800px;
+      margin: 120px auto;
+      background: #fff;
+      padding: 50px 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    h2 {
+      font-size: 28px;
+      text-align: center;
+      color: #1c2a57;
+      margin-bottom: 40px;
+    }
+
+    form label {
+      display: block;
+      margin: 20px 0 8px;
+      font-weight: 600;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 15px;
+      box-sizing: border-box;
+    }
+
+    textarea {
+      min-height: 150px;
+      resize: vertical;
+    }
+
+    button {
+      margin-top: 30px;
+      width: 100%;
+      padding: 14px;
+      background-color: #2742a1;
+      color: #fff;
+      font-size: 17px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.25s;
+    }
+
+    button:hover {
+      background-color: #1d337b;
+    }
+
+    .success-message, .error-message {
+      text-align: center;
+      font-weight: 600;
+      display: none;
+      margin-top: 20px;
+    }
+
+    .success-message { color: #007944; }
+    .error-message { color: #c30000; }
+
+    .notice {
+      margin-top: 30px;
+      font-size: 14px;
+      text-align: center;
+      color: #777;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="header"></div>
+
+  <section class="sub-banner">
+    <img src="/img/sub-banners/subbanner_support_3_V3.jpg" alt="공지사항 배너" />
+    <div class="banner-text">
+      <h1>공지사항</h1>
+      <p>화인디펜스의 주요 공지 및 안내사항을 확인하세요.</p>
+    </div>
+  </section>
+
+  <!-- ✅ 3. breadcrumb -->
+  <div class="breadcrumb">
+    <a href="/">홈</a> &gt;
+    <span class="crumb crumb-level1">고객지원</span> &gt;
+    <span class="crumb crumb-level2">1:1 문의</span>
+
+    <!-- ✅ breadcrumb 내부에 탭 1개만 -->
+    <div id="side-tabs" class="side-tabs"></div>
+  </div>
+
+
+
+
+
+  <section class="inquiry-container">
+    <h2>1:1 문의</h2>
+    <form id="inquiryForm" enctype="multipart/form-data">
+      <label for="name">이름</label>
+      <input type="text" id="name" name="name" placeholder="이름을 입력하세요" required>
+
+      <label for="email">이메일</label>
+      <input type="email" id="email" name="email" placeholder="이메일을 입력하세요" required>
+
+      <label for="subject">제목</label>
+      <input type="text" id="subject" name="subject" placeholder="제목을 입력하세요" required>
+
+      <label for="category">문의유형</label>
+      <select id="category" name="category">
+        <option value="제품문의">제품문의</option>
+        <option value="기술지원">기술지원</option>
+        <option value="자료요청">자료요청</option>
+        <option value="기타">기타</option>
+      </select>
+
+      <label for="message">문의내용</label>
+      <textarea id="message" name="message" placeholder="문의 내용을 입력하세요" required></textarea>
+
+      <label for="file">첨부파일 (선택)</label>
+      <input type="file" id="file" name="file" accept=".pdf,.doc,.docx,.jpg,.png">
+
+      <button type="submit">문의 보내기</button>
+
+      <p id="successMsg" class="success-message">문의가 성공적으로 접수되었습니다.</p>
+      <p id="errorMsg" class="error-message">전송 중 오류가 발생했습니다.</p>
+    </form>
+
+    <div class="notice">
+      ※ 입력하신 내용은 관리자에게 이메일로 전달되며, 회신까지 1~2일 소요될 수 있습니다.
+    </div>
+  </section>
+
+
+
+  <div id="footer"></div>
+
+
+
+
+<script>
+  const form = document.getElementById("inquiryForm");
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+
+    try {
+      const res = await fetch("http://localhost:3000/api/sendInquiry", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error("서버 응답 실패");
+
+      const result = await res.json();
+      if (result.success) {
+        document.getElementById("successMsg").style.display = "block";
+      } else {
+        document.getElementById("errorMsg").style.display = "block";
+      }
+    } catch (err) {
+      console.error("❌ 전송 오류:", err);
+      document.getElementById("errorMsg").style.display = "block";
+    }
+  });
+</script>
+
+
+<!-- ✅ 공통 스크립트 -->
+<script src="../../../js/language.js"></script>
+<script src="../../../js/nav.js"></script>
+
+
+
+</body>
+</html>
