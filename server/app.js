@@ -25,19 +25,17 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ====================================
-//  정적 파일 제공
-// ====================================
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-app.use("/data", express.static(path.join(__dirname, "data")));
-app.use(express.static(path.join(__dirname, "public"))); // ← 이게 가장 아래로 가야 했던 문제 해결
-
-// ====================================
-//  라우터 연결
+//  라우터 연결  ← API 먼저!
 // ====================================
 app.use("/api/inquiry", sendInquiryRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/posts", postsRouter);
+
+// ====================================
+//  정적 파일 제공  ← 반드시 맨 아래!!
+// ====================================
+app.use(express.static(path.join(__dirname, "public")));
 
 // ====================================
 //  서버 실행
