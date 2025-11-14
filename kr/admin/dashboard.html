@@ -102,12 +102,30 @@
       padding: 3px;
     }
 
+    .preview-item {
+      position: relative;
+      display: inline-block;
+    }
+
+    .remove-btn {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      background: crimson;
+      color: #fff;
+      border: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
   </style>
 
-  <!-- Quill Editor -->
   <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-
 </head>
+
 <body>
   <header>
     <h1>Fine Defense 관리자 대시보드</h1>
@@ -136,7 +154,6 @@
       <label for="images"><strong>이미지 업로드 (여러 장 선택 가능)</strong></label>
       <input type="file" id="images" name="images" multiple>
 
-      <!-- ⭐ 파일 선택 미리보기 영역 -->
       <div id="filePreview" style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
         선택된 파일 없음
       </div>
@@ -150,7 +167,6 @@
     </section>
   </main>
 
-  <!-- Quill JS -->
   <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 
   <script>
@@ -158,13 +174,11 @@
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
 
-    // 로그인 확인
     if (!token || role !== "admin") {
       alert("로그인이 필요합니다.");
       location.href = "/kr/admin/login.html";
     }
 
-    // ⭐ Quill Editor 초기화
     document.addEventListener("DOMContentLoaded", () => {
       window.quill = new Quill("#editor", {
         theme: "snow",
@@ -181,27 +195,86 @@
       });
     });
 
-    // ⭐ 여러 장 파일 썸네일 미리보기
-    document.getElementById("images").addEventListener("change", () => {
-      const files = document.getElementById("images").files;
+    // ⭐ 누적 파일 저장 배열
+    let selectedFiles = [];
+
+    // ⭐ 파일 선택 시 누적 처리
+    document.getElementById("images").addEventListener("change", (e) => {
+      const newFiles = Array.from(e.target.files);
+
+      selectedFiles.push(...newFiles); // 누적됨
+
+      redrawPreview();
+    });
+
+    // ⭐ 미리보기 다시 그리기
+    function redrawPreview() {
       const preview = document.getElementById("filePreview");
+      preview.innerHTML = "";
 
-      preview.innerHTML = ""; // 초기화
-
-      if (files.length === 0) {
+      if (selectedFiles.length === 0) {
         preview.textContent = "선택된 파일 없음";
         return;
       }
 
-      Array.from(files).forEach(file => {
+      selectedFiles.forEach((file, index) => {
         const reader = new FileReader();
+
         reader.onload = (e) => {
+          const wrapper = document.createElement("div");
+          wrapper.className = "preview-item";
+
           const img = document.createElement("img");
           img.src = e.target.result;
-          preview.appendChild(img);
+
+          const removeBtn = document.createElement("button");
+          removeBtn.className = "remove-btn";
+          removeBtn.textContent = "×";
+          removeBtn.onclick = () => {
+            selectedFiles.splice(index, 1);
+            redrawPreview();
+          };
+
+          wrapper.appendChild(img);
+          wrapper.appendChild(removeBtn);
+
+          preview.appendChild(wrapper);
         };
+
         reader.readAsDataURL(file);
       });
+    }
+
+    // ⭐ 게시물 업로드
+    document.getElementById("uploadBtn").addEventListener("click", async () => {
+      const fd = new FormData();
+
+      fd.append("title", document.getElementById("title").value);
+      fd.append("content", window.quill.root.innerHTML);
+      fd.append("category", document.getElementById("category").value);
+      fd.append("lang", document.getElementById("lang").value);
+
+      selectedFiles.forEach(file => {
+        fd.append("images", file);
+      });
+
+      const res = await fetch(`${API_URL}/posts`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: fd,
+      });
+
+      if (res.ok) {
+        alert("등록 완료!");
+        selectedFiles = [];
+        redrawPreview();
+        document.getElementById("title").value = "";
+        document.getElementById("images").value = "";
+        window.quill.root.innerHTML = "";
+        loadPosts();
+      } else {
+        alert("등록 실패. 서버 로그 확인 필요");
+      }
     });
 
     // 게시물 목록 로드
@@ -210,8 +283,6 @@
         const res = await fetch(`${API_URL}/posts/news`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-
-        if (!res.ok) throw new Error("불러오기 실패");
 
         const posts = await res.json();
         const list = document.getElementById("posts");
@@ -222,17 +293,17 @@
               <div class="post-item">
                 <div>
                   <strong>${p.title}</strong> (${p.category}) [${p.lang}]
-                    <div style="display:flex; gap:6px; margin-top:6px;">
-                      ${
-                        p.images && p.images.length > 0
-                          ? p.images
-                              .map(img =>
-                                `<img src="${img}" style="width:70px;height:70px;object-fit:cover;border-radius:6px;border:1px solid #ddd;">`
-                              )
-                              .join("")
-                          : ""
-                      }
-                    </div>
+                  <div style="display:flex; gap:6px; margin-top:6px;">
+                    ${
+                      p.images
+                        ? p.images
+                            .map(img =>
+                              `<img src="${img}" style="width:70px;height:70px;object-fit:cover;border-radius:6px;border:1px solid #ddd;">`
+                            )
+                            .join("")
+                        : ""
+                    }
+                  </div>
                 </div>
                 <button class="delete-btn" onclick="deletePost(${p.id})">삭제</button>
               </div>`
@@ -255,46 +326,13 @@
       loadPosts();
     }
 
-    // 게시물 업로드
-    document.getElementById("uploadBtn").addEventListener("click", async () => {
-      const fd = new FormData();
-      fd.append("title", document.getElementById("title").value);
-      fd.append("content", window.quill.root.innerHTML);
-      fd.append("category", document.getElementById("category").value);
-      fd.append("lang", document.getElementById("lang").value);
-
-      const files = document.getElementById("images").files;
-
-      console.log("전송할 파일:", files);  // ⭐⭐ 이 줄 추가 ⭐⭐
-
-      for (const file of files) fd.append("images", file);
-
-      const res = await fetch(`${API_URL}/posts`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: fd,
-      });
-
-      if (res.ok) {
-        alert("등록 완료!");
-        document.getElementById("title").value = "";
-        document.getElementById("images").value = "";
-        document.getElementById("filePreview").innerHTML = "선택된 파일 없음";
-        window.quill.root.innerHTML = "";
-        loadPosts();
-      } else {
-        alert("등록 실패. 서버 로그를 확인하세요.");
-      }
-    });
+    loadPosts();
 
     // 로그아웃
     document.getElementById("logoutBtn").addEventListener("click", () => {
       localStorage.clear();
       location.href = "/kr/admin/login.html";
     });
-
-    loadPosts();
   </script>
-
 </body>
 </html>
