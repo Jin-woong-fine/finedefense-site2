@@ -28,7 +28,7 @@ const upload = multer({ storage });
 /* ==========================================
    🧩 1) 게시물 등록 (다중 이미지 업로드)
 ========================================== */
-router.post("/", verifyToken, upload.array("images", 10), async (req, res) => {
+router.post("/", upload.array("images", 10), verifyToken, async (req, res) => {
   try {
     console.log("업로드된 파일들:", req.files);
 
