@@ -61,29 +61,12 @@
     </section>
   </main>
 
-  <script>
-    const API_URL = "http://localhost:3000";
+    <script>
+    // ⭐ API 상대 경로 (도메인/IP 상관없이 동작)
+    const API_URL = "/api";
+
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
-
-
-    // ✅ Quill Editor 초기화
-    const quill = new Quill('#editor', {
-    theme: 'snow',
-    placeholder: '내용을 입력하세요...',
-    modules: {
-        toolbar: [
-        [{ 'header': [1, 2, false] }],
-        ['bold', 'italic', 'underline', 'strike'],
-        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-        ['link', 'image'],
-        ['clean']
-        ]
-    }
-    });
-
-
-
 
     // 로그인 검증
     if (!token || role !== "admin") {
@@ -93,30 +76,48 @@
 
     // 게시물 목록 로드
     async function loadPosts() {
-      const res = await fetch(`${API_URL}/api/posts/news`, { 
-        headers: { Authorization: `Bearer ${token}` } 
-      });
-      const posts = await res.json();
-      const list = document.getElementById("posts");
+      try {
+        const res = await fetch(`${API_URL}/posts/news`, { 
+          headers: { Authorization: `Bearer ${token}` } 
+        });
 
-      list.innerHTML = posts.map(p => `
-        <div class="post-item">
-          <div>
-            <strong>${p.title}</strong> (${p.category}) [${p.lang}]
-            ${p.main_image ? `<img src="${API_URL}${p.main_image}" style="width:80px;vertical-align:middle;margin-left:10px;border-radius:4px;">` : ""}
-          </div>
-          <button class="delete-btn" onclick="deletePost(${p.id})">삭제</button>
-        </div>
-      `).join("");
+        if (!res.ok) throw new Error("불러오기 실패");
+
+        const posts = await res.json();
+        const list = document.getElementById("posts");
+
+        list.innerHTML = posts
+          .map(
+            (p) => `
+          <div class="post-item">
+            <div>
+              <strong>${p.title}</strong> (${p.category}) [${p.lang}]
+              ${
+                p.main_image
+                  ? `<img src="${p.main_image}" style="width:80px;vertical-align:middle;margin-left:10px;border-radius:4px;">`
+                  : ""
+              }
+            </div>
+            <button class="delete-btn" onclick="deletePost(${p.id})">삭제</button>
+          </div>`
+          )
+          .join("");
+
+      } catch (err) {
+        console.error("게시물 로드 실패:", err);
+        alert("게시물을 불러오지 못했습니다.");
+      }
     }
 
     // 게시물 삭제
     async function deletePost(id) {
       if (!confirm("삭제하시겠습니까?")) return;
-      await fetch(`${API_URL}/api/posts/${id}`, { 
-        method: "DELETE", 
-        headers: { Authorization: `Bearer ${token}` } 
+
+      await fetch(`${API_URL}/posts/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
       });
+
       loadPosts();
     }
 
@@ -137,16 +138,15 @@
       const files = document.getElementById("images").files;
       for (const file of files) fd.append("images", file);
 
-      const res = await fetch(`${API_URL}/api/posts`, {
+      const res = await fetch(`${API_URL}/posts`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
-        body: fd
+        body: fd,
       });
 
       if (res.ok) {
         alert("등록 완료!");
         document.getElementById("title").value = "";
-        document.getElementById("content").value = "";
         document.getElementById("images").value = "";
         loadPosts();
       } else {
@@ -157,5 +157,6 @@
     // 초기 목록 로드
     loadPosts();
   </script>
+
 </body>
 </html>
