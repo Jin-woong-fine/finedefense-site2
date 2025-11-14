@@ -65,14 +65,15 @@ router.post("/", verifyToken, upload.array("images", 10), async (req, res) => {
 });
 
 /* ==========================================
-   📤 2) 카테고리별 목록 조회
+   📤 2) 카테고리별 목록 조회 (이미지 포함)
 ========================================== */
 router.get("/:category", async (req, res) => {
   try {
     const { category } = req.params;
     const lang = req.query.lang || "kr";
 
-    const [rows] = await db.execute(
+    // posts + users
+    const [posts] = await db.execute(
       `SELECT p.*, u.name AS author_name
        FROM posts p
        LEFT JOIN users u ON p.author_id = u.id
@@ -81,12 +82,22 @@ router.get("/:category", async (req, res) => {
       [category, lang]
     );
 
-    res.json(rows);
+    // 각 post의 이미지들 추가 ★여기만 있으면 됨!
+    for (const post of posts) {
+      const [images] = await db.execute(
+        "SELECT image_path FROM post_images WHERE post_id = ?",
+        [post.id]
+      );
+      post.images = images.map(i => i.image_path);
+    }
+
+    res.json(posts);
   } catch (err) {
     console.error("목록 조회 오류:", err);
     res.status(500).json({ message: "조회 오류" });
   }
 });
+
 
 /* ==========================================
    📸 3) 게시물 이미지 목록 조회
