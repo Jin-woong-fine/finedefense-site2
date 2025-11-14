@@ -1,341 +1,199 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8">
-  <title>관리자 대시보드 | Fine Defense</title>
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 
-  <style>
-    body {
-      font-family: 'Noto Sans KR', sans-serif;
-      background: #f5f7fb;
-      margin: 0;
-    }
+<script>
+  const API_URL = "/api";
+  const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role");
 
-    header {
-      background: #0f2679;
-      color: #fff;
-      padding: 20px 30px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+  if (!token || role !== "admin") {
+    alert("로그인이 필요합니다.");
+    location.href = "/kr/admin/login.html";
+  }
 
-    header h1 { font-size: 1.3rem; }
-    header button {
-      background: #fff;
-      color: #0f2679;
-      border: none;
-      border-radius: 6px;
-      padding: 8px 14px;
-      cursor: pointer;
-    }
-
-    main {
-      padding: 40px;
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-
-    .upload-form {
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      padding: 30px;
-      margin-bottom: 40px;
-    }
-
-    .upload-form input,
-    .upload-form textarea,
-    .upload-form select {
-      width: 100%;
-      padding: 10px;
-      margin: 6px 0;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 15px;
-    }
-
-    .upload-form button {
-      padding: 10px 20px;
-      background: #0f2679;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-
-    .post-list {
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      padding: 20px;
-    }
-
-    .post-item {
-      border-bottom: 1px solid #eee;
-      padding: 12px 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .post-item:last-child { border-bottom: none; }
-
-    .delete-btn {
-      background: crimson;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      padding: 6px 10px;
-      cursor: pointer;
-    }
-
-    #filePreview img {
-      width: 80px;
-      height: 80px;
-      object-fit: cover;
-      border-radius: 6px;
-      margin-right: 10px;
-      border: 1px solid #ccc;
-      padding: 3px;
-    }
-
-    .preview-item {
-      position: relative;
-      display: inline-block;
-    }
-
-    .remove-btn {
-      position: absolute;
-      top: -6px;
-      right: -6px;
-      background: crimson;
-      color: #fff;
-      border: none;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      cursor: pointer;
-      font-size: 12px;
-    }
-
-  </style>
-
-  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-</head>
-
-<body>
-  <header>
-    <h1>Fine Defense 관리자 대시보드</h1>
-    <button id="logoutBtn">로그아웃</button>
-  </header>
-
-  <main>
-    <section class="upload-form">
-      <h2>게시물 등록</h2>
-
-      <select id="category">
-        <option value="news">뉴스룸</option>
-        <option value="notice">공지사항</option>
-        <option value="gallery">갤러리</option>
-      </select>
-
-      <select id="lang">
-        <option value="kr">한국어</option>
-        <option value="en">English</option>
-      </select>
-
-      <input id="title" placeholder="제목" required>
-
-      <div id="editor" style="height: 300px; background: #fff; border: 1px solid #ccc; border-radius: 6px;"></div>
-
-      <label for="images"><strong>이미지 업로드 (여러 장 선택 가능)</strong></label>
-      <input type="file" id="images" name="images" multiple>
-
-      <div id="filePreview" style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
-        선택된 파일 없음
-      </div>
-
-      <button id="uploadBtn">등록</button>
-    </section>
-
-    <section class="post-list" id="postList">
-      <h2>게시물 목록</h2>
-      <div id="posts"></div>
-    </section>
-  </main>
-
-  <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
-
-  <script>
-    const API_URL = "/api";
-    const token = localStorage.getItem("token");
-    const role = localStorage.getItem("role");
-
-    if (!token || role !== "admin") {
-      alert("로그인이 필요합니다.");
-      location.href = "/kr/admin/login.html";
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-      window.quill = new Quill("#editor", {
-        theme: "snow",
-        placeholder: "내용을 입력하세요...",
-        modules: {
-          toolbar: [
-            [{ header: [1, 2, false] }],
-            ["bold", "italic", "underline"],
-            [{ list: "ordered" }, { list: "bullet" }],
-            ["link", "image"],
-            ["clean"],
-          ],
-        },
-      });
+  // Quill Editor 초기화
+  document.addEventListener("DOMContentLoaded", () => {
+    window.quill = new Quill("#editor", {
+      theme: "snow",
+      placeholder: "내용을 입력하세요...",
+      modules: {
+        toolbar: [
+          [{ header: [1, 2, false] }],
+          ["bold", "italic", "underline"],
+          [{ list: "ordered" }, { list: "bullet" }],
+          ["link", "image"],
+          ["clean"],
+        ],
+      },
     });
+  });
 
-    // ==========================================================
-    //  🔥 완전 안정적인 파일 누적 방식 (input 교체)
-    // ==========================================================
+  // ==========================================================
+  //   🔥 완전 안정적인 파일 누적 방식 (input 완전 재생성)
+  // ==========================================================
+  let selectedFiles = [];
+  let imagesInput = document.getElementById("images");
+  const preview = document.getElementById("filePreview");
 
-    let selectedFiles = [];
-    let imagesInput = document.getElementById("images");
-    const preview = document.getElementById("filePreview");
+  function attachInputHandler() {
+    const parent = imagesInput.parentNode;
 
-    function attachInputHandler() {
-      const newInput = imagesInput.cloneNode(true);
-      imagesInput.replaceWith(newInput);
-      imagesInput = newInput;
+    // 기존 input 삭제
+    imagesInput.remove();
 
-      newInput.addEventListener("change", (e) => {
-        const files = Array.from(e.target.files);
-        if (files.length > 0) {
-          selectedFiles.push(...files);
-          redrawPreview();
-        }
-        attachInputHandler(); // 다음 선택도 정상 동작하도록 새 input 설치
-      });
-    }
+    // 새 input 생성 (캐시 완전 초기화)
+    const newInput = document.createElement("input");
+    newInput.type = "file";
+    newInput.id = "images";
+    newInput.name = "images";
+    newInput.multiple = true;
 
-    attachInputHandler();
+    // DOM에 삽입
+    parent.insertBefore(newInput, parent.children[parent.children.length - 1]);
+    imagesInput = newInput;
 
-    function redrawPreview() {
-      preview.innerHTML = "";
-
-      if (selectedFiles.length === 0) {
-        preview.textContent = "선택된 파일 없음";
-        return;
-      }
-
-      selectedFiles.forEach((file, idx) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const wrap = document.createElement("div");
-          wrap.className = "preview-item";
-
-          const img = document.createElement("img");
-          img.src = e.target.result;
-
-          const btn = document.createElement("button");
-          btn.className = "remove-btn";
-          btn.textContent = "×";
-          btn.onclick = () => {
-            selectedFiles.splice(idx, 1);
-            redrawPreview();
-          };
-
-          wrap.appendChild(img);
-          wrap.appendChild(btn);
-          preview.appendChild(wrap);
-        };
-        reader.readAsDataURL(file);
-      });
-    }
-
-    // ==========================================================
-    // 게시물 목록
-    // ==========================================================
-    async function loadPosts() {
-      const res = await fetch(`${API_URL}/posts/news`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const posts = await res.json();
-      const list = document.getElementById("posts");
-
-      list.innerHTML = posts
-        .map(
-          (p) => `
-          <div class="post-item">
-            <div>
-              <strong>${p.title}</strong> (${p.category}) [${p.lang}]
-              <div style="display:flex; gap:6px; margin-top:6px;">
-                ${
-                  p.images?.length
-                    ? p.images
-                        .map(
-                          (img) =>
-                            `<img src="${img}" style="width:70px;height:70px;object-fit:cover;border-radius:6px;border:1px solid #ddd;">`
-                        )
-                        .join("")
-                    : ""
-                }
-              </div>
-            </div>
-            <button class="delete-btn" onclick="deletePost(${p.id})">삭제</button>
-          </div>`
-        )
-        .join("");
-    }
-
-    async function deletePost(id) {
-      if (!confirm("삭제하시겠습니까?")) return;
-      await fetch(`${API_URL}/posts/${id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      loadPosts();
-    }
-
-    document.getElementById("uploadBtn").addEventListener("click", async () => {
-      if (selectedFiles.length === 0) {
-        alert("이미지를 최소 1장 이상 첨부하세요.");
-        return;
-      }
-
-      const fd = new FormData();
-      fd.append("title", document.getElementById("title").value);
-      fd.append("content", window.quill.root.innerHTML);
-      fd.append("category", document.getElementById("category").value);
-      fd.append("lang", document.getElementById("lang").value);
-
-      selectedFiles.forEach((f) => fd.append("images", f));
-
-      const res = await fetch(`${API_URL}/posts`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: fd,
-      });
-
-      if (res.ok) {
-        alert("등록 완료!");
-        selectedFiles = [];
+    // change 이벤트 연결
+    newInput.addEventListener("change", (e) => {
+      const files = Array.from(e.target.files);
+      if (files.length > 0) {
+        selectedFiles.push(...files);
         redrawPreview();
-        attachInputHandler();
-        document.getElementById("title").value = "";
-        window.quill.root.innerHTML = "";
-        loadPosts();
-      } else {
-        alert("등록 실패. 서버 로그 확인");
       }
-    });
 
-    document.getElementById("logoutBtn").addEventListener("click", () => {
-      localStorage.clear();
-      location.href = "/kr/admin/login.html";
+      // 다음 선택도 정상적으로 작동하도록 input을 또 재생성
+      attachInputHandler();
     });
+  }
 
+  // 최초 1회 실행
+  attachInputHandler();
+
+  // ==========================================================
+  // 미리보기 렌더링
+  // ==========================================================
+  function redrawPreview() {
+    preview.innerHTML = "";
+
+    if (selectedFiles.length === 0) {
+      preview.textContent = "선택된 파일 없음";
+      return;
+    }
+
+    selectedFiles.forEach((file, idx) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const wrap = document.createElement("div");
+        wrap.className = "preview-item";
+
+        const img = document.createElement("img");
+        img.src = e.target.result;
+        img.style.width = "80px";
+        img.style.height = "80px";
+        img.style.objectFit = "cover";
+        img.style.borderRadius = "6px";
+        img.style.border = "1px solid #ccc";
+        img.style.padding = "3px";
+
+        const btn = document.createElement("button");
+        btn.className = "remove-btn";
+        btn.textContent = "×";
+        btn.onclick = () => {
+          selectedFiles.splice(idx, 1);
+          redrawPreview();
+        };
+
+        wrap.appendChild(img);
+        wrap.appendChild(btn);
+        preview.appendChild(wrap);
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // ==========================================================
+  // 게시물 목록 로드
+  // ==========================================================
+  async function loadPosts() {
+    const res = await fetch(`${API_URL}/posts/news`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const posts = await res.json();
+    const list = document.getElementById("posts");
+
+    list.innerHTML = posts
+      .map(
+        (p) => `
+        <div class="post-item">
+          <div>
+            <strong>${p.title}</strong> (${p.category}) [${p.lang}]
+            <div style="display:flex; gap:6px; margin-top:6px;">
+              ${
+                p.images?.length
+                  ? p.images
+                      .map(
+                        (img) =>
+                          `<img src="${img}" style="width:70px;height:70px;object-fit:cover;border-radius:6px;border:1px solid #ddd;">`
+                      )
+                      .join("")
+                  : ""
+              }
+            </div>
+          </div>
+          <button class="delete-btn" onclick="deletePost(${p.id})">삭제</button>
+        </div>`
+      )
+      .join("");
+  }
+
+  async function deletePost(id) {
+    if (!confirm("삭제하시겠습니까?")) return;
+    await fetch(`${API_URL}/posts/${id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
     loadPosts();
-  </script>
+  }
 
-</body>
-</html>
+  // ==========================================================
+  // 게시물 업로드
+  // ==========================================================
+  document.getElementById("uploadBtn").addEventListener("click", async () => {
+    if (selectedFiles.length === 0) {
+      alert("이미지를 최소 1장 이상 첨부하세요.");
+      return;
+    }
+
+    const fd = new FormData();
+    fd.append("title", document.getElementById("title").value);
+    fd.append("content", window.quill.root.innerHTML);
+    fd.append("category", document.getElementById("category").value);
+    fd.append("lang", document.getElementById("lang").value);
+
+    selectedFiles.forEach((f) => fd.append("images", f));
+
+    const res = await fetch(`${API_URL}/posts`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+      body: fd,
+    });
+
+    if (res.ok) {
+      alert("등록 완료!");
+      selectedFiles = [];
+      redrawPreview();
+      attachInputHandler();
+      document.getElementById("title").value = "";
+      window.quill.root.innerHTML = "";
+      loadPosts();
+    } else {
+      alert("등록 실패. 서버 로그 확인");
+    }
+  });
+
+  // 로그아웃
+  document.getElementById("logoutBtn").addEventListener("click", () => {
+    localStorage.clear();
+    location.href = "/kr/admin/login.html";
+  });
+
+  loadPosts();
+</script>
