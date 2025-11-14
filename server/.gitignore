@@ -26,3 +26,6 @@ Thumbs.db
 
 # 업로드된 실제 파일(게시판 첨부파일 등)
 uploads/
+
+
+"git.enabled": false

@@ -3,10 +3,51 @@
 <head>
   <meta charset="UTF-8">
   <title>관리자 로그인 | Fine Defense</title>
+
+
+
   <link rel="stylesheet" href="/css/style.css">
+
+
+
   <style>
-    body { font-family: 'Noto Sans KR', sans-serif; background: #f2f5fa; display: flex; align-items: center; justify-content: center; height: 100vh; }
+      body {
+        font-family: 'Noto Sans KR', sans-serif;
+        background: #f2f5fa;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh; /* footer를 항상 바닥에 고정시키기 위해 필요 */
+      }
+      
+    .login-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: calc(100vh - 200px); /* header + footer 공간 확보 */
+      padding-top: 100px;  /* header 높이만큼 */
+      padding-bottom: 100px; /* footer 여유 */
+    }
     .login-box { background: #fff; padding: 40px 50px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 400px; }
+
+
+    /* 로그인 박스를 화면 중앙에 위치 */
+    .login-wrapper {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .login-area {
+      flex: 1; /* header와 footer 사이를 꽉 채움 */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 0;
+    }
+
+
     h2 { text-align: center; margin-bottom: 30px; color: #0f2679; }
     input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 8px; font-size: 15px; }
     button { width: 100%; padding: 12px; background: #0f2679; color: white; font-size: 16px; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; }
@@ -14,14 +55,24 @@
     .error { color: crimson; text-align: center; margin-top: 10px; font-size: 14px; }
   </style>
 </head>
+
+
+
 <body>
-  <div class="login-box">
-    <h2>관리자 로그인</h2>
-    <input type="text" id="username" placeholder="아이디">
-    <input type="password" id="password" placeholder="비밀번호">
-    <button id="loginBtn">로그인</button>
-    <p id="errorMsg" class="error"></p>
-  </div>
+
+  <div id="header"></div>
+
+  <main class="login-area">
+    <div class="login-box">
+      <h2>관리자 로그인</h2>
+      <input type="text" id="username" placeholder="아이디">
+      <input type="password" id="password" placeholder="비밀번호">
+      <button id="loginBtn">로그인</button>
+      <p id="errorMsg" class="error"></p>
+    </div>
+  </main>
+
+  <div id="footer"></div>
 
   <script>
       const API_URL = "http://13.124.216.100:3000";
@@ -55,5 +106,34 @@
       }
     });
   </script>
+
+
+  <script>
+  // ✅ header 불러오기
+  fetch("/kr/components/header.html")
+    .then(res => res.text())
+    .then(data => {
+      document.getElementById("header").innerHTML = data;
+
+      // ✅ header가 DOM에 완전히 반영된 후 language.js 로드
+      setTimeout(() => {
+        const langScript = document.createElement("script");
+        langScript.src = "/js/language.js";
+        document.body.appendChild(langScript);
+      }, 300);
+    })
+    .catch(err => console.error("❌ header load error:", err));
+
+  // ✅ footer 불러오기
+  fetch("/kr/components/footer.html")
+    .then(res => res.text())
+    .then(data => {
+      document.getElementById("footer").innerHTML = data;
+    })
+    .catch(err => console.error("❌ footer load error:", err));
+</script>
+
+
+
 </body>
 </html>
