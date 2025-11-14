@@ -35,10 +35,13 @@ router.post("/", upload.array("images", 10), verifyToken, async (req, res) => {
     const { title, content, category, lang } = req.body;
     const authorId = req.user.id;
 
+    // 🔴 파일이 하나도 안 온 경우 바로 에러 리턴 (DB 안 건드리기)
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ message: "이미지가 첨부되지 않았습니다." });
+    }
+
     // 대표 이미지(첫 번째)
-    const mainImage = req.files?.[0]
-      ? `/uploads/news/${req.files[0].filename}`
-      : null;
+    const mainImage = `/uploads/news/${req.files[0].filename}`;
 
     // posts 테이블 INSERT
     const [result] = await db.execute(
@@ -49,7 +52,7 @@ router.post("/", upload.array("images", 10), verifyToken, async (req, res) => {
 
     const postId = result.insertId;
 
-    // post_images 테이블 INSERT
+    // post_images 테이블 INSERT (여러 장)
     for (const file of req.files) {
       const imagePath = `/uploads/news/${file.filename}`;
       await db.execute(
@@ -64,10 +67,6 @@ router.post("/", upload.array("images", 10), verifyToken, async (req, res) => {
     console.error("게시물 등록 오류:", err);
     res.status(500).json({ message: "서버 오류" });
   }
-
-  
-
-
 });
 
 /* ==========================================
