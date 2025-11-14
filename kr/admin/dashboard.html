@@ -178,7 +178,7 @@
     location.href = "/kr/admin/login.html";
   }
 
-  // Quill Editor 초기화
+  // Quill 초기화
   document.addEventListener("DOMContentLoaded", () => {
     window.quill = new Quill("#editor", {
       theme: "snow",
@@ -195,63 +195,58 @@
     });
   });
 
-  // ==========================================================
-  //  🔥 완전 안정적인 파일 누적 방식 (랜덤 ID + 완전 재생성)
-  // ==========================================================
-  let selectedFiles = [];
-  let imagesInput = document.getElementById("images");
+  // ================================
+  //   🔥 기업 방식: input을 숨기고 배열로 관리
+  // ================================
+  let fileList = [];  // 파일을 이 배열 안에서 관리
+  const hiddenContainer = document.createElement("div");
+  hiddenContainer.style.display = "none";
+  document.body.appendChild(hiddenContainer);
+
   const preview = document.getElementById("filePreview");
 
-  function recreateInput() {
-    const parent = imagesInput.parentNode;
+  function createNewInput() {
+    // 완전 새로운 input 생성 (브라우저 캐시 영향 없음)
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.multiple = true;
 
-    // 기존 input 삭제
-    imagesInput.remove();
+    // 숨긴 DOM 안에 넣기
+    hiddenContainer.innerHTML = "";
+    hiddenContainer.appendChild(input);
 
-    // 랜덤 ID 생성
-    const randomId = "images_" + Math.random().toString(36).substring(2, 10);
-
-    // 완전히 새로운 input 생성
-    const newInput = document.createElement("input");
-    newInput.type = "file";
-    newInput.multiple = true;
-    newInput.name = "images";
-    newInput.id = randomId;
-
-    // DOM에 항상 아래쪽에 append (위치 자체를 변화시켜 캐시 우회)
-    parent.appendChild(newInput);
-
-    imagesInput = newInput;
-
-    // change 이벤트 (파일 선택 시 누적)
-    newInput.addEventListener("change", (e) => {
+    // 선택 시 배열에 push
+    input.addEventListener("change", (e) => {
       const files = Array.from(e.target.files);
-
-      if (files.length > 0) {
-        selectedFiles.push(...files);
-        redrawPreview();
-      }
-
-      // 다음 파일 선택을 위해 input 완전 재생성
-      recreateInput();
+      fileList = fileList.concat(files);   // 누적
+      drawPreview();
+      createNewInput();  // 다음 선택을 위해 input 재생성
     });
+
+    return input;
   }
 
-  // 최초 1회 실행
-  recreateInput();
+  // 최초 input 생성
+  let inputFile = createNewInput();
 
-  // ==========================================================
-  //  미리보기 렌더링
-  // ==========================================================
-  function redrawPreview() {
+  // 유저가 클릭하면 숨겨진 파일창 열기
+  document.getElementById("images").onclick = () => {
+    inputFile.click();
+  };
+
+  // ================================
+  //   미리보기 렌더링
+  // ================================
+  function drawPreview() {
     preview.innerHTML = "";
 
-    if (selectedFiles.length === 0) {
+    if (fileList.length === 0) {
       preview.textContent = "선택된 파일 없음";
       return;
     }
 
-    selectedFiles.forEach((file, idx) => {
+    fileList.forEach((file, idx) => {
       const reader = new FileReader();
 
       reader.onload = (e) => {
@@ -260,19 +255,13 @@
 
         const img = document.createElement("img");
         img.src = e.target.result;
-        img.style.width = "80px";
-        img.style.height = "80px";
-        img.style.objectFit = "cover";
-        img.style.borderRadius = "6px";
-        img.style.border = "1px solid #ccc";
-        img.style.padding = "3px";
 
         const btn = document.createElement("button");
         btn.className = "remove-btn";
         btn.textContent = "×";
         btn.onclick = () => {
-          selectedFiles.splice(idx, 1);
-          redrawPreview();
+          fileList.splice(idx, 1);
+          drawPreview();
         };
 
         wrap.appendChild(img);
@@ -284,9 +273,51 @@
     });
   }
 
-  // ==========================================================
-  // 게시물 목록
-  // ==========================================================
+  // ================================
+  //   게시물 업로드
+  // ================================
+  document.getElementById("uploadBtn").addEventListener("click", async () => {
+    if (fileList.length === 0) {
+      alert("이미지를 최소 1장 첨부하세요.");
+      return;
+    }
+
+    const fd = new FormData();
+    fd.append("title", document.getElementById("title").value);
+    fd.append("content", window.quill.root.innerHTML);
+    fd.append("category", document.getElementById("category").value);
+    fd.append("lang", document.getElementById("lang").value);
+
+    fileList.forEach((file) => fd.append("images", file));
+
+    const res = await fetch(`${API_URL}/posts`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+      body: fd,
+    });
+
+    if (!res.ok) {
+      alert("등록 실패 (서버확인)");
+      return;
+    }
+
+    alert("등록 완료!");
+
+    // 초기화
+    fileList = [];
+    drawPreview();
+    window.quill.root.innerHTML = "";
+    document.getElementById("title").value = "";
+
+    // input 재생성
+    inputFile = createNewInput();
+
+    loadPosts();
+  });
+
+  // ================================
+  //   게시물 목록
+  // ================================
   async function loadPosts() {
     const res = await fetch(`${API_URL}/posts/news`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -298,24 +329,25 @@
     list.innerHTML = posts
       .map(
         (p) => `
-          <div class="post-item">
-            <div>
-              <strong>${p.title}</strong> (${p.category}) [${p.lang}]
-              <div style="display:flex; gap:6px; margin-top:6px;">
-                ${
-                  p.images?.length
-                    ? p.images
-                        .map(
-                          (img) =>
-                            `<img src="${img}" style="width:70px;height:70px;object-fit:cover;border-radius:6px;border:1px solid #ddd;">`
-                        )
-                        .join("")
-                    : ""
-                }
-              </div>
+        <div class="post-item">
+          <div>
+            <strong>${p.title}</strong> (${p.category}) [${p.lang}]
+            <div style="display:flex; gap:6px; margin-top:6px;">
+              ${
+                p.images?.length
+                  ? p.images
+                      .map(
+                        (img) =>
+                          `<img src="${img}" style="width:70px;height:70px;border-radius:6px;border:1px solid #ddd;">`
+                      )
+                      .join("")
+                  : ""
+              }
             </div>
-            <button class="delete-btn" onclick="deletePost(${p.id})">삭제</button>
-          </div>`
+          </div>
+          <button class="delete-btn" onclick="deletePost(${p.id})">삭제</button>
+        </div>
+      `
       )
       .join("");
   }
@@ -329,42 +361,6 @@
     loadPosts();
   }
 
-  // ==========================================================
-  // 게시물 업로드
-  // ==========================================================
-  document.getElementById("uploadBtn").addEventListener("click", async () => {
-    if (selectedFiles.length === 0) {
-      alert("이미지를 최소 1장 이상 첨부하세요.");
-      return;
-    }
-
-    const fd = new FormData();
-    fd.append("title", document.getElementById("title").value);
-    fd.append("content", window.quill.root.innerHTML);
-    fd.append("category", document.getElementById("category").value);
-    fd.append("lang", document.getElementById("lang").value);
-
-    selectedFiles.forEach((f) => fd.append("images", f));
-
-    const res = await fetch(`${API_URL}/posts`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-      body: fd,
-    });
-
-    if (res.ok) {
-      alert("등록 완료!");
-      selectedFiles = [];
-      redrawPreview();
-      recreateInput();
-      document.getElementById("title").value = "";
-      window.quill.root.innerHTML = "";
-      loadPosts();
-    } else {
-      alert("등록 실패. 서버 로그 확인");
-    }
-  });
-
   document.getElementById("logoutBtn").addEventListener("click", () => {
     localStorage.clear();
     location.href = "/kr/admin/login.html";
@@ -372,6 +368,7 @@
 
   loadPosts();
 </script>
+
 
 
 
