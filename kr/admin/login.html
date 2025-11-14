@@ -58,7 +58,8 @@
 
   <!-- ⭐ 로그인 스크립트 -->
   <script>
-    const API_URL = "http://13.124.216.100:3000";
+    // ⭐ 도메인/IP 상관없이 항상 자동으로 백엔드로 연결됨
+    const API_URL = "/api";    
 
     function initLogin() {
       console.log("initLogin 실행됨!");
@@ -66,7 +67,7 @@
       const btn = document.getElementById("loginBtn");
       if (!btn) {
         console.log("loginBtn 없음 → 200ms 후 재시도");
-        return setTimeout(initLogin, 200); // ⭐ 버튼이 생성될 때까지 반복
+        return setTimeout(initLogin, 200);
       }
 
       btn.addEventListener("click", async () => {
@@ -82,7 +83,8 @@
         }
 
         try {
-          const res = await fetch(`${API_URL}/api/auth/login`, {
+          // ⭐ API_URL + 상대경로 조합
+          const res = await fetch(`${API_URL}/auth/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, password })
@@ -98,6 +100,7 @@
           } else {
             errorMsg.textContent = "로그인 실패: 관리자 권한이 없습니다.";
           }
+
         } catch (err) {
           console.log("fetch 오류:", err);
           errorMsg.textContent = "서버에 연결할 수 없습니다.";
@@ -105,7 +108,6 @@
       });
     }
 
-    // ⭐ DOM이 완전히 준비된 후 initLogin 반복 실행
     document.addEventListener("DOMContentLoaded", () => {
       initLogin();
     });
