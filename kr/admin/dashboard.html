@@ -109,11 +109,15 @@
         return;
       }
 
+      // 여러 장 선택하면 여러 장 표시
       let names = [];
-      for (const file of files) names.push(file.name);
+      for (const file of files) {
+        names.push(file.name);
+      }
 
       preview.textContent = "선택된 파일: " + names.join(", ");
     });
+
 
     // 게시물 목록 로드
     async function loadPosts() {
