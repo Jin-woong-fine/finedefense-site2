@@ -196,47 +196,52 @@
   });
 
   // ==========================================================
-  //   🔥 완전 안정적인 파일 누적 방식 (input 완전 재생성)
+  //  🔥 완전 안정적인 파일 누적 방식 (랜덤 ID + 완전 재생성)
   // ==========================================================
   let selectedFiles = [];
   let imagesInput = document.getElementById("images");
   const preview = document.getElementById("filePreview");
 
-  function attachInputHandler() {
+  function recreateInput() {
     const parent = imagesInput.parentNode;
 
     // 기존 input 삭제
     imagesInput.remove();
 
-    // 새 input 생성 (캐시 완전 초기화)
+    // 랜덤 ID 생성
+    const randomId = "images_" + Math.random().toString(36).substring(2, 10);
+
+    // 완전히 새로운 input 생성
     const newInput = document.createElement("input");
     newInput.type = "file";
-    newInput.id = "images";
-    newInput.name = "images";
     newInput.multiple = true;
+    newInput.name = "images";
+    newInput.id = randomId;
 
-    // DOM에 삽입
-    parent.insertBefore(newInput, parent.children[parent.children.length - 1]);
+    // DOM에 항상 아래쪽에 append (위치 자체를 변화시켜 캐시 우회)
+    parent.appendChild(newInput);
+
     imagesInput = newInput;
 
-    // change 이벤트 연결
+    // change 이벤트 (파일 선택 시 누적)
     newInput.addEventListener("change", (e) => {
       const files = Array.from(e.target.files);
+
       if (files.length > 0) {
         selectedFiles.push(...files);
         redrawPreview();
       }
 
-      // 다음 선택도 정상적으로 작동하도록 input을 또 재생성
-      attachInputHandler();
+      // 다음 파일 선택을 위해 input 완전 재생성
+      recreateInput();
     });
   }
 
   // 최초 1회 실행
-  attachInputHandler();
+  recreateInput();
 
   // ==========================================================
-  // 미리보기 렌더링
+  //  미리보기 렌더링
   // ==========================================================
   function redrawPreview() {
     preview.innerHTML = "";
@@ -248,6 +253,7 @@
 
     selectedFiles.forEach((file, idx) => {
       const reader = new FileReader();
+
       reader.onload = (e) => {
         const wrap = document.createElement("div");
         wrap.className = "preview-item";
@@ -273,41 +279,43 @@
         wrap.appendChild(btn);
         preview.appendChild(wrap);
       };
+
       reader.readAsDataURL(file);
     });
   }
 
   // ==========================================================
-  // 게시물 목록 로드
+  // 게시물 목록
   // ==========================================================
   async function loadPosts() {
     const res = await fetch(`${API_URL}/posts/news`, {
       headers: { Authorization: `Bearer ${token}` },
     });
+
     const posts = await res.json();
     const list = document.getElementById("posts");
 
     list.innerHTML = posts
       .map(
         (p) => `
-        <div class="post-item">
-          <div>
-            <strong>${p.title}</strong> (${p.category}) [${p.lang}]
-            <div style="display:flex; gap:6px; margin-top:6px;">
-              ${
-                p.images?.length
-                  ? p.images
-                      .map(
-                        (img) =>
-                          `<img src="${img}" style="width:70px;height:70px;object-fit:cover;border-radius:6px;border:1px solid #ddd;">`
-                      )
-                      .join("")
-                  : ""
-              }
+          <div class="post-item">
+            <div>
+              <strong>${p.title}</strong> (${p.category}) [${p.lang}]
+              <div style="display:flex; gap:6px; margin-top:6px;">
+                ${
+                  p.images?.length
+                    ? p.images
+                        .map(
+                          (img) =>
+                            `<img src="${img}" style="width:70px;height:70px;object-fit:cover;border-radius:6px;border:1px solid #ddd;">`
+                        )
+                        .join("")
+                    : ""
+                }
+              </div>
             </div>
-          </div>
-          <button class="delete-btn" onclick="deletePost(${p.id})">삭제</button>
-        </div>`
+            <button class="delete-btn" onclick="deletePost(${p.id})">삭제</button>
+          </div>`
       )
       .join("");
   }
@@ -348,7 +356,7 @@
       alert("등록 완료!");
       selectedFiles = [];
       redrawPreview();
-      attachInputHandler();
+      recreateInput();
       document.getElementById("title").value = "";
       window.quill.root.innerHTML = "";
       loadPosts();
@@ -357,7 +365,6 @@
     }
   });
 
-  // 로그아웃
   document.getElementById("logoutBtn").addEventListener("click", () => {
     localStorage.clear();
     location.href = "/kr/admin/login.html";
@@ -365,6 +372,7 @@
 
   loadPosts();
 </script>
+
 
 
 </body>
