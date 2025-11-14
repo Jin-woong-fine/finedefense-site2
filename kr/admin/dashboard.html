@@ -166,8 +166,6 @@
     </section>
   </main>
 
-<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
-
 <script>
   const API_URL = "/api";
   const token = localStorage.getItem("token");
@@ -178,7 +176,9 @@
     location.href = "/kr/admin/login.html";
   }
 
-  // Quill 초기화
+  // ================================
+  //   🔥 Quill 초기화
+  // ================================
   document.addEventListener("DOMContentLoaded", () => {
     window.quill = new Quill("#editor", {
       theme: "snow",
@@ -196,9 +196,9 @@
   });
 
   // ================================
-  //   🔥 기업 방식: input을 숨기고 배열로 관리
+  //   🔥 기업 방식: input 관리 구조 수정
   // ================================
-  let fileList = [];  // 파일을 이 배열 안에서 관리
+  let fileList = [];  
   const hiddenContainer = document.createElement("div");
   hiddenContainer.style.display = "none";
   document.body.appendChild(hiddenContainer);
@@ -206,37 +206,44 @@
   const preview = document.getElementById("filePreview");
 
   function createNewInput() {
-    // 완전 새로운 input 생성 (브라우저 캐시 영향 없음)
     const input = document.createElement("input");
     input.type = "file";
     input.accept = "image/*";
     input.multiple = true;
 
-    // 숨긴 DOM 안에 넣기
     hiddenContainer.innerHTML = "";
     hiddenContainer.appendChild(input);
 
-    // 선택 시 배열에 push
     input.addEventListener("change", (e) => {
       const files = Array.from(e.target.files);
-      fileList = fileList.concat(files);   // 누적
+      fileList = fileList.concat(files);
       drawPreview();
-      createNewInput();  // 다음 선택을 위해 input 재생성
+
+      // 🔥 change 이벤트 루프 방지
+      input.value = null;
+
+      // 다음 선택 대비 새 input 생성
+      inputFile = createNewInput();
     });
 
     return input;
   }
 
-  // 최초 input 생성
+  // 최초 input
   let inputFile = createNewInput();
 
-  // 유저가 클릭하면 숨겨진 파일창 열기
-  document.getElementById("images").onclick = () => {
-    inputFile.click();
-  };
+  // ================================
+  //   🔥 #images를 "버튼" 처럼 사용 (창 안뜨게)
+  // ================================
+  const visibleInput = document.getElementById("images");
+  visibleInput.type = "button";  // ← 핵심! input:file 아님
+  visibleInput.value = "이미지 선택하기"; 
+  visibleInput.addEventListener("click", () => {
+    inputFile.click();   // 숨겨진 input을 호출
+  });
 
   // ================================
-  //   미리보기 렌더링
+  //   🔥 미리보기
   // ================================
   function drawPreview() {
     preview.innerHTML = "";
@@ -274,7 +281,7 @@
   }
 
   // ================================
-  //   게시물 업로드
+  //   🔥 게시물 업로드
   // ================================
   document.getElementById("uploadBtn").addEventListener("click", async () => {
     if (fileList.length === 0) {
@@ -309,14 +316,13 @@
     window.quill.root.innerHTML = "";
     document.getElementById("title").value = "";
 
-    // input 재생성
     inputFile = createNewInput();
 
     loadPosts();
   });
 
   // ================================
-  //   게시물 목록
+  //   🔥 게시물 목록
   // ================================
   async function loadPosts() {
     const res = await fetch(`${API_URL}/posts/news`, {
@@ -368,6 +374,7 @@
 
   loadPosts();
 </script>
+
 
 
 
