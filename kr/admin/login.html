@@ -4,49 +4,34 @@
   <meta charset="UTF-8">
   <title>관리자 로그인 | Fine Defense</title>
 
-
-
   <link rel="stylesheet" href="/css/style.css">
 
-
-
   <style>
-      body {
-        font-family: 'Noto Sans KR', sans-serif;
-        background: #f2f5fa;
-        margin: 0;
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh; /* footer를 항상 바닥에 고정시키기 위해 필요 */
-      }
-      
-    .login-container {
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: #f2f5fa;
+      margin: 0;
       display: flex;
-      justify-content: center;
-      align-items: center;
-      height: calc(100vh - 200px); /* header + footer 공간 확보 */
-      padding-top: 100px;  /* header 높이만큼 */
-      padding-bottom: 100px; /* footer 여유 */
-    }
-    .login-box { background: #fff; padding: 40px 50px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 400px; }
-
-
-    /* 로그인 박스를 화면 중앙에 위치 */
-    .login-wrapper {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+      flex-direction: column;
+      min-height: 100vh;
     }
 
+    /* header + footer 사이 공간 */
     .login-area {
-      flex: 1; /* header와 footer 사이를 꽉 채움 */
+      flex: 1;
       display: flex;
       justify-content: center;
       align-items: center;
       padding: 40px 0;
     }
 
+    .login-box {
+      background: #fff;
+      padding: 40px 50px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      width: 400px;
+    }
 
     h2 { text-align: center; margin-bottom: 30px; color: #0f2679; }
     input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 8px; font-size: 15px; }
@@ -55,8 +40,6 @@
     .error { color: crimson; text-align: center; margin-top: 10px; font-size: 14px; }
   </style>
 </head>
-
-
 
 <body>
 
@@ -75,65 +58,61 @@
   <div id="footer"></div>
 
   <script>
-      const API_URL = "http://13.124.216.100:3000";
+    const API_URL = "http://13.124.216.100:3000";
 
+    function initLogin() {
+      const btn = document.getElementById("loginBtn");
+      if (!btn) return;
 
-    document.getElementById("loginBtn").addEventListener("click", async () => {
-      const username = document.getElementById("username").value.trim();
-      const password = document.getElementById("password").value.trim();
-      const errorMsg = document.getElementById("errorMsg");
+      btn.addEventListener("click", async () => {
+        const username = document.getElementById("username").value.trim();
+        const password = document.getElementById("password").value.trim();
+        const errorMsg = document.getElementById("errorMsg");
 
-      if (!username || !password) {
-        errorMsg.textContent = "아이디와 비밀번호를 입력하세요.";
-        return;
-      }
+        if (!username || !password) {
+          errorMsg.textContent = "아이디와 비밀번호를 입력하세요.";
+          return;
+        }
 
-      const res = await fetch(`${API_URL}/api/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
+        const res = await fetch(`${API_URL}/api/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.role === "admin") {
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("role", data.role);
+          localStorage.setItem("name", data.name);
+          location.href = "/kr/admin/dashboard.html";
+        } else {
+          errorMsg.textContent = "로그인 실패: 관리자 권한이 없습니다.";
+        }
       });
-
-      const data = await res.json();
-
-      if (res.ok && data.role === "admin") {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("role", data.role);
-        localStorage.setItem("name", data.name);
-        location.href = "/kr/admin/dashboard.html";
-      } else {
-        errorMsg.textContent = "로그인 실패: 관리자 권한이 없습니다.";
-      }
-    });
+    }
   </script>
 
-
   <script>
-  // ✅ header 불러오기
-  fetch("/kr/components/header.html")
-    .then(res => res.text())
-    .then(data => {
-      document.getElementById("header").innerHTML = data;
+    // header 로드
+    fetch("/kr/components/header.html")
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById("header").innerHTML = data;
 
-      // ✅ header가 DOM에 완전히 반영된 후 language.js 로드
-      setTimeout(() => {
-        const langScript = document.createElement("script");
-        langScript.src = "/js/language.js";
-        document.body.appendChild(langScript);
-      }, 300);
-    })
-    .catch(err => console.error("❌ header load error:", err));
+        setTimeout(() => {
+          const langScript = document.createElement("script");
+          langScript.src = "/js/language.js";
+          document.body.appendChild(langScript);
 
-  // ✅ footer 불러오기
-  fetch("/kr/components/footer.html")
-    .then(res => res.text())
-    .then(data => {
-      document.getElementById("footer").innerHTML = data;
-    })
-    .catch(err => console.error("❌ footer load error:", err));
-</script>
+          // 🎯 header가 완전히 로드된 후 이벤트 등록
+          initLogin();
+        }, 300);
+      });
 
-
-
-</body>
-</html>
+    // footer 로드
+    fetch("/kr/components/footer.html")
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById("footer").innerHTML = da
