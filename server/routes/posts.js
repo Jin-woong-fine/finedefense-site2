@@ -26,49 +26,52 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 /* ==========================================
-   🧩 게시물 등록 (다중 이미지 업로드)
+   🧩 1) 게시물 등록 (다중 이미지 업로드)
 ========================================== */
 router.post("/", verifyToken, upload.array("images", 10), async (req, res) => {
   try {
     const { title, content, category, lang } = req.body;
     const authorId = req.user.id;
 
-    // 대표 이미지: 첫 번째 파일
+    // 대표 이미지(첫 번째)
     const mainImage = req.files?.[0]
       ? `/uploads/news/${req.files[0].filename}`
       : null;
 
-    // posts 테이블에 등록
+    // posts 테이블 INSERT
     const [result] = await db.execute(
-      "INSERT INTO posts (title, content, category, lang, author_id, main_image) VALUES (?, ?, ?, ?, ?, ?)",
+      `INSERT INTO posts (title, content, category, lang, author_id, main_image)
+       VALUES (?, ?, ?, ?, ?, ?)`,
       [title, content, category, lang, authorId, mainImage]
     );
+
     const postId = result.insertId;
 
-    // 나머지 이미지 post_images 테이블에 등록
+    // post_images 테이블 INSERT
     for (const file of req.files) {
       const imagePath = `/uploads/news/${file.filename}`;
       await db.execute(
-        "INSERT INTO post_images (post_id, image_path) VALUES (?, ?)",
+        `INSERT INTO post_images (post_id, image_path)
+         VALUES (?, ?)`,
         [postId, imagePath]
       );
     }
 
     res.json({ message: "게시물 등록 완료", postId });
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error("게시물 등록 오류:", err);
     res.status(500).json({ message: "서버 오류" });
   }
 });
 
 /* ==========================================
-   📤 게시물 목록 조회 (카테고리별)
+   📤 2) 카테고리별 목록 조회
 ========================================== */
 router.get("/:category", async (req, res) => {
-  const { category } = req.params;
-  const lang = req.query.lang || "kr";
-
   try {
+    const { category } = req.params;
+    const lang = req.query.lang || "kr";
+
     const [rows] = await db.execute(
       `SELECT p.*, u.name AS author_name
        FROM posts p
@@ -77,32 +80,33 @@ router.get("/:category", async (req, res) => {
        ORDER BY p.created_at DESC`,
       [category, lang]
     );
+
     res.json(rows);
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error("목록 조회 오류:", err);
     res.status(500).json({ message: "조회 오류" });
   }
 });
 
 /* ==========================================
-   📸 특정 게시물의 첨부 이미지 목록 조회
+   📸 3) 게시물 이미지 목록 조회
 ========================================== */
 router.get("/images/:postId", async (req, res) => {
-  const { postId } = req.params;
   try {
+    const { postId } = req.params;
     const [rows] = await db.execute(
       "SELECT image_path FROM post_images WHERE post_id = ?",
       [postId]
     );
     res.json(rows);
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error("이미지 조회 오류:", err);
     res.status(500).json({ message: "이미지 조회 오류" });
   }
 });
 
 /* ==========================================
-   🗑️ 게시물 삭제 (관리자 전용)
+   🗑️ 4) 게시물 삭제
 ========================================== */
 router.delete("/:id", verifyToken, async (req, res) => {
   try {
@@ -111,20 +115,23 @@ router.delete("/:id", verifyToken, async (req, res) => {
 
     const { id } = req.params;
 
-    // 이미지 파일도 삭제
+    // 1) 이미지 파일 삭제
     const [images] = await db.execute(
       "SELECT image_path FROM post_images WHERE post_id = ?",
       [id]
     );
+
     for (const img of images) {
       const filePath = path.join(process.cwd(), img.image_path.replace(/^\//, ""));
       if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
     }
 
+    // 2) posts 삭제 (post_images 는 ON DELETE CASCADE 일 수도 있음)
     await db.execute("DELETE FROM posts WHERE id = ?", [id]);
+
     res.json({ message: "삭제 완료" });
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error("삭제 오류:", err);
     res.status(500).json({ message: "삭제 중 오류" });
   }
 });
