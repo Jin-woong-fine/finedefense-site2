@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>관리자 대시보드 | Fine Defense</title>
   <link rel="stylesheet" href="/css/style.css">
+
   <style>
     body { font-family: 'Noto Sans KR', sans-serif; background: #f5f7fb; margin: 0; }
     header { background: #0f2679; color: #fff; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; }
@@ -19,9 +20,8 @@
     .delete-btn { background: crimson; color: white; border: none; border-radius: 4px; padding: 6px 10px; cursor: pointer; }
   </style>
 
-    <!-- ✅ Quill Editor CDN -->
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+  <!-- Quill Editor -->
+  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 
 </head>
 <body>
@@ -31,54 +31,74 @@
   </header>
 
   <main>
-    <!-- ✅ 게시물 등록 폼 -->
     <section class="upload-form">
       <h2>게시물 등록</h2>
+
       <select id="category">
         <option value="news">뉴스룸</option>
         <option value="notice">공지사항</option>
         <option value="gallery">갤러리</option>
       </select>
+
       <select id="lang">
         <option value="kr">한국어</option>
         <option value="en">English</option>
       </select>
+
       <input id="title" placeholder="제목" required>
+
       <div id="editor" style="height: 300px; background: #fff; border: 1px solid #ccc; border-radius: 6px;"></div>
 
-
-      <!-- ✅ 여러 장 업로드 가능 -->
       <label for="images"><strong>이미지 업로드 (여러 장 선택 가능)</strong></label>
       <input type="file" id="images" name="images" multiple>
 
       <button id="uploadBtn">등록</button>
     </section>
 
-    <!-- ✅ 게시물 목록 -->
     <section class="post-list" id="postList">
       <h2>게시물 목록</h2>
       <div id="posts"></div>
     </section>
   </main>
 
-    <script>
-    // ⭐ API 상대 경로 (도메인/IP 상관없이 동작)
-    const API_URL = "/api";
+  <!-- Quill JS (body 아래에서 로드해야 안전함) -->
+  <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 
+  <script>
+    const API_URL = "/api";
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
 
-    // 로그인 검증
+    // 로그인 확인
     if (!token || role !== "admin") {
       alert("로그인이 필요합니다.");
       location.href = "/kr/admin/login.html";
     }
 
+    // ⭐ Quill Editor 초기화 (DOM 로딩 후 실행)
+    document.addEventListener("DOMContentLoaded", () => {
+      window.quill = new Quill("#editor", {
+        theme: "snow",
+        placeholder: "내용을 입력하세요...",
+        modules: {
+          toolbar: [
+            [{ header: [1, 2, false] }],
+            ["bold", "italic", "underline"],
+            [{ list: "ordered" }, { list: "bullet" }],
+            ["link", "image"],
+            ["clean"],
+          ],
+        },
+      });
+
+      console.log("Quill Editor Loaded!");
+    });
+
     // 게시물 목록 로드
     async function loadPosts() {
       try {
-        const res = await fetch(`${API_URL}/posts/news`, { 
-          headers: { Authorization: `Bearer ${token}` } 
+        const res = await fetch(`${API_URL}/posts/news`, {
+          headers: { Authorization: `Bearer ${token}` },
         });
 
         if (!res.ok) throw new Error("불러오기 실패");
@@ -89,23 +109,21 @@
         list.innerHTML = posts
           .map(
             (p) => `
-          <div class="post-item">
-            <div>
-              <strong>${p.title}</strong> (${p.category}) [${p.lang}]
-              ${
-                p.main_image
-                  ? `<img src="${p.main_image}" style="width:80px;vertical-align:middle;margin-left:10px;border-radius:4px;">`
-                  : ""
-              }
-            </div>
-            <button class="delete-btn" onclick="deletePost(${p.id})">삭제</button>
-          </div>`
+              <div class="post-item">
+                <div>
+                  <strong>${p.title}</strong> (${p.category}) [${p.lang}]
+                  ${
+                    p.main_image
+                      ? `<img src="${p.main_image}" style="width:80px;margin-left:10px;border-radius:4px;">`
+                      : ""
+                  }
+                </div>
+                <button class="delete-btn" onclick="deletePost(${p.id})">삭제</button>
+              </div>`
           )
           .join("");
-
       } catch (err) {
         console.error("게시물 로드 실패:", err);
-        alert("게시물을 불러오지 못했습니다.");
       }
     }
 
@@ -121,17 +139,11 @@
       loadPosts();
     }
 
-    // 로그아웃
-    document.getElementById("logoutBtn").addEventListener("click", () => {
-      localStorage.clear();
-      location.href = "/kr/admin/login.html";
-    });
-
     // 게시물 업로드
     document.getElementById("uploadBtn").addEventListener("click", async () => {
       const fd = new FormData();
       fd.append("title", document.getElementById("title").value);
-      fd.append("content", quill.root.innerHTML);
+      fd.append("content", window.quill.root.innerHTML);
       fd.append("category", document.getElementById("category").value);
       fd.append("lang", document.getElementById("lang").value);
 
@@ -148,13 +160,19 @@
         alert("등록 완료!");
         document.getElementById("title").value = "";
         document.getElementById("images").value = "";
+        window.quill.root.innerHTML = "";
         loadPosts();
       } else {
         alert("등록 실패. 서버 로그를 확인하세요.");
       }
     });
 
-    // 초기 목록 로드
+    // 로그아웃
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      localStorage.clear();
+      location.href = "/kr/admin/login.html";
+    });
+
     loadPosts();
   </script>
 
