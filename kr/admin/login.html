@@ -16,7 +16,6 @@
       min-height: 100vh;
     }
 
-    /* header + footer 사이 공간 */
     .login-area {
       flex: 1;
       display: flex;
@@ -57,14 +56,22 @@
 
   <div id="footer"></div>
 
+  <!-- ⭐ 로그인 스크립트 -->
   <script>
     const API_URL = "http://13.124.216.100:3000";
 
     function initLogin() {
+      console.log("initLogin 실행됨!");
+
       const btn = document.getElementById("loginBtn");
-      if (!btn) return;
+      if (!btn) {
+        console.log("loginBtn 없음 → 200ms 후 재시도");
+        return setTimeout(initLogin, 200); // ⭐ 버튼이 생성될 때까지 반복
+      }
 
       btn.addEventListener("click", async () => {
+        console.log("로그인 요청 실행됨!");
+
         const username = document.getElementById("username").value.trim();
         const password = document.getElementById("password").value.trim();
         const errorMsg = document.getElementById("errorMsg");
@@ -74,52 +81,56 @@
           return;
         }
 
-        const res = await fetch(`${API_URL}/api/auth/login`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username, password })
-        });
+        try {
+          const res = await fetch(`${API_URL}/api/auth/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password })
+          });
 
-        const data = await res.json();
+          const data = await res.json();
 
-        if (res.ok && data.role === "admin") {
-          localStorage.setItem("token", data.token);
-          localStorage.setItem("role", data.role);
-          localStorage.setItem("name", data.name);
-          location.href = "/kr/admin/dashboard.html";
-        } else {
-          errorMsg.textContent = "로그인 실패: 관리자 권한이 없습니다.";
+          if (res.ok && data.role === "admin") {
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("role", data.role);
+            localStorage.setItem("name", data.name);
+            location.href = "/kr/admin/dashboard.html";
+          } else {
+            errorMsg.textContent = "로그인 실패: 관리자 권한이 없습니다.";
+          }
+        } catch (err) {
+          console.log("fetch 오류:", err);
+          errorMsg.textContent = "서버에 연결할 수 없습니다.";
         }
       });
     }
 
-
-    console.log("loginBtn:", document.getElementById("loginBtn"));
-
+    // ⭐ DOM이 완전히 준비된 후 initLogin 반복 실행
+    document.addEventListener("DOMContentLoaded", () => {
+      initLogin();
+    });
   </script>
 
+  <!-- header/footer 로드 -->
   <script>
-    // header 로드
+    // header
     fetch("/kr/components/header.html")
       .then(res => res.text())
-      .then(data => {
-        document.getElementById("header").innerHTML = data;
+      .then(html => {
+        document.getElementById("header").innerHTML = html;
 
         setTimeout(() => {
           const langScript = document.createElement("script");
           langScript.src = "/js/language.js";
           document.body.appendChild(langScript);
-
-          // 🎯 header가 완전히 로드된 후 이벤트 등록
-          initLogin();
         }, 300);
       });
 
-    // footer 로드
+    // footer
     fetch("/kr/components/footer.html")
       .then(res => res.text())
-      .then(data => {
-        document.getElementById("footer").innerHTML = data;
+      .then(html => {
+        document.getElementById("footer").innerHTML = html;
       });
   </script>
 
