@@ -91,7 +91,6 @@
       cursor: pointer;
     }
 
-    /* 썸네일 스타일 */
     #filePreview img {
       width: 80px;
       height: 80px;
@@ -174,13 +173,11 @@
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
 
-    // 로그인 확인
     if (!token || role !== "admin") {
       alert("로그인이 필요합니다.");
       location.href = "/kr/admin/login.html";
     }
 
-    // Quill Editor 초기화
     document.addEventListener("DOMContentLoaded", () => {
       window.quill = new Quill("#editor", {
         theme: "snow",
@@ -197,137 +194,110 @@
       });
     });
 
-    // ✅ 누적용 파일 배열
-    let selectedFiles = [];
+    // ==========================================================
+    //  🔥 완전 안정적인 파일 누적 방식 (input 교체)
+    // ==========================================================
 
-    // ✅ 파일 선택 시 누적 + 미리보기 갱신
-    const imagesInput = document.getElementById("images");
+    let selectedFiles = [];
+    let imagesInput = document.getElementById("images");
     const preview = document.getElementById("filePreview");
 
-    imagesInput.addEventListener("change", (e) => {
-      const input = e.target;
-      const newFiles = Array.from(input.files);
+    function attachInputHandler() {
+      const newInput = imagesInput.cloneNode(true);
+      imagesInput.replaceWith(newInput);
+      imagesInput = newInput;
 
-      if (!newFiles.length) return;
+      newInput.addEventListener("change", (e) => {
+        const files = Array.from(e.target.files);
+        if (files.length > 0) {
+          selectedFiles.push(...files);
+          redrawPreview();
+        }
+        attachInputHandler(); // 다음 선택도 정상 동작하도록 새 input 설치
+      });
+    }
 
-      // 🔥 기존 선택 유지 + 새로 선택한 파일 누적
-      selectedFiles = selectedFiles.concat(newFiles);
+    attachInputHandler();
 
-      // 같은 파일 또 선택해도 change 이벤트가 안 막히도록 value 리셋
-      input.value = "";
-
-      redrawPreview();
-    });
-
-    // ✅ 미리보기 다시 그리기
     function redrawPreview() {
       preview.innerHTML = "";
 
-      if (!selectedFiles.length) {
+      if (selectedFiles.length === 0) {
         preview.textContent = "선택된 파일 없음";
         return;
       }
 
-      selectedFiles.forEach((file, index) => {
+      selectedFiles.forEach((file, idx) => {
         const reader = new FileReader();
         reader.onload = (e) => {
-          const wrapper = document.createElement("div");
-          wrapper.className = "preview-item";
-          wrapper.style.position = "relative";
-          wrapper.style.display = "inline-block";
-          wrapper.style.marginRight = "8px";
+          const wrap = document.createElement("div");
+          wrap.className = "preview-item";
 
           const img = document.createElement("img");
           img.src = e.target.result;
-          img.style.width = "80px";
-          img.style.height = "80px";
-          img.style.objectFit = "cover";
-          img.style.borderRadius = "6px";
-          img.style.border = "1px solid #ccc";
-          img.style.padding = "3px";
 
-          const removeBtn = document.createElement("button");
-          removeBtn.textContent = "×";
-          removeBtn.className = "remove-btn";
-          removeBtn.style.position = "absolute";
-          removeBtn.style.top = "-6px";
-          removeBtn.style.right = "-6px";
-          removeBtn.style.width = "20px";
-          removeBtn.style.height = "20px";
-          removeBtn.style.borderRadius = "50%";
-          removeBtn.style.border = "none";
-          removeBtn.style.background = "crimson";
-          removeBtn.style.color = "#fff";
-          removeBtn.style.cursor = "pointer";
-          removeBtn.style.fontSize = "12px";
-          removeBtn.onclick = () => {
-            // 해당 인덱스 파일만 제거
-            selectedFiles.splice(index, 1);
+          const btn = document.createElement("button");
+          btn.className = "remove-btn";
+          btn.textContent = "×";
+          btn.onclick = () => {
+            selectedFiles.splice(idx, 1);
             redrawPreview();
           };
 
-          wrapper.appendChild(img);
-          wrapper.appendChild(removeBtn);
-          preview.appendChild(wrapper);
+          wrap.appendChild(img);
+          wrap.appendChild(btn);
+          preview.appendChild(wrap);
         };
         reader.readAsDataURL(file);
       });
     }
 
-    // ✅ 게시물 목록 로드
+    // ==========================================================
+    // 게시물 목록
+    // ==========================================================
     async function loadPosts() {
-      try {
-        const res = await fetch(`${API_URL}/posts/news`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+      const res = await fetch(`${API_URL}/posts/news`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const posts = await res.json();
+      const list = document.getElementById("posts");
 
-        if (!res.ok) throw new Error("불러오기 실패");
-
-        const posts = await res.json();
-        const list = document.getElementById("posts");
-
-        list.innerHTML = posts
-          .map(
-            (p) => `
-              <div class="post-item">
-                <div>
-                  <strong>${p.title}</strong> (${p.category}) [${p.lang}]
-                  <div style="display:flex; gap:6px; margin-top:6px;">
-                    ${
-                      p.images && p.images.length > 0
-                        ? p.images
-                            .map(img =>
-                              `<img src="${img}" style="width:70px;height:70px;object-fit:cover;border-radius:6px;border:1px solid #ddd;">`
-                            )
-                            .join("")
-                        : ""
-                    }
-                  </div>
-                </div>
-                <button class="delete-btn" onclick="deletePost(${p.id})">삭제</button>
-              </div>`
-          )
-          .join("");
-      } catch (err) {
-        console.error("게시물 로드 실패:", err);
-      }
+      list.innerHTML = posts
+        .map(
+          (p) => `
+          <div class="post-item">
+            <div>
+              <strong>${p.title}</strong> (${p.category}) [${p.lang}]
+              <div style="display:flex; gap:6px; margin-top:6px;">
+                ${
+                  p.images?.length
+                    ? p.images
+                        .map(
+                          (img) =>
+                            `<img src="${img}" style="width:70px;height:70px;object-fit:cover;border-radius:6px;border:1px solid #ddd;">`
+                        )
+                        .join("")
+                    : ""
+                }
+              </div>
+            </div>
+            <button class="delete-btn" onclick="deletePost(${p.id})">삭제</button>
+          </div>`
+        )
+        .join("");
     }
 
-    // ✅ 게시물 삭제
     async function deletePost(id) {
       if (!confirm("삭제하시겠습니까?")) return;
-
       await fetch(`${API_URL}/posts/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
-
       loadPosts();
     }
 
-    // ✅ 게시물 업로드
     document.getElementById("uploadBtn").addEventListener("click", async () => {
-      if (!selectedFiles.length) {
+      if (selectedFiles.length === 0) {
         alert("이미지를 최소 1장 이상 첨부하세요.");
         return;
       }
@@ -338,9 +308,7 @@
       fd.append("category", document.getElementById("category").value);
       fd.append("lang", document.getElementById("lang").value);
 
-      selectedFiles.forEach(file => {
-        fd.append("images", file);
-      });
+      selectedFiles.forEach((f) => fd.append("images", f));
 
       const res = await fetch(`${API_URL}/posts`, {
         method: "POST",
@@ -350,19 +318,17 @@
 
       if (res.ok) {
         alert("등록 완료!");
-        // 업로드 후 초기화
         selectedFiles = [];
         redrawPreview();
+        attachInputHandler();
         document.getElementById("title").value = "";
-        imagesInput.value = "";
         window.quill.root.innerHTML = "";
         loadPosts();
       } else {
-        alert("등록 실패. 서버 로그를 확인하세요.");
+        alert("등록 실패. 서버 로그 확인");
       }
     });
 
-    // ✅ 로그아웃
     document.getElementById("logoutBtn").addEventListener("click", () => {
       localStorage.clear();
       location.href = "/kr/admin/login.html";
