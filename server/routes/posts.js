@@ -30,6 +30,8 @@ const upload = multer({ storage });
 ========================================== */
 router.post("/", verifyToken, upload.array("images", 10), async (req, res) => {
   try {
+    console.log("업로드된 파일들:", req.files);
+
     const { title, content, category, lang } = req.body;
     const authorId = req.user.id;
 
@@ -62,6 +64,10 @@ router.post("/", verifyToken, upload.array("images", 10), async (req, res) => {
     console.error("게시물 등록 오류:", err);
     res.status(500).json({ message: "서버 오류" });
   }
+
+  
+
+
 });
 
 /* ==========================================

@@ -264,6 +264,9 @@
       fd.append("lang", document.getElementById("lang").value);
 
       const files = document.getElementById("images").files;
+
+      console.log("전송할 파일:", files);  // ⭐⭐ 이 줄 추가 ⭐⭐
+
       for (const file of files) fd.append("images", file);
 
       const res = await fetch(`${API_URL}/posts`, {
