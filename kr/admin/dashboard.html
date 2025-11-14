@@ -196,7 +196,7 @@
   });
 
   // ================================
-  //   🔥 기업 방식: input 관리 구조 수정
+  //   🔥 파일 관리 구조 (기업 방식)
   // ================================
   let fileList = [];  
   const hiddenContainer = document.createElement("div");
@@ -219,31 +219,45 @@
       fileList = fileList.concat(files);
       drawPreview();
 
-      // 🔥 change 이벤트 루프 방지
-      input.value = null;
-
-      // 다음 선택 대비 새 input 생성
-      inputFile = createNewInput();
+      input.value = null; // 루프 방지
+      inputFile = createNewInput(); // 다음 업로드 대비
     });
 
     return input;
   }
 
-  // 최초 input
+  // 최초 input 
   let inputFile = createNewInput();
 
   // ================================
-  //   🔥 #images를 "버튼" 처럼 사용 (창 안뜨게)
+  //   🔥 #images 를 "진짜 파일 input" → 숨기기
   // ================================
   const visibleInput = document.getElementById("images");
-  visibleInput.type = "button";  // ← 핵심! input:file 아님
-  visibleInput.value = "이미지 선택하기"; 
-  visibleInput.addEventListener("click", () => {
-    inputFile.click();   // 숨겨진 input을 호출
+  visibleInput.style.opacity = "0";
+  visibleInput.style.width = "1px";
+  visibleInput.style.height = "1px";
+  visibleInput.style.position = "absolute";
+
+  // 버튼 생성
+  const fakeBtn = document.createElement("button");
+  fakeBtn.textContent = "이미지 선택하기";
+  fakeBtn.style.padding = "10px 20px";
+  fakeBtn.style.background = "#0f2679";
+  fakeBtn.style.color = "#fff";
+  fakeBtn.style.border = "none";
+  fakeBtn.style.borderRadius = "6px";
+  fakeBtn.style.cursor = "pointer";
+  fakeBtn.style.marginTop = "10px";
+
+  visibleInput.insertAdjacentElement("afterend", fakeBtn);
+
+  // 버튼 → 숨겨진 inputFile 실행
+  fakeBtn.addEventListener("click", () => {
+    inputFile.click();
   });
 
   // ================================
-  //   🔥 미리보기
+  //   🔥 미리보기 렌더링
   // ================================
   function drawPreview() {
     preview.innerHTML = "";
@@ -374,6 +388,7 @@
 
   loadPosts();
 </script>
+
 
 
 
