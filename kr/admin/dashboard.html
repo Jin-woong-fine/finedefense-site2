@@ -6,10 +6,10 @@
 
   <style>
       body {
-    font-family: 'Noto Sans KR', sans-serif;
-    background: #f5f7fb;
-    margin: 0;
-  }
+        font-family: 'Noto Sans KR', sans-serif;
+        background: #f5f7fb;
+        margin: 0;
+      }
     header { background: #0f2679; color: #fff; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; }
     header h1 { font-size: 1.3rem; }
     header button { background: #fff; color: #0f2679; border: none; border-radius: 6px; padding: 8px 14px; cursor: pointer; }
@@ -21,7 +21,17 @@
     .post-item { border-bottom: 1px solid #eee; padding: 12px 0; display: flex; justify-content: space-between; align-items: center; }
     .post-item:last-child { border-bottom: none; }
     .delete-btn { background: crimson; color: white; border: none; border-radius: 4px; padding: 6px 10px; cursor: pointer; }
-    #filePreview { margin-top: 6px; font-size: 14px; color: #333; }
+
+    /* 파일 썸네일 스타일 */
+    #filePreview img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 6px;
+      margin-right: 10px;
+      border: 1px solid #ccc;
+      padding: 3px;
+    }
   </style>
 
   <!-- Quill Editor -->
@@ -99,25 +109,28 @@
       });
     });
 
-    // ⭐ 파일 선택 프리뷰 기능
+    // ⭐ 여러 장 파일 썸네일 미리보기
     document.getElementById("images").addEventListener("change", () => {
       const files = document.getElementById("images").files;
       const preview = document.getElementById("filePreview");
+
+      preview.innerHTML = ""; // 초기화
 
       if (files.length === 0) {
         preview.textContent = "선택된 파일 없음";
         return;
       }
 
-      // 여러 장 선택하면 여러 장 표시
-      let names = [];
       for (const file of files) {
-        names.push(file.name);
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = document.createElement("img");
+          img.src = e.target.result;
+          preview.appendChild(img);
+        };
+        reader.readAsDataURL(file);
       }
-
-      preview.textContent = "선택된 파일: " + names.join(", ");
     });
-
 
     // 게시물 목록 로드
     async function loadPosts() {
@@ -185,7 +198,7 @@
         alert("등록 완료!");
         document.getElementById("title").value = "";
         document.getElementById("images").value = "";
-        document.getElementById("filePreview").textContent = "선택된 파일 없음";
+        document.getElementById("filePreview").innerHTML = "선택된 파일 없음";
         window.quill.root.innerHTML = "";
         loadPosts();
       } else {
