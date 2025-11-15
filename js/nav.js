@@ -237,6 +237,7 @@ function initAdminBar() {
     color:#fff;
     padding:8px 20px;
     font-size:14px;
+    box-sizing:border-box;
     position:sticky;
     top:0;
     z-index:9999;
@@ -248,18 +249,13 @@ function initAdminBar() {
   adminBar.innerHTML = `
     <div><strong>FINE DEFENSE ADMIN MODE</strong></div>
     <div style="display:flex; gap:20px; align-items:center;">
-      <a href="/kr/admin/dashboard.html" style="color:#fff; text-decoration:none;">
-        관리자 대시보드
-      </a>
-      <a href="#" id="adminLogout"
-         style="color:#ffdddd; text-decoration:none; font-weight:500;">
-         로그아웃
-      </a>
+      <a href="/kr/admin/dashboard.html" style="color:#fff; text-decoration:none;">관리자 대시보드</a>
+      <a href="#" id="adminLogout" style="color:#ffdddd; text-decoration:none; font-weight:500;">로그아웃</a>
     </div>
   `;
 
-  const header = document.querySelector("header");
-  if (header) header.parentNode.insertBefore(adminBar, header);
+  // 🔥 기존 header 위에 넣지 말고 body 최상단에 추가
+  document.body.prepend(adminBar);
 
   document.getElementById("adminLogout").addEventListener("click", () => {
     if (confirm("로그아웃하시겠습니까?")) {
