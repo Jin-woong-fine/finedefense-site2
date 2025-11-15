@@ -164,7 +164,7 @@
 
       async function loadPost(id) {
         try {
-          const res = await fetch(`/api/posts/news?lang=kr`);
+          const res = await fetch(`${window.location.origin}/api/posts/news?lang=kr`);
 
 
           const post = await res.json();

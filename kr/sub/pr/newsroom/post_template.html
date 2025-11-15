@@ -165,7 +165,8 @@
       async function loadPost(id) {
         try {
           // ✅ 단일 조회용 detail 라우트 호출
-          const res = await fetch(`/api/posts/detail/${id}`);
+          const res = await fetch(`${window.location.origin}/api/posts/${id}`);
+
           const post = await res.json();
 
           if (!post || !post.id) {
