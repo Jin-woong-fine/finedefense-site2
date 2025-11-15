@@ -1,214 +1,182 @@
 <!DOCTYPE html>
 <html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="화인디펜스 뉴스룸" />
-    <title>뉴스룸 | 화인디펜스</title>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="화인디펜스 뉴스룸" />
+  <title>뉴스룸 | 화인디펜스</title>
 
-    <!-- ✅ 공통 CSS -->
-    <link rel="stylesheet" href="/css/style.css" />
-    <link rel="stylesheet" href="/css/sub-banner.css" />
+  <!-- 공통 CSS -->
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/sub-banner.css" />
 
-    <style>
-      .newsroom-section {
-        max-width: 1100px;
-        margin: 40px auto 100px;
-        padding: 20px 40px;
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-      }
+  <style>
+    /* ======== 전체 리스트 레이아웃 ======== */
+    .newsroom-section {
+      max-width: 1200px;
+      margin: 50px auto 120px;
+      padding: 20px;
+    }
 
-      .newsroom-section h1 {
-        font-size: 2rem;
-        color: #0f2679;
-        margin-bottom: 16px;
-        text-align: center;
-      }
+    .newsroom-title {
+      text-align: center;
+      margin-bottom: 50px;
+    }
 
-      .newsroom-section p.desc {
-        color: #555;
-        font-size: 1.05rem;
-        margin-bottom: 50px;
-        line-height: 1.7;
-        text-align: center;
-      }
+    .newsroom-title h1 {
+      font-size: 2.2rem;
+      color: #0f2679;
+      margin-bottom: 14px;
+    }
 
-      .news-filter {
-        display: flex;
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 12px;
-        margin-bottom: 40px;
-      }
+    .newsroom-title p {
+      color: #555;
+      font-size: 1.05rem;
+      line-height: 1.6;
+    }
 
-      .news-filter button {
-        border: 1px solid #ccc;
-        background: #f9f9f9;
-        color: #333;
-        padding: 8px 18px;
-        border-radius: 20px;
-        cursor: pointer;
-        transition: all 0.25s ease;
-      }
+    /* ======== 카드 리스트 ======== */
+    .news-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 28px;
+    }
 
-      .news-filter button.active,
-      .news-filter button:hover {
-        background: #0f2679;
-        color: #fff;
-        border-color: #0f2679;
-      }
+    .news-card {
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      text-decoration: none;
+      color: inherit;
+      transition: transform .25s, box-shadow .25s;
+    }
 
-      .news-list {
-        display: flex;
-        flex-direction: column;
-        gap: 30px;
-      }
+    .news-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+    }
 
-      .news-item {
-        display: flex;
-        gap: 24px;
-        align-items: flex-start;
-        padding: 20px;
-        border-radius: 14px;
-        background: #fafafa;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-        transition: all 0.25s ease;
-        text-decoration: none;
-        color: inherit;
-      }
+    .news-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
 
-      .news-item:hover {
-        background: #f3f6ff;
-        transform: translateY(-3px);
-      }
+    .news-content {
+      padding: 18px 20px 25px;
+    }
 
-      .news-item img {
-        width: 260px;
-        height: 160px;
-        object-fit: cover;
-        border-radius: 8px;
-      }
+    .news-content h3 {
+      color: #0f2679;
+      font-size: 1.2rem;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
 
-      .news-info {
-        flex: 1;
-      }
+    .news-content p {
+      color: #555;
+      font-size: 0.92rem;
+      line-height: 1.55;
+      margin-bottom: 14px;
+      height: 45px;
+      overflow: hidden;
+    }
 
-      .news-info h3 {
-        margin: 0 0 10px;
-        color: #0f2679;
-        font-size: 1.2rem;
-      }
+    .news-date {
+      font-size: 0.85rem;
+      color: #999;
+    }
+  </style>
+</head>
 
-      .news-info p {
-        margin: 0 0 12px;
-        color: #555;
-        font-size: 0.95rem;
-        line-height: 1.6;
-      }
+<body>
 
-      .news-date {
-        font-size: 0.85rem;
-        color: #888;
-      }
+  <div id="header"></div>
 
-      @media (max-width: 768px) {
-        .news-item {
-          flex-direction: column;
-        }
-        .news-item img {
-          width: 100%;
-          height: 200px;
-        }
-      }
+  <!-- 배너 -->
+  <section class="sub-banner">
+    <img src="/img/sub-banners/pr-1_v2.jpg" alt="홍보센터 배너" />
+    <div class="banner-text">
+      <h1>홍보센터</h1>
+      <p>화인디펜스의 기술과 활동 소식을 한 자리에서 만나보세요.</p>
+    </div>
+  </section>
 
-      .pagination {
-        text-align: center;
-        margin-top: 60px;
-      }
+  <!-- breadcrumb -->
+  <div class="breadcrumb">
+    <a href="/">홈</a> &gt;
+    <span class="crumb crumb-level1">홍보센터</span> &gt;
+    <span class="crumb crumb-level2">뉴스룸</span>
+    <div id="side-tabs" class="side-tabs"></div>
+  </div>
 
-      .pagination a {
-        display: inline-block;
-        margin: 0 5px;
-        padding: 8px 14px;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        color: #333;
-        text-decoration: none;
-        transition: all 0.2s ease;
-      }
-
-      .pagination a:hover,
-      .pagination a.active {
-        background: #0f2679;
-        color: #fff;
-        border-color: #0f2679;
-      }
-    </style>
-  </head>
-
-  <body>
-    <div id="header"></div>
-
-    <!-- ✅ 배너 -->
-    <section class="sub-banner">
-      <img src="/img/sub-banners/pr-1_v2.jpg" alt="홍보센터 배너" />
-      <div class="banner-text">
-        <h1>홍보센터</h1>
-        <p>화인디펜스의 혁신 기술과 주요 활동 소식을 만나보세요.</p>
-      </div>
-    </section>
-
-    <!-- ✅ breadcrumb -->
-    <div class="breadcrumb">
-      <a href="/">홈</a> &gt;
-      <span class="crumb crumb-level1">홍보센터</span> &gt;
-      <span class="crumb crumb-level2">뉴스룸</span>
-      <div id="side-tabs" class="side-tabs"></div>
+  <!-- 뉴스룸 -->
+  <section class="newsroom-section">
+    <div class="newsroom-title">
+      <h1>화인디펜스 뉴스룸</h1>
+      <p>보도자료 · 기술자료 · 전시회 소식 등 다양한 업데이트를 확인해보세요.</p>
     </div>
 
-    <!-- ✅ 본문 -->
-    <section class="newsroom-section">
-      <h1>화인디펜스 뉴스룸</h1>
-      <p class="desc">
-        보도자료, 기술자료, 행사소식 등<br>
-        화인디펜스의 다양한 이야기를 한 곳에서 만나보세요.
-      </p>
+    <div id="newsList" class="news-grid">
+      <p style="grid-column:1/-1;text-align:center;color:#666;">뉴스를 불러오는 중입니다...</p>
+    </div>
+  </section>
 
-      <!-- ✅ 카테고리 필터 -->
-      <div class="news-filter">
-        <button class="active" data-filter="all">전체</button>
-        <button data-filter="press">보도자료</button>
-        <button data-filter="tech">기술소식</button>
-        <button data-filter="event">행사</button>
-      </div>
+  <div id="footer"></div>
 
-      <!-- ✅ 뉴스 리스트 -->
-      <div class="news-list"></div>
+  <script src="/js/nav.js"></script>
+  <script src="/js/language.js"></script>
 
-      <!-- ✅ 페이지네이션 (추후용) -->
-      <div class="pagination">
-        <a href="#">&laquo;</a>
-        <a href="#" class="active">1</a>
-        <a href="#">2</a>
-        <a href="#">3</a>
-        <a href="#">&raquo;</a>
-      </div>
-    </section>
+  <!-- ======== 뉴스 불러오기 스크립트 ======== -->
+  <script>
+    const API_URL = "http://localhost:3000";
 
-    <div id="footer"></div>
+    async function loadNews() {
+      const list = document.getElementById("newsList");
 
-    <!-- ✅ 공통 스크립트 -->
-    <script src="/js/nav.js"></script>
-    <script src="/js/language.js"></script>
+      try {
+        const res = await fetch(`${API_URL}/api/posts/news?lang=kr`);
+        const posts = await res.json();
 
-    <!-- ✅ 뉴스룸 데이터 로드 -->
-    <script src="/js/newsroom.js"></script>
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        loadNewsroom('/data/newsroom_kr.json');
-      });
-    </script>
-  </body>
+        if (!posts.length) {
+          list.innerHTML = "<p style='grid-column:1/-1;text-align:center;color:#999;'>등록된 뉴스가 없습니다.</p>";
+          return;
+        }
+
+        // 대표 이미지 우선순위:
+        // 1) post.main_image
+        // 2) post.images[0] (post_images 테이블)
+        // 3) placeholder
+        list.innerHTML = posts.map(p => {
+          const img = p.main_image
+            ? API_URL + p.main_image
+            : (p.images?.length ? API_URL + p.images[0] : "/img/newsroom/newsroom-placeholder_v2.png");
+
+          const cleanText = p.content.replace(/<[^>]+>/g, '').slice(0, 80);
+
+          return `
+            <a href="/kr/sub/pr/newsroom/post_template.html?id=${p.id}" class="news-card">
+              <img src="${img}" alt="${p.title}">
+              <div class="news-content">
+                <h3>${p.title}</h3>
+                <p>${cleanText}...</p>
+                <span class="news-date">${new Date(p.created_at).toLocaleDateString()}</span>
+              </div>
+            </a>
+          `;
+        }).join("");
+
+      } catch (err) {
+        console.error(err);
+        list.innerHTML = "<p style='grid-column:1/-1;color:red;text-align:center;'>뉴스를 불러오는 중 오류 발생.</p>";
+      }
+    }
+
+    loadNews();
+  </script>
+
+</body>
 </html>
