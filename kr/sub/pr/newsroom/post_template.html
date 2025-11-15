@@ -132,6 +132,20 @@
       <p>내용을 불러오는 중입니다...</p>
     </div>
 
+    <div id="adminEditBox" style="margin-top:30px; display:none;">
+      <button id="editPostBtn" 
+        style="
+          background:#1b7fcb;
+          color:white;
+          border:none;
+          padding:10px 20px;
+          border-radius:6px;
+          cursor:pointer;
+        ">
+        ✏ 수정하기
+      </button>
+    </div>
+
     <a href="/kr/sub/pr/newsroom/newsroom.html" class="back-btn">
       목록으로 돌아가기
     </a>
@@ -206,6 +220,27 @@
         }
       }
     });
+
+      // 🔥 관리자일 때만 "수정하기" 버튼 보여주기
+      document.addEventListener("DOMContentLoaded", () => {
+        const role = localStorage.getItem("role");
+        const token = localStorage.getItem("token");
+
+        const adminBox = document.getElementById("adminEditBox");
+        const editBtn = document.getElementById("editPostBtn");
+
+        const postId = new URLSearchParams(location.search).get("id");
+
+        if (role === "admin" && token) {
+          adminBox.style.display = "block";
+          editBtn.addEventListener("click", () => {
+            location.href = `/kr/admin/edit_post.html?id=${postId}`;
+          });
+        }
+      });
+
+
+
   </script>
 
 </body>

@@ -214,7 +214,64 @@ router.put("/:id", verifyToken, upload.array("images", 10), async (req, res) => 
 });
 
 /* ==========================================
-   🗑️ 5) 게시물 삭제
+   📝 5) 게시물 수정
+   👉 PUT /api/posts/:id
+========================================== */
+router.put("/:id", upload.array("images", 10), verifyToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, content, category, lang } = req.body;
+
+    // 기본 정보 업데이트
+    await db.execute(
+      `UPDATE posts 
+       SET title=?, content=?, category=?, lang=?, updated_at=NOW()
+       WHERE id=?`,
+      [title, content, category, lang, id]
+    );
+
+    // 새 이미지가 있을 경우 → 기존 이미지 삭제 후 교체
+    if (req.files.length > 0) {
+      const [oldImages] = await db.execute(
+        "SELECT image_path FROM post_images WHERE post_id=?",
+        [id]
+      );
+
+      for (const img of oldImages) {
+        const filePath = path.join(process.cwd(), img.image_path.replace(/^\//, ""));
+        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+      }
+
+      await db.execute("DELETE FROM post_images WHERE post_id=?", [id]);
+
+      const mainImage = `/uploads/news/${req.files[0].filename}`;
+      await db.execute("UPDATE posts SET main_image=? WHERE id=?", [
+        mainImage,
+        id
+      ]);
+
+      for (const file of req.files) {
+        const imagePath = `/uploads/news/${file.filename}`;
+        await db.execute(
+          `INSERT INTO post_images (post_id, image_path)
+           VALUES (?, ?)`,
+          [id, imagePath]
+        );
+      }
+    }
+
+    res.json({ message: "수정 완료" });
+
+  } catch (err) {
+    console.error("수정 오류:", err);
+    res.status(500).json({ message: "수정 중 오류 발생" });
+  }
+});
+
+
+
+/* ==========================================
+   🗑️ 6) 게시물 삭제
    👉 DELETE /api/posts/:id
 ========================================== */
 router.delete("/:id", verifyToken, async (req, res) => {

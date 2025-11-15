@@ -120,6 +120,20 @@
       font-size: 12px;
     }
 
+    .edit-btn {
+      background: #1b7fcb;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 6px 10px;
+      cursor: pointer;
+    }
+    .edit-btn:hover {
+      background: #0f5fa3;
+    }
+
+
+
   </style>
 
   <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
@@ -347,25 +361,29 @@
       list.innerHTML = posts
         .map(
           (p) => `
-          <div class="post-item">
-            <div>
-              <strong>${p.title}</strong> (${p.category}) [${p.lang}]
-              <div style="display:flex; gap:6px; margin-top:6px;">
-                ${
-                  p.images?.length
-                    ? p.images
-                        .map(
-                          (img) =>
-                            `<img src="${img}" style="width:70px;height:70px;border-radius:6px;border:1px solid #ddd;">`
-                        )
-                        .join("")
-                    : ""
-                }
+            <div class="post-item">
+              <div>
+                <strong>${p.title}</strong> (${p.category}) [${p.lang}]
+                <div style="display:flex; gap:6px; margin-top:6px; flex-wrap:wrap;">
+                  ${
+                    p.images?.length
+                      ? p.images
+                          .map(
+                            (img) =>
+                              `<img src="${img}" style="width:60px;height:60px;border-radius:6px;border:1px solid #ddd;object-fit:cover;">`
+                          )
+                          .join("")
+                      : "<span style='color:#888;'>이미지 없음</span>"
+                  }
+                </div>
+              </div>
+
+              <div style="display:flex; gap:8px;">
+                <button class="edit-btn" onclick="editPost(${p.id})">수정</button>
+                <button class="delete-btn" onclick="deletePost(${p.id})">삭제</button>
               </div>
             </div>
-            <button class="delete-btn" onclick="deletePost(${p.id})">삭제</button>
-          </div>
-        `
+          `
         )
         .join("");
     }
@@ -394,6 +412,12 @@
       location.href = "/kr/admin/login.html";
     });
   });
+
+
+    window.editPost = function (id) {
+      location.href = `/kr/admin/edit_post.html?id=${id}`;
+    };
+
 </script>
 
 
