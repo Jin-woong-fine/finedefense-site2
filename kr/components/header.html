@@ -1,54 +1,70 @@
-<!-- 관리자 상단바 (로그인 시 자동 표시) -->
+<!-- ========================================= -->
+<!-- 🔥 관리자 상단바 (로그인 시 자동 표시) -->
+<!-- ========================================= -->
 <div id="adminBar"
      style="
        display:none;
-       width: 100%;
-       background: #0f2679;
-       color: #fff;
-       padding: 8px 20px;
-       font-size: 14px;
-       box-sizing: border-box;
-       display:flex;
-       justify-content: space-between;
-       align-items: center;
-       position: sticky;
-       top: 0;
-       z-index: 9999;
+       width:100%;
+       background:#0f2679;
+       color:#fff;
+       padding:8px 20px;
+       font-size:14px;
+       box-sizing:border-box;
+       position:sticky;
+       top:0;
+       z-index:9999;
+
+       /* flex는 JS에서 켜줄거라 여기선 쓰지 않음 */
+       justify-content:space-between;
+       align-items:center;
      ">
   <div><strong>FINE DEFENSE ADMIN MODE</strong></div>
 
   <div style="display:flex; gap:20px; align-items:center;">
     <a href="/kr/admin/dashboard.html" style="color:#fff; text-decoration:none;">관리자 대시보드</a>
-    <a href="#" id="adminLogoutFromHeader" style="color:#ffdddd; text-decoration:none;">로그아웃</a>
+
+    <a href="#" id="adminLogoutFromHeader"
+       style="color:#ffdddd; text-decoration:none; font-weight:500;">
+       로그아웃
+    </a>
   </div>
 </div>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  const role = localStorage.getItem("role");
+  const role  = localStorage.getItem("role");
   const token = localStorage.getItem("token");
-  const bar = document.getElementById("adminBar");
+  const bar   = document.getElementById("adminBar");
 
+  // 🔥 관리자 로그인일 때만 표시
   if (role === "admin" && token) {
     bar.style.display = "flex";
   }
 
-  document.getElementById("adminLogoutFromHeader")?.addEventListener("click", () => {
-    localStorage.clear();
-    location.reload();
-  });
+  // 🔥 로그아웃 처리
+  const logout = document.getElementById("adminLogoutFromHeader");
+  if (logout) {
+    logout.addEventListener("click", () => {
+      if (confirm("로그아웃하시겠습니까?")) {
+        localStorage.clear();
+        location.href = "/kr/admin/login.html";
+      }
+    });
+  }
 });
 </script>
 
 
-<!-- header.html -->
+<!-- ========================================= -->
+<!--           🔵 기존 HEADER 영역             -->
+<!-- ========================================= -->
 <header class="header-inner">
   <div class="header-left">
     <a href="/kr/index.html">
       <img src="/img/logo_transparent_finedefense.png" alt="Logo" class="logo">
     </a>
 
-    <!-- ✅ 햄버거 버튼 -->
+    <!-- 🔽 햄버거 버튼 -->
     <div class="hamburger" id="hamburger">
       <span></span>
       <span></span>
@@ -101,7 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
     </ul>
   </div>
 
-  <!-- ✅ 언어 선택 영역 (header-right로 분리) -->
+  <!-- 🔽 언어 선택 -->
   <div class="header-right">
     <div class="language-dropdown">
       <button class="lang-toggle" type="button">
@@ -115,7 +131,8 @@ document.addEventListener("DOMContentLoaded", () => {
   </div>
 </header>
 
-<!-- ✅ 반응형 메뉴 스크립트 -->
+
+<!-- 반응형 메뉴 -->
 <script>
   const hamburger = document.getElementById('hamburger');
   const mainMenu = document.querySelector('.main-menu');
