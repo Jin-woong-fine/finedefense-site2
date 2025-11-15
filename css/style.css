@@ -423,3 +423,21 @@ footer {
   text-decoration: none;
   font-weight: 500;
 }
+
+#adminBar .admin-right {
+  display: flex;
+  align-items: center;
+  gap: 36px;  /* 대기업 UI 기본 간격 */
+}
+
+#adminBar .admin-right a {
+  color: #fff;
+  font-size: 14px;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+#adminBar .admin-right a#adminLogout {
+  color: #ffdddd;
+  font-weight: 600;
+}
