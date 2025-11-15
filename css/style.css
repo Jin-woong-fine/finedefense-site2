@@ -410,3 +410,16 @@ footer {
     text-align: center;
   }
 }
+
+
+/* 관리자 모드일 때, 헤더를 자연스럽게 아래로 내림 */
+.admin-mode header {
+  margin-top: 48px; /* 관리자바 높이 */
+}
+
+/* 관리자 모드 링크 스타일 */
+#adminBar a {
+  color: #ffdddd;
+  text-decoration: none;
+  font-weight: 500;
+}
