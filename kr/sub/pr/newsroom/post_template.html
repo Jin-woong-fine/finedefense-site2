@@ -1,201 +1,58 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="화인디펜스 게시물 상세페이지">
-  <title>게시물 상세보기 | 화인디펜스</title>
+<script>
+  // URL에서 postId 추출 (?id=3)
+  const urlParams = new URLSearchParams(window.location.search);
+  const postId = urlParams.get("id");
 
-  <!-- ✅ 공통 CSS -->
-  <link rel="stylesheet" href="/css/style.css">
-  <link rel="stylesheet" href="/css/sub-banner.css">
+  if (!postId) {
+    document.querySelector(".news-post-container").innerHTML =
+      "<p style='text-align:center;color:#555;'>잘못된 접근입니다.</p>";
+  } else {
+    loadPost(postId);
+  }
 
-  <style>
-    body {
-      font-family: 'Noto Sans KR', sans-serif;
-      background: #f9f9fb;
-      margin: 0;
-    }
+  async function loadPost(id) {
+    try {
+      // 🔥 API_URL 없이 상대경로로 요청
+      const res = await fetch(`/api/posts/${id}`);
+      const post = await res.json();
 
-    .news-post-container {
-      max-width: 1000px;
-      margin: 80px auto;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-      padding: 40px;
-    }
-
-    .post-header {
-      text-align: center;
-      margin-bottom: 40px;
-      border-bottom: 1px solid #e5e5e5;
-      padding-bottom: 20px;
-    }
-
-    .post-header h1 {
-      color: #0f2679;
-      font-size: 1.8rem;
-      margin-bottom: 12px;
-    }
-
-    .post-meta {
-      font-size: 0.9rem;
-      color: #777;
-    }
-
-    .post-meta span {
-      margin: 0 8px;
-    }
-
-    .post-image {
-      text-align: center;
-      margin: 30px 0;
-    }
-
-    .post-image img {
-      max-width: 100%;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-
-    .post-content {
-      color: #333;
-      line-height: 1.8;
-      font-size: 1rem;
-      margin-top: 30px;
-    }
-
-    .post-content img {
-      max-width: 100%;
-      border-radius: 6px;
-      margin: 10px 0;
-    }
-
-    .back-btn {
-      display: inline-block;
-      margin-top: 40px;
-      padding: 10px 20px;
-      background: #0f2679;
-      color: #fff;
-      border-radius: 6px;
-      text-decoration: none;
-      transition: 0.2s;
-    }
-
-    .back-btn:hover {
-      background: #1b348f;
-    }
-
-    @media (max-width: 768px) {
-      .news-post-container { padding: 20px; margin: 40px 10px; }
-      .post-header h1 { font-size: 1.4rem; }
-    }
-  </style>
-</head>
-<body>
-  <div id="header"></div>
-
-  <!-- ✅ 상단 배너 -->
-  <section class="sub-banner">
-    <img src="/img/sub-banners/pr-1_v2.jpg" alt="홍보센터 배너">
-    <div class="banner-text">
-      <h1>게시물 상세보기</h1>
-      <p>화인디펜스의 주요 소식을 확인하세요.</p>
-    </div>
-  </section>
-
-  <div class="breadcrumb">
-    <a href="/">홈</a> &gt;
-    <span class="crumb crumb-level1">홍보센터</span> &gt;
-    <span class="crumb crumb-level2">게시물 보기</span>
-  </div>
-
-  <!-- ✅ 본문 -->
-  <section class="news-post-container">
-    <div class="post-header">
-      <h1 id="postTitle">제목 불러오는 중...</h1>
-      <div class="post-meta">
-        <span id="postCategory"></span> |
-        <span id="postDate"></span> |
-        <span id="postAuthor"></span>
-      </div>
-    </div>
-
-    <div class="post-image" id="postImage"></div>
-
-    <div class="post-content" id="postContent">
-      <p>내용을 불러오는 중입니다...</p>
-    </div>
-
-    <a href="javascript:history.back()" class="back-btn">목록으로 돌아가기</a>
-  </section>
-
-  <div id="footer"></div>
-
-  <!-- ✅ 공통 JS -->
-  <script src="/js/nav.js"></script>
-  <script src="/js/language.js"></script>
-
-  <!-- ✅ 게시물 불러오기 -->
-  <script>
-    const API_URL = "http://localhost:3000";
-
-    // URL에서 postId 추출 (?id=3 형태)
-    const urlParams = new URLSearchParams(window.location.search);
-    const postId = urlParams.get("id");
-
-    if (!postId) {
-      document.querySelector(".news-post-container").innerHTML =
-        "<p style='text-align:center;color:#555;'>잘못된 접근입니다.</p>";
-    } else {
-      loadPost(postId);
-    }
-
-    async function loadPost(id) {
-      try {
-        const res = await fetch(`${API_URL}/api/posts/${id}`);
-        const post = await res.json();
-
-        if (!post || !post.id) {
-          document.getElementById("postContent").innerHTML =
-            "<p style='color:#999;'>게시물을 찾을 수 없습니다.</p>";
-          return;
-        }
-
-        // ✅ 제목, 메타 정보
-        document.getElementById("postTitle").textContent = post.title;
-        document.getElementById("postCategory").textContent = categoryName(post.category);
-        document.getElementById("postDate").textContent = new Date(post.created_at).toLocaleDateString();
-        document.getElementById("postAuthor").textContent = post.author_name || "관리자";
-
-        // ✅ 대표 이미지
-        if (post.main_image) {
-          document.getElementById("postImage").innerHTML =
-            `<img src="${API_URL}${post.main_image}" alt="대표 이미지">`;
-        }
-
-        // ✅ 본문 내용 (Quill HTML 그대로 표시)
-        document.getElementById("postContent").innerHTML = post.content;
-
-      } catch (err) {
-        console.error(err);
+      if (!post || !post.id) {
         document.getElementById("postContent").innerHTML =
-          "<p style='color:red;'>게시물을 불러오는 중 오류가 발생했습니다.</p>";
+          "<p style='color:#999;'>게시물을 찾을 수 없습니다.</p>";
+        return;
       }
-    }
 
-    // ✅ 카테고리 한글 변환 함수
-    function categoryName(code) {
-      switch(code) {
-        case "news": return "뉴스룸";
-        case "notice": return "공지사항";
-        case "gallery": return "갤러리";
-        case "cert": return "인증 및 특허";
-        case "catalog": return "카탈로그";
-        default: return "게시물";
+      // 제목, 메타 정보
+      document.getElementById("postTitle").textContent = post.title;
+      document.getElementById("postCategory").textContent = categoryName(post.category);
+      document.getElementById("postDate").textContent = new Date(post.created_at).toLocaleDateString();
+      document.getElementById("postAuthor").textContent = post.author_name || "관리자";
+
+      // 대표 이미지
+      if (post.main_image) {
+        document.getElementById("postImage").innerHTML =
+          `<img src="${post.main_image}" alt="대표 이미지">`;
       }
+
+      // 본문 내용 (Quill에서 저장한 HTML 그대로)
+      document.getElementById("postContent").innerHTML = post.content;
+
+    } catch (err) {
+      console.error(err);
+      document.getElementById("postContent").innerHTML =
+        "<p style='color:red;'>게시물을 불러오는 중 오류가 발생했습니다.</p>";
     }
-  </script>
-</body>
-</html>
+  }
+
+  // 카테고리 한글 변환
+  function categoryName(code) {
+    switch(code) {
+      case "news": return "뉴스룸";
+      case "notice": return "공지사항";
+      case "gallery": return "갤러리";
+      case "cert": return "인증 및 특허";
+      case "catalog": return "카탈로그";
+      default: return "게시물";
+    }
+  }
+</script>
