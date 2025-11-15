@@ -163,7 +163,7 @@
       async function loadPost(id) {
         try {
           // ⭐ 절대경로로 변경!
-          const res = await fetch(`${location.origin}/api/posts/${id}`);
+          const res = await fetch(`/api/posts/detail/${id}`);
           const post = await res.json();
 
           if (!post || !post.id) {
