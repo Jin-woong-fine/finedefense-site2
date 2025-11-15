@@ -103,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
   console.log("✅ nav.js loaded");
 
   // header 로드
-  fetch("/kr/components/header.html")
+fetch("../components/header.html")
     .then(res => {
       if (!res.ok) throw new Error("❌ header.html not found");
       return res.text();
@@ -138,7 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   // footer 로드
-  fetch("/kr/components/footer.html")
+fetch("../components/footer.html")
     .then(res => {
       if (!res.ok) throw new Error("❌ footer.html not found");
       return res.text();
