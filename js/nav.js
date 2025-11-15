@@ -14,7 +14,6 @@ function showSideTabs(tabList, target) {
 
   clearTimeout(hideTimer);
 
-  // 탭 구성
   side.innerHTML = tabList
     .map(tab => `<a href="${tab.link}" class="tab-item">${tab.name}</a>`)
     .join("");
@@ -27,7 +26,6 @@ function showSideTabs(tabList, target) {
     if (!href) return;
 
     if (isTopTabs) {
-      // 상위탭(active)
       if (current.includes("/product/") && href.includes("/product/")) {
         a.classList.add("active");
       } else if (current.includes("/company/") && href.includes("/company/")) {
@@ -40,10 +38,8 @@ function showSideTabs(tabList, target) {
     } else {
       const absHref = new URL(href, location.origin).pathname.toLowerCase();
 
-      // URL 완전 일치
       if (current === absHref) a.classList.add("active");
 
-      // 상세페이지 → 뉴스룸 탭 active
       else if (
         current.includes("/pr/newsroom/post_template") &&
         href.includes("/pr/newsroom/newsroom.html")
@@ -53,7 +49,6 @@ function showSideTabs(tabList, target) {
     }
   });
 
-  // 위치 계산
   const rect = target.getBoundingClientRect();
   const parentRect = breadcrumb.getBoundingClientRect();
   side.style.position = "absolute";
@@ -61,7 +56,6 @@ function showSideTabs(tabList, target) {
   side.style.top = `${rect.bottom - parentRect.top + 8}px`;
   side.classList.add("visible");
 }
-
 
 /* ------------------------------------------------------------
    🔹 탭 숨김 (지연 닫기)
@@ -102,8 +96,10 @@ function highlightTopMenu() {
 document.addEventListener("DOMContentLoaded", () => {
   console.log("✅ nav.js loaded");
 
-  // header 로드
-fetch("../components/header.html")
+  /* ------------------------------
+     🔥 헤더 로드 (절대경로)
+  ------------------------------ */
+  fetch("/kr/components/header.html")
     .then(res => {
       if (!res.ok) throw new Error("❌ header.html not found");
       return res.text();
@@ -114,7 +110,6 @@ fetch("../components/header.html")
 
       headerEl.innerHTML = html;
 
-      // 언어 스크립트 로드
       const langScript = document.createElement("script");
       langScript.src = "/kr/js/language.js";
       document.body.appendChild(langScript);
@@ -124,21 +119,14 @@ fetch("../components/header.html")
         highlightTopMenu();
       }, 300);
 
-
-    /* ------------------------------------------------------------
-       🔥🔥 관리자 상단바 삽입 (헤더 로드 완료 후)
-    ------------------------------------------------------------ */
-    initAdminBar();   // ⭐⭐ 이거 추가
+      initAdminBar(); 
     })
-
     .catch(err => console.error(err));
 
-
-
-
-
-  // footer 로드
-fetch("../components/footer.html")
+  /* ------------------------------
+     🔥 푸터 로드 (절대경로)
+  ------------------------------ */
+  fetch("/kr/components/footer.html")
     .then(res => {
       if (!res.ok) throw new Error("❌ footer.html not found");
       return res.text();
@@ -171,19 +159,14 @@ function initBreadcrumbTabs() {
 
   sideTabs.classList.remove("visible");
 
-  // 상위 탭 hover 시
   if (level1)
     level1.addEventListener("mouseenter", () => showSideTabs(topTabs, level1));
 
-  // 2단계 탭 hover 시
   if (level2) {
     level2.addEventListener("mouseenter", () => {
       const path = location.href.toLowerCase();
       let subTabs = [];
 
-      /* -------------------------
-         🔥 회사소개
-      ------------------------- */
       if (path.includes("/company/")) {
         subTabs = [
           { name: "기업개요", link: "/kr/sub/company/overview.html" },
@@ -195,9 +178,6 @@ function initBreadcrumbTabs() {
         ];
       }
 
-      /* -------------------------
-         🔥 제품소개
-      ------------------------- */
       else if (path.includes("/product/")) {
         subTabs = [
           { name: "수중이동형케이블", link: "/kr/sub/product/towed-cable.html" },
@@ -207,21 +187,12 @@ function initBreadcrumbTabs() {
         ];
       }
 
-      /* -------------------------
-         🔥 홍보센터(뉴스룸/공지/갤러리/인증/카탈로그)
-         ※ 상세페이지는 뉴스룸만 고정
-      ------------------------- */
       else if (path.includes("/pr/")) {
-        
-        // 상세페이지
         if (path.includes("/pr/newsroom/post_template")) {
           subTabs = [
             { name: "뉴스룸", link: "/kr/sub/pr/newsroom/newsroom.html" }
           ];
-        }
-
-        // PR 전체 페이지
-        else {
+        } else {
           subTabs = [
             { name: "뉴스룸", link: "/kr/sub/pr/newsroom/newsroom.html" },
             { name: "공지사항", link: "/kr/sub/pr/notice/notice.html" },
@@ -232,9 +203,6 @@ function initBreadcrumbTabs() {
         }
       }
 
-      /* -------------------------
-         🔥 고객지원
-      ------------------------- */
       else if (path.includes("/support/")) {
         subTabs = [
           { name: "자료실", link: "/kr/sub/support/download.html" },
@@ -246,7 +214,6 @@ function initBreadcrumbTabs() {
     });
   }
 
-  // hover 해제 시 숨김
   breadcrumb.addEventListener("mouseenter", () => clearTimeout(hideTimer));
   breadcrumb.addEventListener("mouseleave", scheduleHideTabs);
   sideTabs.addEventListener("mouseenter", () => clearTimeout(hideTimer));
@@ -254,7 +221,7 @@ function initBreadcrumbTabs() {
 }
 
 /* ------------------------------------------------------------
-   🔥 관리자 모드 상단바 자동 생성
+   🔥 관리자 모드 상단바
 ------------------------------------------------------------ */
 function initAdminBar() {
   const role = localStorage.getItem("role");
@@ -270,7 +237,6 @@ function initAdminBar() {
     color:#fff;
     padding:8px 20px;
     font-size:14px;
-    box-sizing:border-box;
     position:sticky;
     top:0;
     z-index:9999;
@@ -282,9 +248,9 @@ function initAdminBar() {
   adminBar.innerHTML = `
     <div><strong>FINE DEFENSE ADMIN MODE</strong></div>
     <div style="display:flex; gap:20px; align-items:center;">
-      <a href="/kr/admin/dashboard.html" 
-         style="color:#fff; text-decoration:none;">관리자 대시보드</a>
-
+      <a href="/kr/admin/dashboard.html" style="color:#fff; text-decoration:none;">
+        관리자 대시보드
+      </a>
       <a href="#" id="adminLogout"
          style="color:#ffdddd; text-decoration:none; font-weight:500;">
          로그아웃
@@ -292,11 +258,9 @@ function initAdminBar() {
     </div>
   `;
 
-  // 헤더 위에 삽입
   const header = document.querySelector("header");
   if (header) header.parentNode.insertBefore(adminBar, header);
 
-  // 로그아웃
   document.getElementById("adminLogout").addEventListener("click", () => {
     if (confirm("로그아웃하시겠습니까?")) {
       localStorage.clear();
@@ -304,5 +268,3 @@ function initAdminBar() {
     }
   });
 }
-
-
