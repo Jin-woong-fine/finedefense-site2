@@ -27,7 +27,7 @@ function showSideTabs(tabList, target) {
     if (!href) return;
 
     if (isTopTabs) {
-      // ✅ 상위탭 강조
+      // 상위탭(active)
       if (current.includes("/product/") && href.includes("/product/")) {
         a.classList.add("active");
       } else if (current.includes("/company/") && href.includes("/company/")) {
@@ -37,23 +37,20 @@ function showSideTabs(tabList, target) {
       } else if (current.includes("/support/") && href.includes("/support/")) {
         a.classList.add("active");
       }
-      } else {
-        const absHref = new URL(href, location.origin).pathname.toLowerCase();
+    } else {
+      const absHref = new URL(href, location.origin).pathname.toLowerCase();
 
-        // ✅ 조건 1: URL 완전 일치 → 기존 active
-        if (current === absHref) {
-          a.classList.add("active");
-        }
+      // URL 완전 일치
+      if (current === absHref) a.classList.add("active");
 
-        // ✅ 조건 2: post_ 상세글일 때 → 뉴스룸 링크 active
-        else if (
-          current.includes("/pr/newsroom/") &&
-          current.includes("post_") &&
-          href.includes("/pr/newsroom/newsroom.html")
-        ) {
-          a.classList.add("active");
-        }
+      // 상세페이지 → 뉴스룸 탭 active
+      else if (
+        current.includes("/pr/newsroom/post_template") &&
+        href.includes("/pr/newsroom/newsroom.html")
+      ) {
+        a.classList.add("active");
       }
+    }
   });
 
   // 위치 계산
@@ -105,7 +102,7 @@ function highlightTopMenu() {
 document.addEventListener("DOMContentLoaded", () => {
   console.log("✅ nav.js loaded");
 
-  // ✅ header 로드
+  // header 로드
   fetch("/kr/components/header.html")
     .then(res => {
       if (!res.ok) throw new Error("❌ header.html not found");
@@ -113,16 +110,15 @@ document.addEventListener("DOMContentLoaded", () => {
     })
     .then(html => {
       const headerEl = document.getElementById("header");
-      if (!headerEl) throw new Error("❌ #header element missing in HTML");
+      if (!headerEl) throw new Error("❌ #header element missing");
 
       headerEl.innerHTML = html;
 
-      // ✅ 언어 스크립트 로드
+      // 언어 스크립트 로드
       const langScript = document.createElement("script");
       langScript.src = "/kr/js/language.js";
       document.body.appendChild(langScript);
 
-      // ✅ header 렌더 완료 후 메뉴/탭 초기화
       setTimeout(() => {
         initBreadcrumbTabs();
         highlightTopMenu();
@@ -130,7 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
     })
     .catch(err => console.error(err));
 
-  // ✅ footer 로드
+  // footer 로드
   fetch("/kr/components/footer.html")
     .then(res => {
       if (!res.ok) throw new Error("❌ footer.html not found");
@@ -138,8 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
     })
     .then(html => {
       const footerEl = document.getElementById("footer");
-      if (!footerEl) throw new Error("❌ #footer element missing in HTML");
-
+      if (!footerEl) throw new Error("❌ #footer element missing");
       footerEl.innerHTML = html;
     })
     .catch(err => console.error(err));
@@ -152,7 +147,7 @@ function initBreadcrumbTabs() {
   const topTabs = [
     { name: "회사소개", link: "/kr/sub/company/overview.html" },
     { name: "제품소개", link: "/kr/sub/product/towed-cable.html" },
-    { name: "홍보센터", link: "/kr/sub/pr/" },
+    { name: "홍보센터", link: "/kr/sub/pr/newsroom/newsroom.html" },
     { name: "고객지원", link: "/kr/sub/support/" },
   ];
 
@@ -161,23 +156,23 @@ function initBreadcrumbTabs() {
   const breadcrumb = document.querySelector(".breadcrumb");
   const sideTabs = document.getElementById("side-tabs");
 
-  if (!breadcrumb || !sideTabs) {
-    console.warn("⚠️ breadcrumb 또는 side-tabs 요소를 찾을 수 없습니다.");
-    return;
-  }
+  if (!breadcrumb || !sideTabs) return;
 
   sideTabs.classList.remove("visible");
 
-  // 상위 탭
+  // 상위 탭 hover 시
   if (level1)
     level1.addEventListener("mouseenter", () => showSideTabs(topTabs, level1));
 
-  // 하위 탭
+  // 2단계 탭 hover 시
   if (level2) {
     level2.addEventListener("mouseenter", () => {
       const path = location.href.toLowerCase();
       let subTabs = [];
 
+      /* -------------------------
+         🔥 회사소개
+      ------------------------- */
       if (path.includes("/company/")) {
         subTabs = [
           { name: "기업개요", link: "/kr/sub/company/overview.html" },
@@ -187,22 +182,49 @@ function initBreadcrumbTabs() {
           { name: "조직도", link: "/kr/sub/company/organization.html" },
           { name: "찾아오시는 길", link: "/kr/sub/company/location.html" },
         ];
-      } else if (path.includes("/product/")) {
+      }
+
+      /* -------------------------
+         🔥 제품소개
+      ------------------------- */
+      else if (path.includes("/product/")) {
         subTabs = [
           { name: "수중이동형케이블", link: "/kr/sub/product/towed-cable.html" },
           { name: "수중고정형케이블", link: "/kr/sub/product/underwater-fixed-cable.html" },
           { name: "수중커넥터", link: "/kr/sub/product/underwater-connector.html" },
           { name: "커스텀케이블", link: "/kr/sub/product/custom-cable.html" },
         ];
-      } else if (path.includes("/pr/")) {
-        subTabs = [
-          { name: "공지사항", link: "#" },
-          { name: "뉴스룸", link: "/kr/sub/pr/newsroom/newsroom.html" },
-          { name: "홍보영상", link: "/kr/sub/pr/gallery.html" },
-          { name: "인증 및 특허", link: "/kr/sub/pr/gallery.html" },
-          { name: "카탈로그", link: "/kr/sub/pr/gallery.html" },
-        ];
-      } else if (path.includes("/support/")) {
+      }
+
+      /* -------------------------
+         🔥 홍보센터(뉴스룸/공지/갤러리/인증/카탈로그)
+         ※ 상세페이지는 뉴스룸만 고정
+      ------------------------- */
+      else if (path.includes("/pr/")) {
+        
+        // 상세페이지
+        if (path.includes("/pr/newsroom/post_template")) {
+          subTabs = [
+            { name: "뉴스룸", link: "/kr/sub/pr/newsroom/newsroom.html" }
+          ];
+        }
+
+        // PR 전체 페이지
+        else {
+          subTabs = [
+            { name: "뉴스룸", link: "/kr/sub/pr/newsroom/newsroom.html" },
+            { name: "공지사항", link: "/kr/sub/pr/notice/notice.html" },
+            { name: "갤러리", link: "/kr/sub/pr/gallery/gallery.html" },
+            { name: "인증 및 특허", link: "/kr/sub/pr/cert/cert.html" },
+            { name: "카탈로그", link: "/kr/sub/pr/catalog/catalog.html" },
+          ];
+        }
+      }
+
+      /* -------------------------
+         🔥 고객지원
+      ------------------------- */
+      else if (path.includes("/support/")) {
         subTabs = [
           { name: "자료실", link: "/kr/sub/support/download.html" },
           { name: "문의하기", link: "/kr/sub/support/contact.html" },
@@ -213,7 +235,7 @@ function initBreadcrumbTabs() {
     });
   }
 
-  // hover 해제 시 숨김 처리
+  // hover 해제 시 숨김
   breadcrumb.addEventListener("mouseenter", () => clearTimeout(hideTimer));
   breadcrumb.addEventListener("mouseleave", scheduleHideTabs);
   sideTabs.addEventListener("mouseenter", () => clearTimeout(hideTimer));
