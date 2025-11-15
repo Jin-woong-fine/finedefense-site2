@@ -26,7 +26,8 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 /* ==========================================
-   📄 0) 단일 게시물 조회 (✨ post_template에서 사용)
+   📄 0) 단일 게시물 조회 (post_template에서 사용)
+   👉 GET /api/posts/detail/:id
 ========================================== */
 router.get("/detail/:id", async (req, res) => {
   try {
@@ -41,16 +42,18 @@ router.get("/detail/:id", async (req, res) => {
       [id]
     );
 
-    if (rows.length === 0) return res.json({});
+    if (rows.length === 0) {
+      return res.json({});
+    }
 
     const post = rows[0];
 
-    // 이미지 목록 가져오기
+    // 이미지 목록 추가
     const [images] = await db.execute(
-      `SELECT image_path FROM post_images WHERE post_id = ?`,
+      "SELECT image_path FROM post_images WHERE post_id = ?",
       [id]
     );
-    post.images = images.map(img => img.image_path);
+    post.images = images.map(i => i.image_path);
 
     res.json(post);
   } catch (err) {
@@ -61,9 +64,12 @@ router.get("/detail/:id", async (req, res) => {
 
 /* ==========================================
    🧩 1) 게시물 등록 (다중 이미지 업로드)
+   👉 POST /api/posts
 ========================================== */
 router.post("/", upload.array("images", 10), verifyToken, async (req, res) => {
   try {
+    console.log("업로드된 파일들:", req.files);
+
     const { title, content, category, lang } = req.body;
     const authorId = req.user.id;
 
@@ -81,9 +87,8 @@ router.post("/", upload.array("images", 10), verifyToken, async (req, res) => {
 
     const postId = result.insertId;
 
-    // 이미지 테이블 저장
-    for (const f of req.files) {
-      const imagePath = `/uploads/news/${f.filename}`;
+    for (const file of req.files) {
+      const imagePath = `/uploads/news/${file.filename}`;
       await db.execute(
         `INSERT INTO post_images (post_id, image_path)
          VALUES (?, ?)`,
@@ -100,6 +105,7 @@ router.post("/", upload.array("images", 10), verifyToken, async (req, res) => {
 
 /* ==========================================
    📤 2) 카테고리별 목록 조회 (이미지 포함)
+   👉 GET /api/posts/:category   (예: /api/posts/news)
 ========================================== */
 router.get("/:category", async (req, res) => {
   try {
@@ -132,16 +138,15 @@ router.get("/:category", async (req, res) => {
 
 /* ==========================================
    📸 3) 게시물 이미지 목록 조회
+   👉 GET /api/posts/images/:postId
 ========================================== */
 router.get("/images/:postId", async (req, res) => {
   try {
     const { postId } = req.params;
-
     const [rows] = await db.execute(
       "SELECT image_path FROM post_images WHERE post_id = ?",
       [postId]
     );
-
     res.json(rows);
   } catch (err) {
     console.error("이미지 조회 오류:", err);
@@ -151,6 +156,7 @@ router.get("/images/:postId", async (req, res) => {
 
 /* ==========================================
    🗑️ 4) 게시물 삭제
+   👉 DELETE /api/posts/:id
 ========================================== */
 router.delete("/:id", verifyToken, async (req, res) => {
   try {

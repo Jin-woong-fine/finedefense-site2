@@ -136,7 +136,6 @@
 
   <div id="footer"></div>
 
-  <!-- 공통 JS -->
   <script src="/js/nav.js"></script>
   <script src="/js/language.js"></script>
 
@@ -144,7 +143,9 @@
   <script>
     document.addEventListener("DOMContentLoaded", () => {
 
-      const container = document.querySelector(".news-post-container");
+      const sideTabs = document.getElementById("side-tabs");
+      if (sideTabs) sideTabs.style.display = "none";
+
       const titleEl   = document.getElementById("postTitle");
       const catEl     = document.getElementById("postCategory");
       const dateEl    = document.getElementById("postDate");
@@ -153,8 +154,9 @@
       const contentEl = document.getElementById("postContent");
 
       const postId = new URLSearchParams(window.location.search).get("id");
+
       if (!postId) {
-        container.innerHTML = "<p style='text-align:center;color:#555;'>잘못된 접근입니다.</p>";
+        contentEl.innerHTML = "<p style='text-align:center;color:#555;'>잘못된 접근입니다.</p>";
         return;
       }
 
@@ -162,31 +164,29 @@
 
       async function loadPost(id) {
         try {
-          // ⭐ 절대경로로 변경!
+          // ✅ 단일 조회용 detail 라우트 호출
           const res = await fetch(`/api/posts/detail/${id}`);
           const post = await res.json();
 
           if (!post || !post.id) {
-            contentEl.innerHTML = "<p style='color:#999;'>게시물을 찾을 수 없습니다.</p>";
+            contentEl.innerHTML = "<p>게시물을 찾을 수 없습니다.</p>";
             return;
           }
 
           titleEl.textContent = post.title;
-          catEl.textContent = categoryName(post.category);
-          dateEl.textContent = new Date(post.created_at).toLocaleDateString();
+          catEl.textContent   = categoryName(post.category);
+          dateEl.textContent  = new Date(post.created_at).toLocaleDateString();
           authorEl.textContent = post.author_name ?? "관리자";
 
-          if (post.main_image) {
-            imageEl.innerHTML = `<img src="${post.main_image}" alt="대표 이미지">`;
-          } else {
-            imageEl.innerHTML = "";
-          }
+          imageEl.innerHTML = post.main_image
+            ? `<img src="${post.main_image}" alt="대표 이미지" />`
+            : "";
 
           contentEl.innerHTML = post.content;
 
         } catch (err) {
           console.error("❌ 게시물 로딩 오류:", err);
-          contentEl.innerHTML = "<p style='color:red;'>게시물을 불러오는 중 오류가 발생했습니다.</p>";
+          contentEl.innerHTML = "<p style='color:red;'>게시물을 불러오는 중 오류 발생</p>";
         }
       }
 
@@ -202,6 +202,7 @@
       }
     });
   </script>
+
 
 </body>
 </html>
