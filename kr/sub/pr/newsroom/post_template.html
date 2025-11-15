@@ -144,7 +144,6 @@
   <script>
     document.addEventListener("DOMContentLoaded", () => {
 
-      // 필수 DOM 요소 캐싱 (안전)
       const container = document.querySelector(".news-post-container");
       const titleEl   = document.getElementById("postTitle");
       const catEl     = document.getElementById("postCategory");
@@ -153,17 +152,9 @@
       const imageEl   = document.getElementById("postImage");
       const contentEl = document.getElementById("postContent");
 
-      if (!container || !titleEl || !catEl || !dateEl || !authorEl || !imageEl || !contentEl) {
-        console.error("❌ post_template.html: 필수 요소 누락");
-        return;
-      }
-
-      // URL에서 ?id= 값 추출
       const postId = new URLSearchParams(window.location.search).get("id");
-
       if (!postId) {
-        container.innerHTML =
-          "<p style='text-align:center;color:#555;'>잘못된 접근입니다.</p>";
+        container.innerHTML = "<p style='text-align:center;color:#555;'>잘못된 접근입니다.</p>";
         return;
       }
 
@@ -171,7 +162,8 @@
 
       async function loadPost(id) {
         try {
-          const res = await fetch(`/api/posts/${id}`);
+          // ⭐ 절대경로로 변경!
+          const res = await fetch(`${location.origin}/api/posts/${id}`);
           const post = await res.json();
 
           if (!post || !post.id) {
@@ -179,31 +171,25 @@
             return;
           }
 
-          // 제목 + 정보
-          titleEl.textContent  = post.title;
-          catEl.textContent    = categoryName(post.category);
-          dateEl.textContent   = new Date(post.created_at).toLocaleDateString();
+          titleEl.textContent = post.title;
+          catEl.textContent = categoryName(post.category);
+          dateEl.textContent = new Date(post.created_at).toLocaleDateString();
           authorEl.textContent = post.author_name ?? "관리자";
 
-          // 대표 이미지
           if (post.main_image) {
-            imageEl.innerHTML =
-              `<img src="${post.main_image}" alt="대표 이미지">`;
+            imageEl.innerHTML = `<img src="${post.main_image}" alt="대표 이미지">`;
           } else {
             imageEl.innerHTML = "";
           }
 
-          // 본문 HTML (Quill)
           contentEl.innerHTML = post.content;
 
         } catch (err) {
           console.error("❌ 게시물 로딩 오류:", err);
-          contentEl.innerHTML =
-            "<p style='color:red;'>게시물을 불러오는 중 오류가 발생했습니다.</p>";
+          contentEl.innerHTML = "<p style='color:red;'>게시물을 불러오는 중 오류가 발생했습니다.</p>";
         }
       }
 
-      // 카테고리 한글 변환
       function categoryName(code) {
         switch (code) {
           case "news": return "뉴스룸";
