@@ -123,8 +123,19 @@ document.addEventListener("DOMContentLoaded", () => {
         initBreadcrumbTabs();
         highlightTopMenu();
       }, 300);
+
+
+    /* ------------------------------------------------------------
+       🔥🔥 관리자 상단바 삽입 (헤더 로드 완료 후)
+    ------------------------------------------------------------ */
+    initAdminBar();   // ⭐⭐ 이거 추가
     })
+
     .catch(err => console.error(err));
+
+
+
+
 
   // footer 로드
   fetch("/kr/components/footer.html")
@@ -241,3 +252,57 @@ function initBreadcrumbTabs() {
   sideTabs.addEventListener("mouseenter", () => clearTimeout(hideTimer));
   sideTabs.addEventListener("mouseleave", scheduleHideTabs);
 }
+
+/* ------------------------------------------------------------
+   🔥 관리자 모드 상단바 자동 생성
+------------------------------------------------------------ */
+function initAdminBar() {
+  const role = localStorage.getItem("role");
+  const token = localStorage.getItem("token");
+
+  if (role !== "admin" || !token) return;
+
+  const adminBar = document.createElement("div");
+  adminBar.id = "adminBar";
+  adminBar.style.cssText = `
+    width:100%;
+    background:#0f2679;
+    color:#fff;
+    padding:8px 20px;
+    font-size:14px;
+    box-sizing:border-box;
+    position:sticky;
+    top:0;
+    z-index:9999;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  `;
+
+  adminBar.innerHTML = `
+    <div><strong>FINE DEFENSE ADMIN MODE</strong></div>
+    <div style="display:flex; gap:20px; align-items:center;">
+      <a href="/kr/admin/dashboard.html" 
+         style="color:#fff; text-decoration:none;">관리자 대시보드</a>
+
+      <a href="#" id="adminLogout"
+         style="color:#ffdddd; text-decoration:none; font-weight:500;">
+         로그아웃
+      </a>
+    </div>
+  `;
+
+  // 헤더 위에 삽입
+  const header = document.querySelector("header");
+  if (header) header.parentNode.insertBefore(adminBar, header);
+
+  // 로그아웃
+  document.getElementById("adminLogout").addEventListener("click", () => {
+    if (confirm("로그아웃하시겠습니까?")) {
+      localStorage.clear();
+      location.href = "/kr/admin/login.html";
+    }
+  });
+}
+
+
