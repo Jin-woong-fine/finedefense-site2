@@ -441,33 +441,41 @@
 
 
 
-    <script>
-      // ✅ header 불러오기
-      fetch("/kr/components/header.html")
-        .then(res => res.text())
-        .then(data => {
-          document.getElementById("header").innerHTML = data;
+      <script>
+        // header 불러오기
+        fetch("/kr/components/header.html")
+          .then(res => res.text())
+          .then(data => {
+            document.getElementById("header").innerHTML = data;
 
-          // ✅ header가 DOM에 완전히 반영된 후 language.js 로드
-          setTimeout(() => {
-            const langScript = document.createElement("script");
-            langScript.src = "/js/language.js";
-            document.body.appendChild(langScript);
-          }, 300);
-        })
-        .catch(err => console.error("❌ header load error:", err));
+            // 언어 스크립트 로드
+            setTimeout(() => {
+              const langScript = document.createElement("script");
+              langScript.src = "/js/language.js";
+              document.body.appendChild(langScript);
+            }, 100);
 
-      // ✅ footer 불러오기
-      fetch("/kr/components/footer.html")
-        .then(res => res.text())
-        .then(data => {
-          document.getElementById("footer").innerHTML = data;
-        })
-        .catch(err => console.error("❌ footer load error:", err));
-    </script>
+            // ⭐ nav.js도 header가 로딩된 후 실행!!
+            setTimeout(() => {
+              const navScript = document.createElement("script");
+              navScript.src = "/kr/js/nav.js";
+              document.body.appendChild(navScript);
+            }, 150);
 
-    <script src="/js/banner.js"></script>
-    <script src="/kr/js/nav.js"></script>
+          })
+          .catch(err => console.error("❌ header load error:", err));
+
+        // footer 불러오기
+        fetch("/kr/components/footer.html")
+          .then(res => res.text())
+          .then(data => {
+            document.getElementById("footer").innerHTML = data;
+          })
+          .catch(err => console.error("❌ footer load error:", err));
+      </script>
+
+      <script src="/js/banner.js"></script>
+
 
 
 
