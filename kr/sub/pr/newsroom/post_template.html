@@ -111,7 +111,8 @@
   <div class="breadcrumb">
     <a href="/">홈</a> &gt;
     <span class="crumb crumb-level1">홍보센터</span> &gt;
-    <span class="crumb crumb-level2">게시물 보기</span>
+    <span class="crumb crumb-level2">뉴스룸</span>
+    <div id="side-tabs" class="side-tabs"></div>
   </div>
 
   <!-- 본문 -->
@@ -131,7 +132,9 @@
       <p>내용을 불러오는 중입니다...</p>
     </div>
 
-    <a href="javascript:history.back()" class="back-btn">목록으로 돌아가기</a>
+    <a href="/kr/sub/pr/newsroom/newsroom.html" class="back-btn">
+      목록으로 돌아가기
+    </a>
   </section>
 
   <div id="footer"></div>
@@ -139,10 +142,8 @@
   <script src="/js/nav.js"></script>
   <script src="/js/language.js"></script>
 
-  <!-- 게시물 불러오기 -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-
       const sideTabs = document.getElementById("side-tabs");
       if (sideTabs) sideTabs.style.display = "none";
 
@@ -154,23 +155,26 @@
       const contentEl = document.getElementById("postContent");
 
       const postId = new URLSearchParams(window.location.search).get("id");
+      const numericId = Number(postId);
 
-      if (!postId) {
+      if (!postId || Number.isNaN(numericId)) {
         contentEl.innerHTML = "<p style='text-align:center;color:#555;'>잘못된 접근입니다.</p>";
         return;
       }
 
-      loadPost(postId);
+      loadPost(numericId);
 
       async function loadPost(id) {
         try {
-          // ✅ 단일 조회용 detail 라우트 호출
-          const res = await fetch(`${window.location.origin}/api/posts/${id}`);
+          // ✅ news 카테고리 전체 불러와서 id 매칭 (백엔드 단일조회 없어서 이렇게 처리)
+          const res = await fetch(`${window.location.origin}/api/posts/news?lang=kr`);
+          const posts = await res.json();
 
-          const post = await res.json();
+          const post = posts.find(p => p.id === id);
 
-          if (!post || !post.id) {
+          if (!post) {
             contentEl.innerHTML = "<p>게시물을 찾을 수 없습니다.</p>";
+            titleEl.textContent = "게시물 없음";
             return;
           }
 
@@ -180,7 +184,7 @@
           authorEl.textContent = post.author_name ?? "관리자";
 
           imageEl.innerHTML = post.main_image
-            ? `<img src="${post.main_image}" alt="대표 이미지" />`
+            ? `<img src="${post.main_image}" alt="대표 이미지">`
             : "";
 
           contentEl.innerHTML = post.content;
@@ -203,7 +207,6 @@
       }
     });
   </script>
-
 
 </body>
 </html>
