@@ -132,13 +132,14 @@
 
   <!-- ======== 뉴스 불러오기 스크립트 ======== -->
   <script>
-    const API_URL = "http://localhost:3000";
+    const API_URL = "";  // 공백
 
     async function loadNews() {
       const list = document.getElementById("newsList");
 
       try {
-        const res = await fetch(`${API_URL}/api/posts/news?lang=kr`);
+        const res = await fetch(`/api/posts/news?lang=kr`);
+
         const posts = await res.json();
 
         if (!posts.length) {
