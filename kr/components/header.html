@@ -1,3 +1,53 @@
+<!-- 관리자 상단바 (로그인 시 자동 표시) -->
+<div id="adminBar"
+     style="
+       display: none;
+       width: 100%;
+       background: #0f2679;
+       color: #fff;
+       padding: 8px 20px;
+       font-size: 14px;
+       box-sizing: border-box;
+       display: flex;
+       justify-content: space-between;
+       align-items: center;
+     ">
+  <div><strong>FINE DEFENSE ADMIN MODE</strong></div>
+
+  <div style="display:flex; gap:20px; align-items:center;">
+    <a href="/kr/admin/dashboard.html" style="color:#fff; text-decoration:none;">관리자 대시보드</a>
+
+    <a href="#" id="adminLogoutFromHeader"
+       style="color:#ffdddd; text-decoration:none; font-weight:500;">
+      로그아웃
+    </a>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const role = localStorage.getItem("role");
+    const token = localStorage.getItem("token");
+    const bar = document.getElementById("adminBar");
+    const logoutHeader = document.getElementById("adminLogoutFromHeader");
+
+    if (role === "admin" && token) {
+      bar.style.display = "flex";
+
+      logoutHeader.addEventListener("click", () => {
+        if (confirm("로그아웃하시겠습니까?")) {
+          localStorage.clear();
+          location.reload();
+        }
+      });
+    }
+  });
+</script>
+
+
+
+
+
 <!-- header.html -->
 <header class="header-inner">
   <div class="header-left">
