@@ -24,6 +24,73 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
+
+
+  /* ==========================================
+    📈 조회수 증가 API
+    👉 GET /api/posts/view/:id
+  ========================================== */
+  router.get("/view/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      // 관리자 토큰은 조회수 제외
+      const token = req.headers.authorization?.split(" ")[1];
+      if (token) {
+        try {
+          const decoded = jwt.verify(token, process.env.JWT_SECRET);
+          if (decoded.role === "admin") {
+            return res.json({ message: "관리자 제외", added: false });
+          }
+        } catch (err) {}
+      }
+
+      const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.ip;
+      const ua = req.headers["user-agent"] || "unknown";
+
+      // 24시간 중복 방지
+      const [exists] = await db.execute(
+        `SELECT * FROM post_view_logs
+          WHERE post_id = ? AND ip = ? AND user_agent = ?
+          AND viewed_at > DATE_SUB(NOW(), INTERVAL 1 DAY)`,
+        [id, ip, ua]
+      );
+
+      if (exists.length > 0) {
+        return res.json({ message: "중복(24시간 제한)", added: false });
+      }
+
+      // 로그 저장
+      await db.execute(
+        `INSERT INTO post_view_logs (post_id, ip, user_agent) VALUES (?, ?, ?)`,
+        [id, ip, ua]
+      );
+
+      // 날짜 정보
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth() + 1;
+      const day = now.getDate();
+
+      // 일별 조회수 +1
+      await db.execute(
+        `INSERT INTO post_view_stats (post_id, year, month, day, views)
+          VALUES (?, ?, ?, ?, 1)
+          ON DUPLICATE KEY UPDATE views = views + 1`,
+        [id, year, month, day]
+      );
+
+      res.json({ message: "조회수 +1", added: true });
+
+    } catch (err) {
+      console.error("조회수 증가 오류:", err);
+      res.status(500).json({ message: "조회수 증가 오류" });
+    }
+  });
+
+
+
+
 /* ==========================================
    📄 0) 단일 게시물 조회 + 조회수 기록
    👉 GET /api/posts/detail/:id
