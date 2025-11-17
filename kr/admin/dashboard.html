@@ -173,6 +173,65 @@
       border-radius: 6px;
       border: 1px solid #ddd;
     }
+
+    .stats-container {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+    }
+
+    .stat-card {
+      flex: 1;
+      min-width: 200px;
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      border: 1px solid #e5e7eb;
+      text-align: center;
+    }
+
+    .stat-card h3 {
+      font-size: 16px;
+      margin-bottom: 10px;
+      color: #555;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #0f2679;
+    }
+
+    .top-views {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      margin-bottom: 40px;
+    }
+
+    .top-views ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .top-views li {
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+      font-size: 15px;
+    }
+
+    .top-views li:last-child {
+      border-bottom: none;
+    }
+
+
+
+
+
   </style>
 </head>
 
@@ -192,6 +251,47 @@
 
 <!-- 메인 -->
 <div class="main">
+
+<!-- ================================ -->
+<!--      📊 관리자 통계 카드         -->
+<!-- ================================ -->
+<section class="stats-container">
+
+  <div class="stat-card">
+    <h3>이번달 조회수</h3>
+    <p id="thisMonthViews" class="stat-value">0</p>
+  </div>
+
+  <div class="stat-card">
+    <h3>지난달 조회수</h3>
+    <p id="lastMonthViews" class="stat-value">0</p>
+  </div>
+
+  <div class="stat-card">
+    <h3>증가율</h3>
+    <p id="growthRate" class="stat-value">0%</p>
+  </div>
+
+  <div class="stat-card">
+    <h3>전체 게시물 수</h3>
+    <p id="totalPosts" class="stat-value">0</p>
+  </div>
+
+</section>
+
+<!-- ================================ -->
+<!--      📈 조회수 TOP 5             -->
+<!-- ================================ -->
+<section class="top-views">
+  <h2>조회수 TOP 5 게시물</h2>
+  <ul id="topPostsList"></ul>
+</section>
+
+
+
+
+
+
 
   <!-- 상단바 -->
   <div class="topbar">
@@ -354,6 +454,58 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
 });
+
+
+  /* ==========================================
+    📊 관리자 대시보드 통계 불러오기
+  ========================================== */
+  async function loadDashboardStats() {
+    try {
+      const res = await fetch("/api/admin/dashboard", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        }
+      });
+
+      if (!res.ok) {
+        console.error("대시보드 통계 로드 오류");
+        return;
+      }
+
+      const data = await res.json();
+
+      // 카드 값 채우기
+      document.getElementById("thisMonthViews").textContent =
+        data.thisMonthViews.toLocaleString();
+
+      document.getElementById("lastMonthViews").textContent =
+        data.lastMonthViews.toLocaleString();
+
+      document.getElementById("totalPosts").textContent =
+        data.postCount.toLocaleString();
+
+      // 증가율 계산
+      let growth = 0;
+      if (data.lastMonthViews > 0) {
+        growth = ((data.thisMonthViews - data.lastMonthViews) / data.lastMonthViews * 100).toFixed(1);
+      }
+      document.getElementById("growthRate").textContent = growth + "%";
+
+      // 조회수 TOP5 표시
+      const topList = document.getElementById("topPostsList");
+      topList.innerHTML = data.topPosts
+        .map(p => `<li>${p.title} — <strong>${(p.total_views || 0).toLocaleString()}</strong> 회</li>`)
+        .join("");
+
+    } catch (err) {
+      console.error("관리자 통계 불러오기 실패:", err);
+    }
+  }
+
+  // 페이지 로드시 실행
+  loadDashboardStats();
+
+
 </script>
 
 </body>
