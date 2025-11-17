@@ -1,76 +1,99 @@
-/* ============================================================
-   🟦 제품 상세 페이지 JS (중복 이미지 제거 + 갤러리 기능 포함)
-============================================================ */
+/* ============================================================================
+   📌 제품 상세 페이지 로직 (product-view.js)
+============================================================================ */
+
+document.addEventListener("DOMContentLoaded", loadProductDetail);
 
 async function loadProductDetail() {
   const params = new URLSearchParams(window.location.search);
   const productId = params.get("id");
 
-  if (!productId) return alert("잘못된 접근입니다.");
-
-  // API 요청
-  const res = await fetch(`/api/products/${productId}`);
-  if (!res.ok) {
-    document.getElementById("productDesc").innerHTML = "<p>제품을 불러올 수 없습니다.</p>";
+  if (!productId) {
+    console.error("❌ productId 없음");
     return;
   }
 
-  const { product, images } = await res.json();
+  try {
+    const res = await fetch(`/api/products/${productId}`);
+    if (!res.ok) throw new Error("서버에서 제품 데이터를 불러올 수 없음");
 
-  // HTML 적용
-  document.getElementById("productTitle").textContent = product.title;
-  document.getElementById("crumbProduct").textContent = product.title;
+    const data = await res.json();
+    renderProduct(data);
 
-  /* 카테고리 텍스트 매핑 */
-  const categoryMap = {
-    towed: "수중이동형 케이블",
-    fixed: "수중고정형 케이블",
-    connector: "수중 커넥터",
-    custom: "커스텀 케이블"
-  };
-  document.getElementById("productCategory").textContent =
-    categoryMap[product.category] || product.category;
-
-  /* 메인 이미지 설정 */
-  const mainImage = document.getElementById("mainImage");
-  mainImage.src = product.thumbnail || "/img/products/Image-placeholder.png";
-
-  /* 🔥 상세 이미지에서 대표 이미지 제거 */
-  const detailedImages = images.filter(img => img.url !== product.thumbnail);
-
-  /* 상세 이미지 썸네일 렌더링 */
-  const thumbList = document.getElementById("thumbList");
-  thumbList.innerHTML = detailedImages
-    .map(
-      (img, idx) => `
-      <img 
-        src="${img.url}" 
-        class="thumb" 
-        data-url="${img.url}"
-      >
-    `
-    )
-    .join("");
-
-  // 첫 번째 상세 이미지 활성화 표시
-  const thumbs = thumbList.querySelectorAll("img");
-  if (thumbs.length > 0) {
-    thumbs[0].classList.add("active");
+  } catch (err) {
+    console.error("❌ loadProductDetail Error:", err);
   }
-
-  /* 🔄 썸네일 클릭 → 메인 이미지 교체 */
-  thumbs.forEach(t => {
-    t.addEventListener("click", () => {
-      mainImage.src = t.dataset.url;
-
-      thumbs.forEach(x => x.classList.remove("active"));
-      t.classList.add("active");
-    });
-  });
-
-  /* 제품 설명 적용 */
-  document.getElementById("productDesc").innerHTML =
-    product.description_html || "<p>제품 설명이 없습니다.</p>";
 }
 
-document.addEventListener("DOMContentLoaded", loadProductDetail);
+/* ============================================================================
+   📌 페이지에 실제로 렌더링
+============================================================================ */
+function renderProduct({ product, images }) {
+  // 요소들
+  const titleEl = document.getElementById("productTitle");
+  const categoryEl = document.getElementById("productCategory");
+  const descEl = document.getElementById("productDesc");
+  const mainImageEl = document.getElementById("mainImage");
+  const thumbListEl = document.getElementById("thumbList");
+  const crumbProduct = document.getElementById("crumbProduct");
+
+  // 카테고리 표시용
+  const categoryLabel = getCategoryLabel(product.category);
+
+  // 제목, 카테고리
+  titleEl.textContent = product.title;
+  categoryEl.textContent = `카테고리: ${categoryLabel}`;
+  crumbProduct.textContent = product.title;
+
+  // 대표 이미지 설정
+  const mainImg = product.thumbnail
+    ? product.thumbnail
+    : "/img/products/Image-placeholder.png";
+
+  mainImageEl.src = mainImg;
+
+  // 상세 이미지 목록에서 대표 이미지 제거
+  const detailImgs = images.filter(img => img.url !== product.thumbnail);
+
+  /* 🔥 썸네일 렌더링 */
+  thumbListEl.innerHTML = "";
+
+  // 1) 대표 이미지 → 썸네일 첫 번째로 표시
+  const allThumbs = [
+    { url: mainImg, isMain: true },
+    ...detailImgs.map(img => ({ url: img.url, isMain: false }))
+  ];
+
+  allThumbs.forEach((img, idx) => {
+    const t = document.createElement("img");
+    t.src = img.url;
+    if (idx === 0) t.classList.add("active");
+
+    // 클릭 시 메인 이미지 변경
+    t.addEventListener("click", () => {
+      document.querySelectorAll(".thumb-list img").forEach(el =>
+        el.classList.remove("active")
+      );
+      t.classList.add("active");
+      mainImageEl.src = img.url;
+    });
+
+    thumbListEl.appendChild(t);
+  });
+
+  // 설명 HTML 삽입
+  descEl.innerHTML = product.description_html || "<p>설명 없음</p>";
+}
+
+/* ============================================================================
+   📌 카테고리 라벨 변환
+============================================================================ */
+function getCategoryLabel(code) {
+  switch (code) {
+    case "towed": return "수중이동형 케이블";
+    case "fixed": return "수중고정형 케이블";
+    case "connector": return "수중 커넥터";
+    case "custom": return "커스텀 케이블";
+    default: return "기타";
+  }
+}
