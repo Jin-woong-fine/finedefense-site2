@@ -1,64 +1,30 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const params = new URLSearchParams(window.location.search);
-  const id = params.get("id");
+(async () => {
+  const id = new URLSearchParams(location.search).get("id");
+  const res = await fetch(`/api/products/${id}`);
+  const data = await res.json();
+  
+  const p = data.product;
+  const images = data.images; // 대표 이미지는 없음!
 
-  if (!id) {
-    alert("잘못된 접근입니다.");
-    return;
-  }
+  // 제목, 카테고리
+  document.getElementById("productTitle").textContent = p.title;
+  document.getElementById("productCategory").textContent = "카테고리: " + p.category;
 
-  loadProductDetail(id);
-});
+  // 메인 이미지 = thumbnail
+  const mainImage = document.getElementById("mainImage");
+  mainImage.src = p.thumbnail;
 
-async function loadProductDetail(id) {
-  try {
-    const res = await fetch(`/api/products/${id}`);
-    if (!res.ok) {
-      alert("제품 정보를 불러오지 못했습니다.");
-      return;
-    }
+  // 상세 이미지들 렌더링
+  const thumbBox = document.getElementById("thumbList");
+  thumbBox.innerHTML = images.map(img => `
+    <img src="${img.url}" onclick="changeMain('${img.url}')">
+  `).join("");
 
-    const { product, images } = await res.json();
+  // 설명
+  document.getElementById("productDesc").innerHTML = p.description_html;
 
-    document.getElementById("productTitle").textContent = product.title;
-    document.getElementById("productCategory").textContent = product.category;
-    document.getElementById("crumbProduct").textContent = product.title;
-
-    const mainImage = document.getElementById("mainImage");
-    const allImages = [];
-
-    if (product.thumbnail) allImages.push(product.thumbnail);
-    if (images?.length) {
-      images.forEach(img => allImages.push(img.url));
-    }
-
-    if (allImages.length === 0) {
-      mainImage.src = "/img/products/Image-placeholder.png";
-    } else {
-      mainImage.src = allImages[0];
-    }
-
-    const thumbList = document.getElementById("thumbList");
-    thumbList.innerHTML = allImages
-      .map(
-        (src, idx) => `
-        <img src="${src}" class="${idx === 0 ? "active" : ""}" data-index="${idx}">
-      `
-      )
-      .join("");
-
-    thumbList.querySelectorAll("img").forEach(img => {
-      img.addEventListener("click", () => {
-        thumbList.querySelectorAll("img").forEach(t => t.classList.remove("active"));
-        img.classList.add("active");
-        mainImage.src = img.src;
-      });
-    });
-
-    const descBox = document.getElementById("productDesc");
-    descBox.innerHTML = product.description_html || "<p>제품 설명이 준비중입니다.</p>";
-  } catch (err) {
-    console.error(err);
-    alert("에러가 발생했습니다.");
-  }
-}
+  // 클릭 시 메인 교체
+  window.changeMain = (url) => {
+    mainImage.src = url;
+  };
+})();

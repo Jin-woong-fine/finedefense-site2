@@ -42,8 +42,11 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-/* ============================================================
+//* ============================================================
    📌 제품 등록 (POST /api/products)
+   - thumbnail 1개
+   - images 여러개
+   - thumbnail은 product_images에 저장되지 않도록 필터링
 ============================================================ */
 router.post(
   "/",
@@ -54,40 +57,49 @@ router.post(
   async (req, res) => {
     try {
       const { title, category, description_html } = req.body;
-      if (!title || !category)
+      if (!title || !category) {
         return res.status(400).json({ message: "title, category 필수" });
+      }
 
       let thumbnailPath = null;
 
-      // 1) 썸네일 파일이 따로 온 경우
+      // (1) 썸네일 파일명이 있을 경우 우선 사용
+      let thumbFileName = null;
+
       if (req.files?.thumbnail?.[0]) {
-        thumbnailPath = `/uploads/products/${req.files.thumbnail[0].filename}`;
+        thumbFileName = req.files.thumbnail[0].filename;
+        thumbnailPath = `/uploads/products/${thumbFileName}`;
       }
-      // 2) 없으면 첫 번째 images 사용
+      // (2) thumbnail이 없으면 images 첫 번째 이미지를 대표 이미지로 사용
       else if (req.files?.images?.[0]) {
-        thumbnailPath = `/uploads/products/${req.files.images[0].filename}`;
+        thumbFileName = req.files.images[0].filename;
+        thumbnailPath = `/uploads/products/${thumbFileName}`;
       }
 
+      // DB products 등록
       const [result] = await db.execute(
-        `INSERT INTO products (title, category, thumbnail, description_html)
-         VALUES (?, ?, ?, ?)`,
+        "INSERT INTO products (title, category, thumbnail, description_html) VALUES (?, ?, ?, ?)",
         [title, category, thumbnailPath, description_html || ""]
       );
 
       const productId = result.insertId;
 
-      // 상세 이미지 저장
+      // 상세 이미지 저장 (대표 이미지 제외)
       if (req.files?.images?.length) {
-        const values = req.files.images.map((f, idx) => [
-          productId,
-          `/uploads/products/${f.filename}`,
-          idx,
-        ]);
+        const values = req.files.images
+          .filter(f => f.filename !== thumbFileName)  // ← 대표 이미지 제외 핵심
+          .map((f, idx) => [
+            productId,
+            `/uploads/products/${f.filename}`,
+            idx,
+          ]);
 
-        await db.query(
-          "INSERT INTO product_images (product_id, url, sort_order) VALUES ?",
-          [values]
-        );
+        if (values.length > 0) {
+          await db.query(
+            "INSERT INTO product_images (product_id, url, sort_order) VALUES ?",
+            [values]
+          );
+        }
       }
 
       res.status(201).json({ message: "created", id: productId });
