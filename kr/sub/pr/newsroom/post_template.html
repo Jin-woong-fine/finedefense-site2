@@ -13,84 +13,352 @@
   <style>
     body {
       font-family: 'Noto Sans KR', sans-serif;
-      background: #f9f9fb;
+      background: #f5f6fa;
       margin: 0;
     }
 
-    .news-post-container {
-      max-width: 1000px;
-      margin: 80px auto;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-      padding: 40px;
+    .page-wrap {
+      padding: 40px 16px 80px;
     }
 
+    .news-post-container {
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+
+    /* 상단 정보 영역 (삼성 뉴스룸처럼) */
+    .post-top-meta {
+      margin-bottom: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .post-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge-category {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #0f2679;
+      color: #fff;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .badge-lang {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 999px;
+      border: 1px solid #d0d4f0;
+      color: #4b5563;
+      font-size: 0.75rem;
+    }
+
+    .post-meta-right {
+      font-size: 0.85rem;
+      color: #6b7280;
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .meta-dot::before {
+      content: "•";
+      margin: 0 4px;
+      color: #9ca3af;
+    }
+
+    .meta-label {
+      color: #9ca3af;
+      margin-right: 4px;
+    }
+
+    /* 제목 */
     .post-header {
-      text-align: center;
-      margin-bottom: 40px;
-      border-bottom: 1px solid #e5e5e5;
-      padding-bottom: 20px;
+      margin-bottom: 28px;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 24px;
     }
 
     .post-header h1 {
-      color: #0f2679;
-      font-size: 1.8rem;
-      margin-bottom: 12px;
+      color: #111827;
+      font-size: 2rem;
+      line-height: 1.4;
+      margin: 0 0 10px;
+      word-break: keep-all;
     }
 
-    .post-meta {
-      font-size: 0.9rem;
-      color: #777;
+    /* 공유 버튼 (형식만, 실제 기능은 나중에 확장 가능) */
+    .share-box {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      font-size: 0.8rem;
+      color: #6b7280;
+      margin-top: 6px;
     }
 
-    .post-meta span {
-      margin: 0 8px;
+    .share-btn {
+      border: 1px solid #e5e7eb;
+      background: #f9fafb;
+      border-radius: 999px;
+      padding: 4px 10px;
+      cursor: pointer;
+      font-size: 0.8rem;
     }
 
-    .post-image {
-      text-align: center;
-      margin: 30px 0;
+    .share-btn:hover {
+      background: #eef2ff;
     }
 
-    .post-image img {
-      max-width: 100%;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    /* 대표 이미지 */
+    .post-hero {
+      margin: 24px 0 32px;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 6px 18px rgba(15, 38, 121, 0.12);
+    }
+
+    .post-hero img {
+      width: 100%;
+      display: block;
+      object-fit: cover;
+      max-height: 420px;
+    }
+
+    /* 본문 */
+    .post-content-wrap {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 32px 32px 40px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+      border: 1px solid #e5e7eb;
     }
 
     .post-content {
-      color: #333;
-      line-height: 1.8;
-      font-size: 1rem;
-      margin-top: 30px;
+      color: #111827;
+      line-height: 1.9;
+      font-size: 0.98rem;
       word-break: break-word;
+    }
+
+    .post-content p {
+      margin: 0 0 1rem;
+    }
+
+    .post-content h1,
+    .post-content h2,
+    .post-content h3 {
+      margin-top: 1.6rem;
+      margin-bottom: 0.8rem;
+      color: #111827;
     }
 
     .post-content img {
       max-width: 100%;
-      border-radius: 6px;
-      margin: 10px 0;
+      border-radius: 8px;
+      margin: 16px 0;
+    }
+
+    .post-content ul,
+    .post-content ol {
+      padding-left: 1.2rem;
+      margin-bottom: 1rem;
+    }
+
+    /* 태그/바닥 메타 */
+    .post-footer-meta {
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 0.85rem;
+      color: #6b7280;
+    }
+
+    .post-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tag-pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid #e5e7eb;
+      background: #f9fafb;
+      font-size: 0.8rem;
+      color: #4b5563;
+    }
+
+    /* 이전/다음 글 */
+    .post-nav {
+      max-width: 1080px;
+      margin: 30px auto 0;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 12px;
+    }
+
+    .post-nav-item {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 12px 16px;
+      border: 1px solid #e5e7eb;
+      cursor: pointer;
+      transition: 0.15s ease;
+    }
+
+    .post-nav-item:hover {
+      border-color: #0f2679;
+      box-shadow: 0 3px 10px rgba(15,38,121,0.08);
+    }
+
+    .post-nav-label {
+      font-size: 0.78rem;
+      color: #9ca3af;
+      margin-bottom: 4px;
+    }
+
+    .post-nav-title {
+      font-size: 0.9rem;
+      color: #111827;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* 관련 게시물 */
+    .related-wrap {
+      max-width: 1080px;
+      margin: 40px auto 0;
+    }
+
+    .related-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #111827;
+    }
+
+    .related-list {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .related-card {
+      background: #ffffff;
+      border-radius: 10px;
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+
+    .related-card:hover {
+      border-color: #0f2679;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+    }
+
+    .related-cat {
+      font-size: 0.72rem;
+      color: #9ca3af;
+      margin-bottom: 3px;
+    }
+
+    .related-title-text {
+      font-size: 0.9rem;
+      color: #111827;
+      line-height: 1.4;
+      height: 2.8em;
+      overflow: hidden;
+    }
+
+    .related-date {
+      margin-top: 4px;
+      font-size: 0.75rem;
+      color: #9ca3af;
+    }
+
+    /* 버튼 영역 */
+    .post-bottom-actions {
+      max-width: 1080px;
+      margin: 30px auto 0;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
     }
 
     .back-btn {
-      display: inline-block;
-      margin-top: 40px;
-      padding: 10px 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
       background: #0f2679;
       color: #fff;
       border-radius: 6px;
       text-decoration: none;
-      transition: 0.2s;
+      font-size: 0.9rem;
     }
 
     .back-btn:hover {
       background: #1b348f;
     }
 
-    @media (max-width: 768px) {
-      .news-post-container { padding: 20px; margin: 40px 10px; }
-      .post-header h1 { font-size: 1.4rem; }
+    /* 관리자 박스 */
+    #adminEditBox {
+      display:none;
+    }
+
+    #adminEditBox button {
+      background:#1b7fcb;
+      color:white;
+      border:none;
+      padding:8px 14px;
+      border-radius:6px;
+      cursor:pointer;
+      font-size:0.85rem;
+    }
+
+    /* 반응형 */
+    @media (max-width: 900px) {
+      .post-content-wrap {
+        padding: 20px 18px 28px;
+      }
+      .news-post-container {
+        margin: 0 auto;
+      }
+      .post-nav {
+        grid-template-columns: 1fr;
+      }
+      .related-list {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page-wrap {
+        padding: 24px 10px 60px;
+      }
+      .post-header h1 {
+        font-size: 1.5rem;
+      }
+      .related-list {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -98,11 +366,11 @@
 
   <div id="header"></div>
 
-  <!-- 상단 배너 -->
+  <!-- 상단 배너 (그대로 사용) -->
   <section class="sub-banner">
     <img src="/img/sub-banners/pr-1_v2.jpg" alt="홍보센터 배너">
     <div class="banner-text">
-      <h1>게시물 상세보기</h1>
+      <h1>뉴스룸</h1>
       <p>화인디펜스의 주요 소식을 확인하세요.</p>
     </div>
   </section>
@@ -116,40 +384,92 @@
   </div>
 
   <!-- 본문 -->
-  <section class="news-post-container">
-    <div class="post-header">
-      <h1 id="postTitle">제목 불러오는 중...</h1>
-      <div class="post-meta">
-        <span id="postCategory"></span> |
-        <span id="postDate"></span> |
-        <span id="postAuthor"></span>
+  <div class="page-wrap">
+    <section class="news-post-container">
+      <!-- 상단 메타 + 제목 -->
+      <div class="post-top-meta">
+        <div class="post-badge">
+          <span id="postCategoryBadge" class="badge-category">뉴스룸</span>
+          <span id="postLangBadge" class="badge-lang">KR</span>
+        </div>
+
+        <div class="post-meta-right">
+          <div>
+            <span class="meta-label">작성일</span>
+            <span id="postDate"></span>
+          </div>
+          <div class="meta-dot">
+            <span class="meta-label">작성자</span>
+            <span id="postAuthor">관리자</span>
+          </div>
+          <div class="meta-dot">
+            <span class="meta-label">조회수</span>
+            <span id="postViews">0</span>
+          </div>
+        </div>
       </div>
+
+      <header class="post-header">
+        <h1 id="postTitle">제목 불러오는 중...</h1>
+
+        <div class="share-box">
+          <span>공유하기</span>
+          <button class="share-btn" id="shareLinkBtn">링크 복사</button>
+          <button class="share-btn" id="shareMailBtn">메일로 공유</button>
+        </div>
+      </header>
+
+      <!-- 대표 이미지 -->
+      <div id="postHero" class="post-hero" style="display:none;">
+        <!-- JS에서 이미지 삽입 -->
+      </div>
+
+      <!-- 본문 박스 -->
+      <div class="post-content-wrap">
+        <article id="postContent" class="post-content">
+          <p>내용을 불러오는 중입니다...</p>
+        </article>
+
+        <!-- 태그/카테고리 정보 -->
+        <div class="post-footer-meta">
+          <div class="post-tags">
+            <span class="tag-pill" id="tagCategory">#뉴스룸</span>
+            <span class="tag-pill" id="tagBrand">#FineDefense</span>
+          </div>
+          <div id="adminEditBox">
+            <button id="editPostBtn">✏ 관리자 수정하기</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 이전/다음글 -->
+    <section class="post-nav">
+      <div id="prevPost" class="post-nav-item" style="display:none;">
+        <div class="post-nav-label">이전 글</div>
+        <div class="post-nav-title" id="prevPostTitle"></div>
+      </div>
+      <div id="nextPost" class="post-nav-item" style="display:none;">
+        <div class="post-nav-label">다음 글</div>
+        <div class="post-nav-title" id="nextPostTitle"></div>
+      </div>
+    </section>
+
+    <!-- 관련 게시물 -->
+    <section class="related-wrap">
+      <div class="related-title">관련 게시물</div>
+      <div class="related-list" id="relatedList">
+        <!-- JS로 채움 -->
+      </div>
+    </section>
+
+    <!-- 하단 버튼 -->
+    <div class="post-bottom-actions">
+      <a href="/kr/sub/pr/newsroom/newsroom.html" class="back-btn">
+        ← 목록으로 돌아가기
+      </a>
     </div>
-
-    <div class="post-image" id="postImage"></div>
-
-    <div class="post-content" id="postContent">
-      <p>내용을 불러오는 중입니다...</p>
-    </div>
-
-    <div id="adminEditBox" style="margin-top:30px; display:none;">
-      <button id="editPostBtn" 
-        style="
-          background:#1b7fcb;
-          color:white;
-          border:none;
-          padding:10px 20px;
-          border-radius:6px;
-          cursor:pointer;
-        ">
-        ✏ 수정하기
-      </button>
-    </div>
-
-    <a href="/kr/sub/pr/newsroom/newsroom.html" class="back-btn">
-      목록으로 돌아가기
-    </a>
-  </section>
+  </div>
 
   <div id="footer"></div>
 
@@ -158,54 +478,138 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
+      // breadcrumb 오른쪽 탭 숨기기 (형 기존 구조 유지)
       const sideTabs = document.getElementById("side-tabs");
       if (sideTabs) sideTabs.style.display = "none";
 
       const titleEl   = document.getElementById("postTitle");
-      const catEl     = document.getElementById("postCategory");
+      const catBadge  = document.getElementById("postCategoryBadge");
+      const langBadge = document.getElementById("postLangBadge");
       const dateEl    = document.getElementById("postDate");
       const authorEl  = document.getElementById("postAuthor");
-      const imageEl   = document.getElementById("postImage");
+      const viewsEl   = document.getElementById("postViews");
+      const heroWrap  = document.getElementById("postHero");
       const contentEl = document.getElementById("postContent");
 
-      const postId = new URLSearchParams(window.location.search).get("id");
-      const numericId = Number(postId);
+      const tagCategory = document.getElementById("tagCategory");
 
-      if (!postId || Number.isNaN(numericId)) {
+      const prevBox     = document.getElementById("prevPost");
+      const nextBox     = document.getElementById("nextPost");
+      const prevTitleEl = document.getElementById("prevPostTitle");
+      const nextTitleEl = document.getElementById("nextPostTitle");
+
+      const relatedList = document.getElementById("relatedList");
+
+      const adminBox    = document.getElementById("adminEditBox");
+      const editBtn     = document.getElementById("editPostBtn");
+
+      const postIdParam = new URLSearchParams(window.location.search).get("id");
+      const postId = Number(postIdParam);
+
+      if (!postIdParam || Number.isNaN(postId)) {
         contentEl.innerHTML = "<p style='text-align:center;color:#555;'>잘못된 접근입니다.</p>";
         return;
       }
 
-      loadPost(numericId);
+      // ✅ 조회수 증가 (백엔드에 /api/posts/view/:id 있다고 가정)
+      fetch(`/api/posts/view/${postId}`)
+        .then(res => res.json())
+        .then(data => console.log("조회수 증가:", data))
+        .catch(err => console.error("조회수 증가 오류:", err));
 
-      async function loadPost(id) {
+      // ✅ 뉴스 목록에서 해당 글 + 이전/다음/관련글 모두 처리
+      loadPostAndNeighbors(postId);
+
+      async function loadPostAndNeighbors(id) {
         try {
-          // ✅ news 카테고리 전체 불러와서 id 매칭 (백엔드 단일조회 없어서 이렇게 처리)
           const res = await fetch(`${window.location.origin}/api/posts/news?lang=kr`);
           const posts = await res.json();
 
-          const post = posts.find(p => p.id === id);
+          if (!Array.isArray(posts) || posts.length === 0) {
+            contentEl.innerHTML = "<p>게시물을 찾을 수 없습니다.</p>";
+            return;
+          }
 
-          if (!post) {
+          const idx = posts.findIndex(p => p.id === id);
+          if (idx === -1) {
             contentEl.innerHTML = "<p>게시물을 찾을 수 없습니다.</p>";
             titleEl.textContent = "게시물 없음";
             return;
           }
 
-          titleEl.textContent = post.title;
-          catEl.textContent   = categoryName(post.category);
-          dateEl.textContent  = new Date(post.created_at).toLocaleDateString();
-          authorEl.textContent = post.author_name ?? "관리자";
+          const post = posts[idx];
 
-          imageEl.innerHTML = post.main_image
-            ? `<img src="${post.main_image}" alt="대표 이미지">`
-            : "";
+          // 🔹 제목 / 카테고리 / 언어 / 날짜 / 작성자 / 조회수
+          titleEl.textContent = post.title || "제목 없음";
+          catBadge.textContent = categoryName(post.category);
+          langBadge.textContent = (post.lang || "kr").toUpperCase();
 
-          contentEl.innerHTML = post.content;
+          tagCategory.textContent = "#" + categoryName(post.category);
+
+          const created = post.created_at ? new Date(post.created_at) : null;
+          dateEl.textContent = created
+            ? `${created.getFullYear()}.${String(created.getMonth()+1).padStart(2,"0")}.${String(created.getDate()).padStart(2,"0")}`
+            : "-";
+
+          authorEl.textContent = post.author_name || "관리자";
+
+          viewsEl.textContent = (post.total_views || 0).toLocaleString();
+
+          // 🔹 대표 이미지
+          const mainImg = post.main_image || (post.images && post.images[0]);
+          if (mainImg) {
+            heroWrap.style.display = "block";
+            heroWrap.innerHTML = `<img src="${mainImg}" alt="대표 이미지">`;
+          } else {
+            heroWrap.style.display = "none";
+          }
+
+          // 🔹 본문
+          contentEl.innerHTML = post.content || "<p>내용이 없습니다.</p>";
+
+          // 🔹 이전글 / 다음글
+          if (idx > 0) {
+            const prevPost = posts[idx - 1];
+            prevBox.style.display = "block";
+            prevTitleEl.textContent = prevPost.title;
+            prevBox.onclick = () => {
+              location.href = `/kr/sub/pr/newsroom/post_template.html?id=${prevPost.id}`;
+            };
+          }
+
+          if (idx < posts.length - 1) {
+            const nextPost = posts[idx + 1];
+            nextBox.style.display = "block";
+            nextTitleEl.textContent = nextPost.title;
+            nextBox.onclick = () => {
+              location.href = `/kr/sub/pr/newsroom/post_template.html?id=${nextPost.id}`;
+            };
+          }
+
+          // 🔹 관련 게시물 (같은 카테고리 중에서 최대 3개)
+          const related = posts
+            .filter(p => p.id !== id && p.category === post.category)
+            .slice(0, 3);
+
+          relatedList.innerHTML = related
+            .map(r => {
+              const d = r.created_at ? new Date(r.created_at) : null;
+              const dateStr = d
+                ? `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,"0")}.${String(d.getDate()).padStart(2,"0")}`
+                : "";
+              return `
+                <div class="related-card" onclick="location.href='/kr/sub/pr/newsroom/post_template.html?id=${r.id}'">
+                  <div class="related-cat">${categoryName(r.category)}</div>
+                  <div class="related-title-text">${r.title}</div>
+                  <div class="related-date">${dateStr}</div>
+                </div>
+              `;
+            })
+            .join("");
 
         } catch (err) {
           console.error("❌ 게시물 로딩 오류:", err);
-          contentEl.innerHTML = "<p style='color:red;'>게시물을 불러오는 중 오류 발생</p>";
+          contentEl.innerHTML = "<p style='color:red;'>게시물을 불러오는 중 오류가 발생했습니다.</p>";
         }
       }
 
@@ -219,28 +623,36 @@
           default: return "게시물";
         }
       }
-    });
 
-      // 🔥 관리자일 때만 "수정하기" 버튼 보여주기
-      document.addEventListener("DOMContentLoaded", () => {
-        const role = localStorage.getItem("role");
-        const token = localStorage.getItem("token");
+      // 🔥 관리자 전용 수정 버튼
+      const role = localStorage.getItem("role");
+      const token = localStorage.getItem("token");
+      if (role === "admin" && token) {
+        adminBox.style.display = "block";
+        editBtn.addEventListener("click", () => {
+          location.href = `/kr/admin/edit_post.html?id=${postId}`;
+        });
+      }
 
-        const adminBox = document.getElementById("adminEditBox");
-        const editBtn = document.getElementById("editPostBtn");
+      // 🔗 공유 버튼
+      const shareLinkBtn = document.getElementById("shareLinkBtn");
+      const shareMailBtn = document.getElementById("shareMailBtn");
 
-        const postId = new URLSearchParams(location.search).get("id");
-
-        if (role === "admin" && token) {
-          adminBox.style.display = "block";
-          editBtn.addEventListener("click", () => {
-            location.href = `/kr/admin/edit_post.html?id=${postId}`;
-          });
+      shareLinkBtn.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(window.location.href);
+          alert("링크가 클립보드에 복사되었습니다.");
+        } catch (e) {
+          alert("링크 복사에 실패했습니다. 주소창에서 직접 복사해주세요.");
         }
       });
 
-
-
+      shareMailBtn.addEventListener("click", () => {
+        const subject = encodeURIComponent("[화인디펜스] 뉴스 공유");
+        const body = encodeURIComponent(`${document.title}\n\n${window.location.href}`);
+        location.href = `mailto:?subject=${subject}&body=${body}`;
+      });
+    });
   </script>
 
 </body>
