@@ -7,11 +7,24 @@ const API_BASE = "/api";
 const urlParams = new URLSearchParams(window.location.search);
 const productId = urlParams.get("id");
 
-/* ============================================================================
-   🖋 Quill 초기화
-============================================================================ */
 let quill;
+let existingImages = []; // 서버에서 가져온 이미지 URL 목록
+let removedImages = [];  // 삭제 요청할 이미지 URL 목록
+let newImageFiles = [];  // 새로 추가한 이미지 파일 목록
+
+/* ============================================================================
+   🖋 DOM 로드 시 실행
+============================================================================ */
 document.addEventListener("DOMContentLoaded", () => {
+  initQuill();
+  loadProduct();
+  initNewImageUpload();
+});
+
+/* ============================================================================
+   🖋 Quill 에디터 초기화
+============================================================================ */
+function initQuill() {
   quill = new Quill("#editor", {
     theme: "snow",
     modules: {
@@ -20,42 +33,39 @@ document.addEventListener("DOMContentLoaded", () => {
         ["bold", "italic", "underline"],
         [{ list: "ordered" }, { list: "bullet" }],
         ["link", "image"],
-        ["clean"],
-      ],
-    },
+        ["clean"]
+      ]
+    }
   });
-
-  loadProduct();
-  initNewImageUpload();
-});
+}
 
 /* ============================================================================
-   📥 기존 제품 정보 불러오기
+   📥 제품 상세 불러오기
 ============================================================================ */
 async function loadProduct() {
   const res = await fetch(`${API_BASE}/products/${productId}`, {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${token}` }
   });
 
   const data = await res.json();
 
-  const p = data.product;   // ★ 핵심
-  const imgs = data.images; // ★ 핵심
+  const p = data.product;
+  const imgs = data.images;
 
+  // ----- 제목, 카테고리, 설명 -----
   document.getElementById("title").value = p.title;
   document.getElementById("category").value = p.category;
-
-  // ★ description_html을 읽어야 함
   quill.root.innerHTML = p.description_html || "";
 
-  // ★ 이미지 URL 배열 생성
+  // ----- 기존 이미지 URL 정리 -----
   existingImages = imgs.map(i => i.url);
 
   renderExistingImages();
 }
 
-
-
+/* ============================================================================
+   🖼 기존 이미지 렌더링
+============================================================================ */
 function renderExistingImages() {
   const box = document.getElementById("existingImages");
   box.innerHTML = "";
@@ -64,27 +74,27 @@ function renderExistingImages() {
     const wrap = document.createElement("div");
     wrap.className = "preview-item";
 
-    const image = document.createElement("img");
-    image.src = url; // ★ 이미 url임
+    const img = document.createElement("img");
+    img.src = url;
 
     const btn = document.createElement("button");
-    btn.className = "remove-btn";
     btn.textContent = "×";
+    btn.className = "remove-btn";
+
     btn.onclick = () => {
-      removedImages.push(url);
-      existingImages.splice(idx, 1);
+      removedImages.push(url);        // 삭제 요청
+      existingImages.splice(idx, 1);  // 현재 화면에서는 제거
       renderExistingImages();
     };
 
-    wrap.appendChild(image);
+    wrap.appendChild(img);
     wrap.appendChild(btn);
     box.appendChild(wrap);
   });
 }
 
-
 /* ============================================================================
-   📤 새 이미지 추가 및 미리보기
+   🖼 새 이미지 미리보기 + 추가 로직
 ============================================================================ */
 function initNewImageUpload() {
   const input = document.getElementById("newImages");
@@ -108,8 +118,8 @@ function initNewImageUpload() {
         img.src = ev.target.result;
 
         const btn = document.createElement("button");
-        btn.className = "remove-btn";
         btn.textContent = "×";
+        btn.className = "remove-btn";
 
         btn.onclick = () => {
           newImageFiles.splice(idx, 1);
@@ -120,40 +130,42 @@ function initNewImageUpload() {
         wrap.appendChild(btn);
         box.appendChild(wrap);
       };
+
       reader.readAsDataURL(file);
     });
   }
 }
 
 /* ============================================================================
-   💾 수정 저장
+   💾 제품 수정 저장
 ============================================================================ */
 document.getElementById("saveBtn").addEventListener("click", async () => {
   const title = document.getElementById("title").value.trim();
   const category = document.getElementById("category").value;
-  const description = quill.root.innerHTML.trim();
+  const description_html = quill.root.innerHTML.trim();
 
   if (!title) return alert("제품명을 입력하세요.");
 
   const fd = new FormData();
   fd.append("title", title);
   fd.append("category", category);
-  fd.append("description", description);
+  fd.append("description_html", description_html);
 
-  // 삭제 이미지
+  // 삭제된 기존 이미지 (URL 배열)
   fd.append("removedImages", JSON.stringify(removedImages));
 
-  // 새 이미지
-  newImageFiles.forEach((f) => fd.append("newImages", f));
+  // 새 이미지 추가
+  newImageFiles.forEach((f) => fd.append("images", f));
 
+  // ----- PUT 요청 -----
   const res = await fetch(`${API_BASE}/products/${productId}`, {
     method: "PUT",
     headers: { Authorization: `Bearer ${token}` },
-    body: fd,
+    body: fd
   });
 
   if (!res.ok) {
-    alert("수정 실패! (서버 확인 필요)");
+    alert("수정 실패 (서버 로그 확인 필요)");
     return;
   }
 
