@@ -478,11 +478,11 @@
 
   <div id="footer"></div>
 
-  <script src="/js/nav.js"></script>
+    <script src="/js/nav.js"></script>
   <script src="/js/language.js"></script>
 
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("DOMContentLoaded", async () => {
       // breadcrumb 오른쪽 탭 숨기기 (형 기존 구조 유지)
       const sideTabs = document.getElementById("side-tabs");
       if (sideTabs) sideTabs.style.display = "none";
@@ -516,21 +516,24 @@
         return;
       }
 
-      // ✅ 조회수 증가 (백엔드에 /api/posts/view/:id 있다고 가정)
-      fetch(`/api/posts/view/${postId}`, { method: "POST" })
-        .then(res => res.json())
-        .then(data => console.log("조회수 증가:", data))
-        .catch(err => console.error("조회수 증가 오류:", err));
+      // ✅ 1) 조회수 먼저 증가시키고
+      try {
+        const res = await fetch(`/api/posts/view/${postId}`, { method: "POST" });
+        const data = await res.json();
+        console.log("조회수 증가:", data);
+      } catch (err) {
+        console.error("조회수 증가 오류:", err);
+      }
 
-      // ✅ 뉴스 목록에서 해당 글 + 이전/다음/관련글 모두 처리
-      loadPostAndNeighbors(postId);
+      // ✅ 2) 그 다음에 목록(뉴스 카테고리 전체)에서 현재 글 + 이웃글 + 관련글 로딩
+      await loadPostAndNeighbors(postId);
 
       async function loadPostAndNeighbors(id) {
         try {
+          // ✅ 경로 확정: /api/posts/list/news
           const res = await fetch(`${window.location.origin}/api/posts/list/news?lang=kr`, {
             cache: "no-store"
           });
-
 
           const posts = await res.json();
 
@@ -557,11 +560,12 @@
 
           const created = post.created_at ? new Date(post.created_at) : null;
           dateEl.textContent = created
-            ? `${created.getFullYear()}.${String(created.getMonth()+1).padStart(2,"0")}.${String(created.getDate()).padStart(2,"0")}`
+            ? `${created.getFullYear()}.${String(created.getMonth() + 1).padStart(2, "0")}.${String(created.getDate()).padStart(2, "0")}`
             : "-";
 
           authorEl.textContent = post.author_name || "관리자";
 
+          // ✅ 여기 total_views는 우리가 /list/:category 에서 COUNT(*)로 넣어준 값
           viewsEl.textContent = (post.total_views || 0).toLocaleString();
 
           // 🔹 대표 이미지
@@ -604,7 +608,7 @@
             .map(r => {
               const d = r.created_at ? new Date(r.created_at) : null;
               const dateStr = d
-                ? `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,"0")}.${String(d.getDate()).padStart(2,"0")}`
+                ? `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`
                 : "";
               return `
                 <div class="related-card" onclick="location.href='/kr/sub/pr/newsroom/post_template.html?id=${r.id}'">
@@ -615,7 +619,6 @@
               `;
             })
             .join("");
-
         } catch (err) {
           console.error("❌ 게시물 로딩 오류:", err);
           contentEl.innerHTML = "<p style='color:red;'>게시물을 불러오는 중 오류가 발생했습니다.</p>";
@@ -663,6 +666,7 @@
       });
     });
   </script>
+
 
 </body>
 </html>
