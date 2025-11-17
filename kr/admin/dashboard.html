@@ -4,102 +4,23 @@
   <meta charset="UTF-8">
   <title>관리자 대시보드 | Fine Defense</title>
 
-  <!-- Quill (뉴스 입력 파트용) -->
+  <!-- Quill -->
   <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- 공통 관리자 스타일 -->
+  <!-- 공통 관리자 CSS -->
   <link rel="stylesheet" href="/kr/admin/css/admin.css">
 
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Noto Sans KR', sans-serif;
-      background: #f4f6f9;
-    }
-
-    .main {
-      margin-left: 240px;
-      padding: 30px;
-      min-height: 100vh;
-    }
-
-    .topbar {
-      background: white;
-      padding: 18px 25px;
-      border-radius: 10px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-      margin-bottom: 30px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .title {
-      font-size: 1.4rem;
-      font-weight: 600;
-    }
-
-    #logoutBtn, .home-btn {
-      border: none;
-      padding: 8px 15px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 15px;
-    }
-
-    .home-btn {
-      background: #0f2679;
-      color: #fff;
-      margin-right: 10px;
-    }
-
-    #logoutBtn {
-      background: #e63946;
-      color: #fff;
-    }
-
-    .panel {
-      background: white;
-      padding: 25px;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-      margin-bottom: 35px;
-    }
-
-    .stats-container {
-      display: flex;
-      gap: 20px;
-      margin-bottom: 40px;
-      flex-wrap: wrap;
-    }
-
-    .stat-card {
-      flex: 1;
-      min-width: 200px;
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      text-align: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-
-    .stat-value {
-      font-size: 28px;
-      font-weight: 700;
-      color: #0f2679;
-    }
-  </style>
 </head>
 
 <body>
 
-<!-- 사이드바 -->
+<!-- 🔵 사이드바 -->
 <div id="sidebar"></div>
 
-<!-- 본문 -->
+<!-- 🔵 메인 -->
 <div class="main">
 
   <div class="topbar">
@@ -111,10 +32,22 @@
   </div>
 
   <section class="stats-container">
-    <div class="stat-card"><h3>이번달 조회수</h3><p id="thisMonthViews" class="stat-value">0</p></div>
-    <div class="stat-card"><h3>지난달 조회수</h3><p id="lastMonthViews" class="stat-value">0</p></div>
-    <div class="stat-card"><h3>증가율</h3><p id="growthRate" class="stat-value">0%</p></div>
-    <div class="stat-card"><h3>전체 게시물 수</h3><p id="totalPosts" class="stat-value">0</p></div>
+    <div class="stat-card">
+      <h3>이번달 조회수</h3>
+      <p id="thisMonthViews" class="stat-value">0</p>
+    </div>
+    <div class="stat-card">
+      <h3>지난달 조회수</h3>
+      <p id="lastMonthViews" class="stat-value">0</p>
+    </div>
+    <div class="stat-card">
+      <h3>증가율</h3>
+      <p id="growthRate" class="stat-value">0%</p>
+    </div>
+    <div class="stat-card">
+      <h3>전체 게시물 수</h3>
+      <p id="totalPosts" class="stat-value">0</p>
+    </div>
   </section>
 
   <section class="panel">
@@ -129,7 +62,7 @@
 
 </div>
 
-<!-- 🔥 ES Module 방식으로 통일 -->
+<!-- 🔥 ES Module 방식 -->
 <script type="module">
   import { requireAdmin, logout } from "/kr/admin/js/common_auth.js";
   import { loadSidebar } from "/kr/admin/js/sidebar.js";
@@ -140,7 +73,6 @@
 
   document.getElementById("logoutBtn").addEventListener("click", logout);
 </script>
-
 
 </body>
 </html>
