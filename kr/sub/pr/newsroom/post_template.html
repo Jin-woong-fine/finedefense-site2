@@ -527,10 +527,11 @@
 
       async function loadPostAndNeighbors(id) {
         try {
-          const res = await fetch(`${window.location.origin}/api/posts/news?lang=kr`, {
-            cache: "no-store"   // 최신 데이터 강제 로딩
+          const res = await fetch(`${window.location.origin}/api/posts/list/news?lang=kr`, {
+            cache: "no-store"
           });
-          
+
+
           const posts = await res.json();
 
           if (!Array.isArray(posts) || posts.length === 0) {
