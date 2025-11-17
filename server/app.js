@@ -6,31 +6,54 @@ import { fileURLToPath } from "url";
 // Routers
 import sendInquiryRouter from "./routes/sendInquiry.js";
 import authRouter from "./routes/auth.js";
-import adminRouter from "./routes/admin.js";   // 자료실 + 대시보드 통합 라우터
+import adminRouter from "./routes/admin.js";
 import postsRouter from "./routes/posts.js";
+import adminDashboardRouter from "./routes/adminDashboard.js";
+
 
 const app = express();
 
+// ====================================
+//  경로 처리
+// ====================================
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// ====================================
+//  미들웨어
+// ====================================
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// uploads 정적 제공
+// ====================================
+//  🔥 uploads 정적 제공 (필수 FIX!)
+//  uploads 폴더는 프로젝트 루트(/finedefense_homepage/uploads)에 있으므로
+//  app.js 기준에서는 ../uploads 로 접근해야 한다
+// ====================================
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
-// API 라우터 순서 중요!
+
+// ====================================
+//  라우터 연결  ← API 먼저!
+// ====================================
 app.use("/api/inquiry", sendInquiryRouter);
 app.use("/api/auth", authRouter);
-app.use("/api/admin", adminRouter);   // ← 딱 하나만!
+app.use("/api/admin", adminRouter);         // 기존 관리자 라우터
+app.use("/api/admin", adminDashboardRouter); // 🔥 새로 추가 (조회수 대시보드 API)
 app.use("/api/posts", postsRouter);
 
-// public 정적 파일 제공 (마지막)
+// ====================================
+//  정적 파일 제공  ← 반드시 맨 아래!!
+//  public 폴더를 /로 제공
+// ====================================
 app.use(express.static(path.join(__dirname, "public")));
 
+
+// ====================================
+//  서버 실행
+// ====================================
 const PORT = 3000;
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server running at http://0.0.0.0:${PORT}`);
+  console.log(`✅ Server running at http://0.0.0.0:${PORT}`);
 });
