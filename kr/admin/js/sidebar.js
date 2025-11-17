@@ -1,17 +1,20 @@
-export function loadSidebar(active = "") {
-  fetch("/kr/admin/sidebar.html")
-    .then(r => r.text())
-    .then(html => {
-      const box = document.getElementById("sidebar");
-      if (!box) return;
+export function loadSidebar(activeMenu) {
 
-      box.innerHTML = html;
-
-      // 현재 메뉴 강조
-      if (active) {
-        const activeEl = box.querySelector(`[data-menu="${active}"]`);
-        if (activeEl) activeEl.classList.add("active");
-      }
+  fetch("./sidebar.html")
+    .then(res => {
+      if (!res.ok) throw new Error("Sidebar load failed");
+      return res.text();
     })
-    .catch(err => console.error("sidebar load error:", err));
+    .then(html => {
+      const container = document.getElementById("sidebar");
+      container.innerHTML = html;
+
+      // 메뉴 강조 처리
+      const menuItem = container.querySelector(`[data-menu="${activeMenu}"]`);
+      if (menuItem) menuItem.classList.add("active");
+    })
+    .catch(err => {
+      console.error("Sidebar Load Error:", err);
+    });
+
 }
