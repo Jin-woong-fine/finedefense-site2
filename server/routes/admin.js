@@ -41,7 +41,7 @@ router.post(
 );
 
 /* ============================================================
-   📊 관리자 대시보드 — 이번달/지난달/게시물 수/Top5 + 제품 현황
+   📊 관리자 대시보드
 ============================================================ */
 router.get("/dashboard", verifyToken, async (req, res) => {
   try {
@@ -90,18 +90,20 @@ router.get("/dashboard", verifyToken, async (req, res) => {
       SELECT COUNT(*) AS count FROM products
     `);
 
-    // 🔥 최근 등록 제품 5개
+    // 🔥 최근 등록 제품 5개 (현재 DB 구조에 맞게 수정)
     const [recentProducts] = await db.execute(`
-      SELECT id, title, category, lang, image
+      SELECT id, title, category, thumbnail
       FROM products
       ORDER BY created_at DESC
       LIMIT 5
     `);
 
-    // 이미지 경로 붙이기 (image 컬럼이 파일명만 저장되어 있을 때)
+    // 이미지 경로 보정
     recentProducts.forEach(p => {
-      if (p.image) {
-        p.image = `/uploads/products/${p.image}`;
+      if (p.thumbnail) {
+        p.image = p.thumbnail;   // 관리자 페이지에서 image 이름 그대로 사용하도록 변경
+      } else {
+        p.image = null;
       }
     });
 
