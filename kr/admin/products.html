@@ -5,7 +5,9 @@
   <title>제품 관리 | Fine Defense 관리자</title>
 
   <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-  <link rel="stylesheet" href="/kr/admin/css/admin.css">
+
+  <!-- 상대경로로 수정 (GitHub/AWS/로컬 모두 호환) -->
+  <link rel="stylesheet" href="./css/admin.css">
 
   <style>
     body { margin: 0; background:#f4f6f9; font-family:'Noto Sans KR'; }
@@ -57,7 +59,6 @@
       border-radius:8px;
     }
 
-    /* 🔥 카드형 목록 */
     .product-grid {
       display:flex;
       flex-wrap:wrap;
@@ -101,27 +102,27 @@
     }
     .btn-primary { background:#0f2679; color:#fff; }
     .btn-danger { background:#d62828; color:#fff; }
-    .btn-edit { background:#1976d2; color:#fff; }
 
   </style>
 </head>
 
 <body>
 
+<!-- 🔵 사이드바 -->
 <div id="sidebar"></div>
 
+<!-- 🔵 메인 -->
 <div class="main">
 
   <div class="topbar">
     <h2>제품 관리</h2>
 
     <div>
-      <button class="btn btn-primary" onclick="location.href='/kr/index.html'">홈으로</button>
+      <button class="btn btn-primary" onclick="location.href='../index.html'">홈으로</button>
       <button id="logoutBtn" class="btn btn-danger">로그아웃</button>
     </div>
   </div>
 
-  <!-- 🔵 제품 등록 -->
   <section class="panel">
     <h2>신규 제품 등록</h2>
 
@@ -145,8 +146,6 @@
     <button class="btn btn-primary" onclick="uploadProduct()">등록</button>
   </section>
 
-
-  <!-- 🔵 제품 목록 -->
   <section class="panel">
     <h2>등록 제품 목록</h2>
     <div id="productList" class="product-grid"></div>
@@ -154,19 +153,17 @@
 
 </div>
 
-<script src="/kr/admin/js/common_auth.js"></script>
-<script src="/kr/admin/js/sidebar.js"></script>
-<script src="/kr/admin/js/products_core.js"></script>
+<!-- 스크립트 -->
+<script src="./js/common_auth.js"></script>
+<script src="./js/sidebar.js"></script>
+<script src="./js/products_core.js"></script>
 <script>
   requireAdmin();
   loadSidebar("products");
   document.getElementById("logoutBtn").addEventListener("click", logout);
 </script>
 
-
 <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 
 </body>
 </html>
-
-
