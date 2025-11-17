@@ -26,16 +26,15 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 /* ============================================================
-   📈 조회수 증가 API (POST /api/posts/view/:id)
-   ※ 반드시 상단에 위치해야 함 (라우팅 충돌 방지)
+   📈 조회수 증가 (POST /api/posts/view/:id)
+   ※ 반드시 최상단에 위치
 ============================================================ */
 router.post("/view/:id", async (req, res) => {
   try {
-    const { id } = req.params;
-    const postId = Number(id);
+    const postId = Number(req.params.id);
 
-    if (!postId || isNaN(postId)) {
-      return res.status(400).json({ message: "잘못된 post id" });
+    if (!postId) {
+      return res.status(400).json({ message: "Invalid Post ID" });
     }
 
     // 관리자 제외
@@ -52,7 +51,7 @@ router.post("/view/:id", async (req, res) => {
     const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.ip;
     const ua = req.headers["user-agent"] || "unknown";
 
-    // 24시간 중복 방지
+    // 24시간 내 중복 조회 방지
     const [exists] = await db.execute(
       `SELECT id FROM post_view_logs
        WHERE post_id = ? AND ip = ? AND user_agent = ?
@@ -64,14 +63,13 @@ router.post("/view/:id", async (req, res) => {
       return res.json({ message: "중복 조회(24시간)", added: false });
     }
 
-    // 로그 기록
+    // 로그 삽입
     await db.execute(
       `INSERT INTO post_view_logs (post_id, ip, user_agent)
        VALUES (?, ?, ?)`,
       [postId, ip, ua]
     );
 
-    // 날짜 정보
     const now = new Date();
     const y = now.getFullYear();
     const m = now.getMonth() + 1;
@@ -94,19 +92,18 @@ router.post("/view/:id", async (req, res) => {
 });
 
 
-
 /* ============================================================
-   📄 단일 게시물 조회 (조회수 증가 없음)
+   📄 단일 게시물 조회 (GET /api/posts/detail/:id)
 ============================================================ */
 router.get("/detail/:id", async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id;
 
     const [rows] = await db.execute(
       `SELECT p.*, u.name AS author_name
        FROM posts p
        LEFT JOIN users u ON p.author_id = u.id
-       WHERE p.id = ?`,
+       WHERE p.id=?`,
       [id]
     );
 
@@ -115,7 +112,7 @@ router.get("/detail/:id", async (req, res) => {
     const post = rows[0];
 
     const [images] = await db.execute(
-      `SELECT image_path FROM post_images WHERE post_id = ?`,
+      `SELECT image_path FROM post_images WHERE post_id=?`,
       [id]
     );
 
@@ -131,14 +128,53 @@ router.get("/detail/:id", async (req, res) => {
 
 
 /* ============================================================
+   📤 카테고리 목록 조회 (GET /api/posts/list/:category)
+============================================================ */
+router.get("/list/:category", async (req, res) => {
+  try {
+    const category = req.params.category;
+    const lang = req.query.lang || "kr";
+
+    const [posts] = await db.execute(
+      `SELECT 
+         p.*,
+         u.name AS author_name,
+         (SELECT COALESCE(SUM(views), 0)
+          FROM post_view_stats
+          WHERE post_id = p.id) AS total_views
+       FROM posts p
+       LEFT JOIN users u ON p.author_id = u.id
+       WHERE p.category=? AND p.lang=?
+       ORDER BY p.created_at DESC`,
+      [category, lang]
+    );
+
+    for (const post of posts) {
+      const [imgs] = await db.execute(
+        `SELECT image_path FROM post_images WHERE post_id=?`,
+        [post.id]
+      );
+      post.images = imgs.map(i => i.image_path);
+    }
+
+    res.json(posts);
+
+  } catch (err) {
+    console.error("목록 조회 오류:", err);
+    res.status(500).json({ message: "조회 오류" });
+  }
+});
+
+
+/* ============================================================
    🧩 게시물 등록
 ============================================================ */
-router.post("/", upload.array("images", 10), verifyToken, async (req, res) => {
+router.post("/", verifyToken, upload.array("images", 10), async (req, res) => {
   try {
     const { title, content, category, lang } = req.body;
     const authorId = req.user.id;
 
-    if (!req.files || req.files.length === 0) {
+    if (!req.files.length) {
       return res.status(400).json({ message: "이미지를 첨부하세요." });
     }
 
@@ -152,6 +188,7 @@ router.post("/", upload.array("images", 10), verifyToken, async (req, res) => {
 
     const postId = result.insertId;
 
+    // 서브 이미지 저장
     for (const f of req.files) {
       await db.execute(
         `INSERT INTO post_images (post_id, image_path)
@@ -163,53 +200,10 @@ router.post("/", upload.array("images", 10), verifyToken, async (req, res) => {
     res.json({ message: "등록 완료", postId });
 
   } catch (err) {
-    console.error("게시물 등록 오류:", err);
+    console.error("등록 오류:", err);
     res.status(500).json({ message: "서버 오류" });
   }
 });
-
-
-/* ============================================================
-   📤 카테고리별 조회수 포함 목록
-============================================================ */
-router.get("/:category", async (req, res) => {
-  try {
-    const { category } = req.params;
-    const lang = req.query.lang || "kr";
-
-    const [posts] = await db.execute(
-      `SELECT 
-         p.*,
-         u.name AS author_name,
-         (
-           SELECT COALESCE(SUM(s.views), 0)
-           FROM post_view_stats s
-           WHERE s.post_id = p.id
-         ) AS total_views
-       FROM posts p
-       LEFT JOIN users u ON p.author_id = u.id
-       WHERE p.category = ? AND p.lang = ?
-       ORDER BY p.created_at DESC`,
-      [category, lang]
-    );
-
-    for (const post of posts) {
-      const [images] = await db.execute(
-        `SELECT image_path FROM post_images WHERE post_id = ?`,
-        [post.id]
-      );
-      post.images = images.map(i => i.image_path);
-    }
-
-    res.json(posts);
-
-  } catch (err) {
-    console.error("카테고리 조회 오류:", err);
-    res.status(500).json({ message: "조회 오류" });
-  }
-});
-
-
 
 
 /* ============================================================
@@ -217,7 +211,7 @@ router.get("/:category", async (req, res) => {
 ============================================================ */
 router.put("/:id", verifyToken, upload.array("images", 10), async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id;
     const { title, content, category, lang } = req.body;
 
     await db.execute(
@@ -225,20 +219,22 @@ router.put("/:id", verifyToken, upload.array("images", 10), async (req, res) => 
       [title, content, category, lang, id]
     );
 
-    // 새로운 이미지가 올라올 때만 기존 이미지 교체
-    if (req.files && req.files.length > 0) {
+    // 이미지 교체 있을 때만 바꿈
+    if (req.files.length > 0) {
       const [oldImgs] = await db.execute(
-        `SELECT image_path FROM post_images WHERE post_id=?`,
-        [id]
+        `SELECT image_path FROM post_images WHERE post_id=?`, [id]
       );
 
+      // 기존 이미지 파일 삭제
       for (const img of oldImgs) {
-        const filePath = path.join(process.cwd(), img.image_path.replace(/^\//, ""));
-        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+        const filepath = path.join(process.cwd(), img.image_path.replace(/^\//, ""));
+        if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
       }
 
+      // 기존 DB 삭제
       await db.execute(`DELETE FROM post_images WHERE post_id=?`, [id]);
 
+      // 새 이미지 저장
       for (const f of req.files) {
         await db.execute(
           `INSERT INTO post_images (post_id, image_path)
@@ -271,16 +267,16 @@ router.delete("/:id", verifyToken, async (req, res) => {
       return res.status(403).json({ message: "권한 없음" });
     }
 
-    const { id } = req.params;
+    const id = req.params.id;
 
     const [imgs] = await db.execute(
-      `SELECT image_path FROM post_images WHERE post_id = ?`,
+      `SELECT image_path FROM post_images WHERE post_id=?`,
       [id]
     );
 
     for (const img of imgs) {
-      const filePath = path.join(process.cwd(), img.image_path.replace(/^\//, ""));
-      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+      const filepath = path.join(process.cwd(), img.image_path.replace(/^\//, ""));
+      if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
     }
 
     await db.execute(`DELETE FROM posts WHERE id=?`, [id]);
