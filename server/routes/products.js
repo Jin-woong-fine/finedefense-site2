@@ -9,7 +9,9 @@ const router = express.Router();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// 업로드 폴더
+/* ============================================================
+   📂 업로드 폴더
+============================================================ */
 const uploadDir = path.join(__dirname, "../public/uploads/products");
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
@@ -30,11 +32,10 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 /* ============================================================
-   📌 제품 등록
-   POST /api/products
+   📌 제품 등록  (POST /api/products)
 ============================================================ */
 router.post(
-  "/",   // ★★★ 핵심 변경: "/products" → "/"
+  "/",
   upload.fields([
     { name: "thumbnail", maxCount: 1 },
     { name: "images", maxCount: 20 },
@@ -58,6 +59,7 @@ router.post(
 
       const productId = result.insertId;
 
+      // 상세 이미지 저장
       if (req.files?.images?.length) {
         const values = req.files.images.map((f, idx) => [
           productId,
@@ -80,10 +82,9 @@ router.post(
 );
 
 /* ============================================================
-   📌 제품 목록
-   GET /api/products
+   📌 제품 목록 (GET /api/products)
 ============================================================ */
-router.get("/", async (req, res) => {   // ★ 변경
+router.get("/", async (req, res) => {
   try {
     const [rows] = await db.execute(
       "SELECT id, title, category, thumbnail, created_at FROM products ORDER BY created_at DESC"
@@ -96,10 +97,9 @@ router.get("/", async (req, res) => {   // ★ 변경
 });
 
 /* ============================================================
-   📌 제품 상세
-   GET /api/products/:id
+   📌 제품 상세 (GET /api/products/:id)
 ============================================================ */
-router.get("/:id", async (req, res) => {   // ★ 변경
+router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -107,7 +107,6 @@ router.get("/:id", async (req, res) => {   // ★ 변경
       "SELECT id, title, category, thumbnail, description_html, created_at FROM products WHERE id = ?",
       [id]
     );
-
     if (!product) return res.status(404).json({ message: "not found" });
 
     const [images] = await db.execute(
@@ -123,48 +122,50 @@ router.get("/:id", async (req, res) => {   // ★ 변경
 });
 
 /* ============================================================
-   📌 제품 수정
-   PUT /api/products/:id
+   📌 제품 수정 (PUT /api/products/:id)
 ============================================================ */
 router.put(
-  "/:id",  // ★ 변경
+  "/:id",
   upload.fields([
     { name: "thumbnail", maxCount: 1 },
     { name: "images", maxCount: 20 },
   ]),
   async (req, res) => {
-    const { id } = req.params;
-
     try {
+      const { id } = req.params;
       const { title, category, description_html } = req.body;
 
       const [[old]] = await db.execute(
         "SELECT thumbnail FROM products WHERE id = ?",
         [id]
       );
+      if (!old) return res.status(404).json({ message: "not found" });
 
       let thumbnailPath = old.thumbnail;
 
+      // 썸네일 교체 시
       if (req.files?.thumbnail?.[0]) {
         thumbnailPath = `/uploads/products/${req.files.thumbnail[0].filename}`;
 
-        // 기존 파일 삭제
-        const oldFile = path.join(__dirname, "../public", old.thumbnail);
-        if (fs.existsSync(oldFile)) fs.unlinkSync(oldFile);
+        // 기존썸네일 삭제 (null 방지)
+        if (old.thumbnail) {
+          const oldFile = path.join(__dirname, "../public", old.thumbnail);
+          if (fs.existsSync(oldFile)) fs.unlinkSync(oldFile);
+        }
       }
 
       await db.execute(
         "UPDATE products SET title = ?, category = ?, thumbnail = ?, description_html = ? WHERE id = ?",
-        [title, category, thumbnailPath, description_html, id]
+        [title, category, thumbnailPath, description_html || "", id]
       );
 
+      // 상세 이미지 추가
       if (req.files?.images?.length) {
         const values = req.files.images.map((f, idx) => [
           id,
           `/uploads/products/${f.filename}`,
           idx,
         ]);
-
         await db.query(
           "INSERT INTO product_images (product_id, url, sort_order) VALUES ?",
           [values]
@@ -180,12 +181,12 @@ router.put(
 );
 
 /* ============================================================
-   📌 제품 삭제
-   DELETE /api/products/:id
+   📌 제품 삭제 (DELETE /api/products/:id)
 ============================================================ */
-router.delete("/:id", async (req, res) => {   // ★ 변경
-  const { id } = req.params;
+router.delete("/:id", async (req, res) => {
   try {
+    const { id } = req.params;
+
     const [[product]] = await db.execute(
       "SELECT thumbnail FROM products WHERE id = ?",
       [id]
@@ -200,12 +201,14 @@ router.delete("/:id", async (req, res) => {   // ★ 변경
       "SELECT url FROM product_images WHERE product_id = ?",
       [id]
     );
+
     imgs.forEach((img) => {
       const f = path.join(__dirname, "../public", img.url);
       if (fs.existsSync(f)) fs.unlinkSync(f);
     });
 
     await db.execute("DELETE FROM products WHERE id = ?", [id]);
+
     res.json({ message: "deleted" });
   } catch (err) {
     console.error("DELETE /products/:id error:", err);
@@ -215,20 +218,19 @@ router.delete("/:id", async (req, res) => {   // ★ 변경
 
 /* ============================================================
    📌 개별 이미지 삭제
-   DELETE /api/product-images/:imageId
 ============================================================ */
-router.delete("/image/:imageId", async (req, res) => {  // ★ 변경
-  const { imageId } = req.params;
-
+router.delete("/image/:imageId", async (req, res) => {
   try {
+    const { imageId } = req.params;
+
     const [[img]] = await db.execute(
       "SELECT url FROM product_images WHERE id = ?",
       [imageId]
     );
     if (!img) return res.status(404).json({ message: "not found" });
 
-    const f = path.join(__dirname, "../public", img.url);
-    if (fs.existsSync(f)) fs.unlinkSync(f);
+    const filePath = path.join(__dirname, "../public", img.url);
+    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
 
     await db.execute("DELETE FROM product_images WHERE id = ?", [imageId]);
 
