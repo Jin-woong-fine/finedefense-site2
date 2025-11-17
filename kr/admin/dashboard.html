@@ -135,11 +135,12 @@
   import { loadSidebar } from "/kr/admin/js/sidebar.js";
   import "/kr/admin/js/dashboard_core.js";
 
-  requireAdmin();          // 로그인 체크
-  loadSidebar("dashboard"); // 사이드바 로드 + active 표시
+  requireAdmin();
+  loadSidebar("dashboard");
 
   document.getElementById("logoutBtn").addEventListener("click", logout);
 </script>
+
 
 </body>
 </html>

@@ -1,5 +1,3 @@
-// /kr/admin/js/sidebar.js
-
 export function loadSidebar(active = "") {
   fetch("/kr/admin/sidebar.html")
     .then(r => r.text())
@@ -9,9 +7,9 @@ export function loadSidebar(active = "") {
 
       box.innerHTML = html;
 
-      // 현재 페이지 강조
+      // 현재 메뉴 강조
       if (active) {
-        const activeEl = box.querySelector(`[data-menu='${active}']`);
+        const activeEl = box.querySelector(`[data-menu="${active}"]`);
         if (activeEl) activeEl.classList.add("active");
       }
     })
