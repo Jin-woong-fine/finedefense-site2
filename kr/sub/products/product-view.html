@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>제품 상세 | Fine Defense</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/sub-banner.css">
+
+  <style>
+    .product-detail {
+      max-width: 1200px;
+      margin: 60px auto 80px;
+      padding: 40px;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    }
+    .product-title {
+      font-size: 2rem;
+      color: #0f2679;
+      margin-bottom: 10px;
+    }
+    .product-category {
+      color:#666;
+      margin-bottom: 30px;
+    }
+    .product-content {
+      display:flex;
+      flex-wrap:wrap;
+      gap:40px;
+      align-items:flex-start;
+    }
+    .product-gallery {
+      flex:1 1 45%;
+      text-align:center;
+    }
+    .main-image img {
+      width:100%;
+      max-width:420px;
+      border-radius:12px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.08);
+      object-fit:cover;
+    }
+    .thumb-list {
+      margin-top:15px;
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      gap:8px;
+    }
+    .thumb-list img {
+      width:80px;
+      height:80px;
+      object-fit:cover;
+      border-radius:8px;
+      opacity:0.7;
+      border:2px solid transparent;
+      cursor:pointer;
+      transition:all 0.2s;
+    }
+    .thumb-list img.active,
+    .thumb-list img:hover {
+      opacity:1;
+      border-color:#0f2679;
+      transform:scale(1.03);
+    }
+
+    .product-desc {
+      flex:1 1 45%;
+      font-size:1.02rem;
+      line-height:1.8;
+      color:#333;
+    }
+
+    @media (max-width: 768px) {
+      .product-content {
+        flex-direction:column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="header"></div>
+
+<section class="sub-banner">
+  <img src="/img/sub-banners/cable.jpg" alt="제품소개 배너">
+  <div class="banner-text">
+    <h1>제품소개</h1>
+    <p>해양 방산 현장을 연결하는 케이블 솔루션</p>
+  </div>
+</section>
+
+<div class="breadcrumb">
+  <a href="/kr/index.html">홈</a> &gt;
+  <span class="crumb crumb-level1">제품소개</span> &gt;
+  <span id="crumbProduct" class="crumb crumb-level2">제품 상세</span>
+  <div id="side-tabs" class="side-tabs"></div>
+</div>
+
+<section class="product-detail">
+  <h1 id="productTitle" class="product-title">제품명</h1>
+  <div id="productCategory" class="product-category"></div>
+
+  <div class="product-content">
+    <div class="product-gallery">
+      <div class="main-image">
+        <img id="mainImage" src="/img/products/Image-placeholder.png" alt="제품 이미지">
+      </div>
+      <div id="thumbList" class="thumb-list"></div>
+    </div>
+
+    <div id="productDesc" class="product-desc">
+      <!-- description_html 가 여기 들어감 -->
+    </div>
+  </div>
+</section>
+
+<div id="footer"></div>
+
+<script src="/js/nav.js"></script>
+<script src="/js/product-view.js"></script>
+
+</body>
+</html>

@@ -1,232 +1,283 @@
 import express from "express";
-import multer from "multer";
-import db from "../config/db.js";
-import { verifyToken } from "../middleware/auth.js";
-import fs from "fs";
 import path from "path";
+import fs from "fs";
+import multer from "multer";
 import { fileURLToPath } from "url";
+import db from "../config/db.js";
+// 필요하면 인증 미들웨어도 불러와서 admin 보호
+// import { verifyToken } from "../middleware/auth.js";
 
 const router = express.Router();
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// 🔥 절대경로
-const uploadDir = path.join(__dirname, "../uploads/products");
-
+// 업로드 폴더: server/public/uploads/products
+const uploadDir = path.join(__dirname, "../public/uploads/products");
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
-  console.log("📁 업로드 폴더 생성:", uploadDir);
 }
 
-
-
-/* ============================================================
-   📌 1) Multer 저장 설정 (강화판)
-============================================================ */
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    console.log("📥 [multer] destination 호출됨 →", uploadDir);
+  destination(req, file, cb) {
     cb(null, uploadDir);
   },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname); // .png .jpg 유지
-    const unique = Date.now() + "-" + Math.round(Math.random() * 1e6);
-    const newName = unique + ext;
-
-    console.log("🖼 [multer] 업로드 파일명:", newName);
-
-    cb(null, newName);
+  filename(req, file, cb) {
+    const ext = path.extname(file.originalname);
+    const base = path.basename(file.originalname, ext);
+    const unique = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, `${base}-${unique}${ext}`);
   }
 });
 
-const upload = multer({
-  storage,
-  limits: { fileSize: 20 * 1024 * 1024 } // 20MB
-});
+const upload = multer({ storage });
 
 /* ============================================================
-   📌 2) 제품 목록
+   📌 제품 등록 (썸네일 1개 + 상세 이미지 여러 개)
+   POST /api/products
 ============================================================ */
-router.get("/list/:category", async (req, res) => {
-  console.log("📄 [제품 목록 요청]", req.params.category, req.query.lang);
+router.post(
+  "/products",
+  // verifyToken,
+  upload.fields([
+    { name: "thumbnail", maxCount: 1 },
+    { name: "images", maxCount: 20 }
+  ]),
+  async (req, res) => {
+    try {
+      const { title, category, description_html } = req.body;
+      if (!title || !category) {
+        return res.status(400).json({ message: "title, category 필수" });
+      }
 
-  const { category } = req.params;
-  const { lang } = req.query;
+      // 썸네일 경로
+      let thumbnailPath = null;
+      if (req.files?.thumbnail?.[0]) {
+        const filename = req.files.thumbnail[0].filename;
+        thumbnailPath = `/uploads/products/${filename}`;
+      }
 
+      // 1) products 삽입
+      const [result] = await db.execute(
+        "INSERT INTO products (title, category, thumbnail, description_html) VALUES (?, ?, ?, ?)",
+        [title, category, thumbnailPath, description_html || ""]
+      );
+
+      const productId = result.insertId;
+
+      // 2) 상세 이미지들 삽입
+      if (req.files?.images?.length) {
+        const images = req.files.images;
+        const values = images.map((f, idx) => [
+          productId,
+          `/uploads/products/${f.filename}`,
+          idx
+        ]);
+
+        await db.query(
+          "INSERT INTO product_images (product_id, url, sort_order) VALUES ?",
+          [values]
+        );
+      }
+
+      res.status(201).json({ message: "created", id: productId });
+    } catch (err) {
+      console.error("POST /products error:", err);
+      res.status(500).json({ message: "server error" });
+    }
+  }
+);
+
+
+/* ============================================================
+   📌 제품 목록
+   GET /api/products
+============================================================ */
+router.get("/products", async (req, res) => {
   try {
     const [rows] = await db.execute(
-      `SELECT * FROM products 
-       WHERE category = ? AND lang = ?
-       ORDER BY order_index ASC, id DESC`,
-      [category, lang]
+      "SELECT id, title, category, thumbnail, created_at FROM products ORDER BY created_at DESC"
     );
-
-    rows.forEach(p => {
-      if (p.image) {
-        p.image = `/uploads/products/${p.image}`;
-      }
-    });
-
     res.json(rows);
   } catch (err) {
-    console.error("❌ 제품 불러오기 오류:", err);
-    res.status(500).json({ message: "제품 불러오기 실패" });
+    console.error("GET /products error:", err);
+    res.status(500).json({ message: "server error" });
   }
 });
 
+
 /* ============================================================
-   📌 3) 제품 단일 조회
+   📌 제품 상세 (기본정보 + 이미지 리스트)
+   GET /api/products/:id
 ============================================================ */
-router.get("/:id", verifyToken, async (req, res) => {
+router.get("/products/:id", async (req, res) => {
   try {
-    const [rows] = await db.execute(
-      `SELECT * FROM products WHERE id = ?`,
-      [req.params.id]
+    const { id } = req.params;
+
+    const [[product]] = await db.execute(
+      "SELECT id, title, category, thumbnail, description_html, created_at FROM products WHERE id = ?",
+      [id]
     );
 
-    if (!rows.length) {
-      return res.status(404).json({ message: "없는 제품" });
+    if (!product) {
+      return res.status(404).json({ message: "not found" });
     }
 
-    const p = rows[0];
-    if (p.image) {
-      p.image = `/uploads/products/${p.image}`;
-    }
-
-    res.json(p);
-  } catch (err) {
-    console.error("❌ 단일 제품 조회 오류:", err);
-    res.status(500).json({ message: "단일 제품 조회 실패" });
-  }
-});
-
-/* ============================================================
-   📌 4) 제품 등록 (multer 디버그)
-============================================================ */
-router.post("/", verifyToken, upload.single("image"), async (req, res) => {
-  console.log("====================================");
-  console.log("🔥 [제품 등록 요청 들어옴]");
-  console.log("📦 req.body:", req.body);
-  console.log("🖼 req.file:", req.file);
-  console.log("====================================");
-
-  try {
-    const { category, lang, title, description, link, order_index } = req.body;
-    const image = req.file ? req.file.filename : null;
-
-    await db.execute(
-      `
-      INSERT INTO products 
-      (category, lang, title, description, link, order_index, image)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-      `,
-      [category, lang, title, description, link, order_index, image]
+    const [images] = await db.execute(
+      "SELECT id, url, sort_order FROM product_images WHERE product_id = ? ORDER BY sort_order ASC, id ASC",
+      [id]
     );
 
-    console.log("✅ [제품 등록 완료]");
-
-    res.json({ message: "등록 완료" });
+    res.json({ product, images });
   } catch (err) {
-    console.error("❌ 제품 등록 오류:", err);
-    res.status(500).json({ message: "등록 실패" });
+    console.error("GET /products/:id error:", err);
+    res.status(500).json({ message: "server error" });
   }
 });
 
+
 /* ============================================================
-   📌 5) 제품 수정
+   📌 제품 수정 (제목/카테고리/설명 + 썸네일 교체 + 이미지 추가)
+   PUT /api/products/:id
 ============================================================ */
-router.put("/:id", verifyToken, upload.single("image"), async (req, res) => {
-  console.log("====================================");
-  console.log("♻️ [제품 수정 요청]", req.params.id);
-  console.log("📦 req.body:", req.body);
-  console.log("🖼 req.file:", req.file);
-  console.log("====================================");
+router.put(
+  "/products/:id",
+  // verifyToken,
+  upload.fields([
+    { name: "thumbnail", maxCount: 1 },
+    { name: "images", maxCount: 20 }
+  ]),
+  async (req, res) => {
+    const { id } = req.params;
 
-  try {
-    const { category, lang, title, description, link, order_index } = req.body;
-    const id = req.params.id;
+    try {
+      const { title, category, description_html } = req.body;
+      if (!title || !category) {
+        return res.status(400).json({ message: "title, category 필수" });
+      }
 
-    if (req.file) {
-      const image = req.file.filename;
-
-      await db.execute(
-        `UPDATE products 
-         SET category=?, lang=?, title=?, description=?, link=?, order_index=?, image=? 
-         WHERE id=?`,
-        [category, lang, title, description, link, order_index, image, id]
+      // 기존 제품 가져오기 (썸네일 삭제용)
+      const [[oldProduct]] = await db.execute(
+        "SELECT thumbnail FROM products WHERE id = ?",
+        [id]
       );
-    } else {
+
+      if (!oldProduct) {
+        return res.status(404).json({ message: "not found" });
+      }
+
+      let thumbnailPath = oldProduct.thumbnail;
+
+      // 썸네일 새로 업로드된 경우
+      if (req.files?.thumbnail?.[0]) {
+        const filename = req.files.thumbnail[0].filename;
+        const newPath = `/uploads/products/${filename}`;
+        thumbnailPath = newPath;
+
+        // 기존 파일 삭제
+        if (oldProduct.thumbnail) {
+          const oldFile = path.join(
+            __dirname,
+            "../public",
+            oldProduct.thumbnail
+          );
+          if (fs.existsSync(oldFile)) fs.unlinkSync(oldFile);
+        }
+      }
+
+      // products 업데이트
       await db.execute(
-        `UPDATE products 
-         SET category=?, lang=?, title=?, description=?, link=?, order_index=? 
-         WHERE id=?`,
-        [category, lang, title, description, link, order_index, id]
+        "UPDATE products SET title = ?, category = ?, thumbnail = ?, description_html = ? WHERE id = ?",
+        [title, category, thumbnailPath, description_html || "", id]
       );
-    }
 
-    console.log("✅ [제품 수정 완료]");
-    res.json({ message: "수정 완료" });
-  } catch (err) {
-    console.error("❌ 제품 수정 오류:", err);
-    res.status(500).json({ message: "수정 실패" });
+      // 새 상세 이미지들 추가 (기존 이미지 삭제는 별도 API)
+      if (req.files?.images?.length) {
+        const images = req.files.images;
+        const values = images.map((f, idx) => [
+          id,
+          `/uploads/products/${f.filename}`,
+          idx
+        ]);
+        await db.query(
+          "INSERT INTO product_images (product_id, url, sort_order) VALUES ?",
+          [values]
+        );
+      }
+
+      res.json({ message: "updated" });
+    } catch (err) {
+      console.error("PUT /products/:id error:", err);
+      res.status(500).json({ message: "server error" });
+    }
   }
-});
+);
+
 
 /* ============================================================
-   📌 6) 제품 삭제
+   📌 제품 삭제
+   DELETE /api/products/:id
 ============================================================ */
-router.delete("/:id", verifyToken, async (req, res) => {
-  try {
-    await db.execute(`DELETE FROM products WHERE id=?`, [req.params.id]);
-    console.log("🗑 제품 삭제:", req.params.id);
-    res.json({ message: "삭제 완료" });
-  } catch (err) {
-    console.error("❌ 제품 삭제 오류:", err);
-    res.status(500).json({ message: "삭제 실패" });
+router.delete("/products/:id",
+  // verifyToken,
+  async (req, res) => {
+    const { id } = req.params;
+    try {
+      // 썸네일 / 상세이미지 파일 삭제까지 해주면 더 깔끔
+      const [[product]] = await db.execute(
+        "SELECT thumbnail FROM products WHERE id = ?",
+        [id]
+      );
+
+      if (product?.thumbnail) {
+        const f = path.join(__dirname, "../public", product.thumbnail);
+        if (fs.existsSync(f)) fs.unlinkSync(f);
+      }
+
+      const [imgs] = await db.execute(
+        "SELECT url FROM product_images WHERE product_id = ?",
+        [id]
+      );
+      imgs.forEach(img => {
+        const f = path.join(__dirname, "../public", img.url);
+        if (fs.existsSync(f)) fs.unlinkSync(f);
+      });
+
+      await db.execute("DELETE FROM products WHERE id = ?", [id]);
+
+      res.json({ message: "deleted" });
+    } catch (err) {
+      console.error("DELETE /products/:id error:", err);
+      res.status(500).json({ message: "server error" });
+    }
   }
-});
+);
+
 
 /* ============================================================
-   📌 7) 제품 상세페이지 조회수 증가 (신규)
+   📌 개별 이미지 삭제
+   DELETE /api/product-images/:imageId
 ============================================================ */
-router.post("/view/:id", async (req, res) => {
-  const productId = req.params.id;
+router.delete("/product-images/:imageId",
+  // verifyToken,
+  async (req, res) => {
+    const { imageId } = req.params;
+    try {
+      const [[img]] = await db.execute(
+        "SELECT url FROM product_images WHERE id = ?",
+        [imageId]
+      );
+      if (!img) return res.status(404).json({ message: "not found" });
 
-  const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.ip;
-  const ua = req.headers["user-agent"] || "unknown";
+      const f = path.join(__dirname, "../public", img.url);
+      if (fs.existsSync(f)) fs.unlinkSync(f);
 
-  try {
-    // 하루 중복 방지
-    const [exists] = await db.execute(
-      `
-      SELECT id FROM product_view_logs
-      WHERE product_id = ?
-        AND ip = ?
-        AND user_agent = ?
-        AND viewed_at > DATE_SUB(NOW(), INTERVAL 1 DAY)
-      `,
-      [productId, ip, ua]
-    );
-
-    if (exists.length > 0) {
-      return res.json({ added: false });
+      await db.execute("DELETE FROM product_images WHERE id = ?", [imageId]);
+      res.json({ message: "image deleted" });
+    } catch (err) {
+      console.error("DELETE /product-images/:imageId error:", err);
+      res.status(500).json({ message: "server error" });
     }
-
-    // 조회수 저장
-    await db.execute(
-      `
-      INSERT INTO product_view_logs (product_id, ip, user_agent)
-      VALUES (?, ?, ?)
-      `,
-      [productId, ip, ua]
-    );
-
-    res.json({ added: true });
-  } catch (err) {
-    console.error("❌ 제품 조회수 증가 오류:", err);
-    res.status(500).json({ message: "조회수 처리 실패" });
   }
-});
+);
 
 export default router;

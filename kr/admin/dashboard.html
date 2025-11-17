@@ -4,9 +4,7 @@
   <meta charset="UTF-8">
   <title>관리자 대시보드 | Fine Defense</title>
 
-  <!-- Quill -->
   <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
@@ -14,49 +12,14 @@
       margin: 0;
       font-family: 'Noto Sans KR', sans-serif;
       background: #f4f6f9;
-      display: flex;
     }
 
-    /* 사이드바 */
-    .sidebar {
-      width: 240px;
-      background: #0f2679;
-      color: white;
-      height: 100vh;
-      position: fixed;
-      top: 0;
-      left: 0;
-      padding: 30px 20px;
-      box-sizing: border-box;
-    }
-    .sidebar h2 {
-      font-size: 1.3rem;
-      margin-bottom: 40px;
-    }
-    .sidebar nav a {
-      display: block;
-      padding: 10px;
-      margin-bottom: 8px;
-      text-decoration: none;
-      color: #cfd6ff;
-      border-radius: 6px;
-      transition: 0.2s;
-    }
-    .sidebar nav a:hover,
-    .sidebar nav .active {
-      background: rgba(255,255,255,0.18);
-      color: #fff;
-    }
-
-    /* 메인 */
     .main {
       margin-left: 240px;
-      width: calc(100% - 240px);
       padding: 30px;
-      box-sizing: border-box;
+      min-height: 100vh;
     }
 
-    /* 상단 헤더 */
     .topbar {
       background: white;
       padding: 18px 25px;
@@ -69,28 +32,25 @@
       align-items: center;
     }
 
-    .topbar .title {
-      font-size: 1.4rem;
-      font-weight: 600;
-    }
+    .title { font-size: 1.4rem; font-weight: 600; }
 
-    #logoutBtn {
-      background: #e63946;
-      color: #fff;
+    #logoutBtn, .home-btn {
       border: none;
       padding: 8px 15px;
       border-radius: 6px;
       cursor: pointer;
+      font-size: 15px;
     }
 
-    .home-btn {
-      background: #0f2679;
-      color: white;
-      border: none;
-      padding: 8px 15px;
-      border-radius: 6px;
-      cursor: pointer;
-      margin-right: 10px;
+    .home-btn { background: #0f2679; color: #fff; margin-right: 10px; }
+    #logoutBtn { background: #e63946; color: #fff; }
+
+    .panel {
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      margin-bottom: 35px;
     }
 
     .stats-container {
@@ -103,18 +63,11 @@
     .stat-card {
       flex: 1;
       min-width: 200px;
-      background: #fff;
-      border-radius: 12px;
+      background: white;
       padding: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      border: 1px solid #e5e7eb;
+      border-radius: 12px;
       text-align: center;
-    }
-
-    .stat-card h3 {
-      font-size: 16px;
-      margin-bottom: 10px;
-      color: #555;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
 
     .stat-value {
@@ -122,104 +75,15 @@
       font-weight: 700;
       color: #0f2679;
     }
-
-    .top-views {
-      background: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      margin-bottom: 40px;
-    }
-
-    .top-views ul {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-    }
-
-    .top-views li {
-      padding: 10px 0;
-      border-bottom: 1px solid #eee;
-      font-size: 15px;
-    }
-
-    .top-views li:last-child {
-      border-bottom: none;
-    }
-
-    /* 업로드 */
-    .panel {
-      background: white;
-      padding: 25px;
-      border-radius: 10px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.05);
-      margin-bottom: 35px;
-    }
-
-    .upload-form input,
-    .upload-form select {
-      width: 100%;
-      margin: 8px 0;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 15px;
-    }
-
-    #filePreview img {
-      width: 70px;
-      height: 70px;
-      object-fit: cover;
-      border-radius: 6px;
-      border: 1px solid #ddd;
-    }
-
-    .post-item {
-      padding: 15px 0;
-      border-bottom: 1px solid #eee;
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .delete-btn {
-      background: crimson;
-      color: white;
-      border: none;
-      padding: 6px 10px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .edit-btn {
-      background: #1976d2;
-      color: white;
-      border: none;
-      padding: 6px 10px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
   </style>
 </head>
 
 <body>
 
-<!-- 사이드바 -->
-<aside class="sidebar">
-  <h2>Fine Defense</h2>
+<div id="sidebar"></div>
 
-  <nav>
-    <a href="/kr/index.html">홈으로 이동</a>
-    <a href="/kr/admin/dashboard.html" class="active">대시보드</a>
-    <a href="/kr/admin/inquiry.html">1:1 문의관리</a>
-    <a href="/kr/admin/newsroom_list.html">뉴스룸 관리</a>
-    <a href="/kr/admin/files.html">자료실 관리</a>
-  </nav>
-</aside>
-
-<!-- 메인 -->
 <div class="main">
 
-  <!-- 상단바 -->
   <div class="topbar">
     <div class="title">관리자 대시보드</div>
     <div>
@@ -228,7 +92,6 @@
     </div>
   </div>
 
-  <!-- 통계 카드 -->
   <section class="stats-container">
     <div class="stat-card"><h3>이번달 조회수</h3><p id="thisMonthViews" class="stat-value">0</p></div>
     <div class="stat-card"><h3>지난달 조회수</h3><p id="lastMonthViews" class="stat-value">0</p></div>
@@ -236,324 +99,25 @@
     <div class="stat-card"><h3>전체 게시물 수</h3><p id="totalPosts" class="stat-value">0</p></div>
   </section>
 
-  <!-- 월별 조회수 그래프 -->
-  <section class="panel" style="margin-bottom:40px;">
+  <section class="panel">
     <h2>월별 조회수 그래프</h2>
     <canvas id="monthlyChart" style="max-height:350px;"></canvas>
   </section>
 
-  <!-- 조회수 TOP 5 -->
-  <section class="top-views">
+  <section class="panel">
     <h2>조회수 TOP 5 게시물</h2>
     <ul id="topPostsList"></ul>
   </section>
 
-  <!-- 게시물 등록 -->
-  <div class="panel upload-form">
-    <h2>게시물 등록</h2>
-
-    <select id="category">
-      <option value="news">뉴스룸</option>
-      <option value="notice">공지사항</option>
-      <option value="gallery">갤러리</option>
-    </select>
-
-    <select id="lang">
-      <option value="kr">한국어</option>
-      <option value="en">English</option>
-    </select>
-
-    <input id="title" placeholder="제목" />
-
-    <div id="editor" style="height: 250px; background: #fff;"></div>
-
-    <input type="file" id="images" multiple />
-    <div id="filePreview" style="margin-top: 10px; display: flex; gap: 10px;"></div>
-
-    <button id="uploadBtn">등록</button>
-  </div>
-
-  <!-- 게시물 리스트 -->
-  <div class="panel">
-    <h2>게시물 목록</h2>
-    <div id="posts"></div>
-  </div>
-
-  <!-- 📦 제품 관리 패널 -->
-  <div class="panel">
-    <h2>제품 관리</h2>
-
-    <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
-      <div style="font-size:16px; font-weight:600;">
-        총 제품 수: <span id="productCount">0</span> 개
-      </div>
-      <button onclick="location.href='/kr/admin/products.html'"
-              style="padding:8px 12px; background:#0f2679; color:#fff; border:none; border-radius:6px; cursor:pointer;">
-        제품 관리 페이지로 이동
-      </button>
-    </div>
-
-    <div id="recentProducts"></div>
-  </div>
-
-
-
-
 </div>
 
-<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
-
 <script>
-/* 로그인 체크 */
-const token = localStorage.getItem("token");
-const role = localStorage.getItem("role");
-if (!token || role !== "admin") {
-  alert("로그인이 필요합니다.");
-  location.href = "/kr/admin/login.html";
-}
-
-document.getElementById("logoutBtn").addEventListener("click", () => {
-  localStorage.clear();
-  location.href = "/kr/admin/login.html";
-});
-
-
-/* ===== Quill ===== */
-document.addEventListener("DOMContentLoaded", () => {
-  window.quill = new Quill("#editor", {
-    theme: "snow",
-    modules: {
-      toolbar: [
-        [{ header: [1,2,false] }],
-        ["bold","italic","underline"],
-        [{ list:"ordered" }, { list:"bullet" }],
-        ["link","image"],
-        ["clean"],
-      ],
-    },
-  });
-
-  /* 파일 미리보기 */
-  let fileList = [];
-  const preview = document.getElementById("filePreview");
-
-  document.getElementById("images").addEventListener("change", e => {
-    fileList = Array.from(e.target.files);
-    preview.innerHTML = "";
-    fileList.forEach(f => {
-      const reader = new FileReader();
-      reader.onload = ev => {
-        const img = document.createElement("img");
-        img.src = ev.target.result;
-        preview.appendChild(img);
-      };
-      reader.readAsDataURL(f);
-    });
-  });
-
-  /* 게시물 등록 */
-  document.getElementById("uploadBtn").addEventListener("click", async () => {
-    const title = document.getElementById("title").value.trim();
-    const content = window.quill.root.innerHTML.trim();
-    if (!title) return alert("제목을 입력하세요.");
-
-    const fd = new FormData();
-    fd.append("title", title);
-    fd.append("content", content);
-    fd.append("category", document.getElementById("category").value);
-    fd.append("lang", document.getElementById("lang").value);
-    fileList.forEach(f => fd.append("images", f));
-
-    await fetch(`/api/posts`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-      body: fd,
-    });
-
-    alert("등록 완료!");
-    loadPosts();
-  });
-
-  loadPosts();
-});
-
-
-/* 게시물 불러오기 + 조회수 포함 */
-async function loadPosts() {
-  const res = await fetch(`/api/posts/list/news?withViews=1&lang=kr`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
-  const posts = await res.json();
-  const list = document.getElementById("posts");
-
-  list.innerHTML = posts
-    .map(
-      p => `
-        <div class="post-item">
-          <div style="flex:1;">
-            <strong style="font-size:16px;">${p.title}</strong>
-            <div style="color:#666; font-size:13px; margin-top:4px;">
-              카테고리: <b>${p.category}</b> | 언어: <b>${p.lang}</b>
-            </div>
-
-            <div style="margin-top:6px; color:#0f2679; font-weight:600;">
-              조회수: ${(p.total_views || 0).toLocaleString()} 회
-            </div>
-
-            <div style="display:flex; gap:6px; margin-top:10px;">
-              ${
-                p.images?.length
-                  ? p.images
-                      .map(img => `<img src="${img}" style="width:55px;height:55px;border:1px solid #ddd;border-radius:6px;object-fit:cover;">`)
-                      .join("")
-                  : "<span style='color:#aaa;'>이미지 없음</span>"
-              }
-            </div>
-          </div>
-
-          <div style="display:flex; flex-direction:column; gap:6px;">
-            <button class="edit-btn" onclick="editPost(${p.id})">수정</button>
-            <button class="delete-btn" onclick="deletePost(${p.id})">삭제</button>
-          </div>
-        </div>
-      `
-    )
-    .join("");
-}
-
-
-window.deletePost = async (id) => {
-  if (!confirm("삭제하시겠습니까?")) return;
-  await fetch(`/api/posts/${id}`, {
-    method: "DELETE",
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  loadPosts();
-};
-
-window.editPost = (id) => {
-  location.href = `/kr/admin/edit_post.html?id=${id}`;
-};
-
-
-/* ==========================================
-   📌 관리자 통계 불러오기 (제품 포함)
-========================================== */
-async function loadDashboardStats() {
-  const res = await fetch(`/api/admin/dashboard`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-
-  const data = await res.json();
-
-  /* ===== 기존 조회수 / 게시물 ===== */
-  document.getElementById("thisMonthViews").textContent =
-    data.thisMonthViews.toLocaleString();
-  document.getElementById("lastMonthViews").textContent =
-    data.lastMonthViews.toLocaleString();
-  document.getElementById("totalPosts").textContent =
-    data.postCount.toLocaleString();
-
-  let growth = 0;
-  if (data.lastMonthViews > 0) {
-    growth = (
-      (data.thisMonthViews - data.lastMonthViews) /
-      data.lastMonthViews * 100
-    ).toFixed(1);
-  }
-  document.getElementById("growthRate").textContent = growth + "%";
-
-  const topList = document.getElementById("topPostsList");
-  topList.innerHTML = data.topPosts
-    .map(p => `<li>${p.title} — <strong>${(p.total_views || 0).toLocaleString()}</strong> 회</li>`)
-    .join("");
-
-
-  /* =============================
-       🔥 추가된 제품 통계
-  ============================== */
-
-  // 총 제품 수
-  if (document.getElementById("productCount")) {
-    document.getElementById("productCount").textContent =
-      data.productCount.toLocaleString();
-  }
-
-  // 최근 제품 목록
-  if (document.getElementById("recentProducts")) {
-    const box = document.getElementById("recentProducts");
-
-    if (data.recentProducts.length === 0) {
-      box.innerHTML = `<p style="color:#777;">등록된 제품이 없습니다.</p>`;
-    } else {
-      box.innerHTML = data.recentProducts
-        .map(
-          p => `
-          <div style="display:flex; gap:12px; padding:10px 0; border-bottom:1px solid #eee;">
-            <img src="${p.image || '/img/no-image.png'}"
-                 style="width:60px; height:45px; object-fit:cover; border-radius:6px; border:1px solid #ddd;">
-            <div style="flex:1;">
-              <div style="font-size:15px; font-weight:600;">${p.title}</div>
-              <div style="font-size:13px; color:#666;">
-                카테고리: ${p.category} / 언어: ${p.lang}
-              </div>
-            </div>
-            <button onclick="location.href='/kr/admin/products.html'"
-                    style="padding:5px 10px; background:#0f2679; color:#fff; border:none; border-radius:6px; cursor:pointer;">
-              관리
-            </button>
-          </div>
-        `
-        )
-        .join("");
-    }
-  }
-}
-
-loadDashboardStats();
-
-
-
-/* ==========================================
-   📈 월별 조회수 그래프
-========================================== */
-async function loadMonthlyChart() {
-  const res = await fetch("/api/admin/monthly-views", {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-
-  const data = await res.json();
-  const ordered = [...data].reverse();
-
-  const labels = ordered.map(d => `${d.year}-${String(d.month).padStart(2,"0")}`);
-  const values = ordered.map(d => d.total_views);
-
-  const ctx = document.getElementById("monthlyChart");
-
-  new Chart(ctx, {
-    type: "line",
-    data: {
-      labels,
-      datasets: [{
-        label: "월별 조회수",
-        data: values,
-        borderWidth: 2,
-        tension: 0.3
-      }]
-    },
-    options: {
-      responsive: true,
-      scales: {
-        y: { beginAtZero: true }
-      }
-    }
-  });
-}
-
-loadMonthlyChart();
-
+  fetch("/kr/admin/components/sidebar.html")
+    .then(r => r.text())
+    .then(html => document.getElementById("sidebar").innerHTML = html);
 </script>
+
+<script src="/kr/admin/js/dashboard_core.js"></script>
 
 </body>
 </html>
