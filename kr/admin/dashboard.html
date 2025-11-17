@@ -62,14 +62,14 @@
   </div>
 
   <!-- ✅ 모듈 아님, 그냥 일반 스크립트 -->
-  <script src="./js/common_auth.js"></script>
-  <script src="./js/sidebar.js"></script>
-  <script src="./js/dashboard_core.js"></script>
-  <script>
-    requireAdmin();
-    loadSidebar("dashboard"); // ← 여기 중요 (활성 메뉴)
-    document.getElementById("logoutBtn").addEventListener("click", logout);
-  </script>
+    <script src="./js/common_auth.js"></script>
+    <script src="./js/sidebar.js"></script>
+    <script src="./js/dashboard_core.js"></script>
+    <script>
+      requireAdmin();        // 이제 정상 작동
+      loadSidebar("dashboard");
+      document.getElementById("logoutBtn").addEventListener("click", logout);
+    </script>
 
 </body>
 </html>
