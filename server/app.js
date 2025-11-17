@@ -9,6 +9,7 @@ import authRouter from "./routes/auth.js";
 import adminRouter from "./routes/admin.js";
 import postsRouter from "./routes/posts.js";
 import productsRouter from "./routes/products.js";
+app.use("/api/products", productsRouter);
 
 const app = express();
 
