@@ -11,7 +11,7 @@ import postsRouter from "./routes/posts.js";
 import productsRouter from "./routes/products.js";
 
 // ============================================================
-// 🔥 app 선언은 최상단 import 아래에만 두어야 함
+// 📌 기본 설정
 // ============================================================
 
 const app = express();
@@ -28,33 +28,52 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ============================================================
-// 📁 업로드 폴더 static 제공
+// 📁 업로드 이미지 static 경로 (절대 중요!)
 // ============================================================
+//
+// /uploads/xxx → server/public/uploads/xxx 연결
+//
+// 예) 브라우저 요청
+//   http://3.36.100.60/uploads/products/aaa.png
+// 실제 파일:
+//   server/public/uploads/products/aaa.png
+//
 
-app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
+app.use(
+  "/uploads",
+  express.static(path.join(__dirname, "public", "uploads"))
+);
 
 // ============================================================
-// 📌 API Routers 등록
+// 📌 API 라우터 등록
 // ============================================================
+//
+// /api/products → 제품 관리 API (파일 업로드 포함)
+// /api/inquiry  → 문의 처리
+// /api/auth     → 로그인/토큰
+// /api/admin    → 관리자 통계
+// /api/posts    → 게시물/뉴스룸
+//
 
-// 제품 관리 (파일 업로드 포함)
 app.use("/api/products", productsRouter);
-
-// 1:1 문의
 app.use("/api/inquiry", sendInquiryRouter);
-
-// 인증
 app.use("/api/auth", authRouter);
-
-// 관리자 통계/관리
 app.use("/api/admin", adminRouter);
-
-// 뉴스룸/게시물
 app.use("/api/posts", postsRouter);
 
 // ============================================================
-// 🌐 정적 파일 제공 (홈페이지 HTML)
+// 🌐 정적 파일 제공 (홈페이지 + 관리자 페이지 HTML)
 // ============================================================
+//
+// / → server/../ (= 프로젝트 루트 / 홈페이지 정적 HTML)
+//
+// 서버폴더 구조 기준
+// server/
+//   app.js
+// ../ (프로젝트 루트)
+//   kr/index.html
+//   img/...
+//
 
 app.use(express.static(path.join(__dirname, "../")));
 
