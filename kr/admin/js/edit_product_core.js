@@ -49,14 +49,15 @@ async function loadProduct() {
   document.getElementById("title").value = p.title;
   document.getElementById("category").value = p.category;
 
-  // description_html 사용
+  // 🔥 description_html 로딩
   quill.root.innerHTML = p.description_html || "";
 
-  // 이미지 URL만 배열로 저장
+  // 🔥 전체 URL 조립 필요 없음 (이미 절대경로)
   existingImages = imgs.map(i => i.url);
 
   renderExistingImages();
 }
+
 
 
 /* 기존 이미지 표시 */

@@ -31,7 +31,7 @@ app.use(express.urlencoded({ extended: true }));
 // 📁 업로드 폴더 static 제공
 // ============================================================
 
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
 
 // ============================================================
 // 📌 API Routers 등록
