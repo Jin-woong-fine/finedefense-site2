@@ -21,9 +21,12 @@ document.addEventListener("DOMContentLoaded", () => {
 /* Quill 초기화 */
 function initQuill() {
   const editorEl = document.getElementById("editor");
-  if (!editorEl) return;
+  if (!editorEl) {
+    console.warn("⚠️ Quill 에디터가 없는 페이지입니다.");
+    return;
+  }
 
-  quill = new Quill("#editor", {
+  quill = new Quill(editorEl, {
     theme: "snow",
     modules: {
       toolbar: [
@@ -32,11 +35,10 @@ function initQuill() {
         [{ list: "ordered" }, { list: "bullet" }],
         ["link", "image"],
         ["clean"],
-      ],
-    },
+      ]
+    }
   });
 }
-
 /* ============================================================================
    🖼 이미지 여러 개 선택 + 미리보기
 ============================================================================ */
@@ -212,19 +214,23 @@ async function loadProductList() {
 
 /* 제품 카드 HTML */
 function renderProductCardHTML(p) {
-  const thumb =
-    p.thumbImage ||
-    (Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : "/img/products/Image-placeholder.png");
+  const title = p.title || "이름 없음";
 
   const categoryLabel = getCategoryLabel(p.category);
 
-  const detailPath = p.detailPath || ""; // 서버에서 만들어주면 표시
+  const thumb =
+    p.thumbImage ||
+    (Array.isArray(p.images) && p.images.length > 0
+      ? p.images[0]
+      : "/img/products/Image-placeholder.png");
+
+  const detailPath = p.detailPath || "";
   const hasDetail = !!detailPath;
 
   return `
     <div class="product-card">
-      <img src="${thumb}" alt="${p.title || "제품 이미지"}">
-      <h3>${p.title || ""}</h3>
+      <img src="${thumb}" alt="${title}">
+      <h3>${title}</h3>
       <div class="category">카테고리: ${categoryLabel}</div>
 
       <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;">
@@ -239,6 +245,7 @@ function renderProductCardHTML(p) {
     </div>
   `;
 }
+
 
 /* 카테고리 표시용 라벨 */
 function getCategoryLabel(code) {
