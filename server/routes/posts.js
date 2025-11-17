@@ -1,3 +1,8 @@
+console.log("URL postIdParam:", postIdParam);
+console.log("parsed postId:", postId);
+
+
+
 import express from "express";
 import multer from "multer";
 import path from "path";
