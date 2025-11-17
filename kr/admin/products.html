@@ -4,114 +4,42 @@
   <meta charset="UTF-8" />
   <title>제품 관리 | Fine Defense Admin</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <style>
-    body {
-      margin: 0;
-      font-family: 'Noto Sans KR', sans-serif;
-      background: #f4f6f9;
-      display: flex;
-    }
+    body { margin: 0; font-family: 'Noto Sans KR', sans-serif; background: #f4f6f9; display:flex; }
     .sidebar {
-      width: 240px;
-      background: #0f2679;
-      color: #fff;
-      height: 100vh;
-      position: fixed;
-      top: 0;
-      left: 0;
-      padding: 30px 20px;
-      box-sizing: border-box;
+      width:240px; background:#0f2679; color:#fff; height:100vh;
+      position:fixed; top:0; left:0; padding:30px 20px; box-sizing:border-box;
     }
-    .sidebar h2 { margin-bottom: 30px; font-size: 1.2rem; }
     .sidebar nav a {
-      display:block; padding: 10px; margin-bottom:8px;
+      display:block; padding:10px; margin-bottom:8px;
       color:#cfd6ff; text-decoration:none; border-radius:6px;
     }
     .sidebar nav a:hover, .sidebar nav .active {
-      background: rgba(255,255,255,0.18); color:#fff;
+      background:rgba(255,255,255,0.18); color:#fff;
     }
-
-    .main {
-      margin-left: 240px;
-      width: calc(100% - 240px);
-      padding: 30px;
-      box-sizing: border-box;
-    }
-
+    .main { margin-left:240px; width:calc(100% - 240px); padding:30px; box-sizing:border-box; }
     .topbar {
-      background: #fff;
-      padding: 16px 22px;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      margin-bottom: 25px;
-      display:flex; justify-content:space-between; align-items:center;
+      background:#fff; padding:16px 22px; border-radius:10px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.08);
+      margin-bottom:25px; display:flex; justify-content:space-between; align-items:center;
     }
-    .topbar h1 { font-size: 1.2rem; margin:0; }
-
     .panel {
-      background:#fff;
-      border-radius:10px;
+      background:#fff; border-radius:10px;
       box-shadow:0 2px 8px rgba(0,0,0,0.05);
-      padding:20px;
-      margin-bottom:25px;
+      padding:20px; margin-bottom:25px;
     }
-
-    .panel h2 {
-      margin-top:0;
-      font-size:1.1rem;
-      margin-bottom:12px;
+    input[type='text'], input[type='number'], select, textarea {
+      width:100%; padding:8px 10px; border-radius:6px;
+      border:1px solid #ccc; font-size:0.9rem; margin-bottom:10px; box-sizing:border-box;
     }
-
-    input[type="text"],
-    input[type="number"],
-    select,
-    textarea {
-      width:100%;
-      padding:8px 10px;
-      border-radius:6px;
-      border:1px solid #ccc;
-      font-size:0.9rem;
-      box-sizing:border-box;
-      margin-bottom:10px;
-    }
-
     textarea { min-height:80px; }
-
-    button {
-      padding:8px 14px;
-      border:none;
-      border-radius:6px;
-      cursor:pointer;
-      font-size:0.9rem;
-    }
-
+    button { padding:8px 14px; border:none; border-radius:6px; cursor:pointer; }
     .btn-primary { background:#0f2679; color:#fff; }
     .btn-secondary { background:#e5e7eb; color:#333; }
     .btn-danger { background:#e63946; color:#fff; }
-
-    table {
-      width:100%;
-      border-collapse:collapse;
-      font-size:0.9rem;
-    }
-    th, td {
-      border-bottom:1px solid #eee;
-      padding:8px;
-      text-align:left;
-      vertical-align:middle;
-    }
-    th { background:#f9fafb; }
-
-    img.thumb {
-      width:60px;
-      height:40px;
-      object-fit:cover;
-      border-radius:4px;
-      border:1px solid #ddd;
-    }
-
-    .actions button { margin-right:4px; }
+    table { width:100%; border-collapse:collapse; font-size:0.9rem; }
+    th, td { padding:8px; border-bottom:1px solid #eee; vertical-align:middle; }
+    img.thumb { width:60px; height:40px; object-fit:cover; border-radius:4px; border:1px solid #ddd; }
   </style>
 </head>
 
@@ -123,7 +51,7 @@
       <a href="/kr/admin/dashboard.html">대시보드</a>
       <a href="/kr/admin/newsroom_list.html">뉴스룸 관리</a>
       <a href="/kr/admin/files.html">자료실 관리</a>
-      <a href="/kr/admin/products.html" class="active">제품 관리</a>
+      <a class="active" href="/kr/admin/products.html">제품 관리</a>
     </nav>
   </aside>
 
@@ -133,11 +61,11 @@
       <button id="logoutBtn" class="btn-secondary">로그아웃</button>
     </div>
 
-    <!-- 등록/수정 -->
+    <!-- 등록/수정: form 제거됨 -->
     <section class="panel">
       <h2>제품 등록 / 수정</h2>
 
-      <form id="productForm">
+      <div id="productForm">
         <label>카테고리</label>
         <select id="category">
           <option value="sub_towed">수중이동형케이블 (sub_towed)</option>
@@ -162,73 +90,51 @@
         <input type="text" id="link">
 
         <label>썸네일 이미지</label>
-        <input type="file" id="image" name="image" accept="image/*">
+        <input type="file" id="image" accept="image/*">
 
-
-        <button type="button" id="saveBtn" class="btn-primary">등록</button>
-        <button type="button" id="resetBtn" class="btn-secondary">초기화</button>
-      </form>
+        <button id="saveBtn" class="btn-primary">등록</button>
+        <button id="resetBtn" class="btn-secondary">초기화</button>
+      </div>
     </section>
 
     <!-- 목록 -->
     <section class="panel">
       <h2>제품 목록</h2>
 
-      <div style="margin-bottom:10px;">
-        <label>카테고리</label>
-        <select id="filterCategory">
-          <option value="sub_towed">수중이동형케이블 (sub_towed)</option>
-        </select>
+      <label>카테고리</label>
+      <select id="filterCategory">
+        <option value="sub_towed">수중이동형케이블 (sub_towed)</option>
+      </select>
 
-        <label>언어</label>
-        <select id="filterLang">
-          <option value="kr">한국어</option>
-          <option value="en">English</option>
-        </select>
+      <label>언어</label>
+      <select id="filterLang">
+        <option value="kr">한국어</option>
+        <option value="en">English</option>
+      </select>
 
-        <button id="reloadBtn" class="btn-secondary">불러오기</button>
-      </div>
+      <button id="reloadBtn" class="btn-secondary">불러오기</button>
 
       <table>
         <thead>
-          <tr>
-            <th>ID</th>
-            <th>이미지</th>
-            <th>제품명</th>
-            <th>링크</th>
-            <th>카테고리</th>
-            <th>언어</th>
-            <th>순서</th>
-            <th>관리</th>
-          </tr>
-        </thead>
+        <tr>
+          <th>ID</th><th>이미지</th><th>제품명</th>
+          <th>링크</th><th>카테고리</th><th>언어</th><th>순서</th><th>관리</th>
+        </tr></thead>
         <tbody id="productTableBody"></tbody>
       </table>
     </section>
   </div>
 
-
 <script>
-
 /* 로그인 체크 */
 const token = localStorage.getItem("token");
-const role = localStorage.getItem("role");
-
-if (!token || role !== "admin") {
-  alert("관리자 로그인이 필요합니다.");
-  location.href = "/kr/admin/login.html";
+if (!token || localStorage.getItem("role") !== "admin") {
+  alert("로그인이 필요합니다."); location.href="/kr/admin/login.html";
 }
 
-/* 로그아웃 */
-document.getElementById("logoutBtn").addEventListener("click", () => {
-  localStorage.clear();
-  location.href = "/kr/admin/login.html";
-});
-
-/* form 기본 제출 막기 (핵심!!) */
-document.getElementById("productForm").addEventListener("submit", e => {
-  e.preventDefault();
-});
+document.getElementById("logoutBtn").onclick = () => {
+  localStorage.clear(); location.href="/kr/admin/login.html";
+};
 
 /* 요소 */
 const catSel = document.getElementById("category");
@@ -245,46 +151,30 @@ const tableBody = document.getElementById("productTableBody");
 
 let editingId = null;
 
-
-/* ================================
-   목록 불러오기
-================================ */
+/* 목록 불러오기 */
 async function loadProducts() {
-  const category = filterCategory.value;
-  const lang = filterLang.value;
-
-  const res = await fetch(`/api/products/list/${category}?lang=${lang}`);
+  const res = await fetch(`/api/products/list/${filterCategory.value}?lang=${filterLang.value}`);
   const data = await res.json();
 
-  tableBody.innerHTML = data
-    .map(
-      (p) => `
-        <tr>
-          <td>${p.id}</td>
-          <td>${p.image ? `<img src="${p.image}" class="thumb">` : "-"}</td>
-          <td>${p.title}</td>
-          <td>${p.link || "-"}</td>
-          <td>${p.category}</td>
-          <td>${p.lang}</td>
-          <td>${p.order_index}</td>
-          <td>
-            <button class="btn-secondary" onclick="editProduct(${p.id})">수정</button>
-            <button class="btn-danger" onclick="deleteProduct(${p.id})">삭제</button>
-          </td>
-        </tr>
-      `
-    )
-    .join("");
+  tableBody.innerHTML = data.map(p => `
+    <tr>
+      <td>${p.id}</td>
+      <td>${p.image ? `<img src="${p.image}" class="thumb">` : "-"}</td>
+      <td>${p.title}</td>
+      <td>${p.link || "-"}</td>
+      <td>${p.category}</td>
+      <td>${p.lang}</td>
+      <td>${p.order_index}</td>
+      <td>
+        <button onclick="editProduct(${p.id})" class="btn-secondary">수정</button>
+        <button onclick="deleteProduct(${p.id})" class="btn-danger">삭제</button>
+      </td>
+    </tr>
+  `).join("");
 }
 
-document.getElementById("reloadBtn").addEventListener("click", loadProducts);
-
-
-/* ================================
-   등록/수정
-================================ */
-document.getElementById("saveBtn").addEventListener("click", async () => {
-
+/* 저장 */
+document.getElementById("saveBtn").onclick = async () => {
   const fd = new FormData();
   fd.append("category", catSel.value);
   fd.append("lang", langSel.value);
@@ -293,7 +183,7 @@ document.getElementById("saveBtn").addEventListener("click", async () => {
   fd.append("link", linkInput.value.trim());
   fd.append("order_index", orderInput.value);
 
-  if (imgInput.files[0]) {
+  if (imgInput.files.length > 0) {
     fd.append("image", imgInput.files[0]);
   }
 
@@ -301,68 +191,52 @@ document.getElementById("saveBtn").addEventListener("click", async () => {
   const method = editingId ? "PUT" : "POST";
 
   const res = await fetch(url, {
-    method,
-    headers: { Authorization: `Bearer ${token}` },
-    body: fd,
+    method, headers:{ Authorization:`Bearer ${token}` }, body:fd
   });
 
   if (!res.ok) return alert("저장 실패");
 
   alert(editingId ? "수정 완료" : "등록 완료");
-
   resetForm();
   loadProducts();
-});
+};
 
-
-/* ================================
-   수정 모드
-================================ */
+/* 수정 */
 window.editProduct = async (id) => {
   const res = await fetch(`/api/products/${id}`, {
-    headers: { Authorization: `Bearer ${token}` },
+    headers:{ Authorization:`Bearer ${token}` }
   });
-
-  if (!res.ok) return alert("불러오기 실패");
-
   const p = await res.json();
-  editingId = p.id;
 
+  editingId = p.id;
   catSel.value = p.category;
   langSel.value = p.lang;
   orderInput.value = p.order_index;
   titleInput.value = p.title;
-  descInput.value = p.description || "";
-  linkInput.value = p.link || "";
+  descInput.value = p.description;
+  linkInput.value = p.link;
 
   document.getElementById("saveBtn").textContent = "수정 완료";
-
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  window.scrollTo({ top:0, behavior:"smooth" });
 };
 
-
-/* ================================
-   삭제
-================================ */
-window.deleteProduct = async (id) => {
-  if (!confirm("정말 삭제하시겠습니까?")) return;
+/* 삭제 */
+window.deleteProduct = async(id)=>{
+  if(!confirm("삭제하시겠습니까?")) return;
 
   const res = await fetch(`/api/products/${id}`, {
-    method: "DELETE",
-    headers: { Authorization: `Bearer ${token}` },
+    method:"DELETE",
+    headers:{ Authorization:`Bearer ${token}` }
   });
 
-  if (!res.ok) return alert("삭제 실패");
+  if(!res.ok) return alert("삭제 실패");
 
   alert("삭제 완료");
   loadProducts();
 };
 
-
-/* ================================
-   초기화
-================================ */
-document.getElementById("resetBtn").addEventListener("click", resetForm);
+/* 초기화 */
+document.getElementById("resetBtn").onclick = resetForm;
 
 function resetForm() {
   editingId = null;
@@ -373,27 +247,11 @@ function resetForm() {
   descInput.value = "";
   linkInput.value = "";
   imgInput.value = "";
-
   document.getElementById("saveBtn").textContent = "등록";
 }
 
-
-/* 초기 실행 */
 loadProducts();
-
 </script>
-
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-    const imgInput = document.getElementById("image");
-    console.log("🔥 DOM 로드 후 input:", imgInput);
-});
-</script>
-
-
-
-
-
 
 </body>
 </html>
