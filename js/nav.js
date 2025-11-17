@@ -177,7 +177,7 @@ function initBreadcrumbTabs() {
             ];
       }
 
-      if (path.includes("/product/")) {
+      if (path.includes("/products/")) {
         subTabs = LANG === "kr"
           ? [
               { name: "수중이동형케이블", link: `${base}/product/towed-cable.html` },
