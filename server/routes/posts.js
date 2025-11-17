@@ -1,8 +1,3 @@
-console.log("URL postIdParam:", postIdParam);
-console.log("parsed postId:", postId);
-
-
-
 import express from "express";
 import multer from "multer";
 import path from "path";
@@ -13,9 +8,9 @@ import { verifyToken } from "../middleware/auth.js";
 
 const router = express.Router();
 
-/* ==========================================
-   📁 파일 업로드 설정 (multer)
-========================================== */
+/* ============================================================
+   📁 Multer 설정
+============================================================ */
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const dir = "uploads/news";
@@ -31,58 +26,63 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 /* ============================================================
-   📈 조회수 증가 API  (POST /api/posts/view/:id)
-   ⭐ 반드시 라우터 최상단에 있어야 충돌 없음
+   📈 조회수 증가 API (POST /api/posts/view/:id)
+   ※ 반드시 상단에 위치해야 함 (라우팅 충돌 방지)
 ============================================================ */
 router.post("/view/:id", async (req, res) => {
   try {
     const { id } = req.params;
+    const postId = Number(id);
 
-    // 🔹 관리자 제외
+    if (!postId || isNaN(postId)) {
+      return res.status(400).json({ message: "잘못된 post id" });
+    }
+
+    // 관리자 제외
     const token = req.headers.authorization?.split(" ")[1];
     if (token) {
       try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         if (decoded.role === "admin") {
-          return res.json({ message: "관리자 조회수 제외", added: false });
+          return res.json({ message: "관리자 제외", added: false });
         }
       } catch (err) {}
     }
 
-    // 🔹 접속 정보
     const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.ip;
     const ua = req.headers["user-agent"] || "unknown";
 
-    // 🔹 24시간 중복방지 체크
+    // 24시간 중복 방지
     const [exists] = await db.execute(
       `SELECT id FROM post_view_logs
        WHERE post_id = ? AND ip = ? AND user_agent = ?
        AND viewed_at > DATE_SUB(NOW(), INTERVAL 1 DAY)`,
-      [id, ip, ua]
+      [postId, ip, ua]
     );
 
     if (exists.length > 0) {
-      return res.json({ message: "24시간 내 중복 제외", added: false });
+      return res.json({ message: "중복 조회(24시간)", added: false });
     }
 
-    // 🔹 로그 기록
+    // 로그 기록
     await db.execute(
       `INSERT INTO post_view_logs (post_id, ip, user_agent)
        VALUES (?, ?, ?)`,
-      [id, ip, ua]
+      [postId, ip, ua]
     );
 
-    // 🔹 일별 집계
+    // 날짜 정보
     const now = new Date();
     const y = now.getFullYear();
     const m = now.getMonth() + 1;
     const d = now.getDate();
 
+    // 일별 집계
     await db.execute(
       `INSERT INTO post_view_stats (post_id, year, month, day, views)
        VALUES (?, ?, ?, ?, 1)
        ON DUPLICATE KEY UPDATE views = views + 1`,
-      [id, y, m, d]
+      [postId, y, m, d]
     );
 
     res.json({ message: "조회수 +1", added: true });
@@ -93,8 +93,10 @@ router.post("/view/:id", async (req, res) => {
   }
 });
 
+
+
 /* ============================================================
-   📄 단일 게시물 조회 (조회수 집계 없음)
+   📄 단일 게시물 조회 (조회수 증가 없음)
 ============================================================ */
 router.get("/detail/:id", async (req, res) => {
   try {
@@ -116,15 +118,17 @@ router.get("/detail/:id", async (req, res) => {
       `SELECT image_path FROM post_images WHERE post_id = ?`,
       [id]
     );
+
     post.images = images.map(i => i.image_path);
 
     res.json(post);
 
   } catch (err) {
-    console.error("단일 게시물 조회 오류:", err);
+    console.error("단일 조회 오류:", err);
     res.status(500).json({ message: "조회 오류" });
   }
 });
+
 
 /* ============================================================
    🧩 게시물 등록
@@ -164,8 +168,9 @@ router.post("/", upload.array("images", 10), verifyToken, async (req, res) => {
   }
 });
 
+
 /* ============================================================
-   📤 카테고리별 게시물 목록 + 조회수 포함
+   📤 카테고리별 조회수 포함 목록
 ============================================================ */
 router.get("/:category", async (req, res) => {
   try {
@@ -189,20 +194,23 @@ router.get("/:category", async (req, res) => {
     );
 
     for (const post of posts) {
-      const [imgRows] = await db.execute(
+      const [images] = await db.execute(
         `SELECT image_path FROM post_images WHERE post_id = ?`,
         [post.id]
       );
-      post.images = imgRows.map(i => i.image_path);
+      post.images = images.map(i => i.image_path);
     }
 
     res.json(posts);
 
   } catch (err) {
-    console.error("카테고리 목록 조회 오류:", err);
+    console.error("카테고리 조회 오류:", err);
     res.status(500).json({ message: "조회 오류" });
   }
 });
+
+
+
 
 /* ============================================================
    📝 게시물 수정
@@ -217,9 +225,10 @@ router.put("/:id", verifyToken, upload.array("images", 10), async (req, res) => 
       [title, content, category, lang, id]
     );
 
+    // 새로운 이미지가 올라올 때만 기존 이미지 교체
     if (req.files && req.files.length > 0) {
       const [oldImgs] = await db.execute(
-        `SELECT image_path FROM post_images WHERE post_id = ?`,
+        `SELECT image_path FROM post_images WHERE post_id=?`,
         [id]
       );
 
@@ -228,7 +237,7 @@ router.put("/:id", verifyToken, upload.array("images", 10), async (req, res) => 
         if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
       }
 
-      await db.execute(`DELETE FROM post_images WHERE post_id = ?`, [id]);
+      await db.execute(`DELETE FROM post_images WHERE post_id=?`, [id]);
 
       for (const f of req.files) {
         await db.execute(
@@ -239,7 +248,7 @@ router.put("/:id", verifyToken, upload.array("images", 10), async (req, res) => 
       }
 
       await db.execute(
-        `UPDATE posts SET main_image = ? WHERE id=?`,
+        `UPDATE posts SET main_image=? WHERE id=?`,
         [`/uploads/news/${req.files[0].filename}`, id]
       );
     }
@@ -252,8 +261,9 @@ router.put("/:id", verifyToken, upload.array("images", 10), async (req, res) => 
   }
 });
 
+
 /* ============================================================
-   🗑 삭제
+   🗑 게시물 삭제
 ============================================================ */
 router.delete("/:id", verifyToken, async (req, res) => {
   try {
@@ -273,7 +283,7 @@ router.delete("/:id", verifyToken, async (req, res) => {
       if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
     }
 
-    await db.execute(`DELETE FROM posts WHERE id = ?`, [id]);
+    await db.execute(`DELETE FROM posts WHERE id=?`, [id]);
 
     res.json({ message: "삭제 완료" });
 
