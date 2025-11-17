@@ -124,14 +124,19 @@
       border-radius: 12px;
       overflow: hidden;
       box-shadow: 0 6px 18px rgba(15, 38, 121, 0.12);
+      text-align: center;
     }
+
 
     .post-hero img {
       width: 100%;
+      height: auto;
       display: block;
-      object-fit: cover;
-      max-height: 420px;
+      object-fit: contain;  /* 이미지 전체 보이기 */
+      border-radius: 12px;
+      max-height: 600px;
     }
+
 
     /* 본문 */
     .post-content-wrap {
