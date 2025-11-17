@@ -10,8 +10,7 @@
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- 공통 관리자 CSS (상대경로) -->
-  <!-- dashboard.html 기준: ./css/admin.css -->
+  <!-- 공통 관리자 CSS -->
   <link rel="stylesheet" href="./css/admin.css">
 </head>
 
@@ -26,7 +25,6 @@
     <div class="topbar">
       <div class="title">관리자 대시보드</div>
       <div>
-        <!-- kr/admin/dashboard.html → kr/index.html 로 가야 하니까 ../ -->
         <button class="home-btn" onclick="location.href='../index.html'">홈으로</button>
         <button id="logoutBtn">로그아웃</button>
       </div>
@@ -63,16 +61,13 @@
 
   </div>
 
-  <!-- 🔥 ES Module 방식 -->
-  <script type="module">
-    // 👉 dashboard.html 기준 상대경로
-    import { requireAdmin, logout } from "./js/common_auth.js";
-    import { loadSidebar } from "./js/sidebar.js";
-    import "./js/dashboard_core.js"; // 실행용
-
+  <!-- ✅ 모듈 아님, 그냥 일반 스크립트 -->
+  <script src="./js/common_auth.js"></script>
+  <script src="./js/sidebar.js"></script>
+  <script src="./js/dashboard_core.js"></script>
+  <script>
     requireAdmin();
-    loadSidebar("dashboard");
-
+    loadSidebar("dashboard"); // ← 여기 중요 (활성 메뉴)
     document.getElementById("logoutBtn").addEventListener("click", logout);
   </script>
 
