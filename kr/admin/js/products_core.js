@@ -1,9 +1,11 @@
 /* ============================================================================
-   🔐 관리자 토큰
-   - requireAdmin()은 common_auth.js에서 이미 실행됨
+   🔐 토큰 읽기 (전역 변수 제거)
 ============================================================================ */
-const token = localStorage.getItem("token");
-const API_BASE = "/api";
+function getAuthHeaders() {
+  const token = localStorage.getItem("token");
+  return { Authorization: `Bearer ${token}` };
+}
+
 
 /* ============================================================================
    🖋 Quill 에디터 & 이미지 파일 상태
@@ -11,18 +13,28 @@ const API_BASE = "/api";
 let quill;
 let imageFiles = [];
 
-/* DOM 준비되면 에디터 및 이벤트 세팅 */
+
+/* ============================================================================
+   🔧 DOM 준비 후 초기화
+============================================================================ */
 document.addEventListener("DOMContentLoaded", () => {
-  initQuill();
-  initImageInput();
-  loadProductList();
+  try {
+    initQuill();
+    initImageInput();
+    loadProductList();
+  } catch (err) {
+    console.error("초기화 오류:", err);
+  }
 });
 
-/* Quill 초기화 */
+
+/* ============================================================================
+   🖋 Quill 초기화
+============================================================================ */
 function initQuill() {
   const editorEl = document.getElementById("editor");
   if (!editorEl) {
-    console.warn("⚠️ Quill 에디터가 없는 페이지입니다.");
+    console.warn("⚠️ Quill 에디터 없음");
     return;
   }
 
@@ -35,17 +47,18 @@ function initQuill() {
         [{ list: "ordered" }, { list: "bullet" }],
         ["link", "image"],
         ["clean"],
-      ]
-    }
+      ],
+    },
   });
 }
+
+
 /* ============================================================================
-   🖼 이미지 여러 개 선택 + 미리보기
+   🖼 이미지 선택 + 미리보기
 ============================================================================ */
 function initImageInput() {
   const input = document.getElementById("images");
   const previewBox = document.getElementById("preview");
-
   if (!input || !previewBox) return;
 
   input.addEventListener("change", (e) => {
@@ -55,7 +68,6 @@ function initImageInput() {
   });
 }
 
-/* 이미지 썸네일 미리보기 렌더링 */
 function renderImagePreview() {
   const previewBox = document.getElementById("preview");
   if (!previewBox) return;
@@ -98,198 +110,155 @@ function renderImagePreview() {
   });
 }
 
-/* ============================================================================
-   🧩 slug 유틸 (자동 파일명 / URL 생성용 - 선택적 사용)
-============================================================================ */
-function slugify(text) {
-  return text
-    .toString()
-    .trim()
-    .toLowerCase()
-    .replace(/[ㄱ-ㅎ가-힣]/g, "")       // 한글 제거 (원하면 유지해도 됨)
-    .replace(/[^a-z0-9]+/g, "-")        // 영문/숫자 제외 모두 -
-    .replace(/^-+|-+$/g, "")            // 앞뒤 - 제거
-    .substring(0, 60);                  // 너무 길면 자르기
-}
 
 /* ============================================================================
    📦 제품 등록
 ============================================================================ */
 async function uploadProduct() {
-  const titleEl = document.getElementById("title");
-  const categoryEl = document.getElementById("category");
-
-  const title = (titleEl?.value || "").trim();
-  const category = categoryEl?.value || "";
-  const description = quill ? quill.root.innerHTML.trim() : "";
-
-  if (!title) {
-    alert("제품명을 입력하세요.");
-    return;
-  }
-  if (!category) {
-    alert("카테고리를 선택하세요.");
-    return;
-  }
-  if (!description.replace(/<p><br><\/p>/g, "").trim()) {
-    if (!confirm("제품 설명이 비어 있습니다. 계속 진행할까요?")) return;
-  }
-
-  const fd = new FormData();
-  fd.append("title", title);
-  fd.append("category", category);
-  fd.append("description", description);
-
-  // 선택: 서버에서 상세페이지 자동 생성 시 사용할 slug
-  const slug = slugify(title);
-  fd.append("slug", slug);
-
-  // 여러 이미지
-  imageFiles.forEach((file) => fd.append("images", file));
-
   try {
-    const res = await fetch(`${API_BASE}/products`, {
+    const title = document.getElementById("title")?.value.trim();
+    const category = document.getElementById("category")?.value;
+    const description = quill ? quill.root.innerHTML.trim() : "";
+
+    if (!title) return alert("제품명을 입력하세요.");
+    if (!category) return alert("카테고리를 선택하세요.");
+
+    if (!description.replace(/<p><br><\/p>/g, "").trim()) {
+      if (!confirm("설명이 비어 있습니다. 진행할까요?")) return;
+    }
+
+    const fd = new FormData();
+    fd.append("title", title);
+    fd.append("category", category);
+    fd.append("description", description);
+
+    // slug 사용 (선택)
+    fd.append("slug", slugify(title));
+
+    // 여러 이미지
+    imageFiles.forEach((file) => fd.append("images", file));
+
+    const res = await fetch("/api/products", {
       method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
+      headers: getAuthHeaders(),
       body: fd,
     });
 
     if (!res.ok) {
-      const text = await res.text();
-      console.error("등록 실패 응답:", text);
-      alert("제품 등록 실패 (서버 확인 필요)");
+      const msg = await res.text();
+      console.error(msg);
+      alert("제품 등록 실패");
       return;
     }
 
-    alert("제품 등록 완료!");
+    alert("등록 완료!");
 
-    // 폼 리셋
-    titleEl.value = "";
-    categoryEl.value = "";
+    // 초기화
+    document.getElementById("title").value = "";
+    document.getElementById("category").value = "";
     if (quill) quill.root.innerHTML = "";
     imageFiles = [];
     renderImagePreview();
 
     loadProductList();
+
   } catch (err) {
-    console.error(err);
-    alert("통신 오류로 등록에 실패했습니다.");
+    console.error("uploadProduct Error:", err);
+    alert("오류 발생");
   }
 }
-
-/* 전역에서 호출 가능하도록 window에 붙이기 */
 window.uploadProduct = uploadProduct;
 
+
 /* ============================================================================
-   📥 제품 목록 불러오기
+   📥 목록 불러오기
 ============================================================================ */
 async function loadProductList() {
-  const listBox = document.getElementById("productList");
-  if (!listBox) return;
+  const box = document.getElementById("productList");
+  if (!box) return;
 
-  listBox.innerHTML = "불러오는 중...";
+  box.innerHTML = "불러오는 중...";
 
   try {
-    const res = await fetch(`${API_BASE}/products`, {
-      headers: { Authorization: `Bearer ${token}` },
+    const res = await fetch("/api/products", {
+      headers: getAuthHeaders(),
     });
 
     if (!res.ok) throw new Error("목록 조회 실패");
 
     const products = await res.json();
 
-    if (!Array.isArray(products) || products.length === 0) {
-      listBox.innerHTML = "<p style='color:#666;'>등록된 제품이 없습니다.</p>";
+    if (!products.length) {
+      box.innerHTML = "<p style='color:#666;'>등록된 제품이 없습니다.</p>";
       return;
     }
 
-    listBox.innerHTML = products
-      .map((p) => renderProductCardHTML(p))
-      .join("");
+    box.innerHTML = products.map(renderProductCardHTML).join("");
+
   } catch (err) {
-    console.error(err);
-    listBox.innerHTML = "<p style='color:#d00;'>제품 목록을 불러오는 중 오류가 발생했습니다.</p>";
+    console.error("loadProductList Error:", err);
+    box.innerHTML = "<p style='color:#d00;'>목록 불러오기 실패</p>";
   }
 }
 
-/* 제품 카드 HTML */
+
+/* ============================================================================
+   🧱 제품 카드 HTML
+============================================================================ */
 function renderProductCardHTML(p) {
-  const title = p.title || "이름 없음";
-
-  const categoryLabel = getCategoryLabel(p.category);
-
-  const thumb =
+  const img =
     p.thumbImage ||
-    (Array.isArray(p.images) && p.images.length > 0
-      ? p.images[0]
-      : "/img/products/Image-placeholder.png");
-
-  const detailPath = p.detailPath || "";
-  const hasDetail = !!detailPath;
+    (p.images?.[0] ?? "/img/products/Image-placeholder.png");
 
   return `
     <div class="product-card">
-      <img src="${thumb}" alt="${title}">
-      <h3>${title}</h3>
-      <div class="category">카테고리: ${categoryLabel}</div>
+      <img src="${img}" alt="${p.title || ''}">
+      <h3>${p.title}</h3>
+      <div class="category">카테고리: ${getCategoryLabel(p.category)}</div>
 
-      <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;">
+      <div style="display:flex; gap:6px; margin-top:10px;">
         <button class="btn btn-edit" onclick="editProduct(${p.id})">수정</button>
         <button class="btn btn-danger" onclick="deleteProduct(${p.id})">삭제</button>
-        ${
-          hasDetail
-            ? `<button class="btn btn-primary" onclick="openDetail('${detailPath}')">상세보기</button>`
-            : ""
-        }
       </div>
     </div>
   `;
 }
 
 
-/* 카테고리 표시용 라벨 */
+/* 카테고리 라벨 */
 function getCategoryLabel(code) {
-  switch (code) {
-    case "towed": return "수중이동형 케이블";
-    case "fixed": return "수중고정형 케이블";
-    case "connector": return "수중 커넥터";
-    case "custom": return "커스텀 케이블";
-    default: return code || "미지정";
-  }
+  return {
+    towed: "수중이동형 케이블",
+    fixed: "수중고정형 케이블",
+    connector: "수중 커넥터",
+    custom: "커스텀 케이블",
+  }[code] || "미지정";
 }
 
+
 /* ============================================================================
-   ✏ 수정 / 삭제 / 상세보기
+   ✏ 수정 / 삭제
 ============================================================================ */
 window.editProduct = (id) => {
   location.href = `/kr/admin/edit_product.html?id=${id}`;
 };
 
 window.deleteProduct = async (id) => {
-  if (!confirm("정말 삭제하시겠습니까?")) return;
+  if (!confirm("삭제하시겠습니까?")) return;
 
   try {
-    const res = await fetch(`${API_BASE}/products/${id}`, {
+    const res = await fetch(`/api/products/${id}`, {
       method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
+      headers: getAuthHeaders(),
     });
 
     if (!res.ok) throw new Error("삭제 실패");
 
     alert("삭제되었습니다.");
     loadProductList();
-  } catch (err) {
-    console.error(err);
-    alert("삭제 중 오류 발생 (서버 로그 확인 필요)");
-  }
-};
 
-window.openDetail = (path) => {
-  if (!path) return;
-  // 상대/절대 모두 처리
-  if (path.startsWith("http")) {
-    window.open(path, "_blank");
-  } else {
-    window.open(path, "_blank");
+  } catch (err) {
+    console.error("deleteProduct Error:", err);
+    alert("삭제 중 오류");
   }
 };
