@@ -10,13 +10,24 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 /* ============================================================
-   📂 업로드 폴더
+   📂 업로드 폴더 설정 (nginx alias와 100% 일치)
+   /uploads → /home/ubuntu/finedefense_homepage/server/uploads
 ============================================================ */
-const uploadDir = path.join(__dirname, "../public/uploads/products");
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
+const uploadRoot = path.join(__dirname, "../uploads");
+const uploadDir = path.join(uploadRoot, "products");
+
+if (!fs.existsSync(uploadRoot)) fs.mkdirSync(uploadRoot, { recursive: true });
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+
+/* 실제 파일 시스템 경로 변환 */
+function resolveUploadPath(url) {
+  if (!url) return null;
+  return path.join(uploadRoot, url.replace("/uploads/", ""));
 }
 
+/* ============================================================
+   📸 multer 설정
+============================================================ */
 const storage = multer.diskStorage({
   destination(req, file, cb) {
     cb(null, uploadDir);
@@ -32,7 +43,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 /* ============================================================
-   📌 제품 등록  (POST /api/products)
+   📌 제품 등록 (POST /api/products)
 ============================================================ */
 router.post(
   "/",
@@ -43,17 +54,23 @@ router.post(
   async (req, res) => {
     try {
       const { title, category, description_html } = req.body;
-      if (!title || !category) {
+      if (!title || !category)
         return res.status(400).json({ message: "title, category 필수" });
-      }
 
       let thumbnailPath = null;
+
+      // 1) 썸네일 파일이 따로 온 경우
       if (req.files?.thumbnail?.[0]) {
         thumbnailPath = `/uploads/products/${req.files.thumbnail[0].filename}`;
       }
+      // 2) 없으면 첫 번째 images 사용
+      else if (req.files?.images?.[0]) {
+        thumbnailPath = `/uploads/products/${req.files.images[0].filename}`;
+      }
 
       const [result] = await db.execute(
-        "INSERT INTO products (title, category, thumbnail, description_html) VALUES (?, ?, ?, ?)",
+        `INSERT INTO products (title, category, thumbnail, description_html)
+         VALUES (?, ?, ?, ?)`,
         [title, category, thumbnailPath, description_html || ""]
       );
 
@@ -87,7 +104,8 @@ router.post(
 router.get("/", async (req, res) => {
   try {
     const [rows] = await db.execute(
-      "SELECT id, title, category, thumbnail, created_at FROM products ORDER BY created_at DESC"
+      `SELECT id, title, category, thumbnail, created_at 
+       FROM products ORDER BY created_at DESC`
     );
     res.json(rows);
   } catch (err) {
@@ -104,13 +122,17 @@ router.get("/:id", async (req, res) => {
     const { id } = req.params;
 
     const [[product]] = await db.execute(
-      "SELECT id, title, category, thumbnail, description_html, created_at FROM products WHERE id = ?",
+      `SELECT id, title, category, thumbnail, description_html, created_at
+       FROM products WHERE id = ?`,
       [id]
     );
     if (!product) return res.status(404).json({ message: "not found" });
 
     const [images] = await db.execute(
-      "SELECT id, url, sort_order FROM product_images WHERE product_id = ? ORDER BY sort_order ASC, id ASC",
+      `SELECT id, url, sort_order 
+       FROM product_images 
+       WHERE product_id = ? 
+       ORDER BY sort_order ASC, id ASC`,
       [id]
     );
 
@@ -143,19 +165,19 @@ router.put(
 
       let thumbnailPath = old.thumbnail;
 
-      // 썸네일 교체 시
+      // 썸네일이 새로 들어오면 교체
       if (req.files?.thumbnail?.[0]) {
         thumbnailPath = `/uploads/products/${req.files.thumbnail[0].filename}`;
 
-        // 기존썸네일 삭제 (null 방지)
-        if (old.thumbnail) {
-          const oldFile = path.join(__dirname, "../public", old.thumbnail);
-          if (fs.existsSync(oldFile)) fs.unlinkSync(oldFile);
-        }
+        // 기존 썸네일 삭제
+        const oldFile = resolveUploadPath(old.thumbnail);
+        if (oldFile && fs.existsSync(oldFile)) fs.unlinkSync(oldFile);
       }
 
       await db.execute(
-        "UPDATE products SET title = ?, category = ?, thumbnail = ?, description_html = ? WHERE id = ?",
+        `UPDATE products
+         SET title = ?, category = ?, thumbnail = ?, description_html = ?
+         WHERE id = ?`,
         [title, category, thumbnailPath, description_html || "", id]
       );
 
@@ -166,6 +188,7 @@ router.put(
           `/uploads/products/${f.filename}`,
           idx,
         ]);
+
         await db.query(
           "INSERT INTO product_images (product_id, url, sort_order) VALUES ?",
           [values]
@@ -192,19 +215,21 @@ router.delete("/:id", async (req, res) => {
       [id]
     );
 
+    // 썸네일 삭제
     if (product?.thumbnail) {
-      const f = path.join(__dirname, "../public", product.thumbnail);
-      if (fs.existsSync(f)) fs.unlinkSync(f);
+      const f = resolveUploadPath(product.thumbnail);
+      if (f && fs.existsSync(f)) fs.unlinkSync(f);
     }
 
+    // 상세 이미지 삭제
     const [imgs] = await db.execute(
       "SELECT url FROM product_images WHERE product_id = ?",
       [id]
     );
 
     imgs.forEach((img) => {
-      const f = path.join(__dirname, "../public", img.url);
-      if (fs.existsSync(f)) fs.unlinkSync(f);
+      const f = resolveUploadPath(img.url);
+      if (f && fs.existsSync(f)) fs.unlinkSync(f);
     });
 
     await db.execute("DELETE FROM products WHERE id = ?", [id]);
@@ -217,7 +242,7 @@ router.delete("/:id", async (req, res) => {
 });
 
 /* ============================================================
-   📌 개별 이미지 삭제
+   📌 개별 이미지 삭제 (DELETE /api/products/image/:imageId)
 ============================================================ */
 router.delete("/image/:imageId", async (req, res) => {
   try {
@@ -229,14 +254,14 @@ router.delete("/image/:imageId", async (req, res) => {
     );
     if (!img) return res.status(404).json({ message: "not found" });
 
-    const filePath = path.join(__dirname, "../public", img.url);
-    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    const filePath = resolveUploadPath(img.url);
+    if (filePath && fs.existsSync(filePath)) fs.unlinkSync(filePath);
 
     await db.execute("DELETE FROM product_images WHERE id = ?", [imageId]);
 
     res.json({ message: "image deleted" });
   } catch (err) {
-    console.error("DELETE /product-images/:imageId error:", err);
+    console.error("DELETE /products/image/:imageId error:", err);
     res.status(500).json({ message: "server error" });
   }
 });

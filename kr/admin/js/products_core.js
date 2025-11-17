@@ -130,7 +130,12 @@ async function uploadProduct() {
     const fd = new FormData();
     fd.append("title", title);
     fd.append("category", category);
-    fd.append("description", description);
+
+    // ❌ 기존
+    // fd.append("description", description);
+
+    // ✅ 수정
+    fd.append("description_html", description);
 
     // slug 사용 (선택)
     fd.append("slug", slugify(title));
@@ -206,9 +211,7 @@ async function loadProductList() {
    🧱 제품 카드 HTML
 ============================================================================ */
 function renderProductCardHTML(p) {
-  const img =
-    p.thumbImage ||
-    (p.images?.[0] ?? "/img/products/Image-placeholder.png");
+  const img = p.thumbnail || "/img/products/Image-placeholder.png";
 
   return `
     <div class="product-card">
