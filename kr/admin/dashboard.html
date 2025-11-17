@@ -4,8 +4,14 @@
   <meta charset="UTF-8">
   <title>관리자 대시보드 | Fine Defense</title>
 
+  <!-- Quill (뉴스룸 입력 파트용) -->
   <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- 공통 관리자 스타일 -->
+  <link rel="stylesheet" href="/kr/admin/css/admin.css">
 
   <style>
     body {
@@ -32,7 +38,10 @@
       align-items: center;
     }
 
-    .title { font-size: 1.4rem; font-weight: 600; }
+    .title {
+      font-size: 1.4rem;
+      font-weight: 600;
+    }
 
     #logoutBtn, .home-btn {
       border: none;
@@ -42,8 +51,16 @@
       font-size: 15px;
     }
 
-    .home-btn { background: #0f2679; color: #fff; margin-right: 10px; }
-    #logoutBtn { background: #e63946; color: #fff; }
+    .home-btn {
+      background: #0f2679;
+      color: #fff;
+      margin-right: 10px;
+    }
+
+    #logoutBtn {
+      background: #e63946;
+      color: #fff;
+    }
 
     .panel {
       background: white;
@@ -80,8 +97,10 @@
 
 <body>
 
+<!-- 사이드바 영역 -->
 <div id="sidebar"></div>
 
+<!-- 본문 -->
 <div class="main">
 
   <div class="topbar">
@@ -111,13 +130,17 @@
 
 </div>
 
-<script>
-  fetch("/kr/admin/components/sidebar.html")
-    .then(r => r.text())
-    .then(html => document.getElementById("sidebar").innerHTML = html);
-</script>
+<!-- JS 모듈 -->
+<script type="module">
+  import { requireAdmin, logout } from "/kr/admin/js/common_auth.js";
+  import { loadSidebar } from "/kr/admin/js/sidebar.js";
+  import "/kr/admin/js/dashboard_core.js";
 
-<script src="/kr/admin/js/dashboard_core.js"></script>
+  requireAdmin();
+  loadSidebar();
+
+  document.getElementById("logoutBtn").addEventListener("click", logout);
+</script>
 
 </body>
 </html>

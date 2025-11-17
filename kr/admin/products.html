@@ -2,79 +2,107 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>제품 관리 | Fine Defense</title>
+  <title>제품 관리 | Fine Defense 관리자</title>
 
-  <!-- Quill -->
   <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+  <link rel="stylesheet" href="/kr/admin/css/admin.css">
 
   <style>
     body { margin: 0; background:#f4f6f9; font-family:'Noto Sans KR'; }
 
-    .main { margin-left: 240px; padding: 30px; }
+    .main {
+      margin-left: 240px;
+      padding: 30px;
+      min-height: 100vh;
+    }
 
     .topbar {
       background: #fff;
       padding: 18px 25px;
       border-radius: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
       box-shadow: 0 3px 10px rgba(0,0,0,0.08);
       margin-bottom: 30px;
+
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
     }
 
     .panel {
-      background: #fff;
-      padding: 25px;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      margin-bottom: 30px;
+      background:#fff;
+      padding:25px;
+      border-radius:10px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.06);
+      margin-bottom:35px;
     }
 
-    .product-item {
-      display:flex;
-      justify-content:space-between;
-      padding:12px 0;
-      border-bottom:1px solid #eee;
-      transition: opacity 0.3s;
-    }
-
-    .btn {
-      padding: 7px 13px;
-      border:none;
+    .input {
+      width:100%;
+      padding:10px;
+      border:1px solid #ccc;
       border-radius:6px;
-      cursor:pointer;
-      font-size: 14px;
+      margin-bottom:10px;
     }
-
-    .btn-primary { background:#0f2679; color:white; }
-    .btn-danger { background:#d62828; color:white; }
-    .btn-secondary { background:#6c757d; color:white; }
 
     .thumb-preview {
-      width: 120px;
-      height: 90px;
-      object-fit: cover;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      display: none;
-      margin-bottom: 10px;
-    }
-
-    .detail-preview {
       display:flex;
+      gap:10px;
       flex-wrap:wrap;
-      gap:8px;
-      margin-top:8px;
     }
-
-    .detail-preview img {
+    .thumb-preview img {
       width:80px;
       height:80px;
       object-fit:cover;
-      border-radius:6px;
       border:1px solid #ddd;
+      border-radius:8px;
     }
+
+    /* 🔥 카드형 목록 */
+    .product-grid {
+      display:flex;
+      flex-wrap:wrap;
+      gap:20px;
+    }
+
+    .product-card {
+      width:250px;
+      background:#fff;
+      border-radius:10px;
+      padding:15px;
+      border:1px solid #eee;
+      box-shadow:0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .product-card img {
+      width:100%;
+      height:160px;
+      object-fit:cover;
+      border-radius:8px;
+      margin-bottom:10px;
+    }
+
+    .product-card h3 {
+      font-size:1.1rem;
+      margin:0 0 6px;
+      color:#222;
+    }
+
+    .product-card .category {
+      color:#666;
+      font-size:0.9rem;
+      margin-bottom:10px;
+    }
+
+    .btn {
+      padding:8px 14px;
+      border:none;
+      cursor:pointer;
+      border-radius:6px;
+    }
+    .btn-primary { background:#0f2679; color:#fff; }
+    .btn-danger { background:#d62828; color:#fff; }
+    .btn-edit { background:#1976d2; color:#fff; }
+
   </style>
 </head>
 
@@ -85,48 +113,58 @@
 <div class="main">
 
   <div class="topbar">
-    <h2>제품 관리 (등록 / 목록)</h2>
+    <h2>제품 관리</h2>
+
     <div>
-      <button class="btn btn-secondary" onclick="location.href='/kr/index.html'">홈으로</button>
-      <button class="btn btn-danger" onclick="logout()">로그아웃</button>
+      <button class="btn btn-primary" onclick="location.href='/kr/index.html'">홈으로</button>
+      <button id="logoutBtn" class="btn btn-danger">로그아웃</button>
     </div>
   </div>
 
+  <!-- 🔵 제품 등록 -->
   <section class="panel">
-    <h2>제품 등록</h2>
+    <h2>신규 제품 등록</h2>
 
-    <input id="title" placeholder="제품명" style="width:100%;padding:10px;margin:8px 0;">
-    <input id="category" placeholder="카테고리" style="width:100%;padding:10px;margin:8px 0;">
+    <input id="title" class="input" placeholder="제품명 입력">
+    
+    <select id="category" class="input">
+      <option value="">카테고리 선택</option>
+      <option value="towed">수중이동형 케이블</option>
+      <option value="fixed">수중고정형 케이블</option>
+      <option value="connector">수중 커넥터</option>
+      <option value="custom">커스텀 케이블</option>
+    </select>
 
-    <label><strong>대표 이미지 (썸네일)</strong></label>
-    <input type="file" id="thumbnail" style="width:100%;padding:10px;margin:8px 0;">
-    <img id="thumbPreview" class="thumb-preview">
+    <h3>제품 설명 (Quill 에디터)</h3>
+    <div id="editor" style="height:220px;background:#fff;border:1px solid #ccc;border-radius:6px;"></div>
 
-    <label style="margin-top:10px;"><strong>상세 이미지 (여러 개 선택 가능)</strong></label>
-    <input type="file" id="images" multiple style="width:100%;padding:10px;margin:8px 0;">
-    <div id="detailPreview" class="detail-preview"></div>
+    <h3>제품 이미지 (여러 개 가능)</h3>
+    <input type="file" id="images" multiple class="input">
+    <div id="preview" class="thumb-preview"></div>
 
-    <label style="margin-top:15px;"><strong>제품 설명</strong></label>
-    <div id="editor" style="height:200px;background:#fff;"></div>
-
-    <button class="btn btn-primary" style="margin-top:15px;" onclick="uploadProduct()">등록</button>
+    <button class="btn btn-primary" onclick="uploadProduct()">등록</button>
   </section>
 
+
+  <!-- 🔵 제품 목록 -->
   <section class="panel">
-    <h2>제품 목록</h2>
-    <div id="productList"></div>
+    <h2>등록 제품 목록</h2>
+    <div id="productList" class="product-grid"></div>
   </section>
 
 </div>
 
-<script>
-  fetch("/kr/admin/sidebar.html")
-    .then(r => r.text())
-    .then(html => document.getElementById("sidebar").innerHTML = html);
-</script>
+<!-- 모듈 스크립트 -->
+<script type="module">
+  import { requireAdmin, logout } from "/kr/admin/js/common_auth.js";
+  import { loadSidebar } from "/kr/admin/js/sidebar.js";
+  import "/kr/admin/js/products_core.js";
 
-<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
-<script src="/kr/admin/products_core.js"></script>
+  requireAdmin();
+  loadSidebar();
+
+  document.getElementById("logoutBtn").addEventListener("click", logout);
+</script>
 
 </body>
 </html>

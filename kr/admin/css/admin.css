@@ -1,0 +1,43 @@
+/* 관리자 sidebar */
+
+.sidebar {
+  width: 240px;
+  background: #0f2679;
+  color: white;
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  padding: 30px 20px;
+  box-sizing: border-box;
+}
+
+.sidebar-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 40px;
+}
+
+.sidebar-menu a {
+  display: block;
+  padding: 10px 0;
+  margin-bottom: 6px;
+  text-decoration: none;
+  color: #cfd6ff;
+  font-size: 0.95rem;
+  transition: 0.2s;
+}
+
+.sidebar-menu a:hover,
+.sidebar-menu a.active {
+  color: #fff;
+  font-weight: 600;
+}
+
+/* 관리자 main */
+.main {
+  margin-left: 260px; /* sidebar width + padding */
+  padding: 30px;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
