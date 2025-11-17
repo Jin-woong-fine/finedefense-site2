@@ -310,7 +310,14 @@
     </script>
 
 
-    <!-- ✅ 공통 네비 관련 스크립트 -->
+    <!-- 공통 네비 관련 스크립트 -->
     <script src="/js/nav.js"></script>
+
+    <!-- 🔥 제품 상세 조회수 증가 -->
+    <script>
+    fetch("/api/products/view/3", { method: "POST" });
+    </script>
+
+
   </body>
 </html>
