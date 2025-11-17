@@ -298,3 +298,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   highlightTopMenu();
   initAdminBar();
 });
+
+
+
+/* ------------------------------------------------------------
+   🔹 사이드 탭 자동 숨김 (필수)
+------------------------------------------------------------ */
+function scheduleHideTabs() {
+  const side = document.getElementById("side-tabs");
+  if (!side) return;
+
+  // 0.2초 뒤 자동 숨김
+  hideTimer = setTimeout(() => {
+    side.classList.remove("visible");
+  }, 200);
+}
