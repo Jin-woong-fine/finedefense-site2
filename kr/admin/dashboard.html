@@ -141,10 +141,27 @@
       padding: 10px 0;
       border-bottom: 1px solid #eee;
       font-size: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     .top-views li:last-child {
       border-bottom: none;
+    }
+
+    .top-views .title {
+      flex: 1;
+      margin-right: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .top-views .views {
+      font-weight: 600;
+      color: #0f2679;
+      font-size: 14px;
     }
 
     /* 업로드 */
@@ -164,6 +181,14 @@
       border: 1px solid #ccc;
       border-radius: 6px;
       font-size: 15px;
+      box-sizing: border-box;
+    }
+
+    #filePreview {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
     }
 
     #filePreview img {
@@ -179,6 +204,17 @@
       border-bottom: 1px solid #eee;
       display: flex;
       justify-content: space-between;
+      gap: 15px;
+    }
+
+    .post-meta {
+      font-size: 13px;
+      color: #666;
+      margin-top: 4px;
+    }
+
+    .post-meta span {
+      margin-right: 8px;
     }
 
     .delete-btn {
@@ -197,6 +233,13 @@
       padding: 6px 10px;
       border-radius: 5px;
       cursor: pointer;
+    }
+
+    .post-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 70px;
     }
   </style>
 </head>
@@ -230,10 +273,22 @@
 
   <!-- 통계 카드 -->
   <section class="stats-container">
-    <div class="stat-card"><h3>이번달 조회수</h3><p id="thisMonthViews" class="stat-value">0</p></div>
-    <div class="stat-card"><h3>지난달 조회수</h3><p id="lastMonthViews" class="stat-value">0</p></div>
-    <div class="stat-card"><h3>증가율</h3><p id="growthRate" class="stat-value">0%</p></div>
-    <div class="stat-card"><h3>전체 게시물 수</h3><p id="totalPosts" class="stat-value">0</p></div>
+    <div class="stat-card">
+      <h3>이번달 조회수</h3>
+      <p id="thisMonthViews" class="stat-value">0</p>
+    </div>
+    <div class="stat-card">
+      <h3>지난달 조회수</h3>
+      <p id="lastMonthViews" class="stat-value">0</p>
+    </div>
+    <div class="stat-card">
+      <h3>증가율</h3>
+      <p id="growthRate" class="stat-value">0%</p>
+    </div>
+    <div class="stat-card">
+      <h3>전체 게시물 수</h3>
+      <p id="totalPosts" class="stat-value">0</p>
+    </div>
   </section>
 
   <!-- 월별 조회수 그래프 -->
@@ -245,7 +300,9 @@
   <!-- 조회수 TOP 5 -->
   <section class="top-views">
     <h2>조회수 TOP 5 게시물</h2>
-    <ul id="topPostsList"></ul>
+    <ul id="topPostsList">
+      <li>데이터를 불러오는 중입니다...</li>
+    </ul>
   </section>
 
   <!-- 게시물 등록 -->
@@ -268,15 +325,17 @@
     <div id="editor" style="height: 250px; background: #fff;"></div>
 
     <input type="file" id="images" multiple />
-    <div id="filePreview" style="margin-top: 10px; display: flex; gap: 10px;"></div>
+    <div id="filePreview"></div>
 
     <button id="uploadBtn">등록</button>
   </div>
 
   <!-- 게시물 리스트 -->
   <div class="panel">
-    <h2>게시물 목록</h2>
-    <div id="posts"></div>
+    <h2>뉴스룸 게시물 목록</h2>
+    <div id="posts">
+      <p style="color:#777;">목록을 불러오는 중입니다...</p>
+    </div>
   </div>
 
 </div>
@@ -284,22 +343,22 @@
 <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 
 <script>
-/* 로그인 체크 */
-const token = localStorage.getItem("token");
-const role = localStorage.getItem("role");
-if (!token || role !== "admin") {
-  alert("로그인이 필요합니다.");
-  location.href = "/kr/admin/login.html";
-}
-
-document.getElementById("logoutBtn").addEventListener("click", () => {
-  localStorage.clear();
-  location.href = "/kr/admin/login.html";
-});
-
-
-/* ===== Quill ===== */
 document.addEventListener("DOMContentLoaded", () => {
+  /* 로그인 체크 */
+  const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role");
+  if (!token || role !== "admin") {
+    alert("로그인이 필요합니다.");
+    location.href = "/kr/admin/login.html";
+    return;
+  }
+
+  document.getElementById("logoutBtn").addEventListener("click", () => {
+    localStorage.clear();
+    location.href = "/kr/admin/login.html";
+  });
+
+  /* ===== Quill ===== */
   window.quill = new Quill("#editor", {
     theme: "snow",
     modules: {
@@ -335,160 +394,291 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("uploadBtn").addEventListener("click", async () => {
     const title = document.getElementById("title").value.trim();
     const content = window.quill.root.innerHTML.trim();
+    const category = document.getElementById("category").value;
+    const lang = document.getElementById("lang").value;
+
     if (!title) return alert("제목을 입력하세요.");
+    if (!content || content === "<p><br></p>") {
+      if (!confirm("본문 내용이 거의 없습니다. 계속 진행하시겠습니까?")) return;
+    }
 
-    const fd = new FormData();
-    fd.append("title", title);
-    fd.append("content", content);
-    fd.append("category", document.getElementById("category").value);
-    fd.append("lang", document.getElementById("lang").value);
-    fileList.forEach(f => fd.append("images", f));
+    try {
+      const fd = new FormData();
+      fd.append("title", title);
+      fd.append("content", content);
+      fd.append("category", category);
+      fd.append("lang", lang);
+      fileList.forEach(f => fd.append("images", f));
 
-    await fetch(`/api/posts`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-      body: fd,
-    });
+      const res = await fetch(`/api/posts`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: fd,
+      });
 
-    alert("등록 완료!");
-    loadPosts();
-  });
-
-  loadPosts();
-});
-
-
-/* 게시물 불러오기 + 조회수 포함 */
-async function loadPosts() {
-  const res = await fetch(`/api/posts/news?withViews=1`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
-  const posts = await res.json();
-  const list = document.getElementById("posts");
-
-  list.innerHTML = posts
-    .map(
-      p => `
-        <div class="post-item">
-          <div style="flex:1;">
-            <strong style="font-size:16px;">${p.title}</strong>
-            <div style="color:#666; font-size:13px; margin-top:4px;">
-              카테고리: <b>${p.category}</b> | 언어: <b>${p.lang}</b>
-            </div>
-
-            <div style="margin-top:6px; color:#0f2679; font-weight:600;">
-              조회수: ${(p.total_views || 0).toLocaleString()} 회
-            </div>
-
-            <div style="display:flex; gap:6px; margin-top:10px;">
-              ${
-                p.images?.length
-                  ? p.images
-                      .map(img => `<img src="${img}" style="width:55px;height:55px;border:1px solid #ddd;border-radius:6px;object-fit:cover;">`)
-                      .join("")
-                  : "<span style='color:#aaa;'>이미지 없음</span>"
-              }
-            </div>
-          </div>
-
-          <div style="display:flex; flex-direction:column; gap:6px;">
-            <button class="edit-btn" onclick="editPost(${p.id})">수정</button>
-            <button class="delete-btn" onclick="deletePost(${p.id})">삭제</button>
-          </div>
-        </div>
-      `
-    )
-    .join("");
-}
-
-window.deletePost = async (id) => {
-  if (!confirm("삭제하시겠습니까?")) return;
-  await fetch(`/api/posts/${id}`, {
-    method: "DELETE",
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  loadPosts();
-};
-
-window.editPost = (id) => {
-  location.href = `/kr/admin/edit_post.html?id=${id}`;
-};
-
-
-/* ==========================================
-   📌 관리자 통계 불러오기
-========================================== */
-async function loadDashboardStats() {
-  const res = await fetch(`/api/admin/dashboard`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-
-  const data = await res.json();
-
-  document.getElementById("thisMonthViews").textContent =
-    data.thisMonthViews.toLocaleString();
-  document.getElementById("lastMonthViews").textContent =
-    data.lastMonthViews.toLocaleString();
-  document.getElementById("totalPosts").textContent =
-    data.postCount.toLocaleString();
-
-  let growth = 0;
-  if (data.lastMonthViews > 0) {
-    growth = (
-      (data.thisMonthViews - data.lastMonthViews) /
-      data.lastMonthViews * 100
-    ).toFixed(1);
-  }
-  document.getElementById("growthRate").textContent = growth + "%";
-
-  const topList = document.getElementById("topPostsList");
-  topList.innerHTML = data.topPosts
-    .map(p => `<li>${p.title} — <strong>${(p.total_views || 0).toLocaleString()}</strong> 회</li>`)
-    .join("");
-}
-
-loadDashboardStats();
-
-
-/* ==========================================
-   📈 월별 조회수 그래프
-========================================== */
-async function loadMonthlyChart() {
-  const res = await fetch("/api/admin/monthly-views", {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-
-  const data = await res.json();
-  const ordered = [...data].reverse();
-
-  const labels = ordered.map(d => `${d.year}-${String(d.month).padStart(2,"0")}`);
-  const values = ordered.map(d => d.total_views);
-
-  const ctx = document.getElementById("monthlyChart");
-
-  new Chart(ctx, {
-    type: "line",
-    data: {
-      labels,
-      datasets: [{
-        label: "월별 조회수",
-        data: values,
-        borderWidth: 2,
-        tension: 0.3
-      }]
-    },
-    options: {
-      responsive: true,
-      scales: {
-        y: { beginAtZero: true }
+      if (!res.ok) {
+        const text = await res.text();
+        console.error(text);
+        alert("등록 중 오류가 발생했습니다.");
+        return;
       }
+
+      alert("등록 완료!");
+      document.getElementById("title").value = "";
+      window.quill.setContents([]);
+      document.getElementById("images").value = "";
+      fileList = [];
+      preview.innerHTML = "";
+
+      loadPosts();
+      loadDashboardStats();
+      loadMonthlyChart();
+    } catch (err) {
+      console.error(err);
+      alert("서버 오류로 등록에 실패했습니다.");
     }
   });
-}
 
-loadMonthlyChart();
+  // 초기 데이터 로딩
+  loadPosts();
+  loadDashboardStats();
+  loadMonthlyChart();
 
+  /* =============================
+      함수 정의들
+  ==============================*/
+
+  // 게시물 목록 (뉴스룸 category 기준) + 조회수 표시
+  async function loadPosts() {
+    const list = document.getElementById("posts");
+    list.innerHTML = "<p style='color:#777;'>목록을 불러오는 중입니다...</p>";
+
+    try {
+      // posts.js의 router.get("/:category") 사용 (조회수 total_views 포함)
+      const res = await fetch(`/api/posts/news?lang=kr`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (!res.ok) {
+        list.innerHTML = "<p style='color:red;'>목록을 불러오는 중 오류가 발생했습니다.</p>";
+        return;
+      }
+
+      const posts = await res.json();
+
+      if (!posts || posts.length === 0) {
+        list.innerHTML = "<p style='color:#777;'>등록된 게시물이 없습니다.</p>";
+        return;
+      }
+
+      posts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+      list.innerHTML = posts
+        .map(p => {
+          const created = p.created_at ? new Date(p.created_at) : null;
+          const dateStr = created
+            ? `${created.getFullYear()}.${String(created.getMonth()+1).padStart(2,"0")}.${String(created.getDate()).padStart(2,"0")}`
+            : "-";
+
+          const views = (p.total_views || 0).toLocaleString();
+          const catText = categoryName(p.category);
+          const langText = (p.lang || "kr").toUpperCase();
+
+          const thumbHtml = p.images && p.images.length
+            ? p.images
+                .map(img => `<img src="${img}" style="width:55px;height:55px;border:1px solid #ddd;border-radius:6px;object-fit:cover;">`)
+                .join("")
+            : "<span style='color:#aaa;font-size:12px;'>이미지 없음</span>";
+
+          return `
+            <div class="post-item">
+              <div style="flex:1;">
+                <div style="font-size:16px; font-weight:600; margin-bottom:4px;">
+                  ${p.title}
+                </div>
+                <div class="post-meta">
+                  <span>카테고리: <b>${catText}</b></span>
+                  <span>언어: <b>${langText}</b></span>
+                  <span>작성일: ${dateStr}</span>
+                </div>
+                <div style="margin-top:6px; color:#0f2679; font-weight:600;">
+                  조회수: ${views} 회
+                </div>
+                <div style="display:flex; gap:6px; margin-top:10px; align-items:center;">
+                  ${thumbHtml}
+                </div>
+              </div>
+              <div class="post-actions">
+                <button class="edit-btn" onclick="editPost(${p.id})">수정</button>
+                <button class="delete-btn" onclick="deletePost(${p.id})">삭제</button>
+              </div>
+            </div>
+          `;
+        })
+        .join("");
+    } catch (err) {
+      console.error(err);
+      list.innerHTML = "<p style='color:red;'>목록을 불러오는 중 오류가 발생했습니다.</p>";
+    }
+  }
+
+  // 카테고리 이름 표시용
+  function categoryName(code) {
+    switch (code) {
+      case "news": return "뉴스룸";
+      case "notice": return "공지사항";
+      case "gallery": return "갤러리";
+      case "cert": return "인증 및 특허";
+      case "catalog": return "카탈로그";
+      default: return code || "기타";
+    }
+  }
+
+  // 삭제
+  window.deletePost = async (id) => {
+    if (!confirm("삭제하시겠습니까?")) return;
+    try {
+      const res = await fetch(`/api/posts/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) {
+        alert("삭제 중 오류가 발생했습니다.");
+        return;
+      }
+
+      alert("삭제 완료");
+      loadPosts();
+      loadDashboardStats();
+      loadMonthlyChart();
+    } catch (err) {
+      console.error(err);
+      alert("서버 오류로 삭제에 실패했습니다.");
+    }
+  };
+
+  // 수정 페이지 이동
+  window.editPost = (id) => {
+    location.href = `/kr/admin/edit_post.html?id=${id}`;
+  };
+
+  /* ==========================================
+     📌 관리자 통계 불러오기
+     (백엔드: /api/admin/dashboard)
+  ===========================================*/
+  async function loadDashboardStats() {
+    try {
+      const res = await fetch(`/api/admin/dashboard`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (!res.ok) {
+        console.error("대시보드 API 오류");
+        return;
+      }
+
+      const data = await res.json();
+
+      const thisMonthViews = data.thisMonthViews || 0;
+      const lastMonthViews = data.lastMonthViews || 0;
+      const postCount = data.postCount || 0;
+      const topPosts = Array.isArray(data.topPosts) ? data.topPosts : [];
+
+      document.getElementById("thisMonthViews").textContent =
+        thisMonthViews.toLocaleString();
+      document.getElementById("lastMonthViews").textContent =
+        lastMonthViews.toLocaleString();
+      document.getElementById("totalPosts").textContent =
+        postCount.toLocaleString();
+
+      let growth = 0;
+      if (lastMonthViews > 0) {
+        growth = (
+          (thisMonthViews - lastMonthViews) /
+          lastMonthViews * 100
+        ).toFixed(1);
+      }
+      document.getElementById("growthRate").textContent = growth + "%";
+
+      const topList = document.getElementById("topPostsList");
+      if (topPosts.length === 0) {
+        topList.innerHTML = "<li>조회된 게시물이 아직 없습니다.</li>";
+        return;
+      }
+
+      topList.innerHTML = topPosts
+        .map(p => `
+          <li>
+            <span class="title">${p.title}</span>
+            <span class="views">${(p.total_views || 0).toLocaleString()} 회</span>
+          </li>
+        `)
+        .join("");
+
+    } catch (err) {
+      console.error("loadDashboardStats 오류:", err);
+    }
+  }
+
+  /* ==========================================
+     📈 월별 조회수 그래프
+     (백엔드: /api/admin/monthly-views)
+  ===========================================*/
+  async function loadMonthlyChart() {
+    const ctx = document.getElementById("monthlyChart");
+    if (!ctx) return;
+
+    try {
+      const res = await fetch("/api/admin/monthly-views", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (!res.ok) {
+        console.error("monthly-views API 오류");
+        return;
+      }
+
+      const data = await res.json();
+      if (!Array.isArray(data) || data.length === 0) {
+        // 데이터 없으면 그래프 그리지 않음
+        return;
+      }
+
+      // 최근 → 과거 순으로 왔으면 뒤집어서 과거 → 최근으로
+      const ordered = [...data].sort((a, b) => {
+        if (a.year === b.year) return a.month - b.month;
+        return a.year - b.year;
+      });
+
+      const labels = ordered.map(d =>
+        `${d.year}-${String(d.month).padStart(2, "0")}`
+      );
+      const values = ordered.map(d => d.total_views || 0);
+
+      new Chart(ctx, {
+        type: "line",
+        data: {
+          labels,
+          datasets: [{
+            label: "월별 조회수",
+            data: values,
+            borderWidth: 2,
+            tension: 0.3
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: { beginAtZero: true }
+          }
+        }
+      });
+    } catch (err) {
+      console.error("loadMonthlyChart 오류:", err);
+    }
+  }
+});
 </script>
 
 </body>
