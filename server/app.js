@@ -9,34 +9,58 @@ import authRouter from "./routes/auth.js";
 import adminRouter from "./routes/admin.js";
 import postsRouter from "./routes/posts.js";
 import productsRouter from "./routes/products.js";
-app.use("/api/products", productsRouter);
+
+// ============================================================
+// 🔥 app 선언은 최상단 import 아래에만 두어야 함
+// ============================================================
 
 const app = express();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// CORS
+// ============================================================
+// 🔧 공통 미들웨어
+// ============================================================
+
 app.use(cors());
-
-// 🔥 1) uploads static 먼저
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
-// 🔥 2) 파일 업로드 라우트 (multer 사용)
-app.use("/api/products", productsRouter);
-
-// 🔥 3) 그 다음 JSON parser
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 🔥 4) 나머지 라우트
+// ============================================================
+// 📁 업로드 폴더 static 제공
+// ============================================================
+
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+// ============================================================
+// 📌 API Routers 등록
+// ============================================================
+
+// 제품 관리 (파일 업로드 포함)
+app.use("/api/products", productsRouter);
+
+// 1:1 문의
 app.use("/api/inquiry", sendInquiryRouter);
+
+// 인증
 app.use("/api/auth", authRouter);
+
+// 관리자 통계/관리
 app.use("/api/admin", adminRouter);
+
+// 뉴스룸/게시물
 app.use("/api/posts", postsRouter);
 
-// 5) Static HTML
+// ============================================================
+// 🌐 정적 파일 제공 (홈페이지 HTML)
+// ============================================================
+
 app.use(express.static(path.join(__dirname, "../")));
+
+// ============================================================
+// 🚀 서버 실행
+// ============================================================
 
 const PORT = 3000;
 app.listen(PORT, "0.0.0.0", () => {
