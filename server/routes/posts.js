@@ -22,17 +22,42 @@ const storage = multer.diskStorage({
     cb(null, fileName);
   },
 });
-
 const upload = multer({ storage });
 
 /* ==========================================
-   📄 0) 단일 게시물 조회 (상세페이지용)
+   📄 0) 단일 게시물 조회 + 조회수 기록
    👉 GET /api/posts/detail/:id
 ========================================== */
 router.get("/detail/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
+    /* -------------------------------
+       🔥 1) 조회수 로그 저장
+    --------------------------------*/
+    const userIp = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+    const userAgent = req.headers["user-agent"];
+
+    await db.execute(
+      `INSERT INTO post_views (post_id, user_ip, user_agent) VALUES (?, ?, ?)`,
+      [id, userIp, userAgent]
+    );
+
+    /* -------------------------------
+       🔥 2) 월별 조회수 +1 (집계)
+    --------------------------------*/
+    await db.execute(
+      `
+      INSERT INTO post_view_stats (post_id, year, month, views)
+      VALUES (?, YEAR(NOW()), MONTH(NOW()), 1)
+      ON DUPLICATE KEY UPDATE views = views + 1
+      `,
+      [id]
+    );
+
+    /* -------------------------------
+       🔥 3) 실제 게시물 조회
+    --------------------------------*/
     const [rows] = await db.execute(
       `SELECT p.*, u.name AS author_name
        FROM posts p
@@ -40,7 +65,6 @@ router.get("/detail/:id", async (req, res) => {
        WHERE p.id = ?`,
       [id]
     );
-
     if (!rows.length) return res.json({});
 
     const post = rows[0];
@@ -61,7 +85,6 @@ router.get("/detail/:id", async (req, res) => {
 
 /* ==========================================
    🧩 1) 게시물 등록 (다중 이미지 업로드)
-   👉 POST /api/posts
 ========================================== */
 router.post("/", upload.array("images", 10), verifyToken, async (req, res) => {
   try {
@@ -102,8 +125,6 @@ router.post("/", upload.array("images", 10), verifyToken, async (req, res) => {
 
 /* ==========================================
    📸 2) 게시물 이미지 목록 조회
-   👉 GET /api/posts/images/:postId
-   ⚠️ 반드시 /:category 보다 위에 둬야 함
 ========================================== */
 router.get("/images/:postId", async (req, res) => {
   try {
@@ -120,8 +141,7 @@ router.get("/images/:postId", async (req, res) => {
 });
 
 /* ==========================================
-   📤 3) 카테고리별 목록 조회 (이미지 포함)
-   👉 GET /api/posts/:category   (예: /api/posts/news?lang=kr)
+   📤 3) 카테고리별 목록 조회
 ========================================== */
 router.get("/:category", async (req, res) => {
   try {
@@ -154,9 +174,6 @@ router.get("/:category", async (req, res) => {
 
 /* ==========================================
    📝 4) 게시물 수정
-   👉 PUT /api/posts/:id
-   - 제목/내용/카테고리/언어 수정
-   - 새 이미지 올리면 기존 이미지 삭제 후 교체
 ========================================== */
 router.put("/:id", verifyToken, upload.array("images", 10), async (req, res) => {
   try {
@@ -173,7 +190,6 @@ router.put("/:id", verifyToken, upload.array("images", 10), async (req, res) => 
 
     // 새 이미지가 업로드된 경우에만 이미지 교체
     if (req.files && req.files.length > 0) {
-      // 1) 기존 이미지 파일 삭제
       const [oldImgs] = await db.execute(
         "SELECT image_path FROM post_images WHERE post_id = ?",
         [id]
@@ -181,24 +197,20 @@ router.put("/:id", verifyToken, upload.array("images", 10), async (req, res) => 
 
       for (const img of oldImgs) {
         const filePath = path.join(process.cwd(), img.image_path.replace(/^\//, ""));
-        if (fs.existsSync(filePath)) {
-          fs.unlinkSync(filePath);
-        }
+        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
       }
 
-      // 2) 기존 이미지 레코드 삭제
       await db.execute("DELETE FROM post_images WHERE post_id = ?", [id]);
 
-      // 3) 새 이미지 레코드 추가
       for (const file of req.files) {
         const imagePath = `/uploads/news/${file.filename}`;
         await db.execute(
-          "INSERT INTO post_images (post_id, image_path) VALUES (?, ?)",
+          `INSERT INTO post_images (post_id, image_path)
+           VALUES (?, ?)`,
           [id, imagePath]
         );
       }
 
-      // 4) 대표 이미지 업데이트 (첫 번째 파일)
       const mainImage = `/uploads/news/${req.files[0].filename}`;
       await db.execute(
         "UPDATE posts SET main_image = ? WHERE id = ?",
@@ -214,65 +226,7 @@ router.put("/:id", verifyToken, upload.array("images", 10), async (req, res) => 
 });
 
 /* ==========================================
-   📝 5) 게시물 수정
-   👉 PUT /api/posts/:id
-========================================== */
-router.put("/:id", upload.array("images", 10), verifyToken, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { title, content, category, lang } = req.body;
-
-    // 기본 정보 업데이트
-    await db.execute(
-      `UPDATE posts 
-       SET title=?, content=?, category=?, lang=?, updated_at=NOW()
-       WHERE id=?`,
-      [title, content, category, lang, id]
-    );
-
-    // 새 이미지가 있을 경우 → 기존 이미지 삭제 후 교체
-    if (req.files.length > 0) {
-      const [oldImages] = await db.execute(
-        "SELECT image_path FROM post_images WHERE post_id=?",
-        [id]
-      );
-
-      for (const img of oldImages) {
-        const filePath = path.join(process.cwd(), img.image_path.replace(/^\//, ""));
-        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-      }
-
-      await db.execute("DELETE FROM post_images WHERE post_id=?", [id]);
-
-      const mainImage = `/uploads/news/${req.files[0].filename}`;
-      await db.execute("UPDATE posts SET main_image=? WHERE id=?", [
-        mainImage,
-        id
-      ]);
-
-      for (const file of req.files) {
-        const imagePath = `/uploads/news/${file.filename}`;
-        await db.execute(
-          `INSERT INTO post_images (post_id, image_path)
-           VALUES (?, ?)`,
-          [id, imagePath]
-        );
-      }
-    }
-
-    res.json({ message: "수정 완료" });
-
-  } catch (err) {
-    console.error("수정 오류:", err);
-    res.status(500).json({ message: "수정 중 오류 발생" });
-  }
-});
-
-
-
-/* ==========================================
    🗑️ 6) 게시물 삭제
-   👉 DELETE /api/posts/:id
 ========================================== */
 router.delete("/:id", verifyToken, async (req, res) => {
   try {

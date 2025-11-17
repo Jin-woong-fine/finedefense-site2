@@ -8,6 +8,8 @@ import sendInquiryRouter from "./routes/sendInquiry.js";
 import authRouter from "./routes/auth.js";
 import adminRouter from "./routes/admin.js";
 import postsRouter from "./routes/posts.js";
+import adminDashboardRouter from "./routes/adminDashboard.js";
+
 
 const app = express();
 
@@ -37,7 +39,8 @@ app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 // ====================================
 app.use("/api/inquiry", sendInquiryRouter);
 app.use("/api/auth", authRouter);
-app.use("/api/admin", adminRouter);
+app.use("/api/admin", adminRouter);         // 기존 관리자 라우터
+app.use("/api/admin", adminDashboardRouter); // 🔥 새로 추가 (조회수 대시보드 API)
 app.use("/api/posts", postsRouter);
 
 // ====================================
