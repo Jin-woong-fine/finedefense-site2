@@ -10,69 +10,71 @@
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- 공통 관리자 CSS -->
-  <link rel="stylesheet" href="/kr/admin/css/admin.css">
-
+  <!-- 공통 관리자 CSS (상대경로) -->
+  <!-- dashboard.html 기준: ./css/admin.css -->
+  <link rel="stylesheet" href="./css/admin.css">
 </head>
 
 <body>
 
-<!-- 🔵 사이드바 -->
-<div id="sidebar"></div>
+  <!-- 🔵 사이드바 -->
+  <div id="sidebar"></div>
 
-<!-- 🔵 메인 -->
-<div class="main">
+  <!-- 🔵 메인 -->
+  <div class="main">
 
-  <div class="topbar">
-    <div class="title">관리자 대시보드</div>
-    <div>
-      <button class="home-btn" onclick="location.href='/kr/index.html'">홈으로</button>
-      <button id="logoutBtn">로그아웃</button>
+    <div class="topbar">
+      <div class="title">관리자 대시보드</div>
+      <div>
+        <!-- kr/admin/dashboard.html → kr/index.html 로 가야 하니까 ../ -->
+        <button class="home-btn" onclick="location.href='../index.html'">홈으로</button>
+        <button id="logoutBtn">로그아웃</button>
+      </div>
     </div>
+
+    <section class="stats-container">
+      <div class="stat-card">
+        <h3>이번달 조회수</h3>
+        <p id="thisMonthViews" class="stat-value">0</p>
+      </div>
+      <div class="stat-card">
+        <h3>지난달 조회수</h3>
+        <p id="lastMonthViews" class="stat-value">0</p>
+      </div>
+      <div class="stat-card">
+        <h3>증가율</h3>
+        <p id="growthRate" class="stat-value">0%</p>
+      </div>
+      <div class="stat-card">
+        <h3>전체 게시물 수</h3>
+        <p id="totalPosts" class="stat-value">0</p>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>월별 조회수 그래프</h2>
+      <canvas id="monthlyChart" style="max-height:350px;"></canvas>
+    </section>
+
+    <section class="panel">
+      <h2>조회수 TOP 5 게시물</h2>
+      <ul id="topPostsList"></ul>
+    </section>
+
   </div>
 
-  <section class="stats-container">
-    <div class="stat-card">
-      <h3>이번달 조회수</h3>
-      <p id="thisMonthViews" class="stat-value">0</p>
-    </div>
-    <div class="stat-card">
-      <h3>지난달 조회수</h3>
-      <p id="lastMonthViews" class="stat-value">0</p>
-    </div>
-    <div class="stat-card">
-      <h3>증가율</h3>
-      <p id="growthRate" class="stat-value">0%</p>
-    </div>
-    <div class="stat-card">
-      <h3>전체 게시물 수</h3>
-      <p id="totalPosts" class="stat-value">0</p>
-    </div>
-  </section>
+  <!-- 🔥 ES Module 방식 -->
+  <script type="module">
+    // 👉 dashboard.html 기준 상대경로
+    import { requireAdmin, logout } from "./js/common_auth.js";
+    import { loadSidebar } from "./js/sidebar.js";
+    import "./js/dashboard_core.js"; // 실행용
 
-  <section class="panel">
-    <h2>월별 조회수 그래프</h2>
-    <canvas id="monthlyChart" style="max-height:350px;"></canvas>
-  </section>
+    requireAdmin();
+    loadSidebar("dashboard");
 
-  <section class="panel">
-    <h2>조회수 TOP 5 게시물</h2>
-    <ul id="topPostsList"></ul>
-  </section>
-
-</div>
-
-<!-- 🔥 ES Module 방식 -->
-<script type="module">
-  import { requireAdmin, logout } from "/kr/admin/js/common_auth.js";
-  import { loadSidebar } from "/kr/admin/js/sidebar.js";
-  import "/kr/admin/js/dashboard_core.js";
-
-  requireAdmin();
-  loadSidebar("dashboard");
-
-  document.getElementById("logoutBtn").addEventListener("click", logout);
-</script>
+    document.getElementById("logoutBtn").addEventListener("click", logout);
+  </script>
 
 </body>
 </html>
