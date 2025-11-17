@@ -517,7 +517,7 @@
       }
 
       // ✅ 조회수 증가 (백엔드에 /api/posts/view/:id 있다고 가정)
-      fetch(`/api/posts/view/${postId}`)
+      fetch(`/api/posts/view/${postId}`, { method: "POST" })
         .then(res => res.json())
         .then(data => console.log("조회수 증가:", data))
         .catch(err => console.error("조회수 증가 오류:", err));
@@ -527,7 +527,10 @@
 
       async function loadPostAndNeighbors(id) {
         try {
-          const res = await fetch(`${window.location.origin}/api/posts/news?lang=kr`);
+          const res = await fetch(`${window.location.origin}/api/posts/news?lang=kr`, {
+            cache: "no-store"   // 최신 데이터 강제 로딩
+          });
+          
           const posts = await res.json();
 
           if (!Array.isArray(posts) || posts.length === 0) {
