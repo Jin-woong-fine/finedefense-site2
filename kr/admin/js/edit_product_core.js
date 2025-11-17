@@ -37,22 +37,18 @@ async function loadProduct() {
     headers: { Authorization: `Bearer ${token}` },
   });
 
-  if (!res.ok) {
-    alert("제품 정보를 불러올 수 없습니다.");
-    return;
-  }
-
   const data = await res.json();
-  const p = data.product;
-  const imgs = data.images;
+
+  const p = data.product;   // ★ 핵심
+  const imgs = data.images; // ★ 핵심
 
   document.getElementById("title").value = p.title;
   document.getElementById("category").value = p.category;
 
-  // 🔥 description_html 로딩
+  // ★ description_html을 읽어야 함
   quill.root.innerHTML = p.description_html || "";
 
-  // 🔥 전체 URL 조립 필요 없음 (이미 절대경로)
+  // ★ 이미지 URL 배열 생성
   existingImages = imgs.map(i => i.url);
 
   renderExistingImages();
@@ -60,33 +56,32 @@ async function loadProduct() {
 
 
 
-/* 기존 이미지 표시 */
 function renderExistingImages() {
   const box = document.getElementById("existingImages");
   box.innerHTML = "";
 
-  existingImages.forEach((img, idx) => {
+  existingImages.forEach((url, idx) => {
     const wrap = document.createElement("div");
     wrap.className = "preview-item";
 
-    const imageEl = document.createElement("img");
-    imageEl.src = img;
+    const image = document.createElement("img");
+    image.src = url; // ★ 이미 url임
 
     const btn = document.createElement("button");
     btn.className = "remove-btn";
     btn.textContent = "×";
-
     btn.onclick = () => {
-      removedImages.push(img);
+      removedImages.push(url);
       existingImages.splice(idx, 1);
       renderExistingImages();
     };
 
-    wrap.appendChild(imageEl);
+    wrap.appendChild(image);
     wrap.appendChild(btn);
     box.appendChild(wrap);
   });
 }
+
 
 /* ============================================================================
    📤 새 이미지 추가 및 미리보기
