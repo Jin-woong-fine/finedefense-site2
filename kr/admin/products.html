@@ -133,7 +133,7 @@
       <button id="logoutBtn" class="btn-secondary">로그아웃</button>
     </div>
 
-    <!-- 제품 등록/수정 -->
+    <!-- 등록/수정 -->
     <section class="panel">
       <h2>제품 등록 / 수정</h2>
 
@@ -169,7 +169,7 @@
       </form>
     </section>
 
-    <!-- 제품 목록 -->
+    <!-- 목록 -->
     <section class="panel">
       <h2>제품 목록</h2>
 
@@ -207,47 +207,57 @@
   </div>
 
 
-  <script>
-    /* 로그인이 없으면 튕김 */
-    const token = localStorage.getItem("token");
-    const role = localStorage.getItem("role");
+<script>
 
-    if (!token || role !== "admin") {
-      alert("관리자 로그인이 필요합니다.");
-      location.href = "/kr/admin/login.html";
-    }
+/* 로그인 체크 */
+const token = localStorage.getItem("token");
+const role = localStorage.getItem("role");
 
-    document.getElementById("logoutBtn").addEventListener("click", () => {
-      localStorage.clear();
-      location.href = "/kr/admin/login.html";
-    });
+if (!token || role !== "admin") {
+  alert("관리자 로그인이 필요합니다.");
+  location.href = "/kr/admin/login.html";
+}
 
-    /* 요소 정의 */
-    const catSel = document.getElementById("category");
-    const langSel = document.getElementById("lang");
-    const orderInput = document.getElementById("order_index");
-    const titleInput = document.getElementById("title");
-    const descInput = document.getElementById("description");
-    const linkInput = document.getElementById("link");
-    const imgInput = document.getElementById("image");
+/* 로그아웃 */
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  localStorage.clear();
+  location.href = "/kr/admin/login.html";
+});
 
-    const filterCategory = document.getElementById("filterCategory");
-    const filterLang = document.getElementById("filterLang");
-    const tableBody = document.getElementById("productTableBody");
+/* form 기본 제출 막기 (핵심!!) */
+document.getElementById("productForm").addEventListener("submit", e => {
+  e.preventDefault();
+});
 
-    let editingId = null;
+/* 요소 */
+const catSel = document.getElementById("category");
+const langSel = document.getElementById("lang");
+const orderInput = document.getElementById("order_index");
+const titleInput = document.getElementById("title");
+const descInput = document.getElementById("description");
+const linkInput = document.getElementById("link");
+const imgInput = document.getElementById("image");
 
-    /* =============================
-          목록 불러오기
-    ============================== */
-    async function loadProducts() {
-      const category = filterCategory.value;
-      const lang = filterLang.value;
+const filterCategory = document.getElementById("filterCategory");
+const filterLang = document.getElementById("filterLang");
+const tableBody = document.getElementById("productTableBody");
 
-      const res = await fetch(`/api/products/list/${category}?lang=${lang}`);
-      const data = await res.json();
+let editingId = null;
 
-      tableBody.innerHTML = data.map(p => `
+
+/* ================================
+   목록 불러오기
+================================ */
+async function loadProducts() {
+  const category = filterCategory.value;
+  const lang = filterLang.value;
+
+  const res = await fetch(`/api/products/list/${category}?lang=${lang}`);
+  const data = await res.json();
+
+  tableBody.innerHTML = data
+    .map(
+      (p) => `
         <tr>
           <td>${p.id}</td>
           <td>${p.image ? `<img src="${p.image}" class="thumb">` : "-"}</td>
@@ -261,115 +271,116 @@
             <button class="btn-danger" onclick="deleteProduct(${p.id})">삭제</button>
           </td>
         </tr>
-      `).join("");
-    }
+      `
+    )
+    .join("");
+}
 
-    document.getElementById("reloadBtn").addEventListener("click", loadProducts);
-
-
-    /* =============================
-          등록 / 수정 저장
-    ============================== */
-    document.getElementById("saveBtn").addEventListener("click", async () => {
-      const fd = new FormData();
-
-      fd.append("category", catSel.value);
-      fd.append("lang", langSel.value);
-      fd.append("title", titleInput.value.trim());
-      fd.append("description", descInput.value.trim());
-      fd.append("link", linkInput.value.trim());
-      fd.append("order_index", orderInput.value);
-
-      if (imgInput.files[0]) {
-        fd.append("image", imgInput.files[0]);
-      }
-
-      const url = editingId ? `/api/products/${editingId}` : `/api/products`;
-      const method = editingId ? "PUT" : "POST";
-
-      const res = await fetch(url, {
-        method,
-        headers: { Authorization: `Bearer ${token}` },
-        body: fd
-      });
-
-      if (!res.ok) {
-        alert("저장 실패");
-        return;
-      }
-
-      alert(editingId ? "수정 완료" : "등록 완료");
-      resetForm();
-      loadProducts();
-    });
+document.getElementById("reloadBtn").addEventListener("click", loadProducts);
 
 
-    /* =============================
-          수정 모드
-    ============================== */
-    window.editProduct = async (id) => {
-      const res = await fetch(`/api/products/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+/* ================================
+   등록/수정
+================================ */
+document.getElementById("saveBtn").addEventListener("click", async () => {
 
-      if (!res.ok) return alert("불러오기 오류");
+  const fd = new FormData();
+  fd.append("category", catSel.value);
+  fd.append("lang", langSel.value);
+  fd.append("title", titleInput.value.trim());
+  fd.append("description", descInput.value.trim());
+  fd.append("link", linkInput.value.trim());
+  fd.append("order_index", orderInput.value);
 
-      const p = await res.json();
-      editingId = p.id;
+  if (imgInput.files[0]) {
+    fd.append("image", imgInput.files[0]);
+  }
 
-      catSel.value = p.category;
-      langSel.value = p.lang;
-      orderInput.value = p.order_index;
-      titleInput.value = p.title;
-      descInput.value = p.description || "";
-      linkInput.value = p.link || "";
+  const url = editingId ? `/api/products/${editingId}` : `/api/products`;
+  const method = editingId ? "PUT" : "POST";
 
-      document.getElementById("saveBtn").textContent = "수정 완료";
+  const res = await fetch(url, {
+    method,
+    headers: { Authorization: `Bearer ${token}` },
+    body: fd,
+  });
 
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    };
+  if (!res.ok) return alert("저장 실패");
 
+  alert(editingId ? "수정 완료" : "등록 완료");
 
-    /* =============================
-          삭제
-    ============================== */
-    window.deleteProduct = async (id) => {
-      if (!confirm("정말 삭제하시겠습니까?")) return;
-
-      const res = await fetch(`/api/products/${id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      if (!res.ok) return alert("삭제 실패");
-
-      alert("삭제 완료");
-      loadProducts();
-    };
+  resetForm();
+  loadProducts();
+});
 
 
-    /* =============================
-          초기화
-    ============================== */
-    document.getElementById("resetBtn").addEventListener("click", resetForm);
+/* ================================
+   수정 모드
+================================ */
+window.editProduct = async (id) => {
+  const res = await fetch(`/api/products/${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
 
-    function resetForm() {
-      editingId = null;
-      catSel.value = "sub_towed";
-      langSel.value = "kr";
-      orderInput.value = 0;
-      titleInput.value = "";
-      descInput.value = "";
-      linkInput.value = "";
-      imgInput.value = "";
+  if (!res.ok) return alert("불러오기 실패");
 
-      document.getElementById("saveBtn").textContent = "등록";
-    }
+  const p = await res.json();
+  editingId = p.id;
 
-    /* 초기 실행 */
-    loadProducts();
+  catSel.value = p.category;
+  langSel.value = p.lang;
+  orderInput.value = p.order_index;
+  titleInput.value = p.title;
+  descInput.value = p.description || "";
+  linkInput.value = p.link || "";
 
-  </script>
+  document.getElementById("saveBtn").textContent = "수정 완료";
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+};
+
+
+/* ================================
+   삭제
+================================ */
+window.deleteProduct = async (id) => {
+  if (!confirm("정말 삭제하시겠습니까?")) return;
+
+  const res = await fetch(`/api/products/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (!res.ok) return alert("삭제 실패");
+
+  alert("삭제 완료");
+  loadProducts();
+};
+
+
+/* ================================
+   초기화
+================================ */
+document.getElementById("resetBtn").addEventListener("click", resetForm);
+
+function resetForm() {
+  editingId = null;
+  catSel.value = "sub_towed";
+  langSel.value = "kr";
+  orderInput.value = 0;
+  titleInput.value = "";
+  descInput.value = "";
+  linkInput.value = "";
+  imgInput.value = "";
+
+  document.getElementById("saveBtn").textContent = "등록";
+}
+
+
+/* 초기 실행 */
+loadProducts();
+
+</script>
 
 </body>
 </html>
