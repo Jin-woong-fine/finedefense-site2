@@ -32,24 +32,32 @@ document.addEventListener("DOMContentLoaded", () => {
 /* ============================================================================
    📥 기존 제품 정보 불러오기
 ============================================================================ */
-let existingImages = [];
-let removedImages = [];
-let newImageFiles = [];
-
 async function loadProduct() {
   const res = await fetch(`${API_BASE}/products/${productId}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 
-  const p = await res.json();
+  if (!res.ok) {
+    alert("제품 정보를 불러올 수 없습니다.");
+    return;
+  }
+
+  const data = await res.json();
+  const p = data.product;
+  const imgs = data.images;
 
   document.getElementById("title").value = p.title;
   document.getElementById("category").value = p.category;
-  quill.root.innerHTML = p.description || "";
 
-  existingImages = p.images || [];
+  // description_html 사용
+  quill.root.innerHTML = p.description_html || "";
+
+  // 이미지 URL만 배열로 저장
+  existingImages = imgs.map(i => i.url);
+
   renderExistingImages();
 }
+
 
 /* 기존 이미지 표시 */
 function renderExistingImages() {
