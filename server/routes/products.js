@@ -7,15 +7,15 @@ import path from "path";
 
 const router = express.Router();
 
-/* ============================================================
-   📌 0) 업로드 폴더 확인 및 생성
-============================================================ */
-const uploadDir = "server/uploads/products";
+// 절대 경로로 변경
+const __dirname = path.resolve();
+const uploadDir = path.join(__dirname, "server", "uploads", "products");
 
 if (!fs.existsSync(uploadDir)) {
-  console.log("📁 [INIT] 제품 업로드 폴더 생성됨:", uploadDir);
   fs.mkdirSync(uploadDir, { recursive: true });
+  console.log("📁 업로드 폴더 생성:", uploadDir);
 }
+
 
 /* ============================================================
    📌 1) Multer 저장 설정 (강화판)
