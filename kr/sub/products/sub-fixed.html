@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>수중고정형케이블 | Fine Defense</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/sub-banner.css">
+
+  <style>
+    .product-section { max-width: 1200px; margin: 40px auto; padding: 20px 40px; background: #fff;
+      border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    .product-section h1 { font-size: 2rem; color: #0f2679; margin-bottom: 16px; text-align: center; }
+    .product-section p { font-size: 1.1rem; text-align: center; margin-bottom: 40px; line-height: 1.7; color:#444; }
+    .product-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(480px, 1fr)); gap: 30px; }
+    .product-card { display: flex; background: #fff; border-radius: 14px; overflow: hidden; text-decoration: none; color: inherit;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: .25s; }
+    .product-card:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+    .card-image { flex: 0 0 40%; background-size: cover; background-position: center; min-height: 200px; }
+    .card-content { flex: 1; padding: 24px; }
+    .card-content h3 { margin-top: 0; margin-bottom: 10px; color: #0f2679; font-size: 1.1rem; }
+    .card-content p { margin: 0; font-size: .95rem; color: #555; }
+    @media (max-width: 768px) { .product-card { flex-direction: column; } .card-image { width:100%; height:200px; } }
+  </style>
+</head>
+
+<body>
+
+<div id="header"></div>
+
+<section class="sub-banner">
+  <img src="/img/sub-banners/cable.jpg" alt="">
+  <div class="banner-text">
+    <h1>제품소개</h1>
+    <p>해양 방산 현장을 연결하는 케이블 솔루션</p>
+  </div>
+</section>
+
+<div class="breadcrumb">
+  <a href="/kr/index.html">홈</a> &gt;
+  <span class="crumb crumb-level1">제품소개</span> &gt;
+  <span class="crumb crumb-level2">수중고정형케이블</span>
+  <div id="side-tabs" class="side-tabs"></div>
+</div>
+
+<section class="product-section">
+  <h1>수중고정형케이블</h1>
+  <p>해저 또는 고정식 해양 구조물에 설치되어 장기간 안정적인 신호·전원 전송을 수행하는 고내구성 케이블입니다.</p>
+
+  <div id="productCards" class="product-cards"></div>
+</section>
+
+<div id="footer"></div>
+
+<script src="/js/nav.js"></script>
+<script src="/js/language.js"></script>
+
+<script>
+  function stripHtml(html) {
+    const t = document.createElement("div");
+    t.innerHTML = html;
+    return t.textContent || t.innerText || "";
+  }
+
+  async function loadProducts() {
+    const box = document.getElementById("productCards");
+
+    try {
+      const res = await fetch("/api/products");
+      const all = await res.json();
+
+      const list = all.filter(p => p.category === "fixed");
+
+      if (!list.length) {
+        box.innerHTML = "<p>등록된 제품이 없습니다.</p>";
+        return;
+      }
+
+      box.innerHTML = list.map(p => `
+        <a class="product-card" href="/kr/sub/products/product-view.html?id=${p.id}">
+          <div class="card-image" style="background-image:url('${p.thumbnail || "/img/products/Image-placeholder.png"}')"></div>
+          <div class="card-content">
+            <h3>${p.title}</h3>
+            <p>${stripHtml(p.description_html ?? "").substring(0, 100)}...</p>
+          </div>
+        </a>
+      `).join("");
+
+    } catch (err) {
+      console.error(err);
+      box.innerHTML = "<p>목록을 불러오는 중 오류 발생</p>";
+    }
+  }
+
+  loadProducts();
+</script>
+
+</body>
+</html>
