@@ -154,15 +154,12 @@
 
 </div>
 
-<!-- 모듈 스크립트 -->
-<script type="module">
-  import { requireAdmin, logout } from "/kr/admin/js/common_auth.js";
-  import { loadSidebar } from "/kr/admin/js/sidebar.js";
-  import "/kr/admin/js/products_core.js";
-
+<script src="/kr/admin/js/common_auth.js"></script>
+<script src="/kr/admin/js/sidebar.js"></script>
+<script src="/kr/admin/js/products_core.js"></script>
+<script>
   requireAdmin();
-  loadSidebar();
-
+  loadSidebar("products");
   document.getElementById("logoutBtn").addEventListener("click", logout);
 </script>
 

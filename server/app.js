@@ -39,10 +39,7 @@ app.use(express.urlencoded({ extended: true }));
 //   server/public/uploads/products/aaa.png
 //
 
-app.use(
-  "/uploads",
-  express.static(path.join(__dirname, "public", "uploads"))
-);
+app.use("/uploads", express.static(path.join(__dirname, "public", "uploads")));
 
 // ============================================================
 // 📌 API 라우터 등록

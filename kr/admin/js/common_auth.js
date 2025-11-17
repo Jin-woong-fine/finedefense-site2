@@ -1,17 +1,21 @@
-/* ===============================
-   🔐 공통 관리자 인증
-================================ */
-const token = localStorage.getItem("token");
-const role = localStorage.getItem("role");
+// /kr/admin/js/common_auth.js
 
-export function requireAdmin() {
-  if (!token || role !== "admin") {
-    alert("로그인이 필요합니다.");
+(function () {
+  const tokenKey = "token";
+  const roleKey = "role";
+
+  window.requireAdmin = function () {
+    const token = localStorage.getItem(tokenKey);
+    const role = localStorage.getItem(roleKey);
+
+    if (!token || role !== "admin") {
+      alert("로그인이 필요합니다.");
+      location.href = "/kr/admin/login.html";
+    }
+  };
+
+  window.logout = function () {
+    localStorage.clear();
     location.href = "/kr/admin/login.html";
-  }
-}
-
-export function logout() {
-  localStorage.clear();
-  location.href = "/kr/admin/login.html";
-}
+  };
+})();
