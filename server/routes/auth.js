@@ -3,15 +3,24 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import pool from "../config/db.js";
 import dotenv from "dotenv";
+import { verifyToken } from "../middleware/auth.js";
 dotenv.config();
 
 const router = express.Router();
 
-// ========================================
-//  🔐 로그인
-// ========================================
+/* ============================================================
+   🔐 로그인
+============================================================ */
 router.post("/login", async (req, res) => {
   const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({ message: "아이디와 비밀번호를 입력하세요." });
+  }
+
+  if (!process.env.JWT_SECRET) {
+    return res.status(500).json({ message: "서버 설정 오류 (JWT_SECRET 없음)" });
+  }
 
   try {
     const [rows] = await pool.query(
@@ -30,7 +39,6 @@ router.post("/login", async (req, res) => {
       return res.status(401).json({ message: "Invalid password" });
     }
 
-    // 🔥 JWT 2시간 유효기간
     const token = jwt.sign(
       { id: user.id, role: user.role, name: user.name },
       process.env.JWT_SECRET,
@@ -39,6 +47,7 @@ router.post("/login", async (req, res) => {
 
     res.json({
       token,
+      id: user.id,
       role: user.role,
       name: user.name,
     });
@@ -49,14 +58,17 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// ========================================
-//  👑 관리자 최초 생성 (1회)
-// ========================================
-router.post("/register-admin", async (req, res) => {
+/* ============================================================
+   👑 관리자 생성 (관리자 전용)
+============================================================ */
+router.post("/register-admin", verifyToken, async (req, res) => {
   try {
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ message: "권한 없음" });
+    }
+
     const { username, password, name } = req.body;
 
-    // 중복확인
     const [exist] = await pool.query(
       "SELECT * FROM users WHERE username = ?",
       [username]
@@ -66,10 +78,8 @@ router.post("/register-admin", async (req, res) => {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    // 비밀번호 해시
     const hash = await bcrypt.hash(password, 10);
 
-    // DB 저장
     await pool.query(
       "INSERT INTO users (username, password, name, role) VALUES (?, ?, ?, 'admin')",
       [username, hash, name]
