@@ -238,25 +238,7 @@
     <!-- ✅ 5. 푸터 -->
     <div id="footer"></div>
 
-    <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      // ✅ header 불러오기
-      fetch("../../components/header.html")
-        .then(res => res.text())
-        .then(html => {
-          document.getElementById("header").innerHTML = html;
-          const langScript = document.createElement("script");
-          langScript.src = "/js/language.js";
-          document.body.appendChild(langScript);
-        });
 
-      // ✅ footer 불러오기
-      fetch("../../components/footer.html")
-        .then(res => res.text())
-        .then(html => document.getElementById("footer").innerHTML = html);
-    });
-
-    </script>
 
     <script>
     function changeImage(img) {
