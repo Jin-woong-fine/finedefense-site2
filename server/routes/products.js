@@ -4,17 +4,21 @@ import db from "../config/db.js";
 import { verifyToken } from "../middleware/auth.js";
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
 
 const router = express.Router();
 
-// 절대 경로로 변경
-const __dirname = path.resolve();
-const uploadDir = path.join(__dirname, "server", "uploads", "products");
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// 🔥 절대경로
+const uploadDir = path.join(__dirname, "../uploads/products");
 
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
   console.log("📁 업로드 폴더 생성:", uploadDir);
 }
+
 
 
 /* ============================================================
