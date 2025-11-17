@@ -425,17 +425,43 @@ document.addEventListener("DOMContentLoaded", () => {
     const posts = await res.json();
     const list = document.getElementById("posts");
 
-    list.innerHTML = posts.map(p => `
-      <div class="post-item">
-        <div>
-          <strong>${p.title}</strong> (${p.category}/${p.lang})
-        </div>
-        <div>
-          <button class="edit-btn" onclick="editPost(${p.id})">수정</button>
-          <button class="delete-btn" onclick="deletePost(${p.id})">삭제</button>
-        </div>
-      </div>
-    `).join("");
+    list.innerHTML = posts
+      .map(
+        p => `
+          <div class="post-item">
+            <div style="flex:1;">
+              <strong style="font-size:16px;">${p.title}</strong>
+              <div style="color:#666; font-size:13px; margin-top:4px;">
+                카테고리: <b>${p.category}</b> | 언어: <b>${p.lang}</b>
+              </div>
+
+              <div style="margin-top:6px; color:#0f2679; font-weight:600;">
+                조회수: ${p.total_views.toLocaleString()} 회
+              </div>
+
+              <div style="display:flex; gap:6px; margin-top:10px;">
+                ${
+                  p.images?.length
+                    ? p.images
+                        .map(
+                          img =>
+                            `<img src="${img}" style="width:55px;height:55px;border-radius:6px;border:1px solid #ddd;object-fit:cover;">`
+                        )
+                        .join("")
+                    : "<span style='color:#aaa;'>이미지 없음</span>"
+                }
+              </div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:6px;">
+              <button class="edit-btn" onclick="editPost(${p.id})">수정</button>
+              <button class="delete-btn" onclick="deletePost(${p.id})">삭제</button>
+            </div>
+          </div>
+        `
+      )
+      .join("");
+
   }
 
   loadPosts();

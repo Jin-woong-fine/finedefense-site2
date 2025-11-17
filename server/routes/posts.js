@@ -141,7 +141,8 @@ router.get("/images/:postId", async (req, res) => {
 });
 
 /* ==========================================
-   📤 3) 카테고리별 목록 조회
+   📤 3) 카테고리별 목록 조회 (조회수 + 이미지 포함)
+   👉 GET /api/posts/:category
 ========================================== */
 router.get("/:category", async (req, res) => {
   try {
@@ -149,7 +150,14 @@ router.get("/:category", async (req, res) => {
     const lang = req.query.lang || "kr";
 
     const [posts] = await db.execute(
-      `SELECT p.*, u.name AS author_name
+      `SELECT 
+         p.*,
+         u.name AS author_name,
+         (
+           SELECT COALESCE(SUM(s.views), 0)
+           FROM post_view_stats s
+           WHERE s.post_id = p.id
+         ) AS total_views
        FROM posts p
        LEFT JOIN users u ON p.author_id = u.id
        WHERE p.category = ? AND p.lang = ?
@@ -157,6 +165,7 @@ router.get("/:category", async (req, res) => {
       [category, lang]
     );
 
+    // 이미지 매핑
     for (const post of posts) {
       const [images] = await db.execute(
         "SELECT image_path FROM post_images WHERE post_id = ?",
@@ -166,11 +175,14 @@ router.get("/:category", async (req, res) => {
     }
 
     res.json(posts);
+
   } catch (err) {
-    console.error("목록 조회 오류:", err);
+    console.error("📌 목록 조회 오류:", err);
     res.status(500).json({ message: "조회 오류" });
   }
 });
+
+
 
 /* ==========================================
    📝 4) 게시물 수정
