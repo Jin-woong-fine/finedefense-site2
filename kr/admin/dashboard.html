@@ -4,7 +4,10 @@
   <meta charset="UTF-8">
   <title>관리자 대시보드 | Fine Defense</title>
 
+  <!-- Quill -->
   <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
     body {
@@ -26,12 +29,10 @@
       padding: 30px 20px;
       box-sizing: border-box;
     }
-
     .sidebar h2 {
       font-size: 1.3rem;
       margin-bottom: 40px;
     }
-
     .sidebar nav a {
       display: block;
       padding: 10px;
@@ -41,7 +42,6 @@
       border-radius: 6px;
       transition: 0.2s;
     }
-
     .sidebar nav a:hover,
     .sidebar nav .active {
       background: rgba(255,255,255,0.18);
@@ -83,95 +83,14 @@
       cursor: pointer;
     }
 
-    /* 통계 카드 */
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-      margin-bottom: 40px;
-    }
-
-    .stat-card {
-      background: white;
-      padding: 25px;
-      border-radius: 10px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.05);
-    }
-
-    .stat-card h3 {
-      margin: 0 0 10px;
-      font-size: 1.1rem;
-      color: #444;
-    }
-
-    .stat-card p {
-      font-size: 2rem;
-      margin: 0;
-      font-weight: bold;
-      color: #0f2679;
-    }
-
-    /* 패널 박스 */
-    .panel {
-      background: white;
-      padding: 25px;
-      border-radius: 10px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.05);
-      margin-bottom: 35px;
-    }
-
-    /* 기존 업로드 스타일 유지 */
-    .upload-form input,
-    .upload-form select {
-      width: 100%;
-      margin: 8px 0;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 15px;
-    }
-
-    .upload-form button {
+    .home-btn {
       background: #0f2679;
       color: white;
       border: none;
-      padding: 10px 16px;
+      padding: 8px 15px;
       border-radius: 6px;
       cursor: pointer;
-      margin-top: 12px;
-    }
-
-    .post-item {
-      padding: 15px 0;
-      border-bottom: 1px solid #eee;
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .delete-btn {
-      background: crimson;
-      color: white;
-      border: none;
-      padding: 6px 10px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .edit-btn {
-      background: #1976d2;
-      color: white;
-      border: none;
-      padding: 6px 10px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    #filePreview img {
-      width: 70px;
-      height: 70px;
-      object-fit: cover;
-      border-radius: 6px;
-      border: 1px solid #ddd;
+      margin-right: 10px;
     }
 
     .stats-container {
@@ -228,10 +147,57 @@
       border-bottom: none;
     }
 
+    /* 업로드 */
+    .panel {
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+      margin-bottom: 35px;
+    }
 
+    .upload-form input,
+    .upload-form select {
+      width: 100%;
+      margin: 8px 0;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 15px;
+    }
 
+    #filePreview img {
+      width: 70px;
+      height: 70px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+    }
 
+    .post-item {
+      padding: 15px 0;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+    }
 
+    .delete-btn {
+      background: crimson;
+      color: white;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .edit-btn {
+      background: #1976d2;
+      color: white;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
   </style>
 </head>
 
@@ -242,6 +208,7 @@
   <h2>Fine Defense</h2>
 
   <nav>
+    <a href="/kr/index.html">홈으로 이동</a>
     <a href="/kr/admin/dashboard.html" class="active">대시보드</a>
     <a href="/kr/admin/inquiry.html">1:1 문의관리</a>
     <a href="/kr/admin/newsroom_list.html">뉴스룸 관리</a>
@@ -252,61 +219,36 @@
 <!-- 메인 -->
 <div class="main">
 
-<!-- ================================ -->
-<!--      📊 관리자 통계 카드         -->
-<!-- ================================ -->
-<section class="stats-container">
-
-  <div class="stat-card">
-    <h3>이번달 조회수</h3>
-    <p id="thisMonthViews" class="stat-value">0</p>
-  </div>
-
-  <div class="stat-card">
-    <h3>지난달 조회수</h3>
-    <p id="lastMonthViews" class="stat-value">0</p>
-  </div>
-
-  <div class="stat-card">
-    <h3>증가율</h3>
-    <p id="growthRate" class="stat-value">0%</p>
-  </div>
-
-  <div class="stat-card">
-    <h3>전체 게시물 수</h3>
-    <p id="totalPosts" class="stat-value">0</p>
-  </div>
-
-</section>
-
-<!-- ================================ -->
-<!--      📈 조회수 TOP 5             -->
-<!-- ================================ -->
-<section class="top-views">
-  <h2>조회수 TOP 5 게시물</h2>
-  <ul id="topPostsList"></ul>
-</section>
-
-
-
-
-
-
-
   <!-- 상단바 -->
   <div class="topbar">
     <div class="title">관리자 대시보드</div>
-    <button id="logoutBtn">로그아웃</button>
+    <div>
+      <button class="home-btn" onclick="location.href='/kr/index.html'">홈으로</button>
+      <button id="logoutBtn">로그아웃</button>
+    </div>
   </div>
 
-  <!-- 통계패널 -->
-  <div class="stats">
-    <div class="stat-card"><h3>전체 게시물</h3><p id="countPosts">0</p></div>
-    <div class="stat-card"><h3>신규 문의</h3><p id="countInquiries">0</p></div>
-    <div class="stat-card"><h3>관리자 수</h3><p id="countUsers">1</p></div>
-  </div>
+  <!-- 통계 카드 -->
+  <section class="stats-container">
+    <div class="stat-card"><h3>이번달 조회수</h3><p id="thisMonthViews" class="stat-value">0</p></div>
+    <div class="stat-card"><h3>지난달 조회수</h3><p id="lastMonthViews" class="stat-value">0</p></div>
+    <div class="stat-card"><h3>증가율</h3><p id="growthRate" class="stat-value">0%</p></div>
+    <div class="stat-card"><h3>전체 게시물 수</h3><p id="totalPosts" class="stat-value">0</p></div>
+  </section>
 
-  <!-- 게시물 등록 패널 -->
+  <!-- 월별 조회수 그래프 -->
+  <section class="panel" style="margin-bottom:40px;">
+    <h2>월별 조회수 그래프</h2>
+    <canvas id="monthlyChart" style="max-height:350px;"></canvas>
+  </section>
+
+  <!-- 조회수 TOP 5 -->
+  <section class="top-views">
+    <h2>조회수 TOP 5 게시물</h2>
+    <ul id="topPostsList"></ul>
+  </section>
+
+  <!-- 게시물 등록 -->
   <div class="panel upload-form">
     <h2>게시물 등록</h2>
 
@@ -323,7 +265,7 @@
 
     <input id="title" placeholder="제목" />
 
-    <div id="editor" style="height: 250px; background: #fff; border:1px solid #ccc; border-radius:6px;"></div>
+    <div id="editor" style="height: 250px; background: #fff;"></div>
 
     <input type="file" id="images" multiple />
     <div id="filePreview" style="margin-top: 10px; display: flex; gap: 10px;"></div>
@@ -342,13 +284,9 @@
 <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 
 <script>
-/* ===== 기존 기능 부분 (업로드/미리보기/불러오기 등) ===== */
-/* 그대로 유지되며, 레이아웃만 변경됨 */
-
-const API_URL = "/api";
+/* 로그인 체크 */
 const token = localStorage.getItem("token");
 const role = localStorage.getItem("role");
-
 if (!token || role !== "admin") {
   alert("로그인이 필요합니다.");
   location.href = "/kr/admin/login.html";
@@ -359,6 +297,8 @@ document.getElementById("logoutBtn").addEventListener("click", () => {
   location.href = "/kr/admin/login.html";
 });
 
+
+/* ===== Quill ===== */
 document.addEventListener("DOMContentLoaded", () => {
   window.quill = new Quill("#editor", {
     theme: "snow",
@@ -373,7 +313,7 @@ document.addEventListener("DOMContentLoaded", () => {
     },
   });
 
-  /* 파일 선택 및 미리보기 */
+  /* 파일 미리보기 */
   let fileList = [];
   const preview = document.getElementById("filePreview");
 
@@ -395,7 +335,6 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("uploadBtn").addEventListener("click", async () => {
     const title = document.getElementById("title").value.trim();
     const content = window.quill.root.innerHTML.trim();
-
     if (!title) return alert("제목을 입력하세요.");
 
     const fd = new FormData();
@@ -403,10 +342,9 @@ document.addEventListener("DOMContentLoaded", () => {
     fd.append("content", content);
     fd.append("category", document.getElementById("category").value);
     fd.append("lang", document.getElementById("lang").value);
-
     fileList.forEach(f => fd.append("images", f));
 
-    await fetch(`${API_URL}/posts`, {
+    await fetch(`/api/posts`, {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
       body: fd,
@@ -416,121 +354,140 @@ document.addEventListener("DOMContentLoaded", () => {
     loadPosts();
   });
 
-  /* 게시물 불러오기 */
-  async function loadPosts() {
-    const res = await fetch(`${API_URL}/posts/news`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    const posts = await res.json();
-    const list = document.getElementById("posts");
-
-    list.innerHTML = posts
-      .map(
-        p => `
-          <div class="post-item">
-            <div style="flex:1;">
-              <strong style="font-size:16px;">${p.title}</strong>
-              <div style="color:#666; font-size:13px; margin-top:4px;">
-                카테고리: <b>${p.category}</b> | 언어: <b>${p.lang}</b>
-              </div>
-
-              <div style="margin-top:6px; color:#0f2679; font-weight:600;">
-                조회수: ${p.total_views.toLocaleString()} 회
-              </div>
-
-              <div style="display:flex; gap:6px; margin-top:10px;">
-                ${
-                  p.images?.length
-                    ? p.images
-                        .map(
-                          img =>
-                            `<img src="${img}" style="width:55px;height:55px;border-radius:6px;border:1px solid #ddd;object-fit:cover;">`
-                        )
-                        .join("")
-                    : "<span style='color:#aaa;'>이미지 없음</span>"
-                }
-              </div>
-            </div>
-
-            <div style="display:flex; flex-direction:column; gap:6px;">
-              <button class="edit-btn" onclick="editPost(${p.id})">수정</button>
-              <button class="delete-btn" onclick="deletePost(${p.id})">삭제</button>
-            </div>
-          </div>
-        `
-      )
-      .join("");
-
-  }
-
   loadPosts();
-
-  window.deletePost = async (id) => {
-    if (!confirm("삭제하시겠습니까?")) return;
-    await fetch(`${API_URL}/posts/${id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    loadPosts();
-  };
-
-  window.editPost = (id) => {
-    location.href = `/kr/admin/edit_post.html?id=${id}`;
-  };
-
 });
 
 
-  /* ==========================================
-    📊 관리자 대시보드 통계 불러오기
-  ========================================== */
-  async function loadDashboardStats() {
-    try {
-      const res = await fetch("/api/admin/dashboard", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`
-        }
-      });
+/* 게시물 불러오기 + 조회수 포함 */
+async function loadPosts() {
+  const res = await fetch(`/api/posts/news?withViews=1`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
 
-      if (!res.ok) {
-        console.error("대시보드 통계 로드 오류");
-        return;
-      }
+  const posts = await res.json();
+  const list = document.getElementById("posts");
 
-      const data = await res.json();
+  list.innerHTML = posts
+    .map(
+      p => `
+        <div class="post-item">
+          <div style="flex:1;">
+            <strong style="font-size:16px;">${p.title}</strong>
+            <div style="color:#666; font-size:13px; margin-top:4px;">
+              카테고리: <b>${p.category}</b> | 언어: <b>${p.lang}</b>
+            </div>
 
-      // 카드 값 채우기
-      document.getElementById("thisMonthViews").textContent =
-        data.thisMonthViews.toLocaleString();
+            <div style="margin-top:6px; color:#0f2679; font-weight:600;">
+              조회수: ${(p.total_views || 0).toLocaleString()} 회
+            </div>
 
-      document.getElementById("lastMonthViews").textContent =
-        data.lastMonthViews.toLocaleString();
+            <div style="display:flex; gap:6px; margin-top:10px;">
+              ${
+                p.images?.length
+                  ? p.images
+                      .map(img => `<img src="${img}" style="width:55px;height:55px;border:1px solid #ddd;border-radius:6px;object-fit:cover;">`)
+                      .join("")
+                  : "<span style='color:#aaa;'>이미지 없음</span>"
+              }
+            </div>
+          </div>
 
-      document.getElementById("totalPosts").textContent =
-        data.postCount.toLocaleString();
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <button class="edit-btn" onclick="editPost(${p.id})">수정</button>
+            <button class="delete-btn" onclick="deletePost(${p.id})">삭제</button>
+          </div>
+        </div>
+      `
+    )
+    .join("");
+}
 
-      // 증가율 계산
-      let growth = 0;
-      if (data.lastMonthViews > 0) {
-        growth = ((data.thisMonthViews - data.lastMonthViews) / data.lastMonthViews * 100).toFixed(1);
-      }
-      document.getElementById("growthRate").textContent = growth + "%";
+window.deletePost = async (id) => {
+  if (!confirm("삭제하시겠습니까?")) return;
+  await fetch(`/api/posts/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  loadPosts();
+};
 
-      // 조회수 TOP5 표시
-      const topList = document.getElementById("topPostsList");
-      topList.innerHTML = data.topPosts
-        .map(p => `<li>${p.title} — <strong>${(p.total_views || 0).toLocaleString()}</strong> 회</li>`)
-        .join("");
+window.editPost = (id) => {
+  location.href = `/kr/admin/edit_post.html?id=${id}`;
+};
 
-    } catch (err) {
-      console.error("관리자 통계 불러오기 실패:", err);
-    }
+
+/* ==========================================
+   📌 관리자 통계 불러오기
+========================================== */
+async function loadDashboardStats() {
+  const res = await fetch(`/api/admin/dashboard`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+
+  const data = await res.json();
+
+  document.getElementById("thisMonthViews").textContent =
+    data.thisMonthViews.toLocaleString();
+  document.getElementById("lastMonthViews").textContent =
+    data.lastMonthViews.toLocaleString();
+  document.getElementById("totalPosts").textContent =
+    data.postCount.toLocaleString();
+
+  let growth = 0;
+  if (data.lastMonthViews > 0) {
+    growth = (
+      (data.thisMonthViews - data.lastMonthViews) /
+      data.lastMonthViews * 100
+    ).toFixed(1);
   }
+  document.getElementById("growthRate").textContent = growth + "%";
 
-  // 페이지 로드시 실행
-  loadDashboardStats();
+  const topList = document.getElementById("topPostsList");
+  topList.innerHTML = data.topPosts
+    .map(p => `<li>${p.title} — <strong>${(p.total_views || 0).toLocaleString()}</strong> 회</li>`)
+    .join("");
+}
 
+loadDashboardStats();
+
+
+/* ==========================================
+   📈 월별 조회수 그래프
+========================================== */
+async function loadMonthlyChart() {
+  const res = await fetch("/api/admin/monthly-views", {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+
+  const data = await res.json();
+  const ordered = [...data].reverse();
+
+  const labels = ordered.map(d => `${d.year}-${String(d.month).padStart(2,"0")}`);
+  const values = ordered.map(d => d.total_views);
+
+  const ctx = document.getElementById("monthlyChart");
+
+  new Chart(ctx, {
+    type: "line",
+    data: {
+      labels,
+      datasets: [{
+        label: "월별 조회수",
+        data: values,
+        borderWidth: 2,
+        tension: 0.3
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
+}
+
+loadMonthlyChart();
 
 </script>
 

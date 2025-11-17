@@ -68,3 +68,29 @@ router.get("/dashboard", verifyToken, verifyAdmin, async (req, res) => {
 });
 
 export default router;
+
+
+
+/* ==========================================
+   📊 월별 조회수 API
+   👉 GET /api/admin/monthly-views
+========================================== */
+router.get("/monthly-views", verifyToken, verifyAdmin, async (req, res) => {
+  try {
+    const [rows] = await pool.execute(`
+      SELECT 
+        year,
+        month,
+        SUM(views) AS total_views
+      FROM post_view_stats
+      GROUP BY year, month
+      ORDER BY year DESC, month DESC
+      LIMIT 12
+    `);
+
+    res.json(rows);
+  } catch (err) {
+    console.error("월별 조회수 오류:", err);
+    res.status(500).json({ message: "월별 조회수 오류" });
+  }
+});
