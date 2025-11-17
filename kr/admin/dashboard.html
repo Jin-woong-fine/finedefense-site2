@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>관리자 대시보드 | Fine Defense</title>
 
-  <!-- Quill (뉴스룸 입력 파트용) -->
+  <!-- Quill (뉴스 입력 파트용) -->
   <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 
   <!-- Chart.js -->
@@ -32,7 +32,6 @@
       border-radius: 10px;
       box-shadow: 0 3px 10px rgba(0,0,0,0.08);
       margin-bottom: 30px;
-
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -97,7 +96,7 @@
 
 <body>
 
-<!-- 사이드바 영역 -->
+<!-- 사이드바 -->
 <div id="sidebar"></div>
 
 <!-- 본문 -->
@@ -130,22 +129,17 @@
 
 </div>
 
-<!-- 공통 JS -->
-<script src="/kr/admin/js/common_auth.js"></script>
-<script src="/kr/admin/js/sidebar.js"></script>
-<script src="/kr/admin/js/dashboard_core.js"></script>
+<!-- 🔥 ES Module 방식으로 통일 -->
+<script type="module">
+  import { requireAdmin, logout } from "/kr/admin/js/common_auth.js";
+  import { loadSidebar } from "/kr/admin/js/sidebar.js";
+  import "/kr/admin/js/dashboard_core.js";
 
-<script>
-  // 로그인 체크
-  requireAdmin();
+  requireAdmin();          // 로그인 체크
+  loadSidebar("dashboard"); // 사이드바 로드 + active 표시
 
-  // 사이드바 로드 + 현재 메뉴 강조
-  loadSidebar("dashboard");
-
-  // 로그아웃 버튼
   document.getElementById("logoutBtn").addEventListener("click", logout);
 </script>
-
 
 </body>
 </html>
