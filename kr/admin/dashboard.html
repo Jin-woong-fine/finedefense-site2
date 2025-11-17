@@ -279,6 +279,26 @@
     <div id="posts"></div>
   </div>
 
+  <!-- 📦 제품 관리 패널 -->
+  <div class="panel">
+    <h2>제품 관리</h2>
+
+    <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+      <div style="font-size:16px; font-weight:600;">
+        총 제품 수: <span id="productCount">0</span> 개
+      </div>
+      <button onclick="location.href='/kr/admin/products.html'"
+              style="padding:8px 12px; background:#0f2679; color:#fff; border:none; border-radius:6px; cursor:pointer;">
+        제품 관리 페이지로 이동
+      </button>
+    </div>
+
+    <div id="recentProducts"></div>
+  </div>
+
+
+
+
 </div>
 
 <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
@@ -418,7 +438,7 @@ window.editPost = (id) => {
 
 
 /* ==========================================
-   📌 관리자 통계 불러오기
+   📌 관리자 통계 불러오기 (제품 포함)
 ========================================== */
 async function loadDashboardStats() {
   const res = await fetch(`/api/admin/dashboard`, {
@@ -427,6 +447,7 @@ async function loadDashboardStats() {
 
   const data = await res.json();
 
+  /* ===== 기존 조회수 / 게시물 ===== */
   document.getElementById("thisMonthViews").textContent =
     data.thisMonthViews.toLocaleString();
   document.getElementById("lastMonthViews").textContent =
@@ -447,9 +468,51 @@ async function loadDashboardStats() {
   topList.innerHTML = data.topPosts
     .map(p => `<li>${p.title} — <strong>${(p.total_views || 0).toLocaleString()}</strong> 회</li>`)
     .join("");
+
+
+  /* =============================
+       🔥 추가된 제품 통계
+  ============================== */
+
+  // 총 제품 수
+  if (document.getElementById("productCount")) {
+    document.getElementById("productCount").textContent =
+      data.productCount.toLocaleString();
+  }
+
+  // 최근 제품 목록
+  if (document.getElementById("recentProducts")) {
+    const box = document.getElementById("recentProducts");
+
+    if (data.recentProducts.length === 0) {
+      box.innerHTML = `<p style="color:#777;">등록된 제품이 없습니다.</p>`;
+    } else {
+      box.innerHTML = data.recentProducts
+        .map(
+          p => `
+          <div style="display:flex; gap:12px; padding:10px 0; border-bottom:1px solid #eee;">
+            <img src="${p.image || '/img/no-image.png'}"
+                 style="width:60px; height:45px; object-fit:cover; border-radius:6px; border:1px solid #ddd;">
+            <div style="flex:1;">
+              <div style="font-size:15px; font-weight:600;">${p.title}</div>
+              <div style="font-size:13px; color:#666;">
+                카테고리: ${p.category} / 언어: ${p.lang}
+              </div>
+            </div>
+            <button onclick="location.href='/kr/admin/products.html'"
+                    style="padding:5px 10px; background:#0f2679; color:#fff; border:none; border-radius:6px; cursor:pointer;">
+              관리
+            </button>
+          </div>
+        `
+        )
+        .join("");
+    }
+  }
 }
 
 loadDashboardStats();
+
 
 
 /* ==========================================
