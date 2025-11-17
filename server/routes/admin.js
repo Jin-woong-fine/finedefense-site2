@@ -2,7 +2,8 @@ import express from "express";
 import fs from "fs";
 import path from "path";
 import multer from "multer";
-import verifyToken from "../middleware/auth.js";
+import { verifyToken } from "../middleware/auth.js";
+
 import db from "../config/db.js";
 
 const router = express.Router();

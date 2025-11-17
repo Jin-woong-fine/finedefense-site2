@@ -4,7 +4,8 @@ import path from "path";
 import fs from "fs";
 import jwt from "jsonwebtoken";
 import db from "../config/db.js";
-import verifyToken from "../middleware/auth.js";
+import { verifyToken } from "../middleware/auth.js";
+
 
 const router = express.Router();
 
