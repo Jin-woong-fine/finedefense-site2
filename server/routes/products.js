@@ -3,7 +3,8 @@ import express from "express";
 import multer from "multer";
 import path from "path";
 import { fileURLToPath } from "url";
-import db from "../db.js"; // <- 너가 쓰는 db 커넥션 모듈 그대로
+import db from "../config/db.js";
+
 
 const router = express.Router();
 
