@@ -75,7 +75,7 @@ function initImagePreview() {
 }
 
 /* =========================================================
- 📤 제품 업로드 (FormData manual append)
+ 📤 제품 업로드
 ========================================================= */
 function initFormSubmit() {
   const form = document.getElementById("productForm");
@@ -87,7 +87,6 @@ function initFormSubmit() {
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-
     console.log("[Form] 제출 시작");
 
     const titleEl = document.getElementById("title");
@@ -103,12 +102,7 @@ function initFormSubmit() {
       return;
     }
 
-    console.log("[Form] title =", title);
-    console.log("[Form] category =", category);
-    console.log("[Form] 파일 개수 =", files.length);
-
     const fd = new FormData();
-
     fd.append("title", title);
     fd.append("category", category);
     fd.append("description_html", editor ? editor.getHTML() : "");
@@ -117,8 +111,6 @@ function initFormSubmit() {
       fd.append("images", files[i]);
     }
 
-    console.log("[FormData] 구성 완료");
-
     try {
       const res = await fetch("/api/products", {
         method: "POST",
@@ -126,33 +118,28 @@ function initFormSubmit() {
         body: fd,
       });
 
-      console.log("[Upload] 응답 코드:", res.status);
-
       if (!res.ok) {
         const err = await res.json().catch(() => null);
-        console.error("[Upload Error]", err || res.statusText);
         alert("등록 실패: " + (err?.detail || res.statusText));
         return;
       }
 
       alert("등록 완료!");
-
-      // 초기화
       form.reset();
       if (editor) editor.setHTML("");
-      const preview = document.getElementById("preview");
-      if (preview) preview.innerHTML = "";
+      document.getElementById("preview").innerHTML = "";
 
       loadProductList();
+
     } catch (err) {
-      console.error("[Exception] 업로드 중 오류:", err);
+      console.error("[Exception] 업로드 오류:", err);
       alert("업로드 중 오류 발생");
     }
   });
 }
 
 /* =========================================================
- 📥 목록 로드
+ 📥 제품 목록 로드 (수정/삭제 버튼 포함)
 ========================================================= */
 async function loadProductList() {
   const list = document.getElementById("productList");
@@ -177,14 +164,57 @@ async function loadProductList() {
         (p) => `
       <div class="product-card">
         <img src="${p.thumbnail || "/img/products/Image-placeholder.png"}">
-        <h3>${p.title}</h3>
-        <div class="category">${p.category}</div>
+
+        <div class="card-body">
+          <h3 class="title">${p.title}</h3>
+          <div class="category">${p.category}</div>
+
+          <div class="card-buttons">
+            <button class="btn btn-primary" onclick="editProduct('${p.id}')">수정</button>
+            <button class="btn btn-danger" onclick="deleteProduct('${p.id}')">삭제</button>
+          </div>
+        </div>
       </div>
     `
       )
       .join("");
+
   } catch (err) {
     console.error("목록 오류:", err);
     list.innerHTML = "<p style='color:red;'>목록을 불러올 수 없습니다</p>";
+  }
+}
+
+/* =========================================================
+ ✏ 수정 기능 (구현 안 된 경우 대비)
+========================================================= */
+function editProduct(id) {
+  alert("수정 기능 준비 중입니다. (id: " + id + ")");
+}
+
+/* =========================================================
+ 🗑 삭제 기능
+========================================================= */
+async function deleteProduct(id) {
+  if (!confirm("정말 삭제하시겠습니까?")) return;
+
+  try {
+    const res = await fetch(`/api/products/${id}`, {
+      method: "DELETE",
+      headers: getAuthHeaders(),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => null);
+      alert("삭제 실패: " + (err?.detail || res.statusText));
+      return;
+    }
+
+    alert("삭제 완료");
+    loadProductList();
+
+  } catch (err) {
+    console.error("[Delete] 오류:", err);
+    alert("삭제 중 오류 발생");
   }
 }

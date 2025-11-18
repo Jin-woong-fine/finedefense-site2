@@ -8,10 +8,8 @@
   <link rel="stylesheet" href="./css/admin.css" />
 
   <!-- Toast UI Editor CSS (CDN) -->
-  <link
-    rel="stylesheet"
-    href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css"
-  />
+  <link rel="stylesheet"
+        href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
 
   <style>
     body { margin: 0; background:#f4f6f9; font-family:'Noto Sans KR', sans-serif; }
@@ -79,6 +77,9 @@
       font-size: 0.95rem;
     }
 
+    /* ======================================================
+       🔵 제품 카드 스타일 (버튼 포함 완전체)
+    ====================================================== */
     .product-card {
       width: 260px;
       background: #fff;
@@ -90,11 +91,31 @@
 
     .product-card img {
       width: 100%;
-      height: 180px;   /* 고정 높이 */
-      object-fit: cover;  /* 비율 유지 + 꽉 채우기 */
+      height: 180px;
+      object-fit: cover;
       display: block;
     }
 
+    .card-body {
+      padding: 15px;
+    }
+
+    .card-body .title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .card-body .category {
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .card-buttons {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+    }
 
     .btn-primary { background:#0f2679; color:#fff; }
     .btn-danger { background:#d62828; color:#fff; }
@@ -116,10 +137,9 @@
     </div>
   </div>
 
-  <!-- 전체 FORM 시작 -->
+  <!-- 🔵 제품 등록 FORM -->
   <form id="productForm" enctype="multipart/form-data">
 
-    <!-- 🔵 제품 등록 제목 -->
     <section class="panel">
       <h2>신규 제품 등록</h2>
 
@@ -136,15 +156,14 @@
       <h3>제품 설명 (Toast UI Editor)</h3>
       <div id="editor" style="border:1px solid #ccc;border-radius:6px;"></div>
 
-      <!-- Toast Editor HTML 전송용 -->
+      <!-- Toast 결과 HTML 전송 -->
       <textarea id="description_html" name="description_html" style="display:none;"></textarea>
     </section>
 
-    <!-- 🟦 이미지 업로드 panel 밖으로 완전 분리 -->
+    <!-- 이미지 업로드 -->
     <section class="panel">
       <h3>제품 이미지 업로드 (여러 개 가능)</h3>
 
-      <!-- ❗ panel 안에 file input 넣으면 Chrome drop 버그 발생 -->
       <input
         type="file"
         id="images"
@@ -162,9 +181,8 @@
     </section>
 
   </form>
-  <!-- FORM 끝 -->
 
-  <!-- 🔵 제품 목록 -->
+  <!-- 🔵 등록 제품 목록 -->
   <section class="panel">
     <h2>등록 제품 목록</h2>
     <div id="productList" class="product-grid"></div>
@@ -179,7 +197,7 @@
 <!-- Toast Editor -->
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 
-<!-- 제품 JS -->
+<!-- 제품 로직 -->
 <script src="./js/products_core.js"></script>
 
 <script>
