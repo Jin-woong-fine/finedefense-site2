@@ -35,63 +35,81 @@ const storage = multer.diskStorage({
   },
 });
 
-// 🔥 10MB 제한
 const upload = multer({
   storage,
-  limits: { fileSize: 10 * 1024 * 1024 },
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB
+    files: 20,
+  },
 });
 
 /* =========================================================
    📌 제품 등록 (POST)
+   🔥 multer 에러 핸들링 포함
 ========================================================= */
 
-router.post("/", upload.array("images", 20), async (req, res) => {
-  try {
-    const { title, category, description_html } = req.body;
+router.post("/", (req, res) => {
+  upload.array("images", 20)(req, res, async (err) => {
+    // -------------------------------
+    // 🔥 Multer 에러 처리 (중요)
+    // -------------------------------
+    if (err) {
+      console.error("🔥 [Multer Error] 파일 업로드 실패:", err);
 
-    if (!title || !category) {
-      return res.status(400).json({ message: "title, category 필수" });
+      return res.status(400).json({
+        message: "upload error",
+        detail: err.message,
+        code: err.code,
+      });
     }
 
-    // 📌 thumbnail = 첫 이미지
-    let thumbnailPath = null;
-    if (req.files && req.files.length > 0) {
-      thumbnailPath = "/uploads/products/" + req.files[0].filename;
-    }
+    try {
+      const { title, category, description_html } = req.body;
 
-    // 1) 제품 레코드 생성
-    const [result] = await db.execute(
-      `
-      INSERT INTO products (title, category, thumbnail, description_html)
-      VALUES (?, ?, ?, ?)
-      `,
-      [title, category, thumbnailPath, description_html || ""]
-    );
+      if (!title || !category) {
+        return res.status(400).json({ message: "title, category 필수" });
+      }
 
-    const productId = result.insertId;
+      // 📌 thumbnail = 첫 이미지
+      let thumbnailPath = null;
+      if (req.files && req.files.length > 0) {
+        thumbnailPath = "/uploads/products/" + req.files[0].filename;
+      }
 
-    // 2) 상세 이미지 저장
-    if (req.files && req.files.length > 0) {
-      const values = req.files.map((file, idx) => [
-        productId,
-        "/uploads/products/" + file.filename,
-        idx,
-      ]);
-
-      await db.query(
+      // 1) 제품 레코드 생성
+      const [result] = await db.execute(
         `
-        INSERT INTO product_images (product_id, url, sort_order)
-        VALUES ?
+        INSERT INTO products (title, category, thumbnail, description_html)
+        VALUES (?, ?, ?, ?)
         `,
-        [values]
+        [title, category, thumbnailPath, description_html || ""]
       );
-    }
 
-    return res.status(201).json({ message: "created", id: productId });
-  } catch (err) {
-    console.error("POST /api/products error:", err);
-    return res.status(500).json({ message: "server error" });
-  }
+      const productId = result.insertId;
+
+      // 2) 상세 이미지 저장
+      if (req.files && req.files.length > 0) {
+        const values = req.files.map((file, idx) => [
+          productId,
+          "/uploads/products/" + file.filename,
+          idx,
+        ]);
+
+        await db.query(
+          `
+          INSERT INTO product_images (product_id, url, sort_order)
+          VALUES ?
+          `,
+          [values]
+        );
+      }
+
+      return res.status(201).json({ message: "created", id: productId });
+    } catch (err) {
+      console.error("🔥 POST /api/products error:", err);
+      return res.status(500).json({ message: "server error" });
+    }
+  });
 });
 
 /* =========================================================
