@@ -51,6 +51,7 @@ function initFormSubmit() {
     e.preventDefault();
 
     const title = document.getElementById("title").value.trim();
+    const summary = document.getElementById("summary").value.trim();
     const category = document.getElementById("category").value;
     const lang = document.getElementById("lang").value;
     const files = document.getElementById("images").files;
@@ -59,6 +60,7 @@ function initFormSubmit() {
 
     const fd = new FormData();
     fd.append("title", title);
+    fd.append("summary", summary);
     fd.append("category", category);
     fd.append("lang", lang);
     fd.append("description_html", editor.getHTML());
