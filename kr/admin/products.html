@@ -5,9 +5,8 @@
   <title>제품 관리 | Fine Defense 관리자</title>
 
   <!-- Toast UI Editor CSS -->
-  <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+  <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
 
-  <!-- 관리자 공통 CSS -->
   <link rel="stylesheet" href="./css/admin.css">
 
   <style>
@@ -44,46 +43,41 @@
       border:1px solid #ccc;
       border-radius:6px;
       margin-bottom:10px;
-      font-family:inherit;
-      font-size:14px;
-      box-sizing:border-box;
+      box-sizing: border-box;
     }
 
     .thumb-preview {
       display:flex;
       gap:10px;
       flex-wrap:wrap;
-      margin-top:8px;
     }
 
     .thumb-preview-item {
-      position:relative;
+      position: relative;
+    }
+
+    .thumb-preview img {
       width:80px;
       height:80px;
-      border-radius:8px;
-      overflow:hidden;
-      border:1px solid #ddd;
-    }
-
-    .thumb-preview-item img {
-      width:100%;
-      height:100%;
       object-fit:cover;
-      display:block;
+      border:1px solid #ddd;
+      border-radius:8px;
     }
 
-    .thumb-preview-item button {
+    .thumb-preview button {
       position:absolute;
       top:-6px;
       right:-6px;
       width:20px;
       height:20px;
-      border-radius:50%;
       border:none;
+      border-radius:50%;
       background:#d62828;
       color:#fff;
-      font-size:12px;
       cursor:pointer;
+      font-size:12px;
+      line-height:20px;
+      padding:0;
     }
 
     .product-grid {
@@ -99,7 +93,7 @@
       padding:15px;
       border:1px solid #eee;
       box-shadow:0 2px 8px rgba(0,0,0,0.05);
-      box-sizing:border-box;
+      box-sizing: border-box;
     }
 
     .product-card img {
@@ -108,11 +102,10 @@
       object-fit:cover;
       border-radius:8px;
       margin-bottom:10px;
-      background:#f2f2f2;
     }
 
     .product-card h3 {
-      font-size:1.05rem;
+      font-size:1.1rem;
       margin:0 0 6px;
       color:#222;
     }
@@ -123,23 +116,16 @@
       margin-bottom:10px;
     }
 
-    .product-card .date {
-      font-size:0.8rem;
-      color:#999;
-      margin-bottom:10px;
-    }
-
     .btn {
       padding:8px 14px;
       border:none;
       cursor:pointer;
       border-radius:6px;
-      font-size:13px;
-      font-family:inherit;
+      font-size:0.9rem;
     }
     .btn-primary { background:#0f2679; color:#fff; }
-    .btn-danger  { background:#d62828; color:#fff; }
-    .btn-edit    { background:#1d7af3; color:#fff; }
+    .btn-danger { background:#d62828; color:#fff; }
+    .btn-edit { background:#1d7af3; color:#fff; }
   </style>
 </head>
 
@@ -163,7 +149,7 @@
     <h2>신규 제품 등록</h2>
 
     <input id="title" class="input" placeholder="제품명 입력">
-    
+
     <select id="category" class="input">
       <option value="">카테고리 선택</option>
       <option value="towed">수중이동형 케이블</option>
@@ -173,13 +159,13 @@
     </select>
 
     <h3>제품 설명 (Toast UI Editor)</h3>
-    <div id="editor"></div>
+    <div id="editor" style="border:1px solid #ccc;border-radius:6px;"></div>
 
-    <h3 style="margin-top:20px;">제품 이미지 (여러 개 선택 가능)</h3>
+    <h3 style="margin-top:20px;">제품 이미지 (여러 개 가능)</h3>
     <input type="file" id="images" multiple class="input" accept="image/*">
     <div id="preview" class="thumb-preview"></div>
 
-    <button class="btn btn-primary" style="margin-top:15px;" onclick="uploadProduct()">등록</button>
+    <button class="btn btn-primary" onclick="uploadProduct()">등록</button>
   </section>
 
   <!-- 🔵 제품 목록 -->
@@ -193,25 +179,19 @@
 <!-- 1) Toast UI Editor JS -->
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 
-<!-- 2) 인증 / 권한 공통 -->
+<!-- 2) 공통 스크립트 -->
 <script src="./js/common_auth.js"></script>
-
-<!-- 3) 사이드바 UI -->
 <script src="./js/sidebar.js"></script>
 
-<!-- 4) 제품 관리 로직 -->
-<script src="./js/products_core.js"></script>
+<!-- 3) 제품 관리 로직 -->
+<script src="./js/products_core_tui.js"></script>
 
-<!-- 5) 마지막: DOM 준비 후 공통 처리 -->
+<!-- 4) DOM 준비 후 공통 처리 -->
 <script>
   document.addEventListener("DOMContentLoaded", () => {
-    // 권한 체크
     requireAdmin();
-
-    // 사이드바 활성화
     loadSidebar("products");
 
-    // 로그아웃 버튼
     const logoutBtn = document.getElementById("logoutBtn");
     if (logoutBtn) logoutBtn.addEventListener("click", logout);
   });

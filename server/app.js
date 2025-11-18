@@ -3,11 +3,13 @@ import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
 
+// 🔥 라우터들 불러오기
 import sendInquiryRouter from "./routes/sendInquiry.js";
 import authRouter from "./routes/auth.js";
 import adminRouter from "./routes/admin.js";
 import postsRouter from "./routes/posts.js";
 import productsRouter from "./routes/products.js";
+import uploadsRouter from "./routes/uploads.js";   // ⭐️ Toast Editor 전용 업로드
 
 // ------------------------------------------------------
 // 기본 설정
@@ -27,31 +29,37 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ------------------------------------------------------
-// ⛳ 업로드 이미지 static 경로
+// 🔥 업로드 이미지 정적 제공
 // ------------------------------------------------------
 //
-// 브라우저 경로:
-//   /uploads/products/aaa.png
+// URL:   https://domain/uploads/products/aaa.png
+// 실제:  server/public/uploads/products/aaa.png
 //
-// 실제 파일 경로:
-//   server/public/uploads/products/aaa.png
-
-app.use("/uploads", express.static(path.join(__dirname, "public", "uploads")));
-
-// ------------------------------------------------------
-// API 라우터 등록
-// ------------------------------------------------------
-
-app.use("/api/products", productsRouter);
-app.use("/api/inquiry", sendInquiryRouter);
-app.use("/api/auth", authRouter);
-app.use("/api/admin", adminRouter);
-app.use("/api/posts", postsRouter);
+// URL:   https://domain/uploads/editor/bb.png
+// 실제:  server/public/uploads/editor/bb.png
+//
+app.use(
+  "/uploads",
+  express.static(path.join(__dirname, "public", "uploads"))
+);
 
 // ------------------------------------------------------
-// 정적 파일 제공 (홈페이지 HTML)
+// 📌 API 라우터
 // ------------------------------------------------------
 
+app.use("/api/products", productsRouter); // 제품
+app.use("/api/inquiry", sendInquiryRouter); // 1:1 문의
+app.use("/api/auth", authRouter); // 로그인
+app.use("/api/admin", adminRouter); // 관리자
+app.use("/api/posts", postsRouter); // 뉴스룸
+app.use("/api/uploads", uploadsRouter); // ⭐️ Toast Editor 이미지 업로드 API
+
+// ------------------------------------------------------
+// 🌐 정적 파일 (홈페이지 배포용)
+// ------------------------------------------------------
+//
+// /kr/index.html, /en/index.html ... 전부 여기서 서비스됨.
+//
 app.use(express.static(path.join(__dirname, "../")));
 
 // ------------------------------------------------------
