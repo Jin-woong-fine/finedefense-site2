@@ -207,3 +207,34 @@ router.put("/:id", verifyToken, verifyEditor, (req, res) => {
    🔄 이미지 순서 업데이트 (Drag & Drop)
 ========================================================== */
 router.put("/:id/reorder-images", verifyToken, verifyEditor, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { order } = req.body;  
+    // order = [{ imageId: 12, sort: 0 }, { imageId: 15, sort: 1 }, ...]
+
+    if (!Array.isArray(order)) {
+      return res.status(400).json({ message: "Invalid order format" });
+    }
+
+    // 여러개 업데이트 → Promise.all로 병렬 처리
+    await Promise.all(
+      order.map((item) =>
+        db.query(
+          `UPDATE product_images 
+           SET sort_order = ? 
+           WHERE id = ? AND product_id = ?`,
+          [item.sort, item.imageId, id]
+        )
+      )
+    );
+
+    res.json({ message: "reordered" });
+
+  } catch (err) {
+    console.error("Reorder error:", err);
+    res.status(500).json({ message: "server error" });
+  }
+});
+
+
+export default router;
