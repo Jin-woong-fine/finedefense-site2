@@ -14,6 +14,7 @@ body {
 =========================== */
 #sidebar {
   width: 240px;
+  flex-shrink: 0;  /* ← 사이드바 절대 줄어들지 않음 */
   background: #0f2679;
   color: #fff;
   min-height: 100vh;
@@ -49,6 +50,8 @@ body {
   background: rgba(255,255,255,.28);
   color: #fff;
 }
+
+
 
 /* ===========================
    MAIN
