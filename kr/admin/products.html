@@ -148,13 +148,16 @@
     </div>
   </div>
 
-  <!-- 🔵 제품 등록 -->
-  <section class="panel">
-    <h2>신규 제품 등록</h2>
+ <!-- 🔵 제품 등록 -->
+<section class="panel">
+  <h2>신규 제품 등록</h2>
 
-    <input id="title" class="input" placeholder="제품명 입력" />
+  <!-- ✅ form 방식으로 전면 수정 -->
+  <form id="productForm" enctype="multipart/form-data">
 
-    <select id="category" class="input">
+    <input id="title" name="title" class="input" placeholder="제품명 입력" />
+
+    <select id="category" name="category" class="input">
       <option value="">카테고리 선택</option>
       <option value="towed">수중이동형 케이블</option>
       <option value="fixed">수중고정형 케이블</option>
@@ -165,12 +168,26 @@
     <h3>제품 설명 (Toast UI Editor)</h3>
     <div id="editor" style="border:1px solid #ccc;border-radius:6px;"></div>
 
+    <!-- Toast Editor 내용 저장용 숨김 textarea -->
+    <textarea id="description_html" name="description_html" style="display:none;"></textarea>
+
     <h3 style="margin-top:20px;">제품 이미지 (여러 개 가능)</h3>
-    <input type="file" id="images" name="images" multiple class="input" accept="image/*">
+    <input
+      type="file"
+      id="images"
+      name="images"
+      multiple
+      class="input"
+      accept="image/*"
+    />
     <div id="preview" class="thumb-preview"></div>
 
-    <button class="btn btn-primary" onclick="uploadProduct()" style="margin-top:15px;">등록</button>
-  </section>
+    <button type="submit" class="btn btn-primary" style="margin-top:15px;">
+      등록
+    </button>
+  </form>
+</section>
+
 
   <!-- 🔵 제품 목록 -->
   <section class="panel">

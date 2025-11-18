@@ -3,7 +3,7 @@
 console.log("%c[products_core] 로드됨", "color:#4caf50;font-weight:bold;");
 
 /* =========================================================
-  🔐 토큰 헤더
+  🔐 토큰 헤더 (Authorization)
 ========================================================= */
 function getAuthHeaders() {
   const token = localStorage.getItem("token");
@@ -17,18 +17,17 @@ function getAuthHeaders() {
 /* =========================================================
   📌 상태
 ========================================================= */
-let editor = null;          // Toast UI Editor 인스턴스
-let selectedFiles = [];     // 사용자가 선택한 이미지 파일들 (File 객체 배열)
+let editor = null;   // Toast UI Editor 인스턴스
 
 /* =========================================================
   🧩 초기화 진입점
-  - products.html 에서 window.initProductsPage() 호출
 ========================================================= */
 window.initProductsPage = function () {
   console.log("%c[products_core] initProductsPage()", "color:#2196f3;font-weight:bold;");
 
   initEditor();
-  initImageInput();
+  initImagePreview();
+  initFormSubmit();
   loadProductList();
 };
 
@@ -38,7 +37,7 @@ window.initProductsPage = function () {
 function initEditor() {
   const editorEl = document.getElementById("editor");
   if (!editorEl) {
-    console.error("[Editor] #editor 요소를 찾을 수 없습니다.");
+    console.error("[Editor] #editor 요소 없음");
     return;
   }
 
@@ -47,9 +46,8 @@ function initEditor() {
   editor = new Editor({
     el: editorEl,
     height: "320px",
-    initialEditType: "wysiwyg",   // 마크다운 말고 워드처럼
+    initialEditType: "wysiwyg",
     previewStyle: "vertical",
-    // language: "ko",  // 필요하면 언어팩 추가
     toolbarItems: [
       ["heading", "bold", "italic", "strike"],
       ["hr", "quote"],
@@ -59,13 +57,13 @@ function initEditor() {
     ],
   });
 
-  console.log("[Editor] Toast UI Editor 초기화 완료:", editor);
+  console.log("[Editor] 초기화 완료:", editor);
 }
 
 /* =========================================================
-  🖼 이미지 선택 + 다중 유지 + 미리보기 (정답 버전)
+  🖼 이미지 선택 시 단순 프리뷰 렌더링
 ========================================================= */
-function initImageInput() {
+function initImagePreview() {
   const inputEl = document.getElementById("images");
   const previewEl = document.getElementById("preview");
 
@@ -74,133 +72,93 @@ function initImageInput() {
     return;
   }
 
-  inputEl.addEventListener("change", (e) => {
-    const newFiles = Array.from(e.target.files || []);
-    console.log("[Image] 새로 선택된 파일:", newFiles);
+  inputEl.addEventListener("change", () => {
+    previewEl.innerHTML = "";
+    const files = inputEl.files;
 
-    // 🔥 기존 파일 + 새 파일 합침 (덮어쓰지 않음)
-    selectedFiles = [...selectedFiles, ...newFiles];
+    console.log("[Image] 파일 선택:", files);
 
-    console.log("[Image] selectedFiles 최신 상태:", selectedFiles);
+    Array.from(files).forEach((file) => {
+      const wrapper = document.createElement("div");
+      wrapper.className = "thumb-preview-item";
 
-    renderImagePreview();
+      const img = document.createElement("img");
+      const reader = new FileReader();
 
-        // ❌ 삭제해야 하는 부분
-        // e.target.value = "";
-  });
-}
+      reader.onload = (ev) => {
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
 
-function renderImagePreview() {
-  const previewEl = document.getElementById("preview");
-  if (!previewEl) return;
-
-  previewEl.innerHTML = "";
-
-  console.log("[Preview] 렌더링 시작, 총 파일 개수:", selectedFiles.length);
-
-  selectedFiles.forEach((file, idx) => {
-    const wrapper = document.createElement("div");
-    wrapper.className = "thumb-preview-item";
-
-    const img = document.createElement("img");
-    const reader = new FileReader();
-
-    reader.onload = (ev) => {
-      img.src = ev.target.result;
-    };
-    reader.readAsDataURL(file);
-
-    const removeBtn = document.createElement("button");
-    removeBtn.className = "thumb-remove-btn";
-    removeBtn.textContent = "×";
-
-    removeBtn.addEventListener("click", () => {
-      console.log("[Preview] 삭제 idx:", idx);
-      selectedFiles.splice(idx, 1);
-      renderImagePreview();
+      wrapper.appendChild(img);
+      previewEl.appendChild(wrapper);
     });
-
-    wrapper.appendChild(img);
-    wrapper.appendChild(removeBtn);
-    previewEl.appendChild(wrapper);
   });
 }
 
 /* =========================================================
-  📦 제품 등록 (POST /api/products)
+  📦 Form 방식 제품 등록
 ========================================================= */
-window.uploadProduct = async function () {
-  try {
-    const titleEl = document.getElementById("title");
-    const categoryEl = document.getElementById("category");
-
-    const title = titleEl?.value.trim();
-    const category = categoryEl?.value;
-    const descriptionHtml = editor ? editor.getHTML().trim() : "";
-
-    console.log("[Upload] title=", title);
-    console.log("[Upload] category=", category);
-    console.log("[Upload] desc length=", descriptionHtml.length);
-    console.log("[Upload] selectedFiles=", selectedFiles);
-
-    if (!title) {
-      alert("제품명을 입력하세요.");
-      return;
-    }
-    if (!category) {
-      alert("카테고리를 선택하세요.");
-      return;
-    }
-
-    const fd = new FormData();
-    fd.append("title", title);
-    fd.append("category", category);
-    fd.append("description_html", descriptionHtml);
-
-    selectedFiles.forEach((file) => {
-      fd.append("images", file); // 백엔드에서 upload.array("images", 20)
-    });
-
-    const res = await fetch("/api/products", {
-      method: "POST",
-      headers: getAuthHeaders(),  // Authorization만 추가 (Content-Type은 FormData가 자동 지정)
-      body: fd,
-    });
-
-    console.log("[Upload] 응답 상태:", res.status);
-
-    if (!res.ok) {
-      const txt = await res.text();
-      console.error("[Upload] 서버 오류:", txt);
-      alert("❌ 등록 실패\n" + txt);
-      return;
-    }
-
-    const data = await res.json();
-    console.log("[Upload] 등록 성공:", data);
-
-    // 성공 alert
-    alert("등록 완료!");
-
-    // 폼 초기화
-    if (titleEl) titleEl.value = "";
-    if (categoryEl) categoryEl.value = "";
-    if (editor) editor.setHTML("");
-
-    selectedFiles = [];
-    renderImagePreview();
-
-    // 🔥 파일 input은 여기서만 value 초기화
-    const imageInputEl = document.getElementById("images");
-    if (imageInputEl) imageInputEl.value = "";
-
-    // 목록 새로고침
-    loadProductList();
-  } catch (err) {
-    console.error("[Upload] 예외 발생:", err);
-    alert("등록 중 오류가 발생했습니다.");
+function initFormSubmit() {
+  const form = document.getElementById("productForm");
+  if (!form) {
+    console.error("[Form] #productForm 없음");
+    return;
   }
-};
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    console.log("[Form] 제출 시작");
+
+    // 1) Toast 내용 hidden textarea로 복사
+    const hiddenDesc = document.getElementById("description_html");
+    if (editor && hiddenDesc) {
+      hiddenDesc.value = editor.getHTML();
+    }
+
+    // 2) FormData 자동 생성
+    const fd = new FormData(form);
+
+    console.log("[FormData] 전송 준비됨");
+
+    try {
+      const res = await fetch("/api/products", {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: fd,   // Content-Type 자동 설정됨
+      });
+
+      console.log("[Upload] 응답 코드:", res.status);
+
+      if (!res.ok) {
+        const txt = await res.text();
+        console.error("[Upload] 서버 오류:", txt);
+        alert("❌ 등록 실패: " + txt);
+        return;
+      }
+
+      alert("등록 완료!");
+
+      // 폼 초기화 (브라우저가 자동으로 초기화함)
+      form.reset();
+
+      // 프리뷰 초기화
+      const previewEl = document.getElementById("preview");
+      if (previewEl) previewEl.innerHTML = "";
+
+      // Toast Editor 초기화
+      if (editor) editor.setHTML("");
+
+      // 목록 갱신
+      loadProductList();
+
+    } catch (err) {
+      console.error("[Upload] 예외 발생:", err);
+      alert("등록 중 오류가 발생했습니다.");
+    }
+  });
+}
 
 /* =========================================================
   📥 제품 목록 로드
@@ -219,7 +177,7 @@ async function loadProductList() {
       headers: getAuthHeaders(),
     });
 
-    console.log("[List] 응답 상태:", res.status);
+    console.log("[List] 응답 코드:", res.status);
 
     if (!res.ok) {
       listEl.innerHTML = "<p style='color:red;'>목록 조회 실패</p>";
@@ -227,7 +185,7 @@ async function loadProductList() {
     }
 
     const products = await res.json();
-    console.log("[List] 조회 개수:", products.length, products);
+    console.log("[List] 조회된 제품:", products);
 
     if (!products.length) {
       listEl.innerHTML = "<p>등록된 제품이 없습니다.</p>";
@@ -235,9 +193,10 @@ async function loadProductList() {
     }
 
     listEl.innerHTML = products.map(renderProductCardHTML).join("");
+
   } catch (err) {
-    console.error("[List] 예외:", err);
-    listEl.innerHTML = "<p style='color:red;'>목록 조회 중 오류 발생</p>";
+    console.error("[List] 오류:", err);
+    listEl.innerHTML = "<p style='color:red;'>조회 오류 발생</p>";
   }
 }
 
@@ -247,23 +206,23 @@ async function loadProductList() {
 function renderProductCardHTML(p) {
   const img = p.thumbnail || "/img/products/Image-placeholder.png";
 
-  const categoryLabel = {
+  const categoryMap = {
     towed: "수중이동형 케이블",
     fixed: "수중고정형 케이블",
     connector: "수중 커넥터",
     custom: "커스텀 케이블",
-  }[p.category] || "미지정";
+  };
 
-  const dateText = p.created_at
-    ? new Date(p.created_at).toLocaleString("ko-KR")
-    : "";
+  const categoryText = categoryMap[p.category] || "미지정";
 
   return `
     <div class="product-card">
       <img src="${img}" alt="${p.title}">
       <h3>${p.title}</h3>
-      <div class="category">${categoryLabel}</div>
-      <div style="font-size:0.8rem;color:#999;margin-bottom:8px;">${dateText}</div>
+      <div class="category">${categoryText}</div>
+      <div style="font-size:0.8rem;color:#999;margin-bottom:8px;">
+        ${new Date(p.created_at).toLocaleString("ko-KR")}
+      </div>
       <div style="display:flex;gap:6px;margin-top:10px;">
         <button class="btn btn-edit" onclick="editProduct(${p.id})">수정</button>
         <button class="btn btn-danger" onclick="deleteProduct(${p.id})">삭제</button>
@@ -276,7 +235,6 @@ function renderProductCardHTML(p) {
   ✏ 수정 / 삭제
 ========================================================= */
 window.editProduct = function (id) {
-  console.log("[EDIT] 이동:", id);
   location.href = `/kr/admin/edit_product.html?id=${id}`;
 };
 
@@ -289,19 +247,17 @@ window.deleteProduct = async function (id) {
       headers: getAuthHeaders(),
     });
 
-    console.log("[DELETE] 응답 상태:", res.status);
-
     if (!res.ok) {
       const txt = await res.text();
-      console.error("[DELETE] 서버 오류:", txt);
-      alert("삭제 실패\n" + txt);
+      alert("삭제 실패: " + txt);
       return;
     }
 
     alert("삭제 완료");
     loadProductList();
+
   } catch (err) {
     console.error("[DELETE] 예외:", err);
-    alert("삭제 중 오류가 발생했습니다.");
+    alert("삭제 중 오류 발생");
   }
 };
