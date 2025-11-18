@@ -1,3 +1,4 @@
+// server/routes/uploads.js
 import express from "express";
 import multer from "multer";
 import path from "path";
@@ -5,17 +6,19 @@ import fs from "fs";
 
 const router = express.Router();
 
-/* =========================================================================
-   📂 /uploads/editor 폴더 준비
-========================================================================= */
+/* =========================================================
+   📂 Toast Editor 업로드 폴더 준비
+========================================================= */
+
 const editorUploadDir = path.join(process.cwd(), "uploads", "editor");
 if (!fs.existsSync(editorUploadDir)) {
   fs.mkdirSync(editorUploadDir, { recursive: true });
 }
 
-/* =========================================================================
-   📸 multer 설정 (에디터 이미지)
-========================================================================= */
+/* =========================================================
+   📸 Multer 설정 (10MB)
+========================================================= */
+
 const storage = multer.diskStorage({
   destination(req, file, cb) {
     cb(null, editorUploadDir);
@@ -30,21 +33,23 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage });
+const upload = multer({
+  storage,
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB
+  },
+});
 
-/* =========================================================================
+/* =========================================================
    📌 Toast UI Editor 이미지 업로드
-   POST /api/uploads/editor-image
-========================================================================= */
+========================================================= */
+
 router.post("/editor-image", upload.single("image"), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ message: "no file" });
   }
 
-  // 클라이언트에서 접근 가능한 URL
   const url = "/uploads/editor/" + req.file.filename;
-
-  // Toast Editor는 { url } 만 주면 됨
   res.json({ url });
 });
 
