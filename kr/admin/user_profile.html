@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>내 프로필 | Fine Defense 관리자</title>
+
+  <link rel="stylesheet" href="./css/admin.css">
+
+  <style>
+    .profile-box {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    .avatar-img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #ddd;
+    }
+    .avatar-wrapper {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="sidebar"></div>
+
+<div class="main">
+
+  <div class="topbar">
+    <h2>내 프로필</h2>
+    <div>
+      <button class="btn btn-primary" onclick="location.href='../index.html'">홈으로</button>
+      <button class="btn btn-danger" onclick="logout()">로그아웃</button>
+    </div>
+  </div>
+
+  <section class="panel profile-box">
+
+    <div class="avatar-wrapper">
+      <img id="avatarImg" class="avatar-img" src="/img/profile/default_avatar.png">
+      <br><br>
+      <input type="file" id="avatarInput" accept="image/*">
+      <button class="btn btn-primary" onclick="uploadAvatar()">업로드</button>
+    </div>
+
+    <label>이름</label>
+    <input id="name" class="input">
+
+    <button class="btn btn-primary" onclick="updateName()">이름 변경</button>
+
+    <h3 style="margin-top:30px;">비밀번호 변경</h3>
+    <input id="oldPw" type="password" class="input" placeholder="현재 비밀번호">
+    <input id="newPw" type="password" class="input" placeholder="새 비밀번호">
+    <button class="btn btn-primary" onclick="changePassword()">비밀번호 변경</button>
+
+  </section>
+
+</div>
+
+<script src="/kr/admin/js/common_auth.js"></script>
+<script src="/kr/admin/js/sidebar.js"></script>
+<script src="/kr/admin/js/user_profile.js"></script>
+
+<script>
+  loadSidebar("profile");
+  requireLogin();
+</script>
+
+</body>
+</html>
