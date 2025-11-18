@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>제품 관리 | Fine Defense 관리자</title>
 
-  <!-- Toast UI Editor CSS -->
-  <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
+  <!-- Admin 공통 CSS -->
+  <link rel="stylesheet" href="./css/admin.css" />
 
-  <link rel="stylesheet" href="./css/admin.css">
+  <!-- Toast UI Editor CSS (CDN) -->
+  <link
+    rel="stylesheet"
+    href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css"
+  />
 
   <style>
     body { margin: 0; background:#f4f6f9; font-family:'Noto Sans KR', sans-serif; }
@@ -50,34 +54,34 @@
       display:flex;
       gap:10px;
       flex-wrap:wrap;
+      margin-top: 10px;
     }
 
     .thumb-preview-item {
       position: relative;
     }
 
-    .thumb-preview img {
+    .thumb-preview-item img {
       width:80px;
       height:80px;
       object-fit:cover;
       border:1px solid #ddd;
       border-radius:8px;
+      display:block;
     }
 
-    .thumb-preview button {
+    .thumb-remove-btn {
       position:absolute;
       top:-6px;
       right:-6px;
       width:20px;
       height:20px;
-      border:none;
       border-radius:50%;
+      border:none;
       background:#d62828;
       color:#fff;
+      font-size:14px;
       cursor:pointer;
-      font-size:12px;
-      line-height:20px;
-      padding:0;
     }
 
     .product-grid {
@@ -121,7 +125,7 @@
       border:none;
       cursor:pointer;
       border-radius:6px;
-      font-size:0.9rem;
+      font-size: 0.95rem;
     }
     .btn-primary { background:#0f2679; color:#fff; }
     .btn-danger { background:#d62828; color:#fff; }
@@ -148,7 +152,7 @@
   <section class="panel">
     <h2>신규 제품 등록</h2>
 
-    <input id="title" class="input" placeholder="제품명 입력">
+    <input id="title" class="input" placeholder="제품명 입력" />
 
     <select id="category" class="input">
       <option value="">카테고리 선택</option>
@@ -162,10 +166,10 @@
     <div id="editor" style="border:1px solid #ccc;border-radius:6px;"></div>
 
     <h3 style="margin-top:20px;">제품 이미지 (여러 개 가능)</h3>
-    <input type="file" id="images" multiple class="input" accept="image/*">
+    <input type="file" id="images" multiple class="input" accept="image/*" />
     <div id="preview" class="thumb-preview"></div>
 
-    <button class="btn btn-primary" onclick="uploadProduct()">등록</button>
+    <button class="btn btn-primary" onclick="uploadProduct()" style="margin-top:15px;">등록</button>
   </section>
 
   <!-- 🔵 제품 목록 -->
@@ -176,25 +180,37 @@
 
 </div>
 
-<!-- 1) Toast UI Editor JS -->
-<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
-
-<!-- 2) 공통 스크립트 -->
+<!-- ✅ 공통 스크립트: 인증 / 사이드바 -->
 <script src="./js/common_auth.js"></script>
 <script src="./js/sidebar.js"></script>
 
-<!-- 3) 제품 관리 로직 -->
-<script src="./js/products_core_tui.js"></script>
+<!-- ✅ Toast UI Editor JS (CDN) -->
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 
-<!-- 4) DOM 준비 후 공통 처리 -->
+<!-- ✅ 제품 관리 전용 JS -->
+<script src="./js/products_core.js"></script>
+
+<!-- ✅ 초기화 -->
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
+  // DOM 다 그려진 후 실행
+  (function () {
+    // 인증 체크
     requireAdmin();
+
+    // 사이드바 로드
     loadSidebar("products");
 
+    // 로그아웃 버튼
     const logoutBtn = document.getElementById("logoutBtn");
     if (logoutBtn) logoutBtn.addEventListener("click", logout);
-  });
+
+    // 제품 페이지 초기화 (Toast, 이미지 미리보기, 목록 로드)
+    if (window.initProductsPage) {
+      window.initProductsPage();
+    } else {
+      console.error("initProductsPage가 정의되지 않음 (products_core.js 확인 필요)");
+    }
+  })();
 </script>
 
 </body>

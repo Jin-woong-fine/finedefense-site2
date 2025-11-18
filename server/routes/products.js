@@ -1,51 +1,47 @@
+// server/routes/products.js
 import express from "express";
 import multer from "multer";
 import path from "path";
-import fs from "fs";
-import db from "../config/db.js"; // 너가 쓰는 db 커넥션 모듈
+import { fileURLToPath } from "url";
+import db from "../db.js"; // <- 너가 쓰는 db 커넥션 모듈 그대로
 
 const router = express.Router();
 
-/* =========================================================================
-   📂 업로드 폴더 준비 (/uploads/products)
-========================================================================= */
-const uploadDir = path.join(process.cwd(), "uploads", "products");
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
+// ------------------------------------------------------
+// ⛳ 업로드 경로 설정
+//    실제 파일: server/public/uploads/products/파일명
+//    브라우저:  /uploads/products/파일명
+// ------------------------------------------------------
 
-/* =========================================================================
-   📸 multer 설정
-========================================================================= */
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const storage = multer.diskStorage({
-  destination(req, file, cb) {
-    cb(null, uploadDir);
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, "../public/uploads/products"));
   },
-  filename(req, file, cb) {
-    const ext = path.extname(file.originalname);
-    const base = path.basename(file.originalname, ext)
-      .replace(/[^a-zA-Z0-9_-]/g, "")
-      .slice(0, 40);
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);         // .jpg, .png 등
+    const base = path.basename(file.originalname, ext);  // 원본 파일명
+    const safe = base.replace(/[^a-zA-Z0-9가-힣_-]/g, "").substring(0, 40);
     const unique = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, `${base}-${unique}${ext}`);
+    cb(null, `${safe || "img"}-${unique}${ext}`);
   },
 });
 
 const upload = multer({ storage });
 
-/* =========================================================================
-   📌 제품 등록 (POST /api/products)
-   - 필드:
-     title, category, description_html
-   - 파일:
-     images[] 여러 장 (최대 20)
-========================================================================= */
+// ------------------------------------------------------
+// 📌 제품 등록 (POST /api/products)
+//    - 필드: title, category, description_html
+//    - 파일: images[] (여러 개)
+//    - 첫 번째 이미지를 자동으로 thumbnail로 사용
+// ------------------------------------------------------
+
 router.post(
   "/",
-  upload.array("images", 20), // input name="images" 여러개
+  upload.array("images", 20),
   async (req, res) => {
-    const conn = db; // mysql2/promise 기반이라고 가정
-
     try {
       const { title, category, description_html } = req.body;
 
@@ -53,17 +49,15 @@ router.post(
         return res.status(400).json({ message: "title, category 필수" });
       }
 
-      // 업로드된 파일들
-      const files = req.files || [];
+      // 1) 메인 제품 레코드 생성
       let thumbnailPath = null;
 
-      if (files.length > 0) {
-        // 첫 번째 이미지를 썸네일로
-        thumbnailPath = "/uploads/products/" + files[0].filename;
+      if (req.files && req.files.length > 0) {
+        // 첫 번째 이미지를 썸네일로 사용
+        thumbnailPath = "/uploads/products/" + req.files[0].filename;
       }
 
-      // 1) products 테이블 insert
-      const [result] = await conn.execute(
+      const [result] = await db.execute(
         `
         INSERT INTO products (title, category, thumbnail, description_html)
         VALUES (?, ?, ?, ?)
@@ -73,15 +67,15 @@ router.post(
 
       const productId = result.insertId;
 
-      // 2) product_images 테이블 insert
-      if (files.length > 0) {
-        const values = files.map((file, idx) => [
+      // 2) 상세 이미지 여러 개 저장
+      if (req.files && req.files.length > 0) {
+        const values = req.files.map((file, idx) => [
           productId,
           "/uploads/products/" + file.filename,
           idx,
         ]);
 
-        await conn.query(
+        await db.query(
           `
           INSERT INTO product_images (product_id, url, sort_order)
           VALUES ?
@@ -90,28 +84,26 @@ router.post(
         );
       }
 
-      res.status(201).json({ message: "created", id: productId });
+      return res.status(201).json({ message: "created", id: productId });
     } catch (err) {
       console.error("POST /api/products error:", err);
-      res.status(500).json({ message: "server error" });
+      return res.status(500).json({ message: "server error" });
     }
   }
 );
 
-/* =========================================================================
-   📥 제품 목록 (GET /api/products)
-   - 리스트용: 썸네일만
-========================================================================= */
+// ------------------------------------------------------
+// 📥 제품 목록 조회 (GET /api/products)
+// ------------------------------------------------------
 router.get("/", async (req, res) => {
   try {
     const [rows] = await db.execute(
       `
       SELECT id, title, category, thumbnail, created_at
       FROM products
-      ORDER BY id DESC
+      ORDER BY created_at DESC
     `
     );
-
     res.json(rows);
   } catch (err) {
     console.error("GET /api/products error:", err);
@@ -119,34 +111,21 @@ router.get("/", async (req, res) => {
   }
 });
 
-/* =========================================================================
-   📥 제품 상세 (GET /api/products/:id)
-   - 본문 HTML + 이미지 목록
-========================================================================= */
+// ------------------------------------------------------
+// 📥 단일 제품 조회 + 이미지들 (GET /api/products/:id)
+//   (edit_product 페이지 등에서 쓰면 됨)
+// ------------------------------------------------------
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
-
   try {
     const [[product]] = await db.execute(
-      `
-      SELECT id, title, category, thumbnail, description_html, created_at
-      FROM products
-      WHERE id = ?
-    `,
+      `SELECT * FROM products WHERE id = ?`,
       [id]
     );
-
-    if (!product) {
-      return res.status(404).json({ message: "not found" });
-    }
+    if (!product) return res.status(404).json({ message: "not found" });
 
     const [images] = await db.execute(
-      `
-      SELECT id, url, sort_order
-      FROM product_images
-      WHERE product_id = ?
-      ORDER BY sort_order ASC, id ASC
-    `,
+      `SELECT id, url, sort_order FROM product_images WHERE product_id = ? ORDER BY sort_order ASC`,
       [id]
     );
 
@@ -157,15 +136,19 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-/* =========================================================================
-   ❌ 삭제 (DELETE /api/products/:id)
-========================================================================= */
+// ------------------------------------------------------
+// 🗑 제품 삭제 (DELETE /api/products/:id)
+//   FK ON DELETE CASCADE 덕분에 이미지도 같이 삭제
+// ------------------------------------------------------
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;
-
   try {
-    // FK ON DELETE CASCADE라 product_images는 자동 삭제
-    await db.execute("DELETE FROM products WHERE id = ?", [id]);
+    const [result] = await db.execute(`DELETE FROM products WHERE id = ?`, [
+      id,
+    ]);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "not found" });
+    }
     res.json({ message: "deleted" });
   } catch (err) {
     console.error("DELETE /api/products/:id error:", err);
