@@ -57,37 +57,18 @@
       margin-top: 10px;
     }
 
-    .thumb-preview-item img {
+    .thumb-preview img {
       width:80px;
       height:80px;
       object-fit:cover;
-      border:1px solid #ddd;
       border-radius:8px;
-      display:block;
+      border:1px solid #ddd;
     }
 
     .product-grid {
       display:flex;
       flex-wrap:wrap;
       gap:20px;
-    }
-
-    .product-card {
-      width:250px;
-      background:#fff;
-      border-radius:10px;
-      padding:15px;
-      border:1px solid #eee;
-      box-shadow:0 2px 8px rgba(0,0,0,0.05);
-      box-sizing: border-box;
-    }
-
-    .product-card img {
-      width:100%;
-      height:160px;
-      object-fit:cover;
-      border-radius:8px;
-      margin-bottom:10px;
     }
 
     .btn {
@@ -97,9 +78,9 @@
       border-radius:6px;
       font-size: 0.95rem;
     }
+
     .btn-primary { background:#0f2679; color:#fff; }
     .btn-danger { background:#d62828; color:#fff; }
-    .btn-edit { background:#1d7af3; color:#fff; }
   </style>
 </head>
 
@@ -118,47 +99,53 @@
     </div>
   </div>
 
-  <!-- 🔵 제품 등록 제목 섹션 -->
-  <section class="panel">
-    <h2>신규 제품 등록</h2>
-  </section>
+  <!-- 전체 FORM 시작 -->
+  <form id="productForm" enctype="multipart/form-data">
 
-  <!-- 🟦 form은 section 밖에 둬야 파일 선택 문제 해결됨 -->
-  <form id="productForm" enctype="multipart/form-data" class="panel">
+    <!-- 🔵 제품 등록 제목 -->
+    <section class="panel">
+      <h2>신규 제품 등록</h2>
 
-    <input id="title" name="title" class="input" placeholder="제품명 입력" />
+      <input id="title" name="title" class="input" placeholder="제품명 입력" />
 
-    <select id="category" name="category" class="input">
-      <option value="">카테고리 선택</option>
-      <option value="towed">수중이동형 케이블</option>
-      <option value="fixed">수중고정형 케이블</option>
-      <option value="connector">수중 커넥터</option>
-      <option value="custom">커스텀 케이블</option>
-    </select>
+      <select id="category" name="category" class="input">
+        <option value="">카테고리 선택</option>
+        <option value="towed">수중이동형 케이블</option>
+        <option value="fixed">수중고정형 케이블</option>
+        <option value="connector">수중 커넥터</option>
+        <option value="custom">커스텀 케이블</option>
+      </select>
 
-    <h3>제품 설명 (Toast UI Editor)</h3>
-    <div id="editor" style="border:1px solid #ccc;border-radius:6px;"></div>
+      <h3>제품 설명 (Toast UI Editor)</h3>
+      <div id="editor" style="border:1px solid #ccc;border-radius:6px;"></div>
 
-    <!-- Toast Editor 내용 전송용 -->
-    <textarea id="description_html" name="description_html" style="display:none;"></textarea>
+      <!-- Toast Editor HTML 전송용 -->
+      <textarea id="description_html" name="description_html" style="display:none;"></textarea>
+    </section>
 
-    <h3 style="margin-top:20px;">제품 이미지 (여러 개 가능)</h3>
-    <input
-      type="file"
-      id="images"
-      name="images"
-      multiple
-      class="input"
+    <!-- 🟦 이미지 업로드 panel 밖으로 완전 분리 -->
+    <section class="panel">
+      <h3>제품 이미지 업로드 (여러 개 가능)</h3>
 
-    />
+      <!-- ❗ panel 안에 file input 넣으면 Chrome drop 버그 발생 -->
+      <input
+        type="file"
+        id="images"
+        name="images"
+        multiple
+        accept="image/*"
+        style="padding:10px;border:1px solid #ccc;border-radius:6px;width:100%;"
+      />
 
-    <div id="preview" class="thumb-preview"></div>
+      <div id="preview" class="thumb-preview"></div>
 
-    <button type="submit" class="btn btn-primary" style="margin-top:15px;">
-      등록
-    </button>
+      <button type="submit" class="btn btn-primary" style="margin-top:15px;">
+        등록
+      </button>
+    </section>
 
   </form>
+  <!-- FORM 끝 -->
 
   <!-- 🔵 제품 목록 -->
   <section class="panel">
@@ -168,17 +155,16 @@
 
 </div>
 
-<!-- 인증, 사이드바 -->
+<!-- 공통 JS -->
 <script src="./js/common_auth.js"></script>
 <script src="./js/sidebar.js"></script>
 
-<!-- Toast UI Editor -->
+<!-- Toast Editor -->
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 
 <!-- 제품 JS -->
 <script src="./js/products_core.js"></script>
 
-<!-- 초기화 -->
 <script>
 (function () {
   requireAdmin();
