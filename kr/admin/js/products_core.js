@@ -63,7 +63,7 @@ function initEditor() {
 }
 
 /* =========================================================
-  🖼 이미지 선택 + 미리보기
+  🖼 이미지 선택 + 다중 유지 + 미리보기 (정답 버전)
 ========================================================= */
 function initImageInput() {
   const inputEl = document.getElementById("images");
@@ -75,12 +75,18 @@ function initImageInput() {
   }
 
   inputEl.addEventListener("change", (e) => {
-    const files = Array.from(e.target.files || []);
-    console.log("[Image] 선택된 파일:", files);
+    const newFiles = Array.from(e.target.files || []);
+    console.log("[Image] 새로 선택된 파일:", newFiles);
 
-    // 이번에 선택한 걸로 교체 (누를 때마다 다시 선택하는 구조)
-    selectedFiles = files;
+    // 🔥 기존 파일 + 새 파일 합침 (덮어쓰지 않음)
+    selectedFiles = [...selectedFiles, ...newFiles];
+
+    console.log("[Image] selectedFiles 최신 상태:", selectedFiles);
+
     renderImagePreview();
+
+    // 다음 선택 때 파일이 추가되도록 value 초기화
+    e.target.value = "";
   });
 }
 
@@ -90,12 +96,7 @@ function renderImagePreview() {
 
   previewEl.innerHTML = "";
 
-  if (!selectedFiles.length) {
-    console.log("[Preview] 선택된 파일 없음");
-    return;
-  }
-
-  console.log("[Preview] 렌더링 시작, 개수:", selectedFiles.length);
+  console.log("[Preview] 렌더링 시작, 총 파일 개수:", selectedFiles.length);
 
   selectedFiles.forEach((file, idx) => {
     const wrapper = document.createElement("div");
@@ -112,10 +113,9 @@ function renderImagePreview() {
     const removeBtn = document.createElement("button");
     removeBtn.className = "thumb-remove-btn";
     removeBtn.textContent = "×";
-    removeBtn.type = "button";
 
     removeBtn.addEventListener("click", () => {
-      console.log("[Preview] 삭제 클릭 idx=", idx);
+      console.log("[Preview] 삭제 idx:", idx);
       selectedFiles.splice(idx, 1);
       renderImagePreview();
     });
