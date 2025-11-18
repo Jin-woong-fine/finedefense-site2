@@ -85,8 +85,8 @@ function initImageInput() {
 
     renderImagePreview();
 
-    // 다음 선택 때 파일이 추가되도록 value 초기화
-    e.target.value = "";
+        // ❌ 삭제해야 하는 부분
+        // e.target.value = "";
   });
 }
 
@@ -179,14 +179,20 @@ window.uploadProduct = async function () {
     const data = await res.json();
     console.log("[Upload] 등록 성공:", data);
 
+    // 성공 alert
     alert("등록 완료!");
 
     // 폼 초기화
     if (titleEl) titleEl.value = "";
     if (categoryEl) categoryEl.value = "";
     if (editor) editor.setHTML("");
+
     selectedFiles = [];
     renderImagePreview();
+
+    // 🔥 파일 input은 여기서만 value 초기화
+    const imageInputEl = document.getElementById("images");
+    if (imageInputEl) imageInputEl.value = "";
 
     // 목록 새로고침
     loadProductList();
