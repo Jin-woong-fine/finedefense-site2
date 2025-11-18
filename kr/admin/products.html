@@ -152,31 +152,29 @@
 
 </div>
 
-<!-- 1) 인증/권한 체크가 가장 먼저 -->
-<script src="./js/common_auth.js"></script>
-<script>
-  requireAdmin();
-</script>
-
-<!-- 2) UI 구조(sidebar) 로드 -->
-<script src="./js/sidebar.js"></script>
-<script>
-  loadSidebar("products");
-</script>
-
-<!-- 3) Quill 에디터 라이브러리 (UI 요소 필요) -->
+<!-- 1) Quill 먼저 로드 (UI 에디터) -->
 <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 
-<!-- 4) 제품 관리 로직은 *가장 마지막* -->
-<script src="./js/products_core_debug.js" defer></script>
+<!-- 2) 제품 관리 핵심 로직 (Quill 필요함) -->
+<script src="./js/products_core_debug.js"></script>
 
-<!-- 5) logout 버튼은 DOM 준비 후 연결 -->
+<!-- 3) 인증 / 로그인 체크 -->
+<script src="./js/common_auth.js"></script>
+
+<!-- 4) UI 요소 (sidebar 등) -->
+<script src="./js/sidebar.js"></script>
+
+<!-- 5) 마지막: DOM 준비 후 실행 -->
 <script>
   document.addEventListener("DOMContentLoaded", () => {
+    requireAdmin();
+    loadSidebar("products");
+
     const logoutBtn = document.getElementById("logoutBtn");
     if (logoutBtn) logoutBtn.addEventListener("click", logout);
   });
 </script>
+
 
 
 
