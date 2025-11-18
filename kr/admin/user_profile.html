@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>내 프로필 | Fine Defense 관리자</title>
+
+  <link rel="stylesheet" href="./css/admin.css" />
+
+  <style>
+    .profile-wrap {
+      max-width: 600px;
+      background: #fff;
+      padding: 30px;
+      border-radius: 14px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+      margin-top: 20px;
+    }
+
+    .avatar-box {
+      text-align:center;
+      margin-bottom:20px;
+    }
+    .avatar-box img {
+      width:120px;
+      height:120px;
+      border-radius:50%;
+      object-fit:cover;
+      border:3px solid #ddd;
+    }
+    .input {
+      width:100%;
+      padding:10px;
+      margin:8px 0 16px;
+      border:1px solid #ccc;
+      border-radius:8px;
+      font-size:15px;
+    }
+    .btn-primary {
+      background:#0f2679;
+      color:white;
+      padding:10px 16px;
+      border:none;
+      border-radius:8px;
+      cursor:pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="sidebar"></div>
+
+<div class="main">
+
+  <div class="topbar">
+    <h2>내 프로필</h2>
+    <div>
+      <button class="btn btn-primary" onclick="location.href='./dashboard.html'">대시보드</button>
+      <button id="logoutBtn" class="btn btn-danger">로그아웃</button>
+    </div>
+  </div>
+
+  <section class="profile-wrap">
+
+    <div class="avatar-box">
+      <img id="avatarImg" src="/img/default-avatar.png" alt="avatar">
+    </div>
+
+    <input type="file" id="avatarInput" class="input" accept="image/*">
+
+    <input type="text" id="nameInput" class="input" placeholder="이름 수정">
+
+    <button id="saveProfileBtn" class="btn-primary">프로필 저장</button>
+
+  </section>
+
+</div>
+
+<script src="/kr/admin/js/common_auth.js"></script>
+<script src="/kr/admin/js/sidebar.js"></script>
+
+<script>
+  const API = "/api";
+  const token = localStorage.getItem("token");
+  const myId = localStorage.getItem("user_id");
+
+  loadSidebar("");
+  document.getElementById("logoutBtn").onclick = logout;
+
+  document.addEventListener("DOMContentLoaded", loadProfile);
+
+  async function loadProfile() {
+    const res = await fetch(`${API}/users`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    if (!res.ok) return alert("불러오기 실패");
+
+    const users = await res.json();
+    const me = users.find(u => u.id == myId);
+
+    if (!me) return alert("내 정보 찾기 실패");
+
+    // 프로필 반영
+    document.getElementById("avatarImg").src = me.avatar || "/img/default-avatar.png";
+    document.getElementById("nameInput").value = me.name || "";
+  }
+
+  // 저장 처리
+  document.getElementById("saveProfileBtn").onclick = async () => {
+    const name = document.getElementById("nameInput").value.trim();
+    const avatarFile = document.getElementById("avatarInput").files[0];
+
+    // ① 이름 수정
+    if (name) {
+      await fetch(`${API}/users/${myId}/role`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ name })
+      });
+    }
+
+    // ② 아바타 업로드
+    if (avatarFile) {
+      const fd = new FormData();
+      fd.append("avatar", avatarFile);
+
+      await fetch(`${API}/users/${myId}/avatar`, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}` },
+        body: fd
+      });
+    }
+
+    alert("프로필 저장 완료!");
+    location.reload();
+  };
+</script>
+
+</body>
+</html>
