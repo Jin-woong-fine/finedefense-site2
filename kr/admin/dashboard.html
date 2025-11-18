@@ -4,9 +4,6 @@
   <meta charset="UTF-8">
   <title>관리자 대시보드 | Fine Defense</title>
 
-  <!-- Quill -->
-  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -22,14 +19,27 @@
   <!-- 🔵 메인 -->
   <div class="main">
 
+    <!-- TOPBAR -->
     <div class="topbar">
       <div class="title">관리자 대시보드</div>
-      <div>
-        <button class="home-btn" onclick="location.href='../index.html'">홈으로</button>
-        <button id="logoutBtn">로그아웃</button>
+
+      <div style="display:flex; align-items:center; gap:12px;">
+        <!-- 프로필 드롭다운 -->
+        <div class="topbar-user" id="topbarUser">
+          <span id="topbarUserName">관리자</span>
+          ▾
+          <div class="user-dropdown" id="userDropdown">
+            <a href="/kr/admin/user_profile.html">내 프로필</a>
+            <a href="/kr/admin/users.html">사용자 관리</a>
+            <a href="javascript:void(0);" onclick="logout()">로그아웃</a>
+          </div>
+        </div>
+
+        <button onclick="location.href='../index.html'">홈으로</button>
       </div>
     </div>
 
+    <!-- 통계 카드 -->
     <section class="stats-container">
       <div class="stat-card">
         <h3>이번달 조회수</h3>
@@ -49,14 +59,22 @@
       </div>
     </section>
 
+    <!-- 월별 조회수 그래프 -->
     <section class="panel">
       <h2>월별 조회수 그래프</h2>
       <canvas id="monthlyChart" style="max-height:350px;"></canvas>
     </section>
 
+    <!-- TOP 5 게시물 -->
     <section class="panel">
       <h2>조회수 TOP 5 게시물</h2>
       <ul id="topPostsList"></ul>
+    </section>
+
+    <!-- 최근 등록 제품 -->
+    <section class="panel">
+      <h2>최근 등록 제품</h2>
+      <div id="recentProducts"></div>
     </section>
 
   </div>
@@ -67,14 +85,34 @@
   <script src="./js/dashboard_core.js"></script>
 
   <script>
-    // 🔥 🔥 🔥 관리자만 접근 허용
-    requireAdmin();      
+    // 🔐 접근 권한: admin / superadmin만
+    requireAdminOrSuperadmin();
 
-    // 🔵 관리자용 사이드바 로드
+    // 🔵 사이드바 로드
     loadSidebar("dashboard");
 
-    // 🔵 로그아웃 버튼 이벤트
-    document.getElementById("logoutBtn").addEventListener("click", logout);
+    // 🔵 상단 유저 이름 세팅
+    (function initTopbarUser() {
+      const name = localStorage.getItem("name") || "관리자";
+      const span = document.getElementById("topbarUserName");
+      if (span) span.textContent = name;
+
+      const userBox = document.getElementById("topbarUser");
+      const dropdown = document.getElementById("userDropdown");
+
+      if (!userBox || !dropdown) return;
+
+      // 클릭 시 토글
+      userBox.addEventListener("click", (e) => {
+        e.stopPropagation();
+        dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+      });
+
+      // 바깥 클릭 시 닫기
+      document.addEventListener("click", () => {
+        dropdown.style.display = "none";
+      });
+    })();
   </script>
 
 </body>

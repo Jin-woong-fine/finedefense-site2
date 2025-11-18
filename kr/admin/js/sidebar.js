@@ -1,28 +1,56 @@
-function loadSidebar(activeMenu) {
-  const container = document.getElementById("sidebar");
-  if (!container) return;
+// /kr/admin/js/sidebar.js
 
-  container.innerHTML = `
+function loadSidebar(active) {
+  const userName = localStorage.getItem("name") || "사용자";
+  const userRole = localStorage.getItem("role") || "-";
+  const avatar = localStorage.getItem("avatar") 
+    ? `/uploads/avatars/${localStorage.getItem("avatar")}`
+    : "/kr/admin/img/default-avatar.png";
+
+  document.getElementById("sidebar").innerHTML = `
     <div class="sidebar">
-      <div class="sidebar-logo">관리자 메뉴</div>
+
+      <div class="sidebar-header">
+        <div class="logo">Fine Defense Admin</div>
+
+        <div class="user-block">
+          <img src="${avatar}" class="avatar">
+          <div class="user-info">
+            <div class="name">${userName}</div>
+            <div class="role">${userRole}</div>
+          </div>
+        </div>
+      </div>
 
       <div class="sidebar-menu">
-        <a href="./dashboard.html" class="menu-item" data-menu="dashboard">대시보드</a>
-        <a href="./products.html" class="menu-item" data-menu="products">제품 관리</a>
-        <a href="./inquiry_list.html" class="menu-item" data-menu="inquiry">1:1 문의</a>
-        <a href="./newsroom_list.html" class="menu-item" data-menu="news">뉴스룸 관리</a>
-        <a href="./files.html" class="menu-item" data-menu="files">자료실 관리</a>
-        <a href="./user_profile.html" class="menu-item" data-menu="profile">내 프로필</a>
-        <a href="./users.html" class="menu-item" data-menu="users">사용자 관리</a>
-        <a href="./login_logs.html" class="menu-item" data-menu="logs">로그인 기록</a>
+        <a class="menu-item ${active === "dashboard" ? "active" : ""}" 
+           href="/kr/admin/dashboard.html">
+           📊 대시보드
+        </a>
+
+        <div class="menu-title">사용자 관리</div>
+        <a class="menu-item ${active === "users" ? "active" : ""}"
+           href="/kr/admin/users.html">
+           🧑‍🤝‍🧑 전체 사용자
+        </a>
+        <a class="menu-item ${active === "profile" ? "active" : ""}"
+           href="/kr/admin/user_profile.html">
+           🙋 내 프로필
+        </a>
+
+        <div class="menu-title">콘텐츠 관리</div>
+        <a class="menu-item ${active === "products" ? "active" : ""}"
+           href="/kr/admin/products.html">
+           📦 제품 관리
+        </a>
+        <a class="menu-item ${active === "posts" ? "active" : ""}"
+           href="/kr/admin/posts.html">
+           📰 뉴스룸 관리
+        </a>
+
+        <div class="menu-title">시스템</div>
+        <a class="menu-item" onclick="logout()">🚪 로그아웃</a>
       </div>
     </div>
   `;
-
-  if (activeMenu) {
-    const activeEl = container.querySelector(`[data-menu="${activeMenu}"]`);
-    if (activeEl) activeEl.classList.add("active");
-  }
 }
-
-window.loadSidebar = loadSidebar;

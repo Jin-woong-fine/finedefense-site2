@@ -1,6 +1,6 @@
-/* ===========================
-   기본 레이아웃
-=========================== */
+/* ===========================================================
+   GLOBAL LAYOUT
+=========================================================== */
 body {
   margin: 0;
   padding: 0;
@@ -9,73 +9,112 @@ body {
   display: flex;
 }
 
-/* ===========================
+/* ===========================================================
    SIDEBAR
-=========================== */
+=========================================================== */
 #sidebar {
   width: 240px;
-  flex-shrink: 0;
   background: #0f2679;
   color: #fff;
   min-height: 100vh;
+  flex-shrink: 0;
 }
 
-/* 사이드바 내부 */
+/* Sidebar wrapper */
 #sidebar .sidebar {
   padding: 30px 20px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 18px;
 }
 
-/* 로고 */
-#sidebar .sidebar-logo {
+/* ========== Sidebar Header (Logo + User info) ========== */
+.sidebar-header {
+  margin-bottom: 18px;
+}
+
+.sidebar-header .logo {
+  color: #fff;
   font-size: 18px;
   font-weight: 700;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
+}
+
+/* 사용자 프로필 */
+.user-block {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+}
+
+.user-block .avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255,255,255,0.35);
+}
+
+.user-block .user-info .name {
+  font-weight: 600;
+  font-size: 15px;
   color: #fff;
+}
+
+.user-block .user-info .role {
+  font-size: 13px;
+  color: #cbd6ff;
+  margin-top: 2px;
+}
+
+/* ========== Menu section title ========== */
+.menu-title {
+  margin: 22px 0 6px;
+  font-size: 13px;
+  color: #9fb3e3;
   padding-left: 4px;
 }
 
-/* 메뉴 */
-#sidebar .sidebar-menu {
+/* ========== Menu items ========== */
+.sidebar-menu {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
-#sidebar .menu-item {
+.menu-item {
   display: block;
   padding: 12px 16px;
   text-decoration: none;
   color: #cfd5e3;
   border-radius: 8px;
-  transition: background 0.2s, color 0.2s;
+  transition: background 0.18s, color 0.18s;
+  font-size: 15px;
 }
 
-#sidebar .menu-item:hover {
-  background: rgba(255, 255, 255, 0.18);
+.menu-item:hover {
+  background: rgba(255,255,255,0.18);
   color: #fff;
 }
 
-#sidebar .menu-item.active {
-  background: rgba(255, 255, 255, 0.28);
-  color: #fff;
+.menu-item.active {
+  background: rgba(255,255,255,0.28);
   font-weight: 600;
+  color: #fff;
 }
 
-/* ===========================
-   MAIN
-=========================== */
+/* ===========================================================
+   MAIN CONTENT
+=========================================================== */
 .main {
   flex: 1;
-  padding: 22px 24px;
-  min-height: 100vh;
+  padding: 22px 26px;
 }
 
-/* ===========================
-   TOP BAR
-=========================== */
+/* ===========================================================
+   TOPBAR
+=========================================================== */
 .topbar {
   display: flex;
   justify-content: space-between;
@@ -84,7 +123,7 @@ body {
 }
 
 .topbar .title {
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 700;
   color: #0f2679;
 }
@@ -97,34 +136,42 @@ body {
   color: white;
   font-size: 14px;
   cursor: pointer;
-  transition: background .2s ease;
+  transition: background 0.2s;
 }
 
 .topbar button:hover {
   background: #1a358a;
 }
 
-/* ===========================
-   TOPBAR USER DROPDOWN
-=========================== */
-
+/* ===========================================================
+   TOPBAR — USER DROPDOWN
+=========================================================== */
 .topbar-user {
   position: relative;
   cursor: pointer;
   color: #0f2679;
   font-weight: 600;
-  user-select: none;
   padding: 6px 10px;
   border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .topbar-user:hover {
-  background: rgba(15, 38, 121, 0.08);
+  background: rgba(15, 38, 121, 0.1);
+}
+
+.topbar-user .avatar-small {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .user-dropdown {
   position: absolute;
-  top: 38px;
+  top: 42px;
   right: 0;
   width: 180px;
   background: #fff;
@@ -147,9 +194,9 @@ body {
   background: #f3f5fa;
 }
 
-/* ===========================
-   Panels
-=========================== */
+/* ===========================================================
+   PANELS
+=========================================================== */
 .panel {
   background: white;
   padding: 28px 32px;
@@ -160,20 +207,22 @@ body {
 
 .panel h2,
 .panel h3 {
-  font-size: 20px;
   font-weight: 700;
   color: #0f2679;
   margin: 0 0 18px 0;
 }
 
-.panel h3 {
-  font-size: 17px;
-  font-weight: 600;
+.panel h2 {
+  font-size: 20px;
 }
 
-/* ===========================
-   입력 필드
-=========================== */
+.panel h3 {
+  font-size: 17px;
+}
+
+/* ===========================================================
+   INPUT FIELDS
+=========================================================== */
 .input,
 input[type="text"],
 input[type="number"],
@@ -190,9 +239,9 @@ textarea {
   box-sizing: border-box;
 }
 
-/* ===========================
-   통계 카드
-=========================== */
+/* ===========================================================
+   DASHBOARD — STAT CARDS
+=========================================================== */
 .stats-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
@@ -207,7 +256,7 @@ textarea {
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   text-align: center;
   border-left: 6px solid #0f2679;
-  transition: transform .15s ease;
+  transition: transform .15s;
 }
 
 .stat-card:hover {
@@ -215,10 +264,9 @@ textarea {
 }
 
 .stat-card h3 {
-  margin: 0 0 12px 0;
   font-size: 16px;
-  font-weight: 600;
   color: #444;
+  margin-bottom: 12px;
 }
 
 .stat-value {
@@ -227,9 +275,9 @@ textarea {
   color: #0f2679;
 }
 
-/* ===========================
-   Top 5 Posts List
-=========================== */
+/* ===========================================================
+   Top Posts List
+=========================================================== */
 #topPostsList {
   padding-left: 16px;
   font-size: 15px;
