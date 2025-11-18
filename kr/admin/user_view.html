@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>사용자 프로필 | Fine Defense 관리자</title>
+
+  <link rel="stylesheet" href="./css/admin.css" />
+
+  <style>
+    .user-view-wrap {
+      display:flex;
+      gap:30px;
+      align-items:flex-start;
+    }
+
+    .user-view-avatar {
+      text-align:center;
+      min-width:220px;
+    }
+    .user-view-avatar img {
+      width:150px;
+      height:150px;
+      border-radius:50%;
+      border:3px solid #e0e4f0;
+      object-fit:cover;
+    }
+    .user-view-avatar .name {
+      margin-top:12px;
+      font-size:18px;
+      font-weight:700;
+      color:#0f2679;
+    }
+    .user-view-avatar .role-badge {
+      display:inline-block;
+      margin-top:6px;
+      padding:4px 10px;
+      border-radius:999px;
+      background:#eef1ff;
+      color:#0f2679;
+      font-size:12px;
+      font-weight:600;
+    }
+
+    .user-view-info dt {
+      font-weight:600;
+      color:#555;
+      margin-bottom:4px;
+    }
+    .user-view-info dd {
+      margin:0 0 14px 0;
+      color:#333;
+    }
+    .user-view-intro {
+      margin-top:10px;
+      padding:14px 16px;
+      border-radius:10px;
+      background:#f7f8fc;
+      min-height:60px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="sidebar"></div>
+
+<div class="main">
+
+  <div class="topbar">
+    <div class="title">사용자 프로필</div>
+
+    <div style="display:flex; align-items:center; gap:12px;">
+      <button class="btn btn-primary" onclick="history.back();">뒤로가기</button>
+
+      <div id="topbarUser" class="topbar-user">
+        <span id="topbarUserName">사용자</span>
+        <span style="font-size:12px;opacity:0.7;margin-left:4px;">▼</span>
+        <div id="userDropdown" class="user-dropdown">
+          <a href="/kr/admin/user_profile.html">내 프로필</a>
+          <a id="menuUserManage" href="/kr/admin/users.html">사용자 관리</a>
+          <a href="#" onclick="logout();return false;">로그아웃</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="panel">
+    <div class="user-view-wrap">
+      <div class="user-view-avatar">
+        <img id="uvAvatar" src="/img/admin/avatar-placeholder.png" alt="avatar">
+        <div class="name" id="uvName">이름</div>
+        <div class="role-badge" id="uvRole">ROLE</div>
+      </div>
+
+      <div style="flex:1;">
+        <dl class="user-view-info">
+          <dt>아이디</dt>
+          <dd id="uvUsername"></dd>
+
+          <dt>부서</dt>
+          <dd id="uvDept"></dd>
+
+          <dt>직책</dt>
+          <dd id="uvPosition"></dd>
+
+          <dt>가입일</dt>
+          <dd id="uvCreated"></dd>
+        </dl>
+
+        <h3>소개</h3>
+        <div class="user-view-intro" id="uvIntro"></div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script src="/kr/admin/js/common_auth.js"></script>
+<script src="/kr/admin/js/sidebar.js"></script>
+<script src="/kr/admin/js/user_view.js"></script>
+
+<script>
+  requireLogin();
+  loadSidebar(); // 특정 메뉴 활성X
+</script>
+
+</body>
+</html>

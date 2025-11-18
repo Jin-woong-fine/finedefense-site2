@@ -45,19 +45,29 @@ async function loadUsers() {
       let actions = "";
 
       // ================================
-      // 자기 자신인 경우
+      // ➤ 프로필 보기 버튼
       // ================================
+      let profileBtn = `
+        <button class="btn-small btn-edit"
+          onclick="location.href='/kr/admin/user_view.html?id=${u.id}'">
+          프로필
+        </button>
+      `;
+
+      // -------------------------------
+      // 자기 자신인 경우 버튼 변경
+      // -------------------------------
       if (u.id === myId) {
-        actions = `
-          <button class="btn-small btn-edit" onclick="resetPassword(${u.id})">
-            비번초기화
+        profileBtn = `
+          <button class="btn-small btn-edit"
+            onclick="location.href='/kr/admin/user_profile.html'">
+            내 프로필
           </button>
         `;
-        return rowTemplate(u, "-", actions);
       }
 
       // ================================
-      // superadmin (전체 관리 가능)
+      // ➤ superadmin 전체 관리 가능
       // ================================
       if (myRole === "superadmin") {
         const roleSelect = `
@@ -70,6 +80,7 @@ async function loadUsers() {
         `;
 
         actions = `
+          ${profileBtn}
           <button class="btn-small btn-edit" onclick="resetPassword(${u.id})">비번초기화</button>
           <button class="btn-small btn-delete" onclick="deleteUser(${u.id})">삭제</button>
         `;
@@ -78,11 +89,10 @@ async function loadUsers() {
       }
 
       // ================================
-      // admin (조회만 가능 + 자기 자신만 초기화)
+      // ➤ admin (조회 전용)
       // ================================
       if (myRole === "admin") {
-        // 자기 자신은 위에서 걸러짐
-        return rowTemplate(u, u.role, "-");
+        return rowTemplate(u, u.role, profileBtn);
       }
 
       // 기타 권한 접근 X
@@ -102,7 +112,7 @@ function rowTemplate(u, roleCell, actionCell) {
       <td>${u.name || "-"}</td>
       <td>${roleCell}</td>
       <td>${u.created_at}</td>
-      <td>${actionCell}</td>
+      <td style="display:flex; gap:6px;">${actionCell}</td>
     </tr>
   `;
 }
@@ -120,6 +130,7 @@ async function changeUserRole(id, newRole) {
   });
 
   if (!res.ok) return alert("역할 변경 실패");
+
   alert("역할 변경 완료");
   loadUsers();
 }
@@ -190,6 +201,7 @@ function initAddUser() {
     if (!res.ok) return alert("추가 실패");
 
     alert("추가 완료");
+
     document.getElementById("new_username").value = "";
     document.getElementById("new_name").value = "";
     document.getElementById("new_password").value = "";

@@ -1,81 +1,112 @@
-console.log("%c[user_profile] loaded", "color:#4caf50");
+console.log("%c[user_profile] 로드됨", "color:#4caf50;font-weight:bold;");
 
-const API = "/api/user-profile";
+const API_BASE = "/api";
+const defaultAvatar = "/img/admin/avatar-placeholder.png"; // 없으면 나중에 만들어도 됨
 
-function authHeader() {
-  return { Authorization: `Bearer ${localStorage.getItem("token")}` };
+document.addEventListener("DOMContentLoaded", () => {
+  loadMyProfile();
+  initProfileSave();
+  initAvatarUpload();
+});
+
+async function loadMyProfile() {
+  try {
+    const res = await fetch(`${API_BASE}/users/me`, {
+      headers: authHeaders(),
+    });
+
+    if (!res.ok) {
+      console.error("내 프로필 로드 실패");
+      return;
+    }
+
+    const data = await res.json();
+
+    document.getElementById("profileUsername").value = data.username || "";
+    document.getElementById("profileName").value = data.name || "";
+    document.getElementById("profileDept").value = data.department || "";
+    document.getElementById("profilePosition").value = data.position || "";
+    document.getElementById("profileIntro").value = data.intro || "";
+
+    document.getElementById("profileNameLabel").textContent =
+      data.name || data.username || "이름 없음";
+    document.getElementById("profileRoleLabel").textContent = data.role || "-";
+
+    const avatarImg = document.getElementById("avatarPreview");
+    avatarImg.src = data.avatar_url || defaultAvatar;
+
+    const topName = document.getElementById("topbarUserName");
+    if (topName) topName.textContent = data.name || data.username || "사용자";
+  } catch (err) {
+    console.error("loadMyProfile 오류:", err);
+  }
 }
 
-// ==============================
-// 🔥 프로필 불러오기
-// ==============================
-(async function loadProfile() {
-  const res = await fetch(API, { headers: authHeader() });
-  const data = await res.json();
+function initProfileSave() {
+  const btn = document.getElementById("profileSaveBtn");
+  btn.addEventListener("click", async () => {
+    const body = {
+      name: document.getElementById("profileName").value.trim(),
+      department: document.getElementById("profileDept").value.trim(),
+      position: document.getElementById("profilePosition").value.trim(),
+      intro: document.getElementById("profileIntro").value.trim(),
+    };
 
-  document.getElementById("name").value = data.name || "";
-  document.getElementById("avatarImg").src = data.avatar || "/img/profile/default_avatar.png";
-})();
+    const res = await fetch(`${API_BASE}/users/me`, {
+      method: "PUT",
+      headers: {
+        ...authHeaders(),
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
 
-// ==============================
-// 🔥 이름 변경
-// ==============================
-async function updateName() {
-  const name = document.getElementById("name").value.trim();
+    if (!res.ok) {
+      alert("프로필 저장 실패");
+      return;
+    }
 
-  const res = await fetch(`${API}/name`, {
-    method: "PUT",
-    headers: {
-      ...authHeader(),
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ name }),
+    alert("프로필이 저장되었습니다.");
+    loadMyProfile();
   });
-
-  if (!res.ok) return alert("이름 변경 실패");
-  alert("이름 수정 완료!");
 }
 
-// ==============================
-// 🔥 비밀번호 변경
-// ==============================
-async function changePassword() {
-  const oldPassword = document.getElementById("oldPw").value;
-  const newPassword = document.getElementById("newPw").value;
+function initAvatarUpload() {
+  const fileInput = document.getElementById("avatarFile");
+  const btn = document.getElementById("avatarUploadBtn");
+  const preview = document.getElementById("avatarPreview");
 
-  const res = await fetch(`${API}/password`, {
-    method: "PUT",
-    headers: {
-      ...authHeader(),
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ oldPassword, newPassword }),
+  fileInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const url = URL.createObjectURL(file);
+    preview.src = url;
   });
 
-  const data = await res.json();
+  btn.addEventListener("click", async () => {
+    const file = fileInput.files[0];
+    if (!file) {
+      alert("업로드할 이미지를 선택하세요.");
+      return;
+    }
 
-  if (!res.ok) return alert(data.message);
-  alert("비밀번호 변경 완료!");
-}
+    const fd = new FormData();
+    fd.append("avatar", file);
 
-// ==============================
-// 🔥 아바타 업로드
-// ==============================
-async function uploadAvatar() {
-  const file = document.getElementById("avatarInput").files[0];
-  if (!file) return alert("이미지를 선택하세요.");
+    const res = await fetch(`${API_BASE}/users/me/avatar`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: fd,
+    });
 
-  const fd = new FormData();
-  fd.append("avatar", file);
+    if (!res.ok) {
+      alert("아바타 업로드 실패");
+      return;
+    }
 
-  const res = await fetch(`${API}/avatar`, {
-    method: "POST",
-    headers: authHeader(),
-    body: fd,
+    const data = await res.json();
+    preview.src = data.avatar_url || defaultAvatar;
+    alert("아바타가 업데이트되었습니다.");
   });
-
-  const data = await res.json();
-  document.getElementById("avatarImg").src = data.avatar;
-
-  alert("아바타 업로드 완료!");
 }
