@@ -1,3 +1,4 @@
+// server/routes/admin.js
 import express from "express";
 import fs from "fs";
 import path from "path";
@@ -19,6 +20,7 @@ router.post(
   async (req, res) => {
     try {
       const { lang, title, desc, date } = req.body;
+
       const filePath = `/uploads/downloads/${req.file.filename}_${req.file.originalname}`;
       const jsonFile = path.join("data", `downloads_${lang}.json`);
 
@@ -39,7 +41,5 @@ router.post(
     }
   }
 );
-
-
 
 export default router;

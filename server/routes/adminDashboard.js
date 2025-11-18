@@ -1,45 +1,39 @@
+// server/routes/adminDashboard.js
 import express from "express";
 import pool from "../config/db.js";
-import { verifyToken, verifyAdmin } from "../middleware/auth.js";
+import { verifyToken } from "../middleware/auth.js";
 
 const router = express.Router();
 
 /* ==========================================
    📊 관리자 대시보드 통계 API
    👉 GET /api/admin/dashboard
+   🔥 로그인 사용자라면 모두 접근 가능
 ========================================== */
-router.get("/dashboard", verifyToken, verifyAdmin, async (req, res) => {
+router.get("/dashboard", verifyToken, async (req, res) => {
   try {
-    /* -------------------------------
-       1) 이번달 조회수
-    --------------------------------*/
+    // 이번달 조회수
     const [[thisMonth]] = await pool.execute(`
       SELECT SUM(views) AS total
       FROM post_view_stats
       WHERE year = YEAR(NOW())
-      AND month = MONTH(NOW())
+        AND month = MONTH(NOW())
     `);
 
-    /* -------------------------------
-       2) 지난달 조회수
-    --------------------------------*/
+    // 지난달 조회수
     const [[lastMonth]] = await pool.execute(`
       SELECT SUM(views) AS total
       FROM post_view_stats
       WHERE year = YEAR(DATE_SUB(NOW(), INTERVAL 1 MONTH))
-      AND month = MONTH(DATE_SUB(NOW(), INTERVAL 1 MONTH))
+        AND month = MONTH(DATE_SUB(NOW(), INTERVAL 1 MONTH))
     `);
 
-    /* -------------------------------
-       3) 전체 게시물 개수
-    --------------------------------*/
+    // 전체 게시물 수
     const [[postCount]] = await pool.execute(`
       SELECT COUNT(*) AS cnt FROM posts
     `);
 
-    /* -------------------------------
-       4) 조회수 TOP5 게시물
-    --------------------------------*/
+    // 조회수 TOP 5
     const [topPosts] = await pool.execute(`
       SELECT 
         p.id,
@@ -54,11 +48,24 @@ router.get("/dashboard", verifyToken, verifyAdmin, async (req, res) => {
       LIMIT 5
     `);
 
+    // 최근 제품 5개
+    const [recentProducts] = await pool.execute(`
+      SELECT id, title, category, thumbnail
+      FROM products
+      ORDER BY created_at DESC
+      LIMIT 5
+    `);
+
+    recentProducts.forEach(p => {
+      p.image = p.thumbnail || null;
+    });
+
     res.json({
       thisMonthViews: thisMonth.total || 0,
       lastMonthViews: lastMonth.total || 0,
       postCount: postCount.cnt,
-      topPosts
+      topPosts,
+      recentProducts
     });
 
   } catch (err) {
@@ -67,15 +74,12 @@ router.get("/dashboard", verifyToken, verifyAdmin, async (req, res) => {
   }
 });
 
-export default router;
-
-
-
 /* ==========================================
-   📊 월별 조회수 API
+   📈 월별 조회수 API
    👉 GET /api/admin/monthly-views
+   🔥 로그인 사용자라면 모두 접근 가능
 ========================================== */
-router.get("/monthly-views", verifyToken, verifyAdmin, async (req, res) => {
+router.get("/monthly-views", verifyToken, async (req, res) => {
   try {
     const [rows] = await pool.execute(`
       SELECT 
@@ -94,3 +98,5 @@ router.get("/monthly-views", verifyToken, verifyAdmin, async (req, res) => {
     res.status(500).json({ message: "월별 조회수 오류" });
   }
 });
+
+export default router;
