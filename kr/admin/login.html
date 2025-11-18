@@ -58,24 +58,17 @@
 
   <!-- ⭐ 로그인 스크립트 -->
   <script>
-    // ⭐ 도메인/IP 상관없이 항상 자동으로 백엔드로 연결됨
-    const API_URL = "/api";    
+    const API_URL = "/api";
 
     function initLogin() {
-      console.log("initLogin 실행됨!");
-
       const btn = document.getElementById("loginBtn");
-      if (!btn) {
-        console.log("loginBtn 없음 → 200ms 후 재시도");
-        return setTimeout(initLogin, 200);
-      }
+      const errorMsg = document.getElementById("errorMsg");
+
+      if (!btn) return setTimeout(initLogin, 200);
 
       btn.addEventListener("click", async () => {
-        console.log("로그인 요청 실행됨!");
-
         const username = document.getElementById("username").value.trim();
         const password = document.getElementById("password").value.trim();
-        const errorMsg = document.getElementById("errorMsg");
 
         if (!username || !password) {
           errorMsg.textContent = "아이디와 비밀번호를 입력하세요.";
@@ -83,7 +76,6 @@
         }
 
         try {
-          // ⭐ API_URL + 상대경로 조합
           const res = await fetch(`${API_URL}/auth/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -92,25 +84,32 @@
 
           const data = await res.json();
 
-          if (res.ok && data.role === "admin") {
-            localStorage.setItem("token", data.token);
-            localStorage.setItem("role", data.role);
-            localStorage.setItem("name", data.name);
+          if (!res.ok) {
+            errorMsg.textContent = data.message || "로그인 실패";
+            return;
+          }
+
+          // 🔥 로그인은 모든 사용자 가능
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("role", data.role);
+          localStorage.setItem("name", data.name);
+
+          // 🔥 superadmin / admin / editor는 관리자 페이지로 이동
+          if (data.role === "superadmin" || data.role === "admin" || data.role === "editor") {
             location.href = "/kr/admin/dashboard.html";
-          } else {
-            errorMsg.textContent = "로그인 실패: 관리자 권한이 없습니다.";
+          } 
+          // 🔥 viewer는 일반 메인 페이지로 이동 (또는 지정페이지)
+          else {
+            location.href = "/kr/index.html";
           }
 
         } catch (err) {
-          console.log("fetch 오류:", err);
-          errorMsg.textContent = "서버에 연결할 수 없습니다.";
+          errorMsg.textContent = "서버 연결 실패";
         }
       });
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-      initLogin();
-    });
+    document.addEventListener("DOMContentLoaded", initLogin);
   </script>
 
   <!-- header/footer 로드 -->
