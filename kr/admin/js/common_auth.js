@@ -83,3 +83,19 @@ window.requireAdminOrSuperadmin = requireAdminOrSuperadmin;
 window.requireSuperadmin = requireSuperadmin;
 window.logout = logout;
 window.authHeaders = authHeaders;
+
+
+// ------------------------------
+// 🔥 editor 이상 허용 (editor, admin, superadmin)
+// ------------------------------
+function requireAdminOrEditor() {
+  const { role } = getUser();
+
+  if (!role || (role !== "editor" && role !== "admin" && role !== "superadmin")) {
+    alert("접근 권한 없음");
+    location.href = "/kr/admin/login.html";
+    return;
+  }
+}
+
+window.requireAdminOrEditor = requireAdminOrEditor;
