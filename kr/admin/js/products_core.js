@@ -1,26 +1,15 @@
-// kr/admin/js/products_core.js
-
 console.log("%c[products_core] 로드됨", "color:#4caf50;font-weight:bold;");
 
 /* =========================================================
-  🔐 토큰 헤더 (Authorization)
+ 🔐 인증 헤더
 ========================================================= */
 function getAuthHeaders() {
   const token = localStorage.getItem("token");
-  if (!token) {
-    console.warn("[Auth] 토큰 없음");
-    return {};
-  }
-  return { Authorization: `Bearer ${token}` };
+  return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
 /* =========================================================
-  📌 상태
-========================================================= */
-let editor = null;   // Toast UI Editor 인스턴스
-
-/* =========================================================
-  🧩 초기화 진입점
+ 🧩 초기화
 ========================================================= */
 window.initProductsPage = function () {
   console.log("%c[products_core] initProductsPage()", "color:#2196f3;font-weight:bold;");
@@ -31,233 +20,135 @@ window.initProductsPage = function () {
   loadProductList();
 };
 
+let editor = null;
+
 /* =========================================================
-  🖋 Toast UI Editor 초기화
+ 📝 Toast Editor 초기화
 ========================================================= */
 function initEditor() {
-  const editorEl = document.getElementById("editor");
-  if (!editorEl) {
-    console.error("[Editor] #editor 요소 없음");
-    return;
-  }
-
   const Editor = toastui.Editor;
 
   editor = new Editor({
-    el: editorEl,
+    el: document.getElementById("editor"),
     height: "320px",
     initialEditType: "wysiwyg",
     previewStyle: "vertical",
-    toolbarItems: [
-      ["heading", "bold", "italic", "strike"],
-      ["hr", "quote"],
-      ["ul", "ol", "task"],
-      ["table", "link"],
-      ["code", "codeblock"]
-    ],
   });
-
-  console.log("[Editor] 초기화 완료:", editor);
 }
 
 /* =========================================================
-  🖼 이미지 선택 시 단순 프리뷰 렌더링
+ 🖼 이미지 프리뷰
 ========================================================= */
 function initImagePreview() {
-  const inputEl = document.getElementById("images");
-  const previewEl = document.getElementById("preview");
+  const input = document.getElementById("images");
+  const preview = document.getElementById("preview");
 
-  if (!inputEl || !previewEl) {
-    console.error("[Image] #images 또는 #preview 요소 없음");
-    return;
-  }
+  input.addEventListener("change", () => {
+    preview.innerHTML = "";
 
-  inputEl.addEventListener("change", () => {
-    previewEl.innerHTML = "";
-    const files = inputEl.files;
-
-    console.log("[Image] 파일 선택:", files);
-
-    Array.from(files).forEach((file) => {
-      const wrapper = document.createElement("div");
-      wrapper.className = "thumb-preview-item";
-
+    Array.from(input.files).forEach((file) => {
       const img = document.createElement("img");
-      const reader = new FileReader();
+      img.src = URL.createObjectURL(file);
+      img.style.width = "80px";
+      img.style.height = "80px";
+      img.style.objectFit = "cover";
+      img.style.borderRadius = "8px";
 
-      reader.onload = (ev) => {
-        img.src = ev.target.result;
-      };
-      reader.readAsDataURL(file);
-
-      wrapper.appendChild(img);
-      previewEl.appendChild(wrapper);
+      preview.appendChild(img);
     });
   });
 }
 
 /* =========================================================
-  📦 Form 방식 제품 등록
+ 📤 제품 업로드 (FormData manual append)
 ========================================================= */
 function initFormSubmit() {
   const form = document.getElementById("productForm");
-  if (!form) {
-    console.error("[Form] #productForm 없음");
-    return;
-  }
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     console.log("[Form] 제출 시작");
 
-    // 1) Toast 내용 hidden textarea로 복사
-    const hiddenDesc = document.getElementById("description_html");
-    if (editor && hiddenDesc) {
-      hiddenDesc.value = editor.getHTML();
+    const title = document.getElementById("title").value.trim();
+    const category = document.getElementById("category").value;
+    const files = document.getElementById("images").files;
+
+    if (!title || !category) {
+      alert("제품명과 카테고리는 필수입니다.");
+      return;
     }
 
-    // 2) FormData 자동 생성
-    const fd = new FormData(form);
+    // ⭐ FormData(form) 절대 사용하지 않는다 (Chrome Drop 문제)
+    const fd = new FormData();
 
-    console.log("[FormData] 전송 준비됨");
+    fd.append("title", title);
+    fd.append("category", category);
+    fd.append("description_html", editor.getHTML());
+
+    // ⭐ 파일 append — Chrome drop 문제 해결
+    for (let i = 0; i < files.length; i++) {
+      fd.append("images", files[i]);
+    }
+
+    console.log("[FormData] 구성 완료");
 
     try {
       const res = await fetch("/api/products", {
         method: "POST",
         headers: getAuthHeaders(),
-        body: fd,   // Content-Type 자동 설정됨
+        body: fd, // Content-Type 자동 설정됨
       });
 
-      console.log("[Upload] 응답 코드:", res.status);
-
       if (!res.ok) {
-        const txt = await res.text();
-        console.error("[Upload] 서버 오류:", txt);
-        alert("❌ 등록 실패: " + txt);
+        const err = await res.json().catch(() => null);
+        console.error("[Upload Error]", err || res.statusText);
+        alert("등록 실패: " + (err?.detail || res.statusText));
         return;
       }
 
       alert("등록 완료!");
 
-      // 폼 초기화 (브라우저가 자동으로 초기화함)
+      // 초기화
       form.reset();
+      editor.setHTML("");
+      document.getElementById("preview").innerHTML = "";
 
-      // 프리뷰 초기화
-      const previewEl = document.getElementById("preview");
-      if (previewEl) previewEl.innerHTML = "";
-
-      // Toast Editor 초기화
-      if (editor) editor.setHTML("");
-
-      // 목록 갱신
       loadProductList();
-
     } catch (err) {
-      console.error("[Upload] 예외 발생:", err);
-      alert("등록 중 오류가 발생했습니다.");
+      console.error("[Exception] 업로드 중 오류:", err);
+      alert("업로드 중 오류 발생");
     }
   });
 }
 
 /* =========================================================
-  📥 제품 목록 로드
+ 📥 목록 로드
 ========================================================= */
 async function loadProductList() {
-  const listEl = document.getElementById("productList");
-  if (!listEl) {
-    console.error("[List] #productList 요소 없음");
-    return;
-  }
+  const list = document.getElementById("productList");
+  list.innerHTML = "불러오는 중...";
 
   try {
-    listEl.innerHTML = "<p>불러오는 중...</p>";
-
     const res = await fetch("/api/products", {
       headers: getAuthHeaders(),
     });
 
-    console.log("[List] 응답 코드:", res.status);
+    const data = await res.json();
 
-    if (!res.ok) {
-      listEl.innerHTML = "<p style='color:red;'>목록 조회 실패</p>";
-      return;
-    }
-
-    const products = await res.json();
-    console.log("[List] 조회된 제품:", products);
-
-    if (!products.length) {
-      listEl.innerHTML = "<p>등록된 제품이 없습니다.</p>";
-      return;
-    }
-
-    listEl.innerHTML = products.map(renderProductCardHTML).join("");
-
+    list.innerHTML = data
+      .map(
+        (p) => `
+      <div class="product-card">
+        <img src="${p.thumbnail || "/img/products/Image-placeholder.png"}">
+        <h3>${p.title}</h3>
+        <div class="category">${p.category}</div>
+      </div>
+    `
+      )
+      .join("");
   } catch (err) {
-    console.error("[List] 오류:", err);
-    listEl.innerHTML = "<p style='color:red;'>조회 오류 발생</p>";
+    console.error("목록 오류:", err);
+    list.innerHTML = "<p style='color:red;'>목록을 불러올 수 없습니다</p>";
   }
 }
-
-/* =========================================================
-  📇 카드 렌더링
-========================================================= */
-function renderProductCardHTML(p) {
-  const img = p.thumbnail || "/img/products/Image-placeholder.png";
-
-  const categoryMap = {
-    towed: "수중이동형 케이블",
-    fixed: "수중고정형 케이블",
-    connector: "수중 커넥터",
-    custom: "커스텀 케이블",
-  };
-
-  const categoryText = categoryMap[p.category] || "미지정";
-
-  return `
-    <div class="product-card">
-      <img src="${img}" alt="${p.title}">
-      <h3>${p.title}</h3>
-      <div class="category">${categoryText}</div>
-      <div style="font-size:0.8rem;color:#999;margin-bottom:8px;">
-        ${new Date(p.created_at).toLocaleString("ko-KR")}
-      </div>
-      <div style="display:flex;gap:6px;margin-top:10px;">
-        <button class="btn btn-edit" onclick="editProduct(${p.id})">수정</button>
-        <button class="btn btn-danger" onclick="deleteProduct(${p.id})">삭제</button>
-      </div>
-    </div>
-  `;
-}
-
-/* =========================================================
-  ✏ 수정 / 삭제
-========================================================= */
-window.editProduct = function (id) {
-  location.href = `/kr/admin/edit_product.html?id=${id}`;
-};
-
-window.deleteProduct = async function (id) {
-  if (!confirm("정말 삭제하시겠습니까?")) return;
-
-  try {
-    const res = await fetch(`/api/products/${id}`, {
-      method: "DELETE",
-      headers: getAuthHeaders(),
-    });
-
-    if (!res.ok) {
-      const txt = await res.text();
-      alert("삭제 실패: " + txt);
-      return;
-    }
-
-    alert("삭제 완료");
-    loadProductList();
-
-  } catch (err) {
-    console.error("[DELETE] 예외:", err);
-    alert("삭제 중 오류 발생");
-  }
-};
