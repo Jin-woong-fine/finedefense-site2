@@ -4,21 +4,93 @@
   <meta charset="UTF-8" />
   <title>제품 관리 | Fine Defense 관리자</title>
 
-
-
   <!-- Toast UI Editor CSS -->
-  <link rel="stylesheet"
-        href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+  <link
+    rel="stylesheet"
+    href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css"
+  />
 
+  <!-- 공통 관리자 CSS -->
   <link rel="stylesheet" href="./css/admin.css" />
 
   <!-- 🔥 이미지 드래그 정렬용 SortableJS -->
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
-
-
-
   <style>
+    /* ==========================
+       레이아웃 & 사이드바 강제 통일
+       (dashboard / users 와 동일하게 맞춤)
+    =========================== */
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Noto Sans KR', sans-serif;
+      background: #f3f5fa;
+      display: flex;
+    }
+
+    /* 사이드바 전체 */
+    #sidebar {
+      width: 240px;
+      flex-shrink: 0;
+      background: #0f2679;
+      color: #fff;
+      min-height: 100vh;
+    }
+
+    #sidebar .sidebar {
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    #sidebar .sidebar-logo {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 18px;
+      color: #fff;
+      padding-left: 4px;
+    }
+
+    #sidebar .sidebar-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    #sidebar .menu-item {
+      display: block;
+      padding: 12px 16px;
+      text-decoration: none;
+      color: #cfd5e3;
+      border-radius: 8px;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    #sidebar .menu-item:hover {
+      background: rgba(255, 255, 255, 0.18);
+      color: #fff;
+    }
+
+    #sidebar .menu-item.active {
+      background: rgba(255, 255, 255, 0.28);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    /* 메인 영역 */
+    .main {
+      flex: 1;
+      padding: 22px 24px;
+      min-height: 100vh;
+    }
+
+    /* ==========================
+       상단바 / 패널 / 입력폼 / 카드
+    =========================== */
+
     .topbar {
       background: #fff;
       padding: 18px 25px;
@@ -177,9 +249,14 @@
     <section class="panel">
       <h3>제품 이미지 업로드</h3>
 
-      <input type="file" id="images" name="images"
-             multiple accept="image/*"
-             class="input" />
+      <input
+        type="file"
+        id="images"
+        name="images"
+        multiple
+        accept="image/*"
+        class="input"
+      />
 
       <div id="preview" class="thumb-preview"></div>
 
@@ -219,14 +296,14 @@
 <script src="/kr/admin/js/products_core.js"></script>
 
 <script>
-(function () {
-  requireAdminOrEditor();
-  loadSidebar("products");
+  (function () {
+    requireAdminOrEditor();
+    loadSidebar("products");
 
-  document.getElementById("logoutBtn").addEventListener("click", logout);
+    document.getElementById("logoutBtn").addEventListener("click", logout);
 
-  if (window.initProductsPage) window.initProductsPage();
-})();
+    if (window.initProductsPage) window.initProductsPage();
+  })();
 </script>
 
 </body>
