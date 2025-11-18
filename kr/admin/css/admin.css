@@ -14,7 +14,7 @@ body {
 =========================== */
 #sidebar {
   width: 240px;
-  flex-shrink: 0;  /* ← 사이드바 절대 줄어들지 않음 */
+  flex-shrink: 0;
   background: #0f2679;
   color: #fff;
   min-height: 100vh;
@@ -50,7 +50,6 @@ body {
   background: rgba(255,255,255,.28);
   color: #fff;
 }
-
 
 
 /* ===========================
@@ -92,6 +91,7 @@ body {
   background: #1a358a;
 }
 
+
 /* ===========================
    통계 카드
 =========================== */
@@ -129,8 +129,9 @@ body {
   color: #0f2679;
 }
 
+
 /* ===========================
-   Panels
+   Panels (통일 스타일)
 =========================== */
 .panel {
   background: white;
@@ -140,12 +141,40 @@ body {
   margin-bottom: 35px;
 }
 
-.panel h2 {
+/* 패널 제목(모든 페이지 통일) */
+.panel h2,
+.panel h3 {
   font-size: 20px;
   font-weight: 700;
   color: #0f2679;
-  margin-bottom: 20px;
+  margin: 0 0 18px 0;
 }
+
+/* 패널 내 작은 제목 */
+.panel h3 {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+/* ===========================
+   입력 필드 통일
+=========================== */
+.input,
+input[type="text"],
+input[type="number"],
+input[type="file"],
+select,
+textarea {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid #d0d4da;
+  border-radius: 8px;
+  font-size: 15px;
+  background: #fff;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+}
+
 
 /* ===========================
    Top 5 게시물 리스트
