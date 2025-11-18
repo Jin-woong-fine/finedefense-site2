@@ -32,11 +32,39 @@
       width: 400px;
     }
 
-    h2 { text-align: center; margin-bottom: 30px; color: #0f2679; }
-    input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 8px; font-size: 15px; }
-    button { width: 100%; padding: 12px; background: #0f2679; color: white; font-size: 16px; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; }
-    button:hover { background: #1b348f; }
-    .error { color: crimson; text-align: center; margin-top: 10px; font-size: 14px; }
+    h2 { 
+      text-align: center; 
+      margin-bottom: 30px; 
+      color: #0f2679; 
+    }
+    input { 
+      width: 100%; 
+      padding: 12px; 
+      margin: 8px 0; 
+      border: 1px solid #ccc; 
+      border-radius: 8px; 
+      font-size: 15px; 
+    }
+    button { 
+      width: 100%; 
+      padding: 12px; 
+      background: #0f2679; 
+      color: white; 
+      font-size: 16px; 
+      border: none; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      transition: 0.2s; 
+    }
+    button:hover { 
+      background: #1b348f; 
+    }
+    .error { 
+      color: crimson; 
+      text-align: center; 
+      margin-top: 10px; 
+      font-size: 14px; 
+    }
   </style>
 </head>
 
@@ -60,56 +88,57 @@
   <script>
     const API_URL = "/api";
 
-    function initLogin() {
-      const btn = document.getElementById("loginBtn");
+    async function tryLogin() {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
       const errorMsg = document.getElementById("errorMsg");
 
-      if (!btn) return setTimeout(initLogin, 200);
+      if (!username || !password) {
+        errorMsg.textContent = "아이디와 비밀번호를 입력하세요.";
+        return;
+      }
 
-      btn.addEventListener("click", async () => {
-        const username = document.getElementById("username").value.trim();
-        const password = document.getElementById("password").value.trim();
+      try {
+        const res = await fetch(`${API_URL}/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password })
+        });
 
-        if (!username || !password) {
-          errorMsg.textContent = "아이디와 비밀번호를 입력하세요.";
+        const data = await res.json();
+
+        if (!res.ok) {
+          errorMsg.textContent = data.message || "로그인 실패";
           return;
         }
 
-        try {
-          const res = await fetch(`${API_URL}/auth/login`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, password })
-          });
+        // 🔥 필수 정보 저장
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("role", data.role);
+        localStorage.setItem("name", data.name);
+        localStorage.setItem("user_id", data.id);
 
-          const data = await res.json();
-
-          if (!res.ok) {
-            errorMsg.textContent = data.message || "로그인 실패";
-            return;
-          }
-
-          // 🔥 로그인은 모든 사용자 가능
-          localStorage.setItem("token", data.token);
-          localStorage.setItem("role", data.role);
-          localStorage.setItem("name", data.name);
-
-          // 🔥 superadmin / admin / editor는 관리자 페이지로 이동
-          if (data.role === "superadmin" || data.role === "admin" || data.role === "editor") {
-            location.href = "/kr/admin/dashboard.html";
-          } 
-          // 🔥 viewer는 일반 메인 페이지로 이동 (또는 지정페이지)
-          else {
-            location.href = "/kr/index.html";
-          }
-
-        } catch (err) {
-          errorMsg.textContent = "서버 연결 실패";
+        // 🔥 권한별 라우팅
+        if (["superadmin", "admin", "editor"].includes(data.role)) {
+          location.href = "/kr/admin/dashboard.html";
+        } else {
+          location.href = "/kr/index.html";
         }
-      });
+
+      } catch (err) {
+        console.error("Login error:", err);
+        errorMsg.textContent = "서버 연결 실패";
+      }
     }
 
-    document.addEventListener("DOMContentLoaded", initLogin);
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("loginBtn").addEventListener("click", tryLogin);
+
+      // 엔터키 로그인 지원
+      document.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") tryLogin();
+      });
+    });
   </script>
 
   <!-- header/footer 로드 -->
