@@ -29,11 +29,10 @@ function requireLogin() {
 }
 
 // ------------------------------
-// 🔥 관리자 전용(admin 이상)
+// 🔥 관리자(admin 이상)
 // ------------------------------
 function requireAdmin() {
   const { role } = getUser();
-
   if (!role || (role !== "admin" && role !== "superadmin")) {
     alert("관리자만 접근할 수 있습니다.");
     location.href = "/kr/admin/login.html";
@@ -41,15 +40,24 @@ function requireAdmin() {
 }
 
 // ------------------------------
-// 🔥 superadmin 또는 admin만
+// 🔥 admin + superadmin
 // ------------------------------
 function requireAdminOrSuperadmin() {
   const { role } = getUser();
-
   if (!role || (role !== "admin" && role !== "superadmin")) {
     alert("접근 권한 없음");
     location.href = "/kr/admin/login.html";
-    return;
+  }
+}
+
+// ------------------------------
+// 🔥 editor + admin + superadmin
+// ------------------------------
+function requireAdminOrEditor() {
+  const { role } = getUser();
+  if (!role || (role !== "editor" && role !== "admin" && role !== "superadmin")) {
+    alert("접근 권한 없음");
+    location.href = "/kr/admin/login.html";
   }
 }
 
@@ -58,7 +66,6 @@ function requireAdminOrSuperadmin() {
 // ------------------------------
 function requireSuperadmin() {
   const { role } = getUser();
-
   if (role !== "superadmin") {
     alert("슈퍼관리자만 접근 가능합니다.");
     location.href = "/kr/admin/login.html";
@@ -66,7 +73,7 @@ function requireSuperadmin() {
 }
 
 // ------------------------------
-// 🔥 로그아웃 처리
+// 🔥 로그아웃
 // ------------------------------
 function logout() {
   localStorage.removeItem("token");
@@ -75,27 +82,47 @@ function logout() {
   location.href = "/kr/admin/login.html";
 }
 
-// 전역으로 노출
+// ------------------------------
+// ⭐ 상단 프로필 드롭다운 초기화
+// ------------------------------
+document.addEventListener("DOMContentLoaded", () => {
+  const user = getUser();
+  const nameEl = document.getElementById("topbarUserName");
+  const box = document.getElementById("topbarUser");
+  const dropdown = document.getElementById("userDropdown");
+
+  if (nameEl && user.name) nameEl.textContent = user.name;
+
+  // admin 이상만 "사용자 관리" 표시
+  const menuUserManage = document.getElementById("menuUserManage");
+  if (menuUserManage) {
+    if (user.role === "admin" || user.role === "superadmin") {
+      menuUserManage.style.display = "block";
+    } else {
+      menuUserManage.style.display = "none";
+    }
+  }
+
+  // 드롭다운 토글
+  if (box) {
+    box.addEventListener("click", () => {
+      dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+    });
+  }
+
+  // 화면 클릭 시 닫기
+  document.addEventListener("click", (e) => {
+    if (!box || !dropdown) return;
+    if (!box.contains(e.target)) dropdown.style.display = "none";
+  });
+});
+
+// 전역 노출
 window.getUser = getUser;
-window.requireLogin = requireLogin;
-window.requireAdmin = requireAdmin;
-window.requireAdminOrSuperadmin = requireAdminOrSuperadmin;
-window.requireSuperadmin = requireSuperadmin;
 window.logout = logout;
 window.authHeaders = authHeaders;
-
-
-// ------------------------------
-// 🔥 editor 이상 허용 (editor, admin, superadmin)
-// ------------------------------
-function requireAdminOrEditor() {
-  const { role } = getUser();
-
-  if (!role || (role !== "editor" && role !== "admin" && role !== "superadmin")) {
-    alert("접근 권한 없음");
-    location.href = "/kr/admin/login.html";
-    return;
-  }
-}
-
+window.requireLogin = requireLogin;
+window.requireAdmin = requireAdmin;
+window.requireSuperadmin = requireSuperadmin;
+window.requireAdminOrSuperadmin = requireAdminOrSuperadmin;
 window.requireAdminOrEditor = requireAdminOrEditor;

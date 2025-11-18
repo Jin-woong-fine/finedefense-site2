@@ -20,8 +20,15 @@ body {
   min-height: 100vh;
 }
 
+/* 사이드바 내부 */
+#sidebar .sidebar {
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 
-/* 사이드바 로고 */
+/* 로고 */
 #sidebar .sidebar-logo {
   font-size: 18px;
   font-weight: 700;
@@ -30,14 +37,7 @@ body {
   padding-left: 4px;
 }
 
-
-#sidebar .sidebar {
-  padding: 30px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
+/* 메뉴 */
 #sidebar .sidebar-menu {
   display: flex;
   flex-direction: column;
@@ -50,18 +50,19 @@ body {
   text-decoration: none;
   color: #cfd5e3;
   border-radius: 8px;
+  transition: background 0.2s, color 0.2s;
 }
 
 #sidebar .menu-item:hover {
-  background: rgba(255,255,255,.18);
+  background: rgba(255, 255, 255, 0.18);
   color: #fff;
 }
 
 #sidebar .menu-item.active {
-  background: rgba(255,255,255,.28);
+  background: rgba(255, 255, 255, 0.28);
   color: #fff;
+  font-weight: 600;
 }
-
 
 /* ===========================
    MAIN
@@ -69,6 +70,7 @@ body {
 .main {
   flex: 1;
   padding: 22px 24px;
+  min-height: 100vh;
 }
 
 /* ===========================
@@ -102,6 +104,91 @@ body {
   background: #1a358a;
 }
 
+/* ===========================
+   TOPBAR USER DROPDOWN
+=========================== */
+
+.topbar-user {
+  position: relative;
+  cursor: pointer;
+  color: #0f2679;
+  font-weight: 600;
+  user-select: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+
+.topbar-user:hover {
+  background: rgba(15, 38, 121, 0.08);
+}
+
+.user-dropdown {
+  position: absolute;
+  top: 38px;
+  right: 0;
+  width: 180px;
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,.15);
+  display: none;
+  z-index: 999;
+}
+
+.user-dropdown a {
+  display: block;
+  padding: 10px 16px;
+  text-decoration: none;
+  color: #333;
+  font-size: 15px;
+}
+
+.user-dropdown a:hover {
+  background: #f3f5fa;
+}
+
+/* ===========================
+   Panels
+=========================== */
+.panel {
+  background: white;
+  padding: 28px 32px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  margin-bottom: 35px;
+}
+
+.panel h2,
+.panel h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f2679;
+  margin: 0 0 18px 0;
+}
+
+.panel h3 {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+/* ===========================
+   입력 필드
+=========================== */
+.input,
+input[type="text"],
+input[type="number"],
+input[type="file"],
+select,
+textarea {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid #d0d4da;
+  border-radius: 8px;
+  font-size: 15px;
+  background: #fff;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+}
 
 /* ===========================
    통계 카드
@@ -140,55 +227,8 @@ body {
   color: #0f2679;
 }
 
-
 /* ===========================
-   Panels (통일 스타일)
-=========================== */
-.panel {
-  background: white;
-  padding: 28px 32px;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  margin-bottom: 35px;
-}
-
-/* 패널 제목(모든 페이지 통일) */
-.panel h2,
-.panel h3 {
-  font-size: 20px;
-  font-weight: 700;
-  color: #0f2679;
-  margin: 0 0 18px 0;
-}
-
-/* 패널 내 작은 제목 */
-.panel h3 {
-  font-size: 17px;
-  font-weight: 600;
-}
-
-/* ===========================
-   입력 필드 통일
-=========================== */
-.input,
-input[type="text"],
-input[type="number"],
-input[type="file"],
-select,
-textarea {
-  width: 100%;
-  padding: 11px 12px;
-  border: 1px solid #d0d4da;
-  border-radius: 8px;
-  font-size: 15px;
-  background: #fff;
-  margin-bottom: 10px;
-  box-sizing: border-box;
-}
-
-
-/* ===========================
-   Top 5 게시물 리스트
+   Top 5 Posts List
 =========================== */
 #topPostsList {
   padding-left: 16px;
