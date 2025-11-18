@@ -13,7 +13,7 @@ const __dirname = path.dirname(__filename);
 const uploadDir = path.join(__dirname, "../public/uploads/products");
 
 /* ============================================
-   🚀 Multer
+   🚀 Multer 설정
 ============================================ */
 const storage = multer.diskStorage({
   destination: (_, __, cb) => cb(null, uploadDir),
@@ -24,7 +24,7 @@ const storage = multer.diskStorage({
       .substring(0, 40);
     const unique = Date.now() + "-" + Math.round(Math.random() * 1e9);
     cb(null, `${base || "img"}-${unique}${ext}`);
-  },
+  }
 });
 const upload = multer({ storage });
 
@@ -37,7 +37,8 @@ router.post(
   verifyEditor,
   (req, res) => {
     upload.array("images")(req, res, async (err) => {
-      if (err) return res.status(400).json({ message: "Upload error", detail: err.message });
+      if (err)
+        return res.status(400).json({ message: "Upload error", detail: err.message });
 
       try {
         const { title, summary, category, description_html, sort_order, lang } = req.body;
@@ -59,7 +60,7 @@ router.post(
             thumbnail,
             description_html || "",
             sort_order || 999,
-            lang,
+            lang
           ]
         );
 
@@ -69,7 +70,7 @@ router.post(
           const values = req.files.map((f, idx) => [
             productId,
             "/uploads/products/" + f.filename,
-            idx,
+            idx
           ]);
 
           await db.query(
@@ -135,6 +136,75 @@ router.get("/:id", async (req, res) => {
     res.status(500).json({ message: "server error" });
   }
 });
+
+/* ==========================================================
+   ✏ 제품 수정 (EDITOR 이상)
+========================================================== */
+router.put(
+  "/:id",
+  verifyToken,
+  verifyEditor,
+  (req, res) => {
+    upload.array("images")(req, res, async (err) => {
+      if (err)
+        return res.status(400).json({ message: "Upload error", detail: err.message });
+
+      try {
+        const { id } = req.params;
+        const { title, category, description_html } = req.body;
+
+        if (!title || !category)
+          return res.status(400).json({ message: "Missing required fields" });
+
+        const removedImages = JSON.parse(req.body.removedImages || "[]");
+
+        /* ---------------------------------------------
+           1) 기본 정보 수정
+        --------------------------------------------- */
+        await db.execute(
+          `UPDATE products
+           SET title = ?, category = ?, description_html = ?
+           WHERE id = ?`,
+          [title, category, description_html || "", id]
+        );
+
+        /* ---------------------------------------------
+           2) 삭제된 이미지 제거
+        --------------------------------------------- */
+        if (removedImages.length > 0) {
+          await db.query(
+            `DELETE FROM product_images 
+             WHERE product_id = ? AND url IN (?)`,
+            [id, removedImages]
+          );
+        }
+
+        /* ---------------------------------------------
+           3) 새 이미지 저장
+        --------------------------------------------- */
+        if (req.files?.length > 0) {
+          const values = req.files.map((f, idx) => [
+            id,
+            "/uploads/products/" + f.filename,
+            idx
+          ]);
+
+          await db.query(
+            `INSERT INTO product_images (product_id, url, sort_order)
+             VALUES ?`,
+            [values]
+          );
+        }
+
+        res.json({ message: "updated" });
+
+      } catch (e) {
+        console.error("PUT error:", e);
+        res.status(500).json({ message: "server error" });
+      }
+    });
+  }
+);
 
 /* ==========================================================
    🗑 삭제 (ADMIN 이상)
