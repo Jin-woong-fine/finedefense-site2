@@ -34,16 +34,29 @@ function initEditor() {
     initialEditType: "wysiwyg",
     previewStyle: "vertical",
   });
+
+  console.log("[Editor] 초기화 완료");
 }
 
 /* =========================================================
- 🖼 이미지 프리뷰
+ 🖼 이미지 프리뷰 + 파일 로그
 ========================================================= */
 function initImagePreview() {
   const input = document.getElementById("images");
   const preview = document.getElementById("preview");
 
+  if (!input || !preview) {
+    console.error("[Image] #images 또는 #preview 없음");
+    return;
+  }
+
   input.addEventListener("change", () => {
+    console.log("=== [Image change] 선택됨 ===");
+    console.log("파일 개수:", input.files.length);
+    Array.from(input.files).forEach((file, idx) => {
+      console.log(`  #${idx} 이름=${file.name}, 크기=${file.size} bytes`);
+    });
+
     preview.innerHTML = "";
 
     Array.from(input.files).forEach((file) => {
@@ -53,6 +66,8 @@ function initImagePreview() {
       img.style.height = "80px";
       img.style.objectFit = "cover";
       img.style.borderRadius = "8px";
+      img.style.border = "1px solid #ddd";
+      img.style.marginRight = "6px";
 
       preview.appendChild(img);
     });
@@ -65,28 +80,39 @@ function initImagePreview() {
 function initFormSubmit() {
   const form = document.getElementById("productForm");
 
+  if (!form) {
+    console.error("[Form] #productForm 없음");
+    return;
+  }
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     console.log("[Form] 제출 시작");
 
-    const title = document.getElementById("title").value.trim();
-    const category = document.getElementById("category").value;
-    const files = document.getElementById("images").files;
+    const titleEl = document.getElementById("title");
+    const categoryEl = document.getElementById("category");
+    const fileInput = document.getElementById("images");
+
+    const title = titleEl.value.trim();
+    const category = categoryEl.value;
+    const files = fileInput.files;
 
     if (!title || !category) {
       alert("제품명과 카테고리는 필수입니다.");
       return;
     }
 
-    // ⭐ FormData(form) 절대 사용하지 않는다 (Chrome Drop 문제)
+    console.log("[Form] title =", title);
+    console.log("[Form] category =", category);
+    console.log("[Form] 파일 개수 =", files.length);
+
     const fd = new FormData();
 
     fd.append("title", title);
     fd.append("category", category);
-    fd.append("description_html", editor.getHTML());
+    fd.append("description_html", editor ? editor.getHTML() : "");
 
-    // ⭐ 파일 append — Chrome drop 문제 해결
     for (let i = 0; i < files.length; i++) {
       fd.append("images", files[i]);
     }
@@ -97,8 +123,10 @@ function initFormSubmit() {
       const res = await fetch("/api/products", {
         method: "POST",
         headers: getAuthHeaders(),
-        body: fd, // Content-Type 자동 설정됨
+        body: fd,
       });
+
+      console.log("[Upload] 응답 코드:", res.status);
 
       if (!res.ok) {
         const err = await res.json().catch(() => null);
@@ -111,8 +139,9 @@ function initFormSubmit() {
 
       // 초기화
       form.reset();
-      editor.setHTML("");
-      document.getElementById("preview").innerHTML = "";
+      if (editor) editor.setHTML("");
+      const preview = document.getElementById("preview");
+      if (preview) preview.innerHTML = "";
 
       loadProductList();
     } catch (err) {
@@ -127,12 +156,19 @@ function initFormSubmit() {
 ========================================================= */
 async function loadProductList() {
   const list = document.getElementById("productList");
+  if (!list) return;
+
   list.innerHTML = "불러오는 중...";
 
   try {
     const res = await fetch("/api/products", {
       headers: getAuthHeaders(),
     });
+
+    if (!res.ok) {
+      list.innerHTML = "<p style='color:red;'>목록 조회 실패</p>";
+      return;
+    }
 
     const data = await res.json();
 
