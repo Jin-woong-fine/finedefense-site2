@@ -57,10 +57,6 @@
       margin-top: 10px;
     }
 
-    .thumb-preview-item {
-      position: relative;
-    }
-
     .thumb-preview-item img {
       width:80px;
       height:80px;
@@ -68,20 +64,6 @@
       border:1px solid #ddd;
       border-radius:8px;
       display:block;
-    }
-
-    .thumb-remove-btn {
-      position:absolute;
-      top:-6px;
-      right:-6px;
-      width:20px;
-      height:20px;
-      border-radius:50%;
-      border:none;
-      background:#d62828;
-      color:#fff;
-      font-size:14px;
-      cursor:pointer;
     }
 
     .product-grid {
@@ -105,18 +87,6 @@
       height:160px;
       object-fit:cover;
       border-radius:8px;
-      margin-bottom:10px;
-    }
-
-    .product-card h3 {
-      font-size:1.1rem;
-      margin:0 0 6px;
-      color:#222;
-    }
-
-    .product-card .category {
-      color:#666;
-      font-size:0.9rem;
       margin-bottom:10px;
     }
 
@@ -148,12 +118,13 @@
     </div>
   </div>
 
- <!-- 🔵 제품 등록 -->
-<section class="panel">
-  <h2>신규 제품 등록</h2>
+  <!-- 🔵 제품 등록 제목 섹션 -->
+  <section class="panel">
+    <h2>신규 제품 등록</h2>
+  </section>
 
-  <!-- ✅ form 방식으로 전면 수정 -->
-  <form id="productForm" enctype="multipart/form-data">
+  <!-- 🟦 form은 section 밖에 둬야 파일 선택 문제 해결됨 -->
+  <form id="productForm" enctype="multipart/form-data" class="panel">
 
     <input id="title" name="title" class="input" placeholder="제품명 입력" />
 
@@ -168,7 +139,7 @@
     <h3>제품 설명 (Toast UI Editor)</h3>
     <div id="editor" style="border:1px solid #ccc;border-radius:6px;"></div>
 
-    <!-- Toast Editor 내용 저장용 숨김 textarea -->
+    <!-- Toast Editor 내용 전송용 -->
     <textarea id="description_html" name="description_html" style="display:none;"></textarea>
 
     <h3 style="margin-top:20px;">제품 이미지 (여러 개 가능)</h3>
@@ -180,14 +151,14 @@
       class="input"
       accept="image/*"
     />
+
     <div id="preview" class="thumb-preview"></div>
 
     <button type="submit" class="btn btn-primary" style="margin-top:15px;">
       등록
     </button>
-  </form>
-</section>
 
+  </form>
 
   <!-- 🔵 제품 목록 -->
   <section class="panel">
@@ -197,37 +168,29 @@
 
 </div>
 
-<!-- ✅ 공통 스크립트: 인증 / 사이드바 -->
+<!-- 인증, 사이드바 -->
 <script src="./js/common_auth.js"></script>
 <script src="./js/sidebar.js"></script>
 
-<!-- ✅ Toast UI Editor JS (CDN) -->
+<!-- Toast UI Editor -->
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 
-<!-- ✅ 제품 관리 전용 JS -->
+<!-- 제품 JS -->
 <script src="./js/products_core.js"></script>
 
-<!-- ✅ 초기화 -->
+<!-- 초기화 -->
 <script>
-  // DOM 다 그려진 후 실행
-  (function () {
-    // 인증 체크
-    requireAdmin();
+(function () {
+  requireAdmin();
+  loadSidebar("products");
 
-    // 사이드바 로드
-    loadSidebar("products");
+  const logoutBtn = document.getElementById("logoutBtn");
+  if (logoutBtn) logoutBtn.addEventListener("click", logout);
 
-    // 로그아웃 버튼
-    const logoutBtn = document.getElementById("logoutBtn");
-    if (logoutBtn) logoutBtn.addEventListener("click", logout);
-
-    // 제품 페이지 초기화 (Toast, 이미지 미리보기, 목록 로드)
-    if (window.initProductsPage) {
-      window.initProductsPage();
-    } else {
-      console.error("initProductsPage가 정의되지 않음 (products_core.js 확인 필요)");
-    }
-  })();
+  if (window.initProductsPage) {
+    window.initProductsPage();
+  }
+})();
 </script>
 
 </body>
