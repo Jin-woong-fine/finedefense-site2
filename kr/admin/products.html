@@ -4,13 +4,14 @@
   <meta charset="UTF-8">
   <title>제품 관리 | Fine Defense 관리자</title>
 
-  <!-- Quill CSS -->
-  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+  <!-- Toast UI Editor CSS -->
+  <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
 
+  <!-- 관리자 공통 CSS -->
   <link rel="stylesheet" href="./css/admin.css">
 
   <style>
-    body { margin: 0; background:#f4f6f9; font-family:'Noto Sans KR'; }
+    body { margin: 0; background:#f4f6f9; font-family:'Noto Sans KR', sans-serif; }
 
     .main {
       margin-left: 240px;
@@ -43,19 +44,46 @@
       border:1px solid #ccc;
       border-radius:6px;
       margin-bottom:10px;
+      font-family:inherit;
+      font-size:14px;
+      box-sizing:border-box;
     }
 
     .thumb-preview {
       display:flex;
       gap:10px;
       flex-wrap:wrap;
+      margin-top:8px;
     }
-    .thumb-preview img {
+
+    .thumb-preview-item {
+      position:relative;
       width:80px;
       height:80px;
-      object-fit:cover;
-      border:1px solid #ddd;
       border-radius:8px;
+      overflow:hidden;
+      border:1px solid #ddd;
+    }
+
+    .thumb-preview-item img {
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .thumb-preview-item button {
+      position:absolute;
+      top:-6px;
+      right:-6px;
+      width:20px;
+      height:20px;
+      border-radius:50%;
+      border:none;
+      background:#d62828;
+      color:#fff;
+      font-size:12px;
+      cursor:pointer;
     }
 
     .product-grid {
@@ -71,6 +99,7 @@
       padding:15px;
       border:1px solid #eee;
       box-shadow:0 2px 8px rgba(0,0,0,0.05);
+      box-sizing:border-box;
     }
 
     .product-card img {
@@ -79,10 +108,11 @@
       object-fit:cover;
       border-radius:8px;
       margin-bottom:10px;
+      background:#f2f2f2;
     }
 
     .product-card h3 {
-      font-size:1.1rem;
+      font-size:1.05rem;
       margin:0 0 6px;
       color:#222;
     }
@@ -93,15 +123,23 @@
       margin-bottom:10px;
     }
 
+    .product-card .date {
+      font-size:0.8rem;
+      color:#999;
+      margin-bottom:10px;
+    }
+
     .btn {
       padding:8px 14px;
       border:none;
       cursor:pointer;
       border-radius:6px;
+      font-size:13px;
+      font-family:inherit;
     }
     .btn-primary { background:#0f2679; color:#fff; }
-    .btn-danger { background:#d62828; color:#fff; }
-    .btn-edit { background:#1d7af3; color:#fff; }
+    .btn-danger  { background:#d62828; color:#fff; }
+    .btn-edit    { background:#1d7af3; color:#fff; }
   </style>
 </head>
 
@@ -134,14 +172,14 @@
       <option value="custom">커스텀 케이블</option>
     </select>
 
-    <h3>제품 설명 (Quill 에디터)</h3>
-    <div id="editor" style="height:220px;background:#fff;border:1px solid #ccc;border-radius:6px;"></div>
+    <h3>제품 설명 (Toast UI Editor)</h3>
+    <div id="editor"></div>
 
-    <h3>제품 이미지 (여러 개 가능)</h3>
+    <h3 style="margin-top:20px;">제품 이미지 (여러 개 선택 가능)</h3>
     <input type="file" id="images" multiple class="input" accept="image/*">
     <div id="preview" class="thumb-preview"></div>
 
-    <button class="btn btn-primary" onclick="uploadProduct()">등록</button>
+    <button class="btn btn-primary" style="margin-top:15px;" onclick="uploadProduct()">등록</button>
   </section>
 
   <!-- 🔵 제품 목록 -->
@@ -152,32 +190,32 @@
 
 </div>
 
-<!-- 1) Quill 먼저 로드 -->
-<script src="https://cdn.quilljs.com/1.3.6/quill.min.js" defer></script>
+<!-- 1) Toast UI Editor JS -->
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 
-<!-- 2) 인증 / 로그인 체크 -->
-<script src="./js/common_auth.js" defer></script>
+<!-- 2) 인증 / 권한 공통 -->
+<script src="./js/common_auth.js"></script>
 
-<!-- 3) UI 요소 (sidebar 등) -->
-<script src="./js/sidebar.js" defer></script>
+<!-- 3) 사이드바 UI -->
+<script src="./js/sidebar.js"></script>
 
-<!-- 4) 제품 관리 핵심 로직 (Quill 필요함) -->
-<script src="./js/products_core_debug.js" defer></script>
+<!-- 4) 제품 관리 로직 -->
+<script src="./js/products_core.js"></script>
 
-<!-- 5) DOM 준비 후 실행 -->
-<script defer>
+<!-- 5) 마지막: DOM 준비 후 공통 처리 -->
+<script>
   document.addEventListener("DOMContentLoaded", () => {
+    // 권한 체크
     requireAdmin();
+
+    // 사이드바 활성화
     loadSidebar("products");
 
+    // 로그아웃 버튼
     const logoutBtn = document.getElementById("logoutBtn");
     if (logoutBtn) logoutBtn.addEventListener("click", logout);
   });
 </script>
-
-
-
-
 
 </body>
 </html>
