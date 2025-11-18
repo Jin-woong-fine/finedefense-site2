@@ -1,43 +1,118 @@
-/* 관리자 sidebar */
+/* 기본 레이아웃 */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Noto Sans KR', sans-serif;
+  background: #f3f5fa;
+  display: flex;
+}
 
-.sidebar {
+/* 사이드바 */
+#sidebar {
   width: 240px;
   background: #0f2679;
-  color: white;
-  position: fixed;
-  left: 0;
-  top: 0;
-  height: 100vh;
-  padding: 30px 20px;
-  box-sizing: border-box;
-}
-
-.sidebar-title {
-  font-size: 1.3rem;
-  font-weight: 600;
-  margin-bottom: 40px;
-}
-
-.sidebar-menu a {
-  display: block;
-  padding: 10px 0;
-  margin-bottom: 6px;
-  text-decoration: none;
-  color: #cfd6ff;
-  font-size: 0.95rem;
-  transition: 0.2s;
-}
-
-.sidebar-menu a:hover,
-.sidebar-menu a.active {
   color: #fff;
-  font-weight: 600;
+  min-height: 100vh;
+  box-shadow: 3px 0 10px rgba(0,0,0,0.1);
 }
 
-/* 관리자 main */
+/* 메인 영역 */
 .main {
-  margin-left: 260px; /* sidebar width + padding */
-  padding: 30px;
-  min-height: 100vh;
-  box-sizing: border-box;
+  flex: 1;
+  padding: 30px 40px;
+}
+
+/* 상단바 */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.topbar .title {
+  font-size: 28px;
+  font-weight: 600;
+  color: #0f2679;
+}
+
+.topbar button {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  background: #0f2679;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.topbar button:hover {
+  background: #1a358a;
+}
+
+/* 통계 카드 섹션 */
+.stats-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  background: #fff;
+  padding: 25px 20px;
+  border-radius: 14px;
+  box-shadow: 0 5px 12px rgba(0,0,0,0.1);
+  text-align: center;
+  border-left: 6px solid #0f2679;
+  transition: transform .15s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+}
+
+.stat-card h3 {
+  margin: 0 0 10px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #444;
+}
+
+.stat-value {
+  font-size: 30px;
+  font-weight: 700;
+  color: #0f2679;
+}
+
+/* 패널 */
+.panel {
+  background: #fff;
+  padding: 25px 30px;
+  border-radius: 14px;
+  box-shadow: 0 5px 12px rgba(0,0,0,0.1);
+  margin-bottom: 30px;
+}
+
+.panel h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #0f2679;
+  margin-bottom: 20px;
+}
+
+/* Top 5 게시물 리스트 */
+#topPostsList {
+  padding-left: 16px;
+  font-size: 15px;
+}
+
+#topPostsList li {
+  margin-bottom: 10px;
+  color: #333;
+}
+
+#topPostsList li strong {
+  color: #0f2679;
 }
