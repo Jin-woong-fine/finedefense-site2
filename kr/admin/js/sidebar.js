@@ -17,6 +17,8 @@ function loadSidebar(activeMenu) {
         <a href="./newsroom_list.html" class="menu-item" data-menu="news">뉴스룸 관리</a>
         <a href="./files.html" class="menu-item" data-menu="files">자료실 관리</a>
         <a href="./users.html" data-menu="users">사용자 관리</a>
+        <a href="./login_logs.html" data-menu="logs">로그인 기록</a>
+
 
       </div>
 

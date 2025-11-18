@@ -11,6 +11,9 @@ import postsRouter from "./routes/posts.js";
 import productsRouter from "./routes/products.js";
 import uploadsRouter from "./routes/uploads.js";   // ⭐️ Toast Editor 전용 업로드
 
+// ⭐️ 신규: 로그인 로그 조회 라우터
+import loginLogsRouter from "./routes/login_logs.js";
+
 // ------------------------------------------------------
 // 기본 설정
 // ------------------------------------------------------
@@ -27,7 +30,6 @@ const __dirname = path.dirname(__filename);
 app.use(cors());
 app.use(express.json({ limit: "20mb" }));
 app.use(express.urlencoded({ extended: true, limit: "20mb" }));
-
 
 // ------------------------------------------------------
 // 🔥 업로드 이미지 정적 제공
@@ -48,12 +50,15 @@ app.use(
 // 📌 API 라우터
 // ------------------------------------------------------
 
-app.use("/api/products", productsRouter); // 제품
-app.use("/api/inquiry", sendInquiryRouter); // 1:1 문의
-app.use("/api/auth", authRouter); // 로그인
-app.use("/api/admin", adminRouter); // 관리자
-app.use("/api/posts", postsRouter); // 뉴스룸
-app.use("/api/uploads", uploadsRouter); // ⭐️ Toast Editor 이미지 업로드 API
+app.use("/api/products", productsRouter);       // 제품
+app.use("/api/inquiry", sendInquiryRouter);     // 1:1 문의
+app.use("/api/auth", authRouter);               // 로그인
+app.use("/api/admin", adminRouter);             // 관리자
+app.use("/api/posts", postsRouter);             // 뉴스룸
+app.use("/api/uploads", uploadsRouter);         // Toast Editor 이미지 업로드
+
+// ⭐️ 신규: 로그인 로그 API
+app.use("/api/logs/login", loginLogsRouter);
 
 // ------------------------------------------------------
 // 🌐 정적 파일 (홈페이지 배포용)
@@ -71,8 +76,3 @@ const PORT = 3000;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running at http://0.0.0.0:${PORT}`);
 });
-
-
-
-
-

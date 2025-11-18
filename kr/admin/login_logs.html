@@ -2,20 +2,38 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>로그인 기록 | 관리자</title>
+  <title>로그인 기록 | Fine Defense 관리자</title>
+
   <link rel="stylesheet" href="./css/admin.css">
 
   <style>
-    table { width:100%; border-collapse: collapse; }
-    th, td { padding:10px; border-bottom:1px solid #ddd; }
-    th { background:#eef1f7; font-weight:600; }
-    .success { color:green; font-weight:bold; }
-    .fail { color:crimson; font-weight:bold; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      font-size: 14px;
+    }
+    th {
+      background:#eef1f7;
+      font-weight:600;
+    }
+    .status-success { color: green; font-weight:600; }
+    .status-fail { color: red; font-weight:600; }
+
+    .search-box {
+      display:flex;
+      gap:10px;
+      margin-bottom:20px;
+    }
+    .input { padding:8px; border:1px solid #ccc; border-radius:6px; }
+    .btn-search { padding:8px 12px; background:#0f2679; color:white; border:none; border-radius:6px; cursor:pointer; }
   </style>
 </head>
 
 <body>
-
 <div id="sidebar"></div>
 
 <div class="main">
@@ -29,51 +47,39 @@
   </div>
 
   <section class="panel">
+
+    <div class="search-box">
+      <input type="text" id="searchInput" class="input" placeholder="아이디 검색">
+      <button class="btn-search" onclick="loadLoginLogs()">검색</button>
+    </div>
+
     <table>
       <thead>
         <tr>
           <th>ID</th>
+          <th>유저ID</th>
           <th>아이디</th>
           <th>IP</th>
-          <th>User Agent</th>
+          <th>브라우저</th>
           <th>결과</th>
           <th>시간</th>
         </tr>
       </thead>
-      <tbody id="logsTable"></tbody>
+      <tbody id="logTable"></tbody>
     </table>
+
   </section>
 
 </div>
 
 <script src="/kr/admin/js/common_auth.js"></script>
 <script src="/kr/admin/js/sidebar.js"></script>
+<script src="/kr/admin/js/login_logs.js"></script>
+
 <script>
   requireAdminOrSuperadmin();
-  loadSidebar("login_logs");
-
-  async function loadLogs() {
-    const res = await fetch("/api/logs/login", {
-      headers: { Authorization: "Bearer " + localStorage.getItem("token") }
-    });
-    const logs = await res.json();
-
-    const tbody = document.getElementById("logsTable");
-    tbody.innerHTML = logs.map(l => `
-      <tr>
-        <td>${l.id}</td>
-        <td>${l.username || "-"}</td>
-        <td>${l.ip}</td>
-        <td>${l.ua}</td>
-        <td class="${l.status}">${l.status}</td>
-        <td>${l.created_at}</td>
-      </tr>
-    `).join("");
-  }
-
-  loadLogs();
+  loadSidebar("logs");
   document.getElementById("logoutBtn").onclick = logout;
 </script>
-
 </body>
 </html>
