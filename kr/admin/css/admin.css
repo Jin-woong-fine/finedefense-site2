@@ -16,6 +16,68 @@ body {
   box-shadow: 3px 0 10px rgba(0,0,0,0.1);
 }
 
+
+/* 사이드바 전체 외곽 */
+#sidebar {
+  width: 240px;
+  background: #0f2679;
+  min-height: 100vh;
+  color: #fff;
+  box-shadow: 3px 0 10px rgba(0,0,0,0.1);
+}
+
+/* 내부 실제 사이드바 콘텐츠 */
+#sidebar .sidebar {
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* 상단 로고 영역 */
+#sidebar .sidebar-logo {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 30px;
+}
+
+/* 메뉴 전체 */
+#sidebar .sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* 개별 메뉴 */
+#sidebar .menu-item {
+  padding: 12px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  color: #cfd5e3;
+  font-size: 15px;
+  transition: background .2s, color .2s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* 마우스 오버 효과 */
+#sidebar .menu-item:hover {
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+}
+
+/* 선택된 메뉴(Active) */
+#sidebar .menu-item.active {
+  background: rgba(255,255,255,0.25);
+  color: #fff;
+  font-weight: 600;
+}
+
+
+
+
 /* 메인 영역 */
 .main {
   flex: 1;
