@@ -61,15 +61,21 @@
 
   </div>
 
-  <!-- ✅ 모듈 아님, 그냥 일반 스크립트 -->
-    <script src="./js/common_auth.js"></script>
-    <script src="./js/sidebar.js"></script>
-    <script src="./js/dashboard_core.js"></script>
-    <script>
-      requireAdmin();        // 이제 정상 작동
-      loadSidebar("dashboard");
-      document.getElementById("logoutBtn").addEventListener("click", logout);
-    </script>
+  <!-- 🔥 공통 스크립트 -->
+  <script src="./js/common_auth.js"></script>
+  <script src="./js/sidebar.js"></script>
+  <script src="./js/dashboard_core.js"></script>
+
+  <script>
+    // 🔥 🔥 🔥 관리자만 접근 허용
+    requireAdmin();      
+
+    // 🔵 관리자용 사이드바 로드
+    loadSidebar("dashboard");
+
+    // 🔵 로그아웃 버튼 이벤트
+    document.getElementById("logoutBtn").addEventListener("click", logout);
+  </script>
 
 </body>
 </html>
