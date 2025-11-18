@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ============================================
-// 사용자 목록 로드
+// 사용자 목록 로드 + 자기 자신 예외 처리 포함
 // ============================================
 async function loadUsers() {
   const table = document.getElementById("usersTable");
@@ -37,44 +37,74 @@ async function loadUsers() {
   }
 
   const users = await res.json();
+  const myId = Number(localStorage.getItem("user_id"));
   const myRole = localStorage.getItem("role");
 
   table.innerHTML = users
-    .map(
-      (u) => `
-      <tr>
-        <td>${u.id}</td>
-        <td>${u.username}</td>
-        <td>${u.name || "-"}</td>
-        <td>
-          ${
-            myRole === "superadmin"
-              ? `
-              <select onchange="changeUserRole(${u.id}, this.value)">
-                <option value="viewer" ${u.role === "viewer" ? "selected" : ""}>viewer</option>
-                <option value="editor" ${u.role === "editor" ? "selected" : ""}>editor</option>
-                <option value="admin" ${u.role === "admin" ? "selected" : ""}>admin</option>
-                <option value="superadmin" ${u.role === "superadmin" ? "selected" : ""}>superadmin</option>
-              </select>`
-              : u.role
-          }
-        </td>
-        <td>${u.created_at}</td>
+    .map((u) => {
+      let actions = "";
 
-        <td>
-          ${
-            myRole === "superadmin"
-              ? `
-            <button class="btn-small btn-edit" onclick="resetPassword(${u.id})">비번초기화</button>
-            <button class="btn-small btn-delete" onclick="deleteUser(${u.id})">삭제</button>
-            `
-              : "-"
-          }
-        </td>
-      </tr>
-    `
-    )
+      // ================================
+      // 자기 자신인 경우
+      // ================================
+      if (u.id === myId) {
+        actions = `
+          <button class="btn-small btn-edit" onclick="resetPassword(${u.id})">
+            비번초기화
+          </button>
+        `;
+        return rowTemplate(u, "-", actions);
+      }
+
+      // ================================
+      // superadmin (전체 관리 가능)
+      // ================================
+      if (myRole === "superadmin") {
+        const roleSelect = `
+          <select onchange="changeUserRole(${u.id}, this.value)">
+            <option value="viewer" ${u.role === "viewer" ? "selected" : ""}>viewer</option>
+            <option value="editor" ${u.role === "editor" ? "selected" : ""}>editor</option>
+            <option value="admin" ${u.role === "admin" ? "selected" : ""}>admin</option>
+            <option value="superadmin" ${u.role === "superadmin" ? "selected" : ""}>superadmin</option>
+          </select>
+        `;
+
+        actions = `
+          <button class="btn-small btn-edit" onclick="resetPassword(${u.id})">비번초기화</button>
+          <button class="btn-small btn-delete" onclick="deleteUser(${u.id})">삭제</button>
+        `;
+
+        return rowTemplate(u, roleSelect, actions);
+      }
+
+      // ================================
+      // admin (조회만 가능 + 자기 자신만 초기화)
+      // ================================
+      if (myRole === "admin") {
+        // 자기 자신은 위에서 걸러짐
+        return rowTemplate(u, u.role, "-");
+      }
+
+      // 기타 권한 접근 X
+      return rowTemplate(u, u.role, "-");
+    })
     .join("");
+}
+
+// ============================================
+// 행 템플릿 함수
+// ============================================
+function rowTemplate(u, roleCell, actionCell) {
+  return `
+    <tr>
+      <td>${u.id}</td>
+      <td>${u.username}</td>
+      <td>${u.name || "-"}</td>
+      <td>${roleCell}</td>
+      <td>${u.created_at}</td>
+      <td>${actionCell}</td>
+    </tr>
+  `;
 }
 
 // ============================================
@@ -109,7 +139,7 @@ async function resetPassword(id) {
 
   if (!res.ok) return alert("비밀번호 초기화 실패");
 
-  alert("초기화 완료");
+  alert("비밀번호 변경 완료");
 }
 
 // ============================================
@@ -136,7 +166,6 @@ function initAddUser() {
   const role = localStorage.getItem("role");
   const panel = document.getElementById("addUserPanel");
 
-  // superadmin만 폼 보이게
   if (role === "superadmin") {
     panel.style.display = "block";
   }
