@@ -7,41 +7,54 @@
   <link rel="stylesheet" href="./css/admin.css" />
 
   <style>
-    .profile-wrap {
-      max-width: 600px;
+    .profile-box {
+      padding: 25px;
       background: #fff;
-      padding: 30px;
-      border-radius: 14px;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.08);
-      margin-top: 20px;
+      border-radius: 12px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+      max-width: 600px;
+      margin: 0 auto;
     }
 
-    .avatar-box {
-      text-align:center;
-      margin-bottom:20px;
+    .profile-field {
+      margin-bottom: 18px;
     }
-    .avatar-box img {
-      width:120px;
-      height:120px;
-      border-radius:50%;
-      object-fit:cover;
-      border:3px solid #ddd;
+
+    .profile-field label {
+      display: block;
+      font-size: 15px;
+      color: #333;
+      margin-bottom: 6px;
+      font-weight: 600;
     }
-    .input {
-      width:100%;
-      padding:10px;
-      margin:8px 0 16px;
-      border:1px solid #ccc;
-      border-radius:8px;
-      font-size:15px;
+
+    .profile-field input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 15px;
     }
-    .btn-primary {
-      background:#0f2679;
-      color:white;
-      padding:10px 16px;
-      border:none;
-      border-radius:8px;
-      cursor:pointer;
+
+    .btn-save {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      background: #0f2679;
+      color: white;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .btn-save:hover {
+      background: #192f82;
+    }
+
+    .readonly {
+      background: #f3f5fa;
+      color: #777;
     }
   </style>
 </head>
@@ -51,93 +64,55 @@
 <div id="sidebar"></div>
 
 <div class="main">
-
   <div class="topbar">
     <h2>내 프로필</h2>
     <div>
-      <button class="btn btn-primary" onclick="location.href='./dashboard.html'">대시보드</button>
+      <button class="btn" onclick="location.href='../index.html'">홈으로</button>
       <button id="logoutBtn" class="btn btn-danger">로그아웃</button>
     </div>
   </div>
 
-  <section class="profile-wrap">
+  <section class="profile-box">
+    <h3 style="margin-bottom:20px;">계정 정보</h3>
 
-    <div class="avatar-box">
-      <img id="avatarImg" src="/img/default-avatar.png" alt="avatar">
+    <div class="profile-field">
+      <label>아이디 (이메일)</label>
+      <input id="pf_username" type="text" class="readonly" readonly>
     </div>
 
-    <input type="file" id="avatarInput" class="input" accept="image/*">
+    <div class="profile-field">
+      <label>이름</label>
+      <input id="pf_name" type="text">
+    </div>
 
-    <input type="text" id="nameInput" class="input" placeholder="이름 수정">
+    <div class="profile-field">
+      <label>권한</label>
+      <input id="pf_role" type="text" class="readonly" readonly>
+    </div>
 
-    <button id="saveProfileBtn" class="btn-primary">프로필 저장</button>
+    <hr style="margin:25px 0;">
 
+    <h3 style="margin-bottom:15px;">비밀번호 변경</h3>
+
+    <div class="profile-field">
+      <label>새 비밀번호</label>
+      <input id="pf_newpw" type="password" placeholder="새 비밀번호 입력">
+    </div>
+
+    <button class="btn-save" onclick="saveProfile()">저장</button>
   </section>
-
 </div>
 
 <script src="/kr/admin/js/common_auth.js"></script>
 <script src="/kr/admin/js/sidebar.js"></script>
+<script src="/kr/admin/js/users_profile.js"></script>
 
 <script>
-  const API = "/api";
-  const token = localStorage.getItem("token");
-  const myId = localStorage.getItem("user_id");
-
-  loadSidebar("");
-  document.getElementById("logoutBtn").onclick = logout;
-
-  document.addEventListener("DOMContentLoaded", loadProfile);
-
-  async function loadProfile() {
-    const res = await fetch(`${API}/users`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-
-    if (!res.ok) return alert("불러오기 실패");
-
-    const users = await res.json();
-    const me = users.find(u => u.id == myId);
-
-    if (!me) return alert("내 정보 찾기 실패");
-
-    // 프로필 반영
-    document.getElementById("avatarImg").src = me.avatar || "/img/default-avatar.png";
-    document.getElementById("nameInput").value = me.name || "";
-  }
-
-  // 저장 처리
-  document.getElementById("saveProfileBtn").onclick = async () => {
-    const name = document.getElementById("nameInput").value.trim();
-    const avatarFile = document.getElementById("avatarInput").files[0];
-
-    // ① 이름 수정
-    if (name) {
-      await fetch(`${API}/users/${myId}/role`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ name })
-      });
-    }
-
-    // ② 아바타 업로드
-    if (avatarFile) {
-      const fd = new FormData();
-      fd.append("avatar", avatarFile);
-
-      await fetch(`${API}/users/${myId}/avatar`, {
-        method: "PUT",
-        headers: { Authorization: `Bearer ${token}` },
-        body: fd
-      });
-    }
-
-    alert("프로필 저장 완료!");
-    location.reload();
-  };
+  (function () {
+    requireLogin();       // 로그인만 되어 있으면 OK
+    loadSidebar();         // 사이드바 로드
+    document.getElementById("logoutBtn").onclick = logout;
+  })();
 </script>
 
 </body>
