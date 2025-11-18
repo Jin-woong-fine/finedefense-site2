@@ -1,16 +1,16 @@
 /* ============================================================
    🔐 공통 설정
 ============================================================ */
-const token = localStorage.getItem("token");
 const API = "/api";
+const token = localStorage.getItem("token");
 
 const urlParams = new URLSearchParams(window.location.search);
 const productId = urlParams.get("id");
 
-let editor;             // Toast UI Editor
-let existingImages = []; // 기존 이미지 URL 배열
-let removedImages = [];  // 삭제할 URL 배열
-let newImageFiles = [];  // 새로 추가한 이미지 파일들
+let editor;
+let existingImages = [];
+let removedImages = [];
+let newImageFiles = [];
 
 /* ============================================================
    🧩 초기화
@@ -28,10 +28,10 @@ function initEditor() {
   const Editor = toastui.Editor;
 
   editor = new Editor({
-    el: document.querySelector('#editor'),
-    height: '320px',
-    initialEditType: 'wysiwyg',
-    previewStyle: 'vertical'
+    el: document.querySelector("#editor"),
+    height: "350px",
+    initialEditType: "wysiwyg",
+    previewStyle: "vertical"
   });
 }
 
@@ -39,20 +39,26 @@ function initEditor() {
    📥 제품 상세 불러오기
 ============================================================ */
 async function loadProduct() {
-  const res = await fetch(`${API}/products/${productId}`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
+  try {
+    const res = await fetch(`${API}/products/${productId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
 
-  const data = await res.json();
-  const p = data.product;
+    if (!res.ok) throw new Error("제품 정보를 불러올 수 없습니다.");
 
-  document.getElementById("title").value = p.title;
-  document.getElementById("category").value = p.category;
-  editor.setHTML(p.description_html || "");
+    const data = await res.json();
+    const p = data.product;
 
-  existingImages = data.images.map(i => i.url);
+    document.getElementById("title").value = p.title;
+    document.getElementById("category").value = p.category;
+    editor.setHTML(p.description_html || "");
 
-  renderExistingImages();
+    existingImages = data.images.map(i => i.url);
+
+    renderExistingImages();
+  } catch (err) {
+    alert("불러오기 실패: " + err.message);
+  }
 }
 
 /* ============================================================
@@ -86,14 +92,18 @@ function renderExistingImages() {
 }
 
 /* ============================================================
-   🖼 새 이미지 추가 미리보기
+   🖼 새 이미지 미리보기
 ============================================================ */
 function initAddImagePreview() {
   const input = document.getElementById("newImages");
   const box = document.getElementById("newPreview");
 
   input.addEventListener("change", (e) => {
-    newImageFiles = [...newImageFiles, ...Array.from(e.target.files)];
+    const files = Array.from(e.target.files);
+
+    // 중복 방지
+    newImageFiles = [...newImageFiles, ...files];
+
     renderNewPreview();
   });
 
@@ -102,6 +112,7 @@ function initAddImagePreview() {
 
     newImageFiles.forEach((file, idx) => {
       const reader = new FileReader();
+
       reader.onload = (ev) => {
         const wrap = document.createElement("div");
         wrap.className = "img-item";
@@ -132,32 +143,37 @@ function initAddImagePreview() {
    💾 저장 (PUT)
 ============================================================ */
 document.getElementById("saveBtn").addEventListener("click", async () => {
-  const title = document.getElementById("title").value.trim();
-  const category = document.getElementById("category").value;
-  const description_html = editor.getHTML();
+  try {
+    const title = document.getElementById("title").value.trim();
+    const category = document.getElementById("category").value;
+    const description_html = editor.getHTML();
 
-  if (!title) return alert("제품명을 입력하세요.");
+    if (!title) return alert("제품명을 입력하세요.");
 
-  const fd = new FormData();
-  fd.append("title", title);
-  fd.append("category", category);
-  fd.append("description_html", description_html);
+    const fd = new FormData();
+    fd.append("title", title);
+    fd.append("category", category);
+    fd.append("description_html", description_html);
 
-  fd.append("removedImages", JSON.stringify(removedImages));
+    fd.append("removedImages", JSON.stringify(removedImages));
 
-  newImageFiles.forEach((f) => fd.append("images", f));
+    newImageFiles.forEach(f => fd.append("images", f));
 
-  const res = await fetch(`${API}/products/${productId}`, {
-    method: "PUT",
-    headers: { Authorization: `Bearer ${token}` },
-    body: fd
-  });
+    const res = await fetch(`${API}/products/${productId}`, {
+      method: "PUT",
+      headers: { Authorization: `Bearer ${token}` },
+      body: fd
+    });
 
-  if (!res.ok) {
-    console.error(await res.text());
-    return alert("수정 실패");
+    if (!res.ok) {
+      console.error(await res.text());
+      return alert("수정 실패");
+    }
+
+    alert("수정 완료!");
+    location.href = "/kr/admin/products.html";
+
+  } catch (err) {
+    alert("저장 오류: " + err.message);
   }
-
-  alert("수정 완료!");
-  location.href = "/kr/admin/products.html";
 });
