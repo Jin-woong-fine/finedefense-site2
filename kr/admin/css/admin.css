@@ -20,6 +20,17 @@ body {
   min-height: 100vh;
 }
 
+
+/* 사이드바 로고 */
+#sidebar .sidebar-logo {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 18px;
+  color: #fff;
+  padding-left: 4px;
+}
+
+
 #sidebar .sidebar {
   padding: 30px 20px;
   display: flex;
