@@ -3,92 +3,128 @@
 <head>
   <meta charset="UTF-8">
   <title>수중이동형케이블 | Fine Defense</title>
+
+  <!-- 공통 스타일 -->
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/sub-banner.css">
 
   <style>
+    /* ===============================
+       메인 섹션
+    =============================== */
     .product-section {
       max-width: 1200px;
-      margin: 40px auto;
-      padding: 20px 40px;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      margin: 50px auto;
+      padding: 30px 40px;
+      background: #ffffff;
+      border-radius: 14px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.06);
     }
 
     .product-section h1 {
-      font-size: 2rem;
+      font-size: 2.2rem;
+      font-weight: 800;
       color: #0f2679;
       margin-bottom: 16px;
       text-align: center;
     }
 
-    .product-section p {
+    .product-section p.section-desc {
       font-size: 1.1rem;
       text-align: center;
-      margin-bottom: 40px;
+      margin-bottom: 45px;
       line-height: 1.7;
-      color:#444;
+      color: #444;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
+    /* ===============================
+       카드 그리드
+    =============================== */
     .product-cards {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
-      gap: 30px;
+      grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+      gap: 32px;
     }
 
+    /* ===============================
+       개별 카드
+    =============================== */
     .product-card {
-      display: flex;
-      align-items: stretch;
       background: #fff;
-      border-radius: 14px;
+      border-radius: 16px;
       overflow: hidden;
       text-decoration: none;
       color: inherit;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-      transition: .25s;
-    }
-    .product-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      display: flex;
+      align-items: stretch;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+      transition: .25s ease;
     }
 
-    /* 🔥 이미지 영역: 세로 사진도 안정적으로 보이게 */
+    .product-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 8px 22px rgba(0,0,0,0.14);
+    }
+
+    /* 🔥 이미지 영역 개선 */
     .card-image {
       flex: 0 0 40%;
-      height: 200px; /* 🔥 세로 사진 크게 보이는 문제 해결 */
+      height: 220px;
+      background: #f4f4f4;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #f9f9f9;
       overflow: hidden;
     }
 
     .card-image img {
       max-width: 100%;
       max-height: 100%;
-      object-fit: contain; /* 비율 유지 */
-      display: block;
+      object-fit: contain;
+      padding: 6px;
     }
+
+    /* 텍스트 영역 */
     .card-content {
       flex: 1;
-      padding: 24px;
+      padding: 24px 22px;
+      display: flex;
+      flex-direction: column;
     }
+
     .card-content h3 {
-      margin-top: 0;
-      margin-bottom: 10px;
+      font-size: 1.25rem;
+      font-weight: 700;
       color: #0f2679;
-      font-size: 1.1rem;
+      margin: 0 0 10px 0;
     }
+
     .card-content p {
       margin: 0;
-      font-size: .95rem;
+      font-size: 0.95rem;
       color: #555;
+      line-height: 1.55;
+      flex-grow: 1;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 3; /* 🔥 3줄로 제한 */
+      -webkit-box-orient: vertical;
     }
 
     @media (max-width: 768px) {
-      .product-card { flex-direction: column; }
-      .card-image { width:100%; height:200px; }
+      .product-card {
+        flex-direction: column;
+      }
+      .card-image {
+        width: 100%;
+        height: 200px;
+      }
+      .product-cards {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -98,7 +134,7 @@
 <!-- 헤더 -->
 <div id="header"></div>
 
-<!-- 배너 -->
+<!-- 서브 배너 -->
 <section class="sub-banner">
   <img src="/img/sub-banners/cable.jpg" alt="">
   <div class="banner-text">
@@ -118,12 +154,12 @@
 <!-- 본문 -->
 <section class="product-section">
   <h1>수중이동형케이블</h1>
-  <p>
+  <p class="section-desc">
     수중 이동형 장비(ROV, 예인체, 소나 시스템 등)에 전원·신호·광전송을 제공하는
     고신뢰성 복합 케이블입니다. 운용 환경에 따라 전력·제어·광섬유 조합의 맞춤 설계가 가능합니다.
   </p>
 
-  <!-- 🔥 자동 렌더링 영역 -->
+  <!-- 제품 카드 자동 렌더링 -->
   <div id="productCards" class="product-cards"></div>
 </section>
 
@@ -134,11 +170,11 @@
 <script src="/js/language.js"></script>
 
 <script>
-  // HTML 제거해서 카드 설명에 짧게 쓰기
+  // 🔥 HTML 태그 제거 후 설명 텍스트만 추출
   function stripHtml(html) {
     const tmp = document.createElement("div");
     tmp.innerHTML = html;
-    return tmp.textContent || tmp.innerText || "";
+    return (tmp.textContent || tmp.innerText || "").trim();
   }
 
   async function loadProducts() {
@@ -150,10 +186,10 @@
 
       const all = await res.json();
 
-      // 👉 카테고리 = "towed" 만 사용
+      // "수중이동형 케이블" 카테고리 필터
       const products = all.filter(p => p.category === "towed");
 
-      if (!products.length) {
+      if (products.length === 0) {
         container.innerHTML = "<p>등록된 수중이동형 케이블 제품이 없습니다.</p>";
         return;
       }
@@ -161,7 +197,9 @@
       container.innerHTML = products.map(p => {
         const img = p.thumbnail || "/img/products/Image-placeholder.png";
         const link = `/kr/sub/products/product-view.html?id=${p.id}`;
-        const desc = stripHtml(p.description_html || "").substring(0, 100) + "...";
+
+        const plainText = stripHtml(p.description_html || "");
+        const desc = plainText.length > 120 ? plainText.slice(0, 120) + "…" : plainText;
 
         return `
           <a class="product-card" href="${link}">
@@ -172,8 +210,7 @@
               <h3>${p.title}</h3>
               <p>${desc}</p>
             </div>
-          </a>
-        `;
+          </a>`;
       }).join("");
 
     } catch (err) {

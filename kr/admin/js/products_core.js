@@ -7,15 +7,16 @@ function getAuthHeaders() {
 
 window.initProductsPage = function () {
   initEditor();
-  initImagePreview();
+  initImageDragPreview();
   initFormSubmit();
   loadProductList();
 };
 
 let editor = null;
+let newImageFiles = [];  // 🔥 새 이미지 배열(드래그 정렬 반영)
 
 /* ============================================
-   Editor
+   Editor 초기화
 ============================================ */
 function initEditor() {
   const Editor = toastui.Editor;
@@ -28,25 +29,81 @@ function initEditor() {
 }
 
 /* ============================================
-   이미지 미리보기
+   🔥 이미지 드래그 정렬 + 미리보기
 ============================================ */
-function initImagePreview() {
+function initImageDragPreview() {
   const input = document.getElementById("images");
   const preview = document.getElementById("preview");
 
   input.addEventListener("change", () => {
-    preview.innerHTML = "";
-    Array.from(input.files).forEach((file) => {
-      const img = document.createElement("img");
-      img.src = URL.createObjectURL(file);
-      img.style.width = "80px";
-      img.style.height = "80px";
-      img.style.objectFit = "cover";
-      img.style.borderRadius = "8px";
-      img.style.border = "1px solid #ddd";
-      preview.appendChild(img);
-    });
+    const newFiles = Array.from(input.files);
+    newImageFiles = [...newImageFiles, ...newFiles];
+    renderPreview();
   });
+
+  function renderPreview() {
+    preview.innerHTML = "";
+
+    newImageFiles.forEach((file, idx) => {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const wrap = document.createElement("div");
+        wrap.className = "img-item";
+        wrap.style.position = "relative";
+
+        const img = document.createElement("img");
+        img.src = ev.target.result;
+        img.style.width = "80px";
+        img.style.height = "80px";
+        img.style.objectFit = "cover";
+        img.style.borderRadius = "8px";
+        img.style.border = "1px solid #ddd";
+
+        const btn = document.createElement("button");
+        btn.textContent = "×";
+        btn.style.position = "absolute";
+        btn.style.top = "-6px";
+        btn.style.right = "-6px";
+        btn.style.width = "22px";
+        btn.style.height = "22px";
+        btn.style.borderRadius = "50%";
+        btn.style.border = "none";
+        btn.style.background = "crimson";
+        btn.style.color = "#fff";
+        btn.style.cursor = "pointer";
+
+        btn.onclick = () => {
+          newImageFiles.splice(idx, 1);
+          renderPreview();
+        };
+
+        wrap.appendChild(img);
+        wrap.appendChild(btn);
+        preview.appendChild(wrap);
+      };
+
+      reader.readAsDataURL(file);
+    });
+
+    enablePreviewSort();
+  }
+
+  function enablePreviewSort() {
+    Sortable.create(preview, {
+      animation: 150,
+      onSort: () => {
+        const items = preview.querySelectorAll(".img-item");
+        const reordered = [];
+
+        items.forEach((item) => {
+          const index = Array.from(items).indexOf(item);
+          reordered.push(newImageFiles[index]);
+        });
+
+        newImageFiles = reordered;
+      },
+    });
+  }
 }
 
 /* ============================================
@@ -66,7 +123,6 @@ function initFormSubmit() {
     const category = document.getElementById("category").value;
     const sort_order = document.getElementById("sort_order").value.trim() || "999";
     const lang = document.getElementById("lang").value;
-    const files = document.getElementById("images").files;
 
     if (!title || !category) {
       return alert("제품명과 카테고리는 필수입니다.");
@@ -80,9 +136,8 @@ function initFormSubmit() {
     fd.append("lang", lang);
     fd.append("description_html", editor.getHTML());
 
-    for (let i = 0; i < files.length; i++) {
-      fd.append("images", files[i]);
-    }
+    // 🔥 드래그로 정렬된 순서대로 파일 추가
+    newImageFiles.forEach((f) => fd.append("images", f));
 
     const res = await fetch("/api/products", {
       method: "POST",
@@ -96,8 +151,10 @@ function initFormSubmit() {
     }
 
     alert("등록 완료");
+
     form.reset();
     editor.setHTML("");
+    newImageFiles = [];
     document.getElementById("preview").innerHTML = "";
 
     loadProductList();
