@@ -8,9 +8,9 @@ const urlParams = new URLSearchParams(window.location.search);
 const productId = urlParams.get("id");
 
 let editor;
-let existingImages = [];
-let removedImages = [];
-let newImageFiles = [];
+let existingImages = [];   // 서버에서 불러온 기존 이미지 목록
+let removedImages = [];    // 삭제된 이미지 목록
+let newImageFiles = [];    // 새로 업로드한 이미지 목록
 
 /* ============================================================
    🧩 초기화
@@ -31,7 +31,7 @@ function initEditor() {
     el: document.querySelector("#editor"),
     height: "350px",
     initialEditType: "wysiwyg",
-    previewStyle: "vertical"
+    previewStyle: "vertical",
   });
 }
 
@@ -41,7 +41,7 @@ function initEditor() {
 async function loadProduct() {
   try {
     const res = await fetch(`${API}/products/${productId}`, {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` },
     });
 
     if (!res.ok) throw new Error("제품 정보를 불러올 수 없습니다.");
@@ -53,11 +53,13 @@ async function loadProduct() {
     document.getElementById("category").value = p.category;
     editor.setHTML(p.description_html || "");
 
-    existingImages = data.images.map(i => i.url);
+    existingImages = data.images.map((img) => img.url);
 
     renderExistingImages();
+    enableExistingImageSort();
   } catch (err) {
-    alert("불러오기 실패: " + err.message);
+    console.error(err);
+    alert("불러오기 오류: " + err.message);
   }
 }
 
@@ -83,6 +85,7 @@ function renderExistingImages() {
       removedImages.push(url);
       existingImages.splice(idx, 1);
       renderExistingImages();
+      enableExistingImageSort();
     };
 
     wrap.appendChild(img);
@@ -92,7 +95,28 @@ function renderExistingImages() {
 }
 
 /* ============================================================
-   🖼 새 이미지 미리보기
+   🔀 기존 이미지 정렬 기능 (SortableJS)
+============================================================ */
+function enableExistingImageSort() {
+  const el = document.getElementById("existingImages");
+
+  Sortable.create(el, {
+    animation: 150,
+
+    onSort: () => {
+      const newOrder = [];
+      el.querySelectorAll("img").forEach((imgEl) => {
+        const relativeUrl = imgEl.src.replace(location.origin, "");
+        newOrder.push(relativeUrl);
+      });
+
+      existingImages = newOrder;
+    },
+  });
+}
+
+/* ============================================================
+   🖼 새 이미지 추가 + 미리보기 + 정렬
 ============================================================ */
 function initAddImagePreview() {
   const input = document.getElementById("newImages");
@@ -100,11 +124,10 @@ function initAddImagePreview() {
 
   input.addEventListener("change", (e) => {
     const files = Array.from(e.target.files);
-
-    // 중복 방지
     newImageFiles = [...newImageFiles, ...files];
 
     renderNewPreview();
+    enableNewImageSort();
   });
 
   function renderNewPreview() {
@@ -127,6 +150,7 @@ function initAddImagePreview() {
         btn.onclick = () => {
           newImageFiles.splice(idx, 1);
           renderNewPreview();
+          enableNewImageSort();
         };
 
         wrap.appendChild(img);
@@ -137,6 +161,30 @@ function initAddImagePreview() {
       reader.readAsDataURL(file);
     });
   }
+}
+
+/* ============================================================
+   🔀 새 이미지 정렬 기능 (SortableJS)
+============================================================ */
+function enableNewImageSort() {
+  const el = document.getElementById("newPreview");
+
+  Sortable.create(el, {
+    animation: 150,
+
+    onSort: () => {
+      const newOrder = [];
+      const items = el.querySelectorAll(".img-item");
+
+      // reader 기반 렌더링이라 order는 index 기준으로만 관리
+      items.forEach((item) => {
+        const idx = Array.from(items).indexOf(item);
+        newOrder.push(newImageFiles[idx]);
+      });
+
+      newImageFiles = newOrder;
+    },
+  });
 }
 
 /* ============================================================
@@ -157,12 +205,13 @@ document.getElementById("saveBtn").addEventListener("click", async () => {
 
     fd.append("removedImages", JSON.stringify(removedImages));
 
-    newImageFiles.forEach(f => fd.append("images", f));
+    // 정렬된 순서대로 이미지 추가
+    newImageFiles.forEach((f) => fd.append("images", f));
 
     const res = await fetch(`${API}/products/${productId}`, {
       method: "PUT",
       headers: { Authorization: `Bearer ${token}` },
-      body: fd
+      body: fd,
     });
 
     if (!res.ok) {
@@ -172,7 +221,6 @@ document.getElementById("saveBtn").addEventListener("click", async () => {
 
     alert("수정 완료!");
     location.href = "/kr/admin/products.html";
-
   } catch (err) {
     alert("저장 오류: " + err.message);
   }
