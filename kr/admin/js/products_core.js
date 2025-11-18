@@ -5,15 +5,17 @@ function getAuthHeaders() {
   return t ? { Authorization: `Bearer ${t}` } : {};
 }
 
+let editor = null;
+let newImageFiles = [];          // 🔥 새 이미지들 (드래그 정렬 포함)
+let currentLangFilter = "kr";    // 🔥 기본: 한국어
+
 window.initProductsPage = function () {
   initEditor();
   initImageDragPreview();
+  initLangFilterUI();
   initFormSubmit();
-  loadProductList();
+  loadProductList(currentLangFilter);
 };
-
-let editor = null;
-let newImageFiles = [];  // 🔥 새 이미지 배열(드래그 정렬 반영)
 
 /* ============================================
    Editor 초기화
@@ -36,8 +38,8 @@ function initImageDragPreview() {
   const preview = document.getElementById("preview");
 
   input.addEventListener("change", () => {
-    const newFiles = Array.from(input.files);
-    newImageFiles = [...newImageFiles, ...newFiles];
+    const files = Array.from(input.files);
+    newImageFiles = [...newImageFiles, ...files];
     renderPreview();
   });
 
@@ -49,28 +51,13 @@ function initImageDragPreview() {
       reader.onload = (ev) => {
         const wrap = document.createElement("div");
         wrap.className = "img-item";
-        wrap.style.position = "relative";
 
         const img = document.createElement("img");
         img.src = ev.target.result;
-        img.style.width = "80px";
-        img.style.height = "80px";
-        img.style.objectFit = "cover";
-        img.style.borderRadius = "8px";
-        img.style.border = "1px solid #ddd";
 
         const btn = document.createElement("button");
+        btn.className = "remove-btn";
         btn.textContent = "×";
-        btn.style.position = "absolute";
-        btn.style.top = "-6px";
-        btn.style.right = "-6px";
-        btn.style.width = "22px";
-        btn.style.height = "22px";
-        btn.style.borderRadius = "50%";
-        btn.style.border = "none";
-        btn.style.background = "crimson";
-        btn.style.color = "#fff";
-        btn.style.cursor = "pointer";
 
         btn.onclick = () => {
           newImageFiles.splice(idx, 1);
@@ -89,21 +76,43 @@ function initImageDragPreview() {
   }
 
   function enablePreviewSort() {
+    if (!preview) return;
+
     Sortable.create(preview, {
       animation: 150,
       onSort: () => {
         const items = preview.querySelectorAll(".img-item");
         const reordered = [];
 
-        items.forEach((item) => {
-          const index = Array.from(items).indexOf(item);
-          reordered.push(newImageFiles[index]);
+        items.forEach((item, indexInDom) => {
+          reordered.push(newImageFiles[indexInDom]);
         });
 
         newImageFiles = reordered;
       },
     });
   }
+}
+
+/* ============================================
+   🔵 언어 필터 UI
+============================================ */
+function initLangFilterUI() {
+  const buttons = document.querySelectorAll(".lang-btn");
+
+  buttons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const lang = btn.dataset.lang; // "kr", "en", "all"
+      currentLangFilter = lang;
+
+      // 버튼 active 토글
+      buttons.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      // 목록 다시 로드
+      loadProductList(currentLangFilter);
+    });
+  });
 }
 
 /* ============================================
@@ -136,7 +145,7 @@ function initFormSubmit() {
     fd.append("lang", lang);
     fd.append("description_html", editor.getHTML());
 
-    // 🔥 드래그로 정렬된 순서대로 파일 추가
+    // 🔥 드래그로 정렬된 순서대로 업로드
     newImageFiles.forEach((f) => fd.append("images", f));
 
     const res = await fetch("/api/products", {
@@ -151,31 +160,66 @@ function initFormSubmit() {
     }
 
     alert("등록 완료");
-
     form.reset();
     editor.setHTML("");
     newImageFiles = [];
     document.getElementById("preview").innerHTML = "";
 
-    loadProductList();
+    // 현재 선택된 언어 필터 기준 재로딩
+    loadProductList(currentLangFilter);
   });
 }
 
 /* ============================================
-   목록 로딩
+   목록 로딩 (언어필터 반영)
 ============================================ */
-async function loadProductList() {
+async function loadProductList(langFilter) {
   const list = document.getElementById("productList");
+  list.innerHTML = "Loading...";
 
-  const res = await fetch("/api/products?lang=kr", {
-    headers: getAuthHeaders(),
-  });
+  let products = [];
 
-  const data = await res.json();
+  try {
+    if (langFilter === "all") {
+      // KR + EN 둘 다 가져오기
+      const [krRes, enRes] = await Promise.all([
+        fetch("/api/products?lang=kr", { headers: getAuthHeaders() }),
+        fetch("/api/products?lang=en", { headers: getAuthHeaders() }),
+      ]);
 
-  list.innerHTML = data
-    .map(
-      (p) => `
+      const kr = krRes.ok ? await krRes.json() : [];
+      const en = enRes.ok ? await enRes.json() : [];
+
+      products = [...kr, ...en];
+
+      // sort_order ASC, created_at DESC 기준으로 대략 정렬
+      products.sort((a, b) => {
+        if (a.sort_order !== b.sort_order) {
+          return (a.sort_order || 999) - (b.sort_order || 999);
+        }
+        return new Date(b.created_at) - new Date(a.created_at);
+      });
+
+    } else {
+      const res = await fetch(`/api/products?lang=${langFilter}`, {
+        headers: getAuthHeaders(),
+      });
+
+      if (!res.ok) {
+        list.innerHTML = "<p>목록을 불러오는 중 오류가 발생했습니다.</p>";
+        return;
+      }
+      products = await res.json();
+    }
+
+    if (!products.length) {
+      list.innerHTML = "<p>등록된 제품이 없습니다.</p>";
+      return;
+    }
+
+    list.innerHTML = products
+      .map(
+        (p) => `
       <div class="product-card">
         <img src="${p.thumbnail || "/img/products/Image-placeholder.png"}">
 
@@ -192,10 +236,14 @@ async function loadProductList() {
         </div>
       </div>
     `
-    )
-    .join("");
+      )
+      .join("");
 
-  applyRoleUI();
+    applyRoleUI();
+  } catch (err) {
+    console.error(err);
+    list.innerHTML = "<p>목록을 불러오는 중 오류가 발생했습니다.</p>";
+  }
 }
 
 /* ============================================
@@ -215,6 +263,9 @@ function applyRoleUI() {
   }
 }
 
+/* ============================================
+   수정 / 삭제
+============================================ */
 function editProduct(id) {
   location.href = `/kr/admin/edit_product.html?id=${id}`;
 }
@@ -235,5 +286,5 @@ async function deleteProduct(id) {
   if (!res.ok) return alert("삭제 실패");
 
   alert("삭제 완료");
-  loadProductList();
+  loadProductList(currentLangFilter);
 }

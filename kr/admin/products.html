@@ -10,9 +10,10 @@
   <link rel="stylesheet"
         href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
 
-  <style>
-    body { margin: 0; background:#f4f6f9; font-family:'Noto Sans KR', sans-serif; }
+  <!-- 🔥 이미지 드래그 정렬용 SortableJS -->
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
+  <style>
     .topbar {
       background: #fff;
       padding: 18px 25px;
@@ -24,23 +25,66 @@
       align-items:center;
     }
 
+    .panel {
+      background:#fff;
+      padding:25px;
+      border-radius:10px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.06);
+      margin-bottom:35px;
+    }
+
+    .input {
+      width:100%;
+      padding:10px;
+      border:1px solid #ccc;
+      border-radius:6px;
+      margin-bottom:10px;
+      box-sizing:border-box;
+    }
+
     .thumb-preview {
       display:flex;
       gap:10px;
       flex-wrap:wrap;
       margin-top:10px;
     }
+    .thumb-preview .img-item {
+      position: relative;
+      width:80px;
+      height:80px;
+    }
     .thumb-preview img {
-      width:80px; height:80px; object-fit:cover;
-      border-radius:8px; border:1px solid #ddd;
+      width:80px; 
+      height:80px; 
+      object-fit:cover;
+      border-radius:8px; 
+      border:1px solid #ddd;
+    }
+    .thumb-preview .remove-btn {
+      position:absolute;
+      top:-6px;
+      right:-6px;
+      width:20px;
+      height:20px;
+      border-radius:50%;
+      border:none;
+      background:crimson;
+      color:#fff;
+      font-size:13px;
+      cursor:pointer;
+      line-height:18px;
+      text-align:center;
     }
 
     .product-grid { display:flex; flex-wrap:wrap; gap:20px; }
     .btn { padding:8px 14px; border:none; cursor:pointer; border-radius:6px; font-size:0.95rem; }
 
     .product-card {
-      width:260px; background:#fff; border:1px solid #ddd;
-      border-radius:10px; overflow:hidden;
+      width:260px; 
+      background:#fff; 
+      border:1px solid #ddd;
+      border-radius:10px; 
+      overflow:hidden;
       box-shadow:0 2px 8px rgba(0,0,0,0.06);
     }
 
@@ -54,8 +98,30 @@
 
     .btn-primary { background:#0f2679; color:#fff; }
     .btn-danger { background:#d62828; color:#fff; }
-    .btn-edit { background:#0f2679; color:#fff; }
-    .btn-delete { background:#d62828; color:#fff; }
+
+    /* 🔵 언어 필터 버튼 그룹 */
+    .lang-filter {
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+      background:#f1f3f8;
+      padding:3px;
+      border-radius:999px;
+    }
+    .lang-filter button {
+      border:none;
+      background:transparent;
+      padding:5px 11px;
+      border-radius:999px;
+      font-size:0.85rem;
+      cursor:pointer;
+      color:#555;
+    }
+    .lang-filter button.active {
+      background:#0f2679;
+      color:#fff;
+      font-weight:600;
+    }
   </style>
 </head>
 
@@ -121,7 +187,17 @@
 
   <!-- ⭐ 목록 -->
   <section class="panel">
-    <h2>등록 제품 목록</h2>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;">
+      <h2>등록 제품 목록</h2>
+
+      <!-- 🔵 언어 필터 버튼 -->
+      <div class="lang-filter">
+        <button type="button" class="lang-btn active" data-lang="kr">KR</button>
+        <button type="button" class="lang-btn" data-lang="en">EN</button>
+        <button type="button" class="lang-btn" data-lang="all">ALL</button>
+      </div>
+    </div>
+
     <div id="productList" class="product-grid"></div>
   </section>
 
@@ -131,16 +207,11 @@
 <script src="/kr/admin/js/common_auth.js"></script>
 <script src="/kr/admin/js/sidebar.js"></script>
 
-
 <!-- Toast UI Editor JS -->
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 
 <!-- 페이지 전용 JS -->
 <script src="/kr/admin/js/products_core.js"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-
-
 
 <script>
 (function () {
