@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>공지사항 관리 | 관리자</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Noto Sans KR', sans-serif;
+      background: #f4f6f9;
+    }
+
+    .admin-container {
+      max-width: 1100px;
+      margin: 60px auto;
+      background: #fff;
+      padding: 30px 40px;
+      border-radius: 14px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 25px;
+      color: #0f2679;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .top-bar-left {
+      flex: 1;
+    }
+
+    .search-input {
+      width: 100%;
+      max-width: 260px;
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 0.95rem;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 18px;
+      border-radius: 6px;
+      border: none;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: #0f2679;
+      color: #fff;
+    }
+
+    .notice-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 0.95rem;
+    }
+
+    .notice-table th,
+    .notice-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+    }
+
+    .notice-table th {
+      background: #0f2679;
+      color: #fff;
+    }
+
+    .notice-table tr:hover td {
+      background: #f3f6ff;
+      cursor: pointer;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-small {
+      padding: 4px 10px;
+      font-size: 0.8rem;
+      border-radius: 4px;
+    }
+
+    .btn-gray {
+      background: #888;
+      color: #fff;
+    }
+
+    .btn-danger {
+      background: #d9534f;
+      color: #fff;
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      margin-top: 18px;
+    }
+
+    .pagination button {
+      min-width: 32px;
+      padding: 6px 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      background: #fff;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    .pagination button.active {
+      background: #0f2679;
+      color: #fff;
+      border-color: #0f2679;
+    }
+
+    .pagination button:disabled {
+      opacity: .5;
+      cursor: default;
+    }
+  </style>
+</head>
+
+<body>
+
+<script>
+  // 🔐 관리자/슈퍼관리자/에디터만 접근 허용
+  const role = localStorage.getItem("role");
+  const token = localStorage.getItem("token");
+  if (!["admin", "superadmin", "editor"].includes(role) || !token) {
+    alert("공지사항 관리는 관리자 권한이 필요합니다.");
+    location.href = "/kr/admin/login.html";
+  }
+</script>
+
+<div class="admin-container">
+  <h1>공지사항 관리</h1>
+
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <input
+        type="text"
+        id="searchInput"
+        class="search-input"
+        placeholder="제목 검색"
+      />
+    </div>
+    <div class="top-bar-right">
+      <button class="btn btn-primary" onclick="goWrite()">공지 작성하기</button>
+    </div>
+  </div>
+
+  <table class="notice-table">
+    <thead>
+      <tr>
+        <th style="width:70px;">번호</th>
+        <th>제목</th>
+        <th style="width:120px;">작성일</th>
+        <th style="width:80px;">조회수</th>
+        <th style="width:120px;">관리</th>
+      </tr>
+    </thead>
+    <tbody id="noticeTbody">
+      <tr><td colspan="5">불러오는 중...</td></tr>
+    </tbody>
+  </table>
+
+  <div class="pagination" id="pagination"></div>
+</div>
+
+<script>
+  const PAGE_SIZE = 10;
+  let allNotices = [];
+  let filteredNotices = [];
+  let currentPage = 1;
+
+  function goWrite() {
+    location.href = "/kr/admin/notice-write.html";
+  }
+
+  function formatDate(dateStr) {
+    const d = new Date(dateStr);
+    if (Number.isNaN(d.getTime())) return "-";
+    return d.toLocaleDateString();
+  }
+
+  function applyFilter() {
+    const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
+    if (!keyword) {
+      filteredNotices = [...allNotices];
+    } else {
+      filteredNotices = allNotices.filter(n =>
+        (n.title || "").toLowerCase().includes(keyword)
+      );
+    }
+    currentPage = 1;
+    renderTable();
+    renderPagination();
+  }
+
+  function renderTable() {
+    const tbody = document.getElementById("noticeTbody");
+    if (!filteredNotices.length) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#777;">등록된 공지사항이 없습니다.</td></tr>`;
+      return;
+    }
+
+    const start = (currentPage - 1) * PAGE_SIZE;
+    const end = start + PAGE_SIZE;
+    const pageItems = filteredNotices.slice(start, end);
+    const total = filteredNotices.length;
+
+    tbody.innerHTML = pageItems.map((n, idx) => {
+      const listIndex = total - (start + idx); // 역순 번호
+      const views = (typeof n.views === "number") ? n.views : "-";
+      return `
+        <tr>
+          <td>${listIndex}</td>
+          <td onclick="openPublicView(${n.id})">${n.title}</td>
+          <td>${formatDate(n.created_at)}</td>
+          <td>${views}</td>
+          <td>
+            <div class="actions">
+              <button class="btn btn-small btn-gray" onclick="editNotice(${n.id})">수정</button>
+              <button class="btn btn-small btn-danger" onclick="deleteNotice(${n.id})" disabled>삭제</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join("");
+  }
+
+  function renderPagination() {
+    const pag = document.getElementById("pagination");
+    pag.innerHTML = "";
+
+    const total = filteredNotices.length;
+    const totalPages = Math.ceil(total / PAGE_SIZE);
+    if (totalPages <= 1) return;
+
+    for (let p = 1; p <= totalPages; p++) {
+      const btn = document.createElement("button");
+      btn.textContent = p;
+      if (p === currentPage) btn.classList.add("active");
+      btn.addEventListener("click", () => {
+        currentPage = p;
+        renderTable();
+        renderPagination();
+      });
+      pag.appendChild(btn);
+    }
+  }
+
+  function openPublicView(id) {
+    window.open(`/kr/sub/pr/notice/notice-view.html?id=${id}`, "_blank");
+  }
+
+  function editNotice(id) {
+    // 3단계에서 구현할 예정
+    location.href = `/kr/admin/notice-edit.html?id=${id}`;
+  }
+
+  function deleteNotice(id) {
+    // 나중 단계에서 활성화 예정
+    alert("삭제 기능은 다음 단계에서 구현할 예정입니다.");
+  }
+
+  async function loadNotices() {
+    try {
+      const res = await fetch(`/api/posts/notice?lang=kr`, {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem("token") || ""}`
+        }
+      });
+      if (!res.ok) throw new Error("공지 목록 불러오기 실패");
+      const data = await res.json();
+
+      // 최신 글이 위로 오도록 정렬 (created_at 기준 내림차순)
+      allNotices = Array.isArray(data)
+        ? data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+        : [];
+
+      filteredNotices = [...allNotices];
+      renderTable();
+      renderPagination();
+    } catch (e) {
+      console.error(e);
+      document.getElementById("noticeTbody").innerHTML =
+        `<tr><td colspan="5">불러오기 중 오류가 발생했습니다.</td></tr>`;
+    }
+  }
+
+  document.getElementById("searchInput").addEventListener("input", () => {
+    applyFilter();
+  });
+
+  loadNotices();
+</script>
+
+</body>
+</html>

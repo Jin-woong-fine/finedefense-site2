@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>공지사항 수정 | Fine Defense 관리자</title>
+
+  <!-- Toast UI Editor CSS -->
+  <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+
+  <!-- 공통 관리자 CSS -->
+  <link rel="stylesheet" href="/kr/admin/css/admin.css" />
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Noto Sans KR', sans-serif;
+      background: #f3f5fa;
+      display: flex;
+    }
+
+    .main {
+      flex: 1;
+      padding: 22px 24px;
+      min-height: 100vh;
+    }
+
+    .panel {
+      background: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      margin-bottom: 35px;
+    }
+
+    .input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      box-sizing: border-box;
+    }
+
+    .btn {
+      padding: 10px 18px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+
+    .btn-primary { background: #0f2679; color: #fff; }
+    .btn-danger { background: #d62828; color: #fff; }
+
+    .thumb-preview img {
+      width: 160px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      margin-top: 10px;
+    }
+  </style>
+
+</head>
+<body>
+
+<div id="sidebar"></div>
+
+<div class="main">
+
+  <div class="topbar">
+    <h2>공지사항 수정</h2>
+
+    <div>
+      <button class="btn btn-primary" onclick="history.back()">뒤로가기</button>
+      <button id="logoutBtn" class="btn btn-danger">로그아웃</button>
+    </div>
+  </div>
+
+  <form id="noticeForm" enctype="multipart/form-data">
+
+    <!-- 제목 / 언어 / 이미지 -->
+    <section class="panel">
+      <h2>공지 정보 수정</h2>
+
+      <input id="title" class="input" placeholder="제목을 입력하세요" />
+
+      <select id="lang" class="input">
+        <option value="kr">한국어</option>
+        <option value="en">English</option>
+      </select>
+
+      <label><strong>대표 이미지 변경(선택)</strong></label>
+      <input type="file" id="image" name="images" accept="image/*" class="input" />
+
+      <div id="preview" class="thumb-preview"></div>
+    </section>
+
+    <!-- 내용 작성 -->
+    <section class="panel">
+      <h3>내용 수정 (Toast UI Editor)</h3>
+      <div id="editor" style="border:1px solid #ccc;border-radius:6px;"></div>
+    </section>
+
+    <button type="submit" class="btn btn-primary" style="margin-bottom:50px;">
+      공지사항 수정 완료
+    </button>
+
+  </form>
+
+</div>
+
+<!-- 관리자 공통 JS -->
+<script src="/kr/admin/js/common_auth.js"></script>
+<script src="/kr/admin/js/sidebar.js"></script>
+
+<!-- Toast UI Editor -->
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+
+<script>
+  let postId = null;
+  let editor = null;
+
+  (function () {
+    requireAdminOrEditor();
+    loadSidebar("notice");
+    document.getElementById("logoutBtn").addEventListener("click", logout);
+
+    const params = new URLSearchParams(location.search);
+    postId = params.get("id");
+
+    if (!postId) {
+      alert("잘못된 접근입니다.");
+      location.href = "./notice-list.html";
+      return;
+    }
+
+    loadNotice();
+  })();
+
+
+  /* -----------------------------------------
+     기존 공지사항 불러오기
+  ----------------------------------------- */
+  async function loadNotice() {
+    try {
+      const res = await fetch(`/api/posts/notice/${postId}`);
+      const notice = await res.json();
+
+      document.getElementById("title").value = notice.title;
+      document.getElementById("lang").value = notice.lang;
+
+      // 이미지 미리보기
+      if (notice.main_image) {
+        document.getElementById("preview").innerHTML =
+          `<img src="${notice.main_image}" />`;
+      }
+
+      // 에디터 초기화 + 기존 내용 적용
+      editor = new toastui.Editor({
+        el: document.querySelector('#editor'),
+        height: '500px',
+        initialEditType: 'wysiwyg',
+        previewStyle: 'vertical',
+        initialValue: notice.content
+      });
+
+    } catch (err) {
+      console.error("공지 불러오기 오류", err);
+      alert("공지 불러오기 실패");
+    }
+  }
+
+
+  /* -----------------------------------------
+     이미지 변경 시 미리보기
+  ----------------------------------------- */
+  document.getElementById("image").addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    document.getElementById("preview").innerHTML = `<img src="${url}" />`;
+  });
+
+
+  /* -----------------------------------------
+     수정 완료 요청
+  ----------------------------------------- */
+  document.getElementById("noticeForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const title = document.getElementById("title").value.trim();
+    const lang = document.getElementById("lang").value;
+    const content = editor.getHTML();
+    const file = document.getElementById("image").files[0];
+
+    if (!title) return alert("제목을 입력하세요.");
+    if (!content) return alert("내용을 입력하세요.");
+
+    const form = new FormData();
+    form.append("title", title);
+    form.append("lang", lang);
+    form.append("content", content);
+    form.append("category", "notice");
+
+    if (file) {
+      form.append("images", file);
+    }
+
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(`/api/posts/notice/update/${postId}`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      body: form
+    });
+
+    const result = await res.json();
+
+    if (res.ok) {
+      alert("수정 완료되었습니다!");
+      location.href = `./notice-view.html?id=${postId}`;
+    } else {
+      console.error(result);
+      alert("수정 실패: " + result.message);
+    }
+  });
+</script>
+
+</body>
+</html>

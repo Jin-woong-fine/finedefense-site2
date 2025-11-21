@@ -254,4 +254,71 @@ router.delete("/:id", verifyToken, async (req, res) => {
   }
 });
 
+
+/* ============================================================
+   📢 NOTICE 전용 Alias 라우트 (프론트 사용 편하게)
+   기존 posts.js 기능 그대로 활용
+============================================================ */
+
+// 공지 목록 (alias)
+router.get("/notice", async (req, res) => {
+  return router.handle(
+    Object.assign(req, { url: `/list/notice`, method: "GET" }),
+    res,
+    () => {}
+  );
+});
+
+
+// 공지 상세
+router.get("/notice/:id", async (req, res) => {
+  return router.handle(
+    Object.assign(req, { url: `/detail/${req.params.id}`, method: "GET" }),
+    res,
+    () => {}
+  );
+});
+
+// 공지 조회수 증가
+router.post("/notice/view/:id", async (req, res) => {
+  return router.handle(
+    Object.assign(req, { url: `/view/${req.params.id}`, method: "POST" }),
+    res,
+    () => {}
+  );
+});
+
+// 공지 등록
+router.post("/notice/create", verifyToken, upload.array("images", 10), async (req, res) => {
+  req.body.category = "notice";   // 분류 자동 notice
+  return router.handle(
+    Object.assign(req, { url: "/", method: "POST" }),
+    res,
+    () => {}
+  );
+});
+
+// 공지 수정
+router.put("/notice/update/:id", verifyToken, upload.array("images", 10), async (req, res) => {
+  return router.handle(
+    Object.assign(req, { url: `/${req.params.id}`, method: "PUT" }),
+    res,
+    () => {}
+  );
+});
+
+// 공지 삭제
+router.delete("/notice/delete/:id", verifyToken, async (req, res) => {
+  return router.handle(
+    Object.assign(req, { url: `/${req.params.id}`, method: "DELETE" }),
+    res,
+    () => {}
+  );
+});
+
+
+
 export default router;
+
+
+
