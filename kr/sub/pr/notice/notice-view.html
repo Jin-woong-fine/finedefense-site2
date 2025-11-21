@@ -21,14 +21,65 @@
       border-radius: 14px;
       box-shadow: 0 3px 12px rgba(0,0,0,0.06);
     }
-    .notice-title { font-size: 2rem; font-weight: 800; color: #0f2679; margin-bottom: 10px; }
-    .notice-info { color: #555; font-size: 0.9rem; margin-bottom: 25px; }
-    .attachment-section { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; }
-    .file-item { padding: 10px; background: #f7f7f7; border-radius: 6px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-    .file-left { display: flex; align-items: center; gap: 8px; }
-    .file-icon { width: 22px; opacity: .8; }
-    .download-btn { background: #0f2679; color: #fff; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; }
-    .back-btn { margin-top:40px; display:inline-block; background:#0f2679; color:#fff; padding:10px 18px; border-radius:6px; text-decoration:none; }
+
+    .notice-title {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #0f2679;
+      margin-bottom: 10px;
+    }
+
+    .notice-info {
+      color: #555;
+      font-size: 0.9rem;
+      margin-bottom: 25px;
+    }
+
+    .attachment-section {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid #ddd;
+    }
+
+    .file-item {
+      padding: 10px;
+      background: #f7f7f7;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .file-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .file-icon {
+      width: 22px;
+      opacity: .8;
+    }
+
+    .download-btn {
+      background: #0f2679;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .back-btn {
+      margin-top: 40px;
+      display: inline-block;
+      background: #0f2679;
+      color: white;
+      padding: 10px 18px;
+      border-radius: 6px;
+      text-decoration: none;
+    }
   </style>
 </head>
 
@@ -52,6 +103,7 @@
 </div>
 
 <div class="notice-container">
+
   <h1 class="notice-title" id="title"></h1>
   <div class="notice-info">
     <span id="date"></span> | 조회수 <span id="views"></span>
@@ -59,6 +111,7 @@
 
   <div id="viewer"></div>
 
+  <!-- 첨부파일 -->
   <div class="attachment-section" id="attachmentWrap" style="display:none;">
     <h3>📎 첨부파일</h3>
     <div id="attachmentList"></div>
@@ -71,20 +124,24 @@
 
 <script src="/js/nav.js"></script>
 
-<!-- 🔥 정식 Viewer JS -->
-<script src="https://uicdn.toast.com/editor/latest/toastui-editor-viewer.min.js"></script>
+<!-- Toast UI Viewer JS -->
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 
 <script>
-  const noticeId = new URLSearchParams(location.search).get("id");
+  const params = new URLSearchParams(location.search);
+  const noticeId = params.get("id");
 
   if (!noticeId) {
     alert("잘못된 접근입니다.");
-    history.back();
+    location.href = "/kr/sub/pr/notice/notice.html";
   }
 
   loadNotice();
   increaseViews();
 
+  /* ===========================================================
+        🔥 공지 상세 데이터 불러오기
+  ============================================================ */
   async function loadNotice() {
     const res = await fetch(`/api/posts/detail/${noticeId}`);
     const data = await res.json();
@@ -94,12 +151,14 @@
       new Date(data.created_at).toLocaleDateString();
     document.getElementById("views").textContent = data.views || 0;
 
-    /* 🔥 진짜 Viewer 모드 */
-    new toastui.Editor.viewer({
+    // 🔥 Toast UI Viewer 정상 방식 (최신)
+    toastui.Editor.factory({
       el: document.querySelector('#viewer'),
+      viewer: true,
       initialValue: data.content || ""
     });
 
+    // 🔥 첨부파일 렌더링
     if (data.files?.length) {
       document.getElementById("attachmentWrap").style.display = "block";
       document.getElementById("attachmentList").innerHTML =
@@ -118,6 +177,16 @@
     }
   }
 
+  /* ===========================================================
+        🔥 조회수 증가
+  ============================================================ */
+  function increaseViews() {
+    fetch(`/api/posts/view/${noticeId}`, { method: "POST" });
+  }
+
+  /* ===========================================================
+        🔥 다운로드 + 로그 기록
+  ============================================================ */
   function downloadFile(noticeId, path, originalName) {
     window.open(path, "_blank");
 
@@ -132,15 +201,16 @@
     });
   }
 
-  function increaseViews() {
-    fetch(`/api/posts/view/${noticeId}`, { method: "POST" });
-  }
-
+  /* ===========================================================
+        📌 파일 아이콘 자동 선택
+  ============================================================ */
   function getFileIcon(name) {
     const ext = name.split(".").pop().toLowerCase();
+
     if (ext === "pdf") return "/img/icons/pdf.png";
     if (["xls", "xlsx"].includes(ext)) return "/img/icons/excel.png";
     if (["jpg", "jpeg", "png"].includes(ext)) return "/img/icons/image.png";
+
     return "/img/icons/file.png";
   }
 </script>
