@@ -209,14 +209,14 @@ function initBreadcrumbTabs() {
 
         subTabs = LANG === "kr"
           ? [
-              { name: "공지사항", link: "/kr/sub/pr/notice/notice.html" },
+              { name: "공지사항", link: `${base}/notice/notice.html` },
               { name: "뉴스룸", link: `${base}/newsroom/newsroom.html` },
               { name: "갤러리", link: `${base}/gallery/gallery.html` },
               { name: "인증 및 특허", link: `${base}/cert/cert.html` },
               { name: "카탈로그", link: `${base}/catalog/catalog.html` },
             ]
           : [
-              { name: "Notice", link: `${base}/notice/notice.html` },
+              { name: "Notice", link: `${base}/notice/index.html` },
               { name: "Newsroom", link: `${base}/newsroom/newsroom.html` },
               { name: "Gallery", link: `${base}/gallery/gallery.html` },
               { name: "Certificates", link: `${base}/cert/cert.html` },

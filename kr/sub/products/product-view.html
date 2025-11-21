@@ -2,130 +2,82 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>수중커넥터 | Fine Defense</title>
+  <title>제품 상세 | Fine Defense</title>
 
-  <!-- 공통 스타일 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/sub-banner.css">
 
   <style>
-    /* ===============================
-       메인 섹션
-    =============================== */
-    .product-section {
+    .product-detail {
       max-width: 1200px;
-      margin: 50px auto;
-      padding: 30px 40px;
-      background: #ffffff;
-      border-radius: 14px;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.06);
-    }
-
-    .product-section h1 {
-      font-size: 2.2rem;
-      font-weight: 800;
-      color: #0f2679;
-      margin-bottom: 16px;
-      text-align: center;
-    }
-
-    .product-section p.section-desc {
-      font-size: 1.1rem;
-      text-align: center;
-      margin-bottom: 45px;
-      line-height: 1.7;
-      color: #444;
-      max-width: 900px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    /* ===============================
-       카드 그리드
-    =============================== */
-    .product-cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
-      gap: 32px;
-    }
-
-    /* ===============================
-       개별 카드
-    =============================== */
-    .product-card {
+      margin: 60px auto 80px;
+      padding: 40px;
       background: #fff;
-      border-radius: 16px;
-      overflow: hidden;
-      text-decoration: none;
-      color: inherit;
-      display: flex;
-      align-items: stretch;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-      transition: .25s ease;
+      border-radius: 14px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
     }
-
-    .product-card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 8px 22px rgba(0,0,0,0.14);
-    }
-
-    /* 이미지 박스 */
-    .card-image {
-      flex: 0 0 40%;
-      height: 220px;
-      background: #f4f4f4;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-
-    .card-image img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-      padding: 6px;
-    }
-
-    /* 텍스트 영역 */
-    .card-content {
-      flex: 1;
-      padding: 24px 22px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .card-content h3 {
-      font-size: 1.25rem;
-      font-weight: 700;
+    .product-title {
+      font-size: 2rem;
       color: #0f2679;
-      margin: 0 0 10px 0;
+      margin-bottom: 10px;
+    }
+    .product-category {
+      color:#666;
+      margin-bottom: 30px;
+    }
+    .product-content {
+      display:flex;
+      flex-wrap:wrap;
+      gap:40px;
+      align-items:flex-start;
+    }
+    .product-gallery {
+      flex:1 1 45%;
+      text-align:center;
+    }
+    .main-image img {
+      width:100%;
+      max-width:420px;
+      border-radius:12px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.08);
+      object-fit:cover;
+    }
+    .thumb-list {
+      margin-top:15px;
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      gap:8px;
+    }
+    .thumb-list img {
+      width:80px;
+      height:80px;
+      object-fit:cover;
+      border-radius:8px;
+      opacity:0.7;
+      border:2px solid transparent;
+      cursor:pointer;
+      transition:all 0.2s;
+    }
+    .thumb-list img.active,
+    .thumb-list img:hover {
+      opacity:1;
+      border-color:#0f2679;
+      transform:scale(1.03);
     }
 
-    .card-content p {
-      margin: 0;
-      font-size: 0.95rem;
-      color: #555;
-      line-height: 1.55;
-      flex-grow: 1;
-
-      /* 텍스트 3줄 제한 */
-      overflow: hidden;
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
+    .product-desc {
+      flex:1 1 45%;
+      font-size:1.02rem;
+      line-height:1.8;
+      color:#333;
     }
 
     @media (max-width: 768px) {
-      .product-card {
-        flex-direction: column;
-      }
-      .card-image {
-        width: 100%;
-        height: 200px;
-      }
-      .product-cards {
-        grid-template-columns: 1fr;
+      .product-content {
+        flex-direction:column;
       }
     }
   </style>
@@ -133,95 +85,45 @@
 
 <body>
 
-<!-- 헤더 -->
 <div id="header"></div>
 
-<!-- 서브 배너 -->
 <section class="sub-banner">
-  <img src="/img/sub-banners/cable.jpg" alt="">
+  <img src="/img/sub-banners/cable.jpg" alt="제품소개 배너">
   <div class="banner-text">
     <h1>제품소개</h1>
     <p>해양 방산 현장을 연결하는 케이블 솔루션</p>
   </div>
 </section>
 
-<!-- breadcrumb -->
 <div class="breadcrumb">
   <a href="/kr/index.html">홈</a> &gt;
   <span class="crumb crumb-level1">제품소개</span> &gt;
-  <span class="crumb crumb-level2">수중 커넥터</span>
+  <span id="crumbProduct" class="crumb crumb-level2">제품 상세</span>
   <div id="side-tabs" class="side-tabs"></div>
 </div>
 
-<!-- 본문 -->
-<section class="product-section">
-  <h1>수중 커넥터</h1>
-  <p class="section-desc">
-    고압·수밀 환경에서 안정적으로 전력·신호를 전달하기 위한 전문 수중 커넥터입니다.
-  </p>
+<section class="product-detail">
+  <h1 id="productTitle" class="product-title">제품명</h1>
+  <div id="productCategory" class="product-category"></div>
 
-  <!-- 제품 카드 자동 렌더링 -->
-  <div id="productCards" class="product-cards"></div>
+  <div class="product-content">
+    <div class="product-gallery">
+      <div class="main-image">
+        <img id="mainImage" src="/img/products/Image-placeholder.png" alt="제품 이미지">
+      </div>
+      <div id="thumbList" class="thumb-list"></div>
+    </div>
+
+    <div id="productDesc" class="product-desc">
+      <!-- description_html 가 여기 들어감 -->
+    </div>
+  </div>
 </section>
 
-<!-- 푸터 -->
 <div id="footer"></div>
 
 <script src="/js/nav.js"></script>
-<script src="/js/language.js"></script>
-
-<script>
-  // HTML 태그 제거 후 텍스트만 추출
-  function stripHtml(html) {
-    const tmp = document.createElement("div");
-    tmp.innerHTML = html;
-    return (tmp.textContent || tmp.innerText || "").trim();
-  }
-
-  async function loadProducts() {
-    const container = document.getElementById("productCards");
-
-    try {
-      const res = await fetch("/api/products");
-      if (!res.ok) throw new Error("서버 오류");
-
-      const all = await res.json();
-
-      // "connector" 카테고리만 불러오기
-      const products = all.filter(p => p.category === "connector");
-
-      if (products.length === 0) {
-        container.innerHTML = "<p>등록된 수중 커넥터 제품이 없습니다.</p>";
-        return;
-      }
-
-      container.innerHTML = products.map(p => {
-        const img = p.thumbnail || "/img/products/Image-placeholder.png";
-        const link = `/kr/sub/products/product-view.html?id=${p.id}`;
-
-        const text = stripHtml(p.description_html || "");
-        const desc = text.length > 120 ? text.slice(0, 120) + "…" : text;
-
-        return `
-          <a class="product-card" href="${link}">
-            <div class="card-image">
-              <img src="${img}" alt="${p.title}">
-            </div>
-            <div class="card-content">
-              <h3>${p.title}</h3>
-              <p>${desc}</p>
-            </div>
-          </a>`;
-      }).join("");
-
-    } catch (err) {
-      console.error("loadProducts 오류:", err);
-      container.innerHTML = "<p>제품 목록을 불러오는 중 오류가 발생했습니다.</p>";
-    }
-  }
-
-  loadProducts();
-</script>
+<script src="/js/product-view.js"></script>
 
 </body>
 </html>
