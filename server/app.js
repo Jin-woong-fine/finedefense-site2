@@ -15,6 +15,7 @@ import postsRouter from "./routes/posts.js";
 import productsRouter from "./routes/products.js";
 import uploadsRouter from "./routes/uploads.js";
 import loginLogsRouter from "./routes/login_logs.js";
+import userProfileRouter from "./routes/user_profile.js";   // ⭐ 추가!!!
 
 // ============================
 // 📌 기본 설정
@@ -34,7 +35,10 @@ app.use(express.urlencoded({ extended: true, limit: "30mb" }));
 // ============================
 // 📌 업로드 폴더 정적 제공
 // ============================
-// → 업로드된 파일 접근:  /uploads/파일명
+//
+// /uploads/ → server/public/uploads 연결
+// 아바타 이미지 URL 예) /uploads/avatar/파일명.png
+//
 app.use(
   "/uploads",
   express.static(path.join(__dirname, "public", "uploads"))
@@ -54,27 +58,33 @@ app.use("/api/inquiry", sendInquiryRouter);
 // 관리자 기능 (자료실 업로드 등)
 app.use("/api/admin", adminRouter);
 
-// 관리자 대시보드 (조회수, 통계)
+// 관리자 대시보드 (통계)
 app.use("/api/admin", adminDashboardRouter);
 
-// 게시물(뉴스룸)
+// 뉴스룸 게시판
 app.use("/api/posts", postsRouter);
 
 // 제품 관리
 app.use("/api/products", productsRouter);
 
-// 이미지 업로드 공통 처리
+// 업로드 공통 처리
 app.use("/api/uploads", uploadsRouter);
 
 // 로그인 로그
 app.use("/api/logs/login", loginLogsRouter);
 
+// ⭐ 사용자 프로필(Me) 기능
+// /api/users/me/...
+app.use("/api/users/me", userProfileRouter);
+
 
 // ============================
 // 📌 정적 페이지 제공
 // ============================
-// server/ 기준에서 프로젝트 root(../)를 정적으로 제공
-// 즉 kr/, en/, index.html, img/, css/, js/ 등을 자동 서빙
+//
+// 프로젝트 root(../) 전체를 정적으로 제공
+// kr/, en/, index.html, img/, css/, js/ 전체 자동 서빙
+//
 app.use(express.static(path.join(__dirname, "../")));
 
 
