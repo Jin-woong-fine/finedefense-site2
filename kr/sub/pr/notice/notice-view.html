@@ -15,7 +15,7 @@
   <style>
     .notice-container {
       max-width: 900px;
-      margin: 50px auto 100px;
+      margin: 50px auto 120px;
       background: #fff;
       padding: 40px 50px;
       border-radius: 14px;
@@ -37,13 +37,13 @@
 
     .attachment-section {
       margin-top: 40px;
-      padding-top: 20px;
+      padding-top: 25px;
       border-top: 1px solid #ddd;
     }
 
     .file-item {
-      padding: 10px;
-      background: #f7f7f7;
+      padding: 10px 12px;
+      background: #f4f4f4;
       border-radius: 6px;
       margin-bottom: 10px;
       display: flex;
@@ -59,7 +59,16 @@
 
     .file-icon {
       width: 22px;
-      opacity: .8;
+      opacity: .85;
+    }
+
+    .download-btn {
+      padding: 6px 12px;
+      background: #0f2679;
+      color: #fff;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
     }
 
     .back-btn {
@@ -67,36 +76,45 @@
       display: inline-block;
       background: #0f2679;
       color: white;
-      padding: 10px 18px;
+      padding: 12px 20px;
       border-radius: 6px;
       text-decoration: none;
+      font-size: 0.95rem;
     }
   </style>
 </head>
 
 <body>
 
+<!-- Header -->
 <div id="header"></div>
 
+<!-- Banner -->
 <section class="sub-banner">
-  <img src="/img/sub-banners/pr-1_v2.jpg" alt="공지사항">
+  <img src="/img/sub-banners/pr-1_v2.jpg" alt="공지사항 배너">
   <div class="banner-text">
     <h1>공지사항</h1>
-    <p>화인디펜스의 주요 안내를 확인하세요.</p>
+    <p>화인디펜스 주요 안내사항을 확인하세요.</p>
   </div>
 </section>
 
+<!-- Breadcrumb -->
 <div class="breadcrumb">
   <a href="/kr/index.html">홈</a> &gt;
-  <span class="crumb crumb-level1">홍보센터</span> &gt;
-  <span class="crumb crumb-level2">공지사항</span>
+  <span>홍보센터</span> &gt;
+  <span>공지사항</span>
   <div id="side-tabs"></div>
 </div>
 
+<!-- Content -->
 <div class="notice-container">
 
   <h1 class="notice-title" id="title"></h1>
-  <div class="notice-info"><span id="date"></span> | 조회수 <span id="views"></span></div>
+  <div class="notice-info">
+    <span id="date"></span>
+    &nbsp; | &nbsp;
+    조회수 <span id="views"></span>
+  </div>
 
   <div id="viewer"></div>
 
@@ -108,9 +126,13 @@
   <a class="back-btn" href="/kr/sub/pr/notice/notice.html">목록으로</a>
 </div>
 
+<!-- Footer -->
 <div id="footer"></div>
 
+<!-- 공통 스크립트 -->
 <script src="/js/nav.js"></script>
+
+<!-- Toast Viewer JS -->
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-viewer.min.js"></script>
 
 <script>
@@ -125,9 +147,9 @@
   loadNotice();
   increaseViews();
 
-  /* -----------------------------------
-      🔥 공지 상세 불러오기
-  ----------------------------------- */
+  /* ---------------------------------------------------------
+      📌 공지 상세 불러오기
+  --------------------------------------------------------- */
   async function loadNotice() {
     const res = await fetch(`/api/posts/detail/${noticeId}`);
     const data = await res.json();
@@ -137,34 +159,39 @@
       new Date(data.created_at).toLocaleDateString();
     document.getElementById("views").textContent = data.views || 0;
 
-    new toastui.Editor.factory({
-      el: document.querySelector('#viewer'),
-      viewer: true,
+    /* Toast UI Viewer */
+    new toastui.Editor.viewer({
+      el: document.querySelector("#viewer"),
       initialValue: data.content || ""
     });
 
-    // 첨부파일
+    /* 첨부파일 */
     if (data.files?.length) {
       document.getElementById("attachmentWrap").style.display = "block";
       document.getElementById("attachmentList").innerHTML =
-        data.files.map((f, i) => `
+        data.files.map((f) => `
           <div class="file-item">
             <div class="file-left">
-              <img class="file-icon" src="${getFileIcon(f.original_name)}">
+              <img class="file-icon" src="${getFileIcon(f.original_name)}" />
               <span>${f.original_name}</span>
             </div>
-            <button onclick="downloadFile(${noticeId}, '${f.file_path}', '${f.original_name}')">다운로드</button>
+            <button class="download-btn" onclick="downloadFile(${noticeId}, '${f.file_path}', '${f.original_name}')">
+              다운로드
+            </button>
           </div>
         `).join("");
     }
   }
 
-  /* -----------------------------------
-      🔥 파일 다운로드 + 로그 기록
-  ----------------------------------- */
+  /* ---------------------------------------------------------
+      📌 다운로드 + 로그 기록
+  --------------------------------------------------------- */
   function downloadFile(noticeId, path, original) {
+
+    // 실제 파일 오픈
     window.open(path, "_blank");
 
+    // 로그 기록
     fetch("/api/posts/notice/download", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
@@ -176,21 +203,22 @@
     });
   }
 
-  /* -----------------------------------
-      🔥 조회수 증가
-  ----------------------------------- */
+  /* ---------------------------------------------------------
+      📌 조회수 증가
+  --------------------------------------------------------- */
   function increaseViews() {
     fetch(`/api/posts/view/${noticeId}`, { method: "POST" });
   }
 
-  /* -----------------------------------
+  /* ---------------------------------------------------------
       📌 파일 아이콘 선택
-  ----------------------------------- */
+  --------------------------------------------------------- */
   function getFileIcon(filename) {
     const ext = filename.split(".").pop().toLowerCase();
-    if (["pdf"].includes(ext)) return "/img/icons/pdf.png";
+
+    if (ext === "pdf") return "/img/icons/pdf.png";
     if (["xls", "xlsx"].includes(ext)) return "/img/icons/excel.png";
-    if (["jpg", "jpeg", "png"].includes(ext)) return "/img/icons/image.png";
+    if (["png", "jpg", "jpeg"].includes(ext)) return "/img/icons/image.png";
     return "/img/icons/file.png";
   }
 </script>
