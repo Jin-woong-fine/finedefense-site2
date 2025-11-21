@@ -10,12 +10,12 @@
   <!-- 공통 관리자 CSS -->
   <link rel="stylesheet" href="./css/admin.css">
 
-  <!-- 🔥 공통 인증 스크립트를 가장 먼저 로드 -->
+  <!-- 🔥 공통 인증 스크립트 -->
   <script src="./js/common_auth.js"></script>
 
   <!-- 🔥 대시보드는 모든 로그인 사용자 허용 -->
   <script>
-    requireAnyUser();  // ⭐ 가장 먼저 실행되는 권한 체크
+    requireAnyUser();  
   </script>
 </head>
 
@@ -36,11 +36,8 @@
         <div class="topbar-user" id="topbarUser">
           <span id="topbarUserName">관리자</span>
           ▾
-          <div class="user-dropdown" id="userDropdown">
-            <a href="/kr/admin/user_profile.html">내 프로필</a>
-            <a href="/kr/admin/users.html">사용자 관리</a>
-            <a href="javascript:void(0);" onclick="logout()">로그아웃</a>
-          </div>
+          <!-- ⚠️ 동적 생성될 dropdown, HTML 비워둔다 -->
+          <div class="user-dropdown" id="userDropdown"></div>
         </div>
 
         <button onclick="location.href='../index.html'">홈으로</button>
@@ -87,7 +84,7 @@
 
   </div>
 
-  <!-- 🔵 나머지 스크립트 로딩 (권한 체크 이후 실행) -->
+  <!-- 🔵 나머지 스크립트 -->
   <script src="./js/sidebar.js"></script>
   <script src="./js/dashboard_core.js"></script>
 
@@ -95,24 +92,41 @@
     // 🔵 사이드바 로드
     loadSidebar("dashboard");
 
-    // 🔵 상단 유저 이름 세팅
+    // 🔵 상단 사용자 드롭다운 권한별 생성
     (function initTopbarUser() {
-      const name = localStorage.getItem("name") || "관리자";
-      const span = document.getElementById("topbarUserName");
-      if (span) span.textContent = name;
-
-      const userBox = document.getElementById("topbarUser");
+      const name = localStorage.getItem("name") || "사용자";
+      const role = localStorage.getItem("role");
+      const nameSpan = document.getElementById("topbarUserName");
       const dropdown = document.getElementById("userDropdown");
+      const userBox = document.getElementById("topbarUser");
 
-      if (!userBox || !dropdown) return;
+      if (nameSpan) nameSpan.textContent = name;
 
-      // 클릭 시 토글
+      // 🔥 dropdown 동적 생성
+      let html = `
+        <a href="/kr/admin/user_profile.html">내 프로필</a>
+      `;
+
+      // admin + superadmin 만 "사용자 관리"
+      if (role === "admin" || role === "superadmin") {
+        html += `
+          <a href="/kr/admin/users.html">사용자 관리</a>
+        `;
+      }
+
+      html += `
+        <a href="javascript:void(0);" onclick="logout()">로그아웃</a>
+      `;
+
+      dropdown.innerHTML = html;
+
+      // 토글 기능
       userBox.addEventListener("click", (e) => {
         e.stopPropagation();
-        dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+        dropdown.style.display = 
+          dropdown.style.display === "block" ? "none" : "block";
       });
 
-      // 바깥 클릭 시 닫기
       document.addEventListener("click", () => {
         dropdown.style.display = "none";
       });
