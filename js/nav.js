@@ -209,8 +209,8 @@ function initBreadcrumbTabs() {
 
         subTabs = LANG === "kr"
           ? [
-              { name: "공지사항", link: `${base}/notice/notice.html` },
-              { name: "뉴스룸", link: `${base}/newsroom/newsroom.html` },
+              { name: "공지사항", link: `${base}/notice/index.html` },
+              { name: "뉴스룸", link: `${base}/newsroom/index.html` },
               { name: "갤러리", link: `${base}/gallery/gallery.html` },
               { name: "인증 및 특허", link: `${base}/cert/cert.html` },
               { name: "카탈로그", link: `${base}/catalog/catalog.html` },
