@@ -54,8 +54,12 @@ app.use("/api/auth", authRouter);
 app.use("/api/inquiry", sendInquiryRouter);
 
 // 3) 관리자 기능
-app.use("/api/admin", adminRouter);
+
+// ⭐ 대시보드 API — editor / viewer도 접근 가능
 app.use("/api/admin", adminDashboardRouter);
+
+// ⭐ admin 기능 — editor 또는 admin만 가능
+app.use("/api/admin", adminRouter);
 
 // 4) 뉴스룸
 app.use("/api/posts", postsRouter);
