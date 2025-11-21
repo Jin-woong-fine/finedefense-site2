@@ -1,141 +1,125 @@
-// ==============================
-// 🔐 공통 인증 함수
-// ==============================
+/****************************************************
+ * 🔐 공통 인증 및 권한 관리 스크립트 (최종 안정 버전)
+ ****************************************************/
 
-// 로컬스토리지에서 인증 정보 꺼내기
+console.log("%c[auth] common_auth.js 로드됨", "color:#4caf50;font-weight:bold;");
+
+/****************************************************
+ * 1) 로컬스토리지 기반 유저 정보
+ ****************************************************/
 function getUser() {
   return {
     token: localStorage.getItem("token"),
     role: localStorage.getItem("role"),
-    name: localStorage.getItem("name")
+    name: localStorage.getItem("name"),
+    id: localStorage.getItem("user_id")
   };
 }
 
-// 인증 헤더 반환
+/****************************************************
+ * 2) Authorization 헤더 생성
+ ****************************************************/
 function authHeaders() {
-  const t = localStorage.getItem("token");
-  return t ? { Authorization: `Bearer ${t}` } : {};
+  const token = localStorage.getItem("token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
-// ------------------------------
-// 🔥 로그인 여부 체크
-// ------------------------------
+/****************************************************
+ * 3) 권한 체크 함수들 (직접 호출한 경우만 작동)
+ ****************************************************/
 function requireLogin() {
   const { token } = getUser();
+  console.log("requireLogin 실행됨, token=", token);
+
   if (!token) {
     alert("로그인이 필요합니다.");
     location.href = "/kr/admin/login.html";
   }
 }
 
-// ------------------------------
-// 🔥 관리자(admin 이상)
-// ------------------------------
-function requireAdmin() {
-  const { role } = getUser();
-  if (!role || (role !== "admin" && role !== "superadmin")) {
-    alert("관리자만 접근할 수 있습니다.");
-    location.href = "/kr/admin/login.html";
-  }
-}
-
-// ------------------------------
-// 🔥 admin + superadmin
-// ------------------------------
-function requireAdminOrSuperadmin() {
-  const { role } = getUser();
-  if (!role || (role !== "admin" && role !== "superadmin")) {
-    alert("접근 권한 없음");
-    location.href = "/kr/admin/login.html";
-  }
-}
-
-// ------------------------------
-// 🔥 editor + admin + superadmin
-// ------------------------------
-function requireAdminOrEditor() {
-  const { role } = getUser();
-  if (!role || (role !== "editor" && role !== "admin" && role !== "superadmin")) {
-    alert("접근 권한 없음");
-    location.href = "/kr/admin/login.html";
-  }
-}
-
-// 🔥 모든 로그인 사용자 허용 (superadmin, admin, editor, viewer)
 function requireAnyUser() {
   const { role } = getUser();
+  console.log("requireAnyUser 실행됨, role=", role);
+
   if (!role) {
     alert("로그인이 필요합니다.");
     location.href = "/kr/admin/login.html";
   }
 }
-window.requireAnyUser = requireAnyUser;
 
+function requireAdmin() {
+  const { role } = getUser();
+  console.log("requireAdmin 실행됨, role=", role);
 
+  if (role !== "admin" && role !== "superadmin") {
+    alert("관리자만 접근 가능합니다.");
+    location.href = "/kr/admin/login.html";
+  }
+}
 
+function requireAdminOrSuperadmin() {
+  const { role } = getUser();
+  console.log("requireAdminOrSuperadmin 실행됨, role=", role);
 
-// ------------------------------
-// 🔥 superadmin만
-// ------------------------------
+  if (role !== "admin" && role !== "superadmin") {
+    alert("접근 권한 없음");
+    location.href = "/kr/admin/login.html";
+  }
+}
+
+function requireAdminOrEditor() {
+  const { role } = getUser();
+  console.log("requireAdminOrEditor 실행됨, role=", role);
+
+  if (role !== "editor" && role !== "admin" && role !== "superadmin") {
+    alert("접근 권한 없음");
+    location.href = "/kr/admin/login.html";
+  }
+}
+
 function requireSuperadmin() {
   const { role } = getUser();
+  console.log("requireSuperadmin 실행됨, role=", role);
+
   if (role !== "superadmin") {
     alert("슈퍼관리자만 접근 가능합니다.");
     location.href = "/kr/admin/login.html";
   }
 }
 
-// ------------------------------
-// 🔥 로그아웃
-// ------------------------------
+/****************************************************
+ * 4) 로그아웃
+ ****************************************************/
 function logout() {
   localStorage.removeItem("token");
   localStorage.removeItem("role");
   localStorage.removeItem("name");
+  localStorage.removeItem("user_id");
   location.href = "/kr/admin/login.html";
 }
 
-// ------------------------------
-// ⭐ 상단 프로필 드롭다운 초기화
-// ------------------------------
-document.addEventListener("DOMContentLoaded", () => {
-  const user = getUser();
-  const nameEl = document.getElementById("topbarUserName");
-  const box = document.getElementById("topbarUser");
-  const dropdown = document.getElementById("userDropdown");
+/****************************************************
+ * 5) 관리자 메뉴 처리 (완전 삭제)
+ *    👉 기존: menuUserManage 자동 제어 → editor 튕기는 원인
+ *    👉 이제 sidebar.js에서만 메뉴 생성 관리
+ ****************************************************/
 
-  if (nameEl && user.name) nameEl.textContent = user.name;
+// ⚠️ 자동으로 DOM을 건드리는 코드는 전부 제거함.
+// ⚠️ dropdown UI는 dashboard.html/jsp 등 개별 페이지에서 처리함.
 
-  // admin 이상만 "사용자 관리" 표시
-  const menuUserManage = document.getElementById("menuUserManage");
-  if (menuUserManage) {
-    if (user.role === "admin" || user.role === "superadmin") {
-      menuUserManage.style.display = "block";
-    } else {
-      menuUserManage.style.display = "none";
-    }
-  }
-
-  // 드롭다운 토글
-  if (box) {
-    box.addEventListener("click", () => {
-      dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
-    });
-  }
-
-  // 화면 클릭 시 닫기
-  document.addEventListener("click", (e) => {
-    if (!box || !dropdown) return;
-    if (!box.contains(e.target)) dropdown.style.display = "none";
-  });
-});
-
-// 전역 노출
+/****************************************************
+ * 6) 전역 함수 노출
+ ****************************************************/
 window.getUser = getUser;
 window.logout = logout;
 window.authHeaders = authHeaders;
+
 window.requireLogin = requireLogin;
+window.requireAnyUser = requireAnyUser;
+
 window.requireAdmin = requireAdmin;
-window.requireSuperadmin = requireSuperadmin;
 window.requireAdminOrSuperadmin = requireAdminOrSuperadmin;
 window.requireAdminOrEditor = requireAdminOrEditor;
+window.requireSuperadmin = requireSuperadmin;
+
+console.log("%c[auth] 공통 인증 시스템 초기화 완료", "color:#2196f3;font-weight:bold;");
