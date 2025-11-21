@@ -151,9 +151,10 @@
 
     // 🔥 Toast UI Viewer (정상 코드)
     new toastui.Editor({
-      el: document.querySelector('#viewer'),
-      viewer: true,
-      initialValue: data.content || ""
+    el: document.querySelector('#viewer'),
+    viewer: true,
+    initialValue: data.content || "",
+    html: true
     });
 
     // 🔥 첨부파일 렌더링
