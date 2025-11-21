@@ -61,6 +61,19 @@ function requireAdminOrEditor() {
   }
 }
 
+// 🔥 모든 로그인 사용자 허용 (superadmin, admin, editor, viewer)
+function requireAnyUser() {
+  const { role } = getUser();
+  if (!role) {
+    alert("로그인이 필요합니다.");
+    location.href = "/kr/admin/login.html";
+  }
+}
+window.requireAnyUser = requireAnyUser;
+
+
+
+
 // ------------------------------
 // 🔥 superadmin만
 // ------------------------------
