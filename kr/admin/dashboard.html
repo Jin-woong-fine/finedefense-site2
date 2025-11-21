@@ -9,6 +9,14 @@
 
   <!-- 공통 관리자 CSS -->
   <link rel="stylesheet" href="./css/admin.css">
+
+  <!-- 🔥 공통 인증 스크립트를 가장 먼저 로드 -->
+  <script src="./js/common_auth.js"></script>
+
+  <!-- 🔥 대시보드는 모든 로그인 사용자 허용 -->
+  <script>
+    requireAnyUser();  // ⭐ 가장 먼저 실행되는 권한 체크
+  </script>
 </head>
 
 <body>
@@ -79,15 +87,11 @@
 
   </div>
 
-  <!-- 🔥 공통 스크립트 -->
-  <script src="./js/common_auth.js"></script>
+  <!-- 🔵 나머지 스크립트 로딩 (권한 체크 이후 실행) -->
   <script src="./js/sidebar.js"></script>
   <script src="./js/dashboard_core.js"></script>
 
   <script>
-    // 🔐 접근 권한: 모두
-    requireAnyUser();
-
     // 🔵 사이드바 로드
     loadSidebar("dashboard");
 
