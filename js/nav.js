@@ -177,19 +177,19 @@ function initBreadcrumbTabs() {
             ];
       }
 
-      if (path.includes("/products/")) {
+      if (path.includes("/products/") || path.includes("/product/")) {
         subTabs = LANG === "kr"
           ? [
-              { name: "수중이동형케이블", link: `${base}/product/towed-cable.html` },
-              { name: "수중고정형케이블", link: `${base}/product/underwater-fixed-cable.html` },
-              { name: "수중커넥터", link: `${base}/product/underwater-connector.html` },
-              { name: "커스텀케이블", link: `${base}/product/custom-cable.html` },
+              { name: "수중이동형케이블", link: `/kr/sub/products/sub-towed.html` },
+              { name: "수중고정형케이블", link: `/kr/sub/products/sub-fixed.html` },
+              { name: "수중커넥터", link: `/kr/sub/products/sub-connector.html` },
+              { name: "커스텀케이블", link: `/kr/sub/products/sub-custom.html` },
             ]
           : [
-              { name: "Towed Cable", link: `${base}/product/towed-cable.html` },
-              { name: "Fixed Underwater Cable", link: `${base}/product/underwater-fixed-cable.html` },
-              { name: "Underwater Connector", link: `${base}/product/underwater-connector.html` },
-              { name: "Custom Cable", link: `${base}/product/custom-cable.html` },
+              { name: "Towed Cable", link: `/en/sub/products/sub-towed.html` },
+              { name: "Fixed Underwater Cable", link: `/en/sub/products/sub-fixed.html` },
+              { name: "Underwater Connector", link: `/en/sub/products/sub-connector.html` },
+              { name: "Custom Cable", link: `/en/sub/products/sub-custom.html` },
             ];
       }
 
