@@ -127,7 +127,7 @@ function initBreadcrumbTabs() {
   const topTabs = LANG === "kr" 
     ? [
         { name: "회사소개", link: "/kr/sub/company/overview.html" },
-        { name: "제품소개", link: "/kr/sub/product/towed-cable.html" },
+        { name: "제품소개", link: "/kr/sub/products/sub-towed.html" },
         { name: "홍보센터", link: "/kr/sub/pr/newsroom/newsroom.html" },
         { name: "고객지원", link: "/kr/sub/support/" },
       ]
