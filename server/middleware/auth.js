@@ -37,7 +37,7 @@ export function allowRoles(...roles) {
 
     if (!roles.includes(req.user.role)) {
       return res.status(403).json({
-        message: `Permission denied: allowed roles = ${roles.join(", ")}`,
+        message: `Permission denied: required roles = ${roles.join(", ")}`,
       });
     }
 
@@ -46,26 +46,26 @@ export function allowRoles(...roles) {
 }
 
 /* ============================================================
-   🟦 CRUD / 페이지 접근 권한
+   🟦 CRUD 권한
 ============================================================ */
 
-// 🔹 생성(Create) — superadmin + admin
+// 생성 (superadmin + admin)
 export const canCreate = allowRoles("superadmin", "admin");
 
-// 🔹 수정(Update) — superadmin + admin + editor
+// 수정 (superadmin + admin + editor)
 export const canUpdate = allowRoles("superadmin", "admin", "editor");
 
-// 🔹 삭제(Delete) — superadmin만
+// 삭제 (superadmin만)
 export const canDelete = allowRoles("superadmin");
 
-// 🔹 관리자 페이지(제품/뉴스룸 등) — superadmin + admin + editor
+// 관리자 페이지 접근 (superadmin + admin + editor)
 export const canReadManagerPages = allowRoles(
   "superadmin",
   "admin",
   "editor"
 );
 
-// 🔹 대시보드 — 모든 로그인 사용자(viewer 포함)
+// 대시보드 접근 (viewer 포함)
 export const canAccessDashboard = allowRoles(
   "superadmin",
   "admin",
@@ -73,17 +73,28 @@ export const canAccessDashboard = allowRoles(
   "viewer"
 );
 
-// 🔹 사용자 목록 조회 — superadmin + admin
+// 사용자 목록 (admin + superadmin)
 export const canViewUsers = allowRoles("superadmin", "admin");
 
-// 🔹 사용자 관리(생성/삭제/권한변경) — superadmin + admin
+// 사용자 관리 (admin + superadmin)
 export const canManageUsers = allowRoles("superadmin", "admin");
 
 
 /* ============================================================
-   🔙 구버전 라우터 호환용 verifyRole
-   (다른 라우터들에서 import 중이므로 반드시 유지해야 함)
+   🔙 구버전 라우터 호환용 (삭제하면 서버 다시 죽음)
 ============================================================ */
+
+// 기존 verifyRole 유지
 export function verifyRole(...roles) {
   return allowRoles(...roles);
+}
+
+// 기존 verifyAdmin → admin만 허용
+export function verifyAdmin(req, res, next) {
+  return allowRoles("admin")(req, res, next);
+}
+
+// 기존 verifyEditor → editor + admin 허용
+export function verifyEditor(req, res, next) {
+  return allowRoles("editor", "admin")(req, res, next);
 }
