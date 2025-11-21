@@ -23,11 +23,11 @@ const LANG = detectLang();
 const PATH = {
   header: `/${LANG}/components/header.html`,
   footer: `/${LANG}/components/footer.html`,
-  scriptLang: `/${LANG}/js/language.js`,
+  scriptLang: `/js/language.js`,   // 🔥 공통 경로로 고정 (language.js 오류 해결)
 };
 
 /* ------------------------------------------------------------
-   🌐 Fetch Helper (대기업 스타일)
+   🌐 Fetch Helper
 ------------------------------------------------------------ */
 async function loadComponent(targetId, url) {
   try {
@@ -50,15 +50,17 @@ async function loadComponent(targetId, url) {
 function highlightTopMenu() {
   const path = window.location.pathname;
 
-  const menuMap = LANG === "kr" 
+  const menuMap = LANG === "kr"
     ? [
         { keyword: "/company/", label: "회사소개" },
+        { keyword: "/products/", label: "제품소개" },
         { keyword: "/product/", label: "제품소개" },
         { keyword: "/pr/", label: "홍보센터" },
         { keyword: "/support/", label: "고객지원" },
       ]
     : [
         { keyword: "/company/", label: "Company" },
+        { keyword: "/products/", label: "Products" },
         { keyword: "/product/", label: "Products" },
         { keyword: "/pr/", label: "PR Center" },
         { keyword: "/support/", label: "Support" },
@@ -97,6 +99,7 @@ function showSideTabs(tabList, target) {
 
     if (isTopTabs) {
       if (current.includes("/product/") && href.includes("/product/")) a.classList.add("active");
+      if (current.includes("/products/") && href.includes("/products/")) a.classList.add("active");
       if (current.includes("/company/") && href.includes("/company/")) a.classList.add("active");
       if (current.includes("/pr/") && href.includes("/pr/")) a.classList.add("active");
       if (current.includes("/support/") && href.includes("/support/")) a.classList.add("active");
@@ -124,7 +127,7 @@ function showSideTabs(tabList, target) {
    🔹 breadcrumb 탭 초기화
 ------------------------------------------------------------ */
 function initBreadcrumbTabs() {
-  const topTabs = LANG === "kr" 
+  const topTabs = LANG === "kr"
     ? [
         { name: "회사소개", link: "/kr/sub/company/overview.html" },
         { name: "제품소개", link: "/kr/sub/products/sub-towed.html" },
@@ -133,7 +136,7 @@ function initBreadcrumbTabs() {
       ]
     : [
         { name: "Company", link: "/en/sub/company/overview.html" },
-        { name: "Products", link: "/en/sub/product/towed-cable.html" },
+        { name: "Products", link: "/en/sub/products/sub-towed.html" },
         { name: "PR Center", link: "/en/sub/pr/newsroom/newsroom.html" },
         { name: "Support", link: "/en/sub/support/" },
       ];
@@ -155,71 +158,40 @@ function initBreadcrumbTabs() {
       const path = location.href.toLowerCase();
       let subTabs = [];
 
-      const base = `/${LANG}/sub`;
-
-      if (path.includes("/company/")) {
-        subTabs = LANG === "kr"
-          ? [
-              { name: "기업개요", link: `${base}/company/overview.html` },
-              { name: "CEO 인사말", link: `${base}/company/ceo.html` },
-              { name: "기업이념 및 비전", link: `${base}/company/vision.html` },
-              { name: "연혁", link: `${base}/company/history.html` },
-              { name: "조직도", link: `${base}/company/organization.html` },
-              { name: "찾아오시는 길", link: `${base}/company/location.html` },
-            ]
-          : [
-              { name: "Overview", link: `${base}/company/overview.html` },
-              { name: "CEO Message", link: `${base}/company/ceo.html` },
-              { name: "Mission & Vision", link: `${base}/company/vision.html` },
-              { name: "History", link: `${base}/company/history.html` },
-              { name: "Organization", link: `${base}/company/organization.html` },
-              { name: "Location", link: `${base}/company/location.html` },
-            ];
-      }
-
       if (path.includes("/products/") || path.includes("/product/")) {
         subTabs = LANG === "kr"
           ? [
-              { name: "수중이동형케이블", link: `/kr/sub/products/sub-towed.html` },
-              { name: "수중고정형케이블", link: `/kr/sub/products/sub-fixed.html` },
-              { name: "수중커넥터", link: `/kr/sub/products/sub-connector.html` },
-              { name: "커스텀케이블", link: `/kr/sub/products/sub-custom.html` },
+              { name: "수중이동형케이블", link: "/kr/sub/products/sub-towed.html" },
+              { name: "수중고정형케이블", link: "/kr/sub/products/sub-fixed.html" },
+              { name: "수중커넥터", link: "/kr/sub/products/sub-connector.html" },
+              { name: "커스텀케이블", link: "/kr/sub/products/sub-custom.html" },
             ]
           : [
-              { name: "Towed Cable", link: `/en/sub/products/sub-towed.html` },
-              { name: "Fixed Underwater Cable", link: `/en/sub/products/sub-fixed.html` },
-              { name: "Underwater Connector", link: `/en/sub/products/sub-connector.html` },
-              { name: "Custom Cable", link: `/en/sub/products/sub-custom.html` },
+              { name: "Towed Cable", link: "/en/sub/products/sub-towed.html" },
+              { name: "Fixed Underwater Cable", link: "/en/sub/products/sub-fixed.html" },
+              { name: "Underwater Connector", link: "/en/sub/products/sub-connector.html" },
+              { name: "Custom Cable", link: "/en/sub/products/sub-custom.html" },
             ];
       }
 
-      if (path.includes("/pr/")) {
+      if (path.includes("/company/")) {
+        const base = `/${LANG}/sub/company`;
         subTabs = LANG === "kr"
           ? [
-              { name: "뉴스룸", link: `${base}/pr/newsroom/newsroom.html` },
-              { name: "공지사항", link: `${base}/pr/notice/notice.html` },
-              { name: "갤러리", link: `${base}/pr/gallery/gallery.html` },
-              { name: "인증 및 특허", link: `${base}/pr/cert/cert.html` },
-              { name: "카탈로그", link: `${base}/pr/catalog/catalog.html` },
+              { name: "기업개요", link: `${base}/overview.html` },
+              { name: "CEO 인사말", link: `${base}/ceo.html` },
+              { name: "기업이념 및 비전", link: `${base}/vision.html` },
+              { name: "연혁", link: `${base}/history.html` },
+              { name: "조직도", link: `${base}/organization.html` },
+              { name: "찾아오시는 길", link: `${base}/location.html` },
             ]
           : [
-              { name: "Newsroom", link: `${base}/pr/newsroom/newsroom.html` },
-              { name: "Notice", link: `${base}/pr/notice/notice.html` },
-              { name: "Gallery", link: `${base}/pr/gallery/gallery.html` },
-              { name: "Certificates", link: `${base}/pr/cert/cert.html` },
-              { name: "Catalog", link: `${base}/pr/catalog/catalog.html` },
-            ];
-      }
-
-      if (path.includes("/support/")) {
-        subTabs = LANG === "kr"
-          ? [
-              { name: "자료실", link: `${base}/support/download.html` },
-              { name: "문의하기", link: `${base}/support/contact.html` },
-            ]
-          : [
-              { name: "Downloads", link: `${base}/support/download.html` },
-              { name: "Contact", link: `${base}/support/contact.html` },
+              { name: "Overview", link: `${base}/overview.html` },
+              { name: "CEO Message", link: `${base}/ceo.html` },
+              { name: "Mission & Vision", link: `${base}/vision.html` },
+              { name: "History", link: `${base}/history.html` },
+              { name: "Organization", link: `${base}/organization.html` },
+              { name: "Location", link: `${base}/location.html` },
             ];
       }
 
@@ -237,12 +209,14 @@ function initAdminBar() {
   const role = localStorage.getItem("role");
   const token = localStorage.getItem("token");
 
-  if (role !== "admin" || !token) return;
+  // superadmin + admin만 표시
+  if (!["admin", "superadmin"].includes(role) || !token) {
+    return;
+  }
 
   const adminBar = document.createElement("div");
   adminBar.id = "adminBar";
 
-  // 언어별 텍스트
   const LABEL = LANG === "kr"
     ? { mode: "FINE DEFENSE ADMIN MODE", dashboard: "관리자 대시보드", logout: "로그아웃" }
     : { mode: "FINE DEFENSE ADMIN MODE", dashboard: "Admin Dashboard", logout: "Logout" };
@@ -275,10 +249,8 @@ function initAdminBar() {
   document.body.prepend(adminBar);
 
   document.getElementById("adminLogout").addEventListener("click", () => {
-    if (confirm(LANG === "kr" ? "로그아웃하시겠습니까?" : "Log out?")) {
-      localStorage.clear();
-      location.href = `/${LANG}/admin/login.html`;
-    }
+    localStorage.clear();
+    location.href = `/${LANG}/admin/login.html`;
   });
 }
 
@@ -299,16 +271,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   initAdminBar();
 });
 
-
-
 /* ------------------------------------------------------------
-   🔹 사이드 탭 자동 숨김 (필수)
+   🔹 사이드 탭 자동 숨김
 ------------------------------------------------------------ */
 function scheduleHideTabs() {
   const side = document.getElementById("side-tabs");
   if (!side) return;
 
-  // 0.2초 뒤 자동 숨김
   hideTimer = setTimeout(() => {
     side.classList.remove("visible");
   }, 200);
