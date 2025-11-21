@@ -158,6 +158,9 @@ function initBreadcrumbTabs() {
       const path = location.href.toLowerCase();
       let subTabs = [];
 
+      /* -------------------------------
+        📌 제품소개
+      --------------------------------*/
       if (path.includes("/products/") || path.includes("/product/")) {
         subTabs = LANG === "kr"
           ? [
@@ -174,6 +177,9 @@ function initBreadcrumbTabs() {
             ];
       }
 
+      /* -------------------------------
+        📌 회사소개
+      --------------------------------*/
       if (path.includes("/company/")) {
         const base = `/${LANG}/sub/company`;
         subTabs = LANG === "kr"
@@ -195,9 +201,50 @@ function initBreadcrumbTabs() {
             ];
       }
 
+      /* -------------------------------
+        📌 홍보센터 (PR) → 5개
+      --------------------------------*/
+      if (path.includes("/pr/")) {
+        const base = `/${LANG}/sub/pr`;
+
+        subTabs = LANG === "kr"
+          ? [
+              { name: "공지사항", link: `${base}/notice/notice.html` },
+              { name: "뉴스룸", link: `${base}/newsroom/newsroom.html` },
+              { name: "갤러리", link: `${base}/gallery/gallery.html` },
+              { name: "인증 및 특허", link: `${base}/cert/cert.html` },
+              { name: "카탈로그", link: `${base}/catalog/catalog.html` },
+            ]
+          : [
+              { name: "Notice", link: `${base}/notice/notice.html` },
+              { name: "Newsroom", link: `${base}/newsroom/newsroom.html` },
+              { name: "Gallery", link: `${base}/gallery/gallery.html` },
+              { name: "Certificates", link: `${base}/cert/cert.html` },
+              { name: "Catalog", link: `${base}/catalog/catalog.html` },
+            ];
+      }
+
+      /* -------------------------------
+        📌 고객지원 (Support) → 2개
+      --------------------------------*/
+      if (path.includes("/support/")) {
+        const base = `/${LANG}/sub/support`;
+
+        subTabs = LANG === "kr"
+          ? [
+              { name: "1:1 문의", link: `${base}/inquiry.html` },
+              { name: "자료실", link: `${base}/download.html` },
+            ]
+          : [
+              { name: "Contact", link: `${base}/inquiry.html` },
+              { name: "Downloads", link: `${base}/download.html` },
+            ];
+      }
+
       showSideTabs(subTabs, level2);
     });
   }
+
 
   breadcrumb.addEventListener("mouseleave", scheduleHideTabs);
 }
