@@ -1,127 +1,148 @@
-console.log("%c[user_profile] 로드됨", "color:#4caf50;font-weight:bold;");
+import express from "express";
+import bcrypt from "bcrypt";
+import db from "../config/db.js";
+import { verifyToken } from "../middleware/auth.js";
+import multer from "multer";
+import path from "path";
+import { fileURLToPath } from "url";
 
-const API_BASE = "/api";
-const defaultAvatar = "/img/admin/avatar-placeholder.png"; // 없으면 나중에 만들어도 됨
+const router = express.Router();
 
-document.addEventListener("DOMContentLoaded", () => {
-  loadMyProfile();
-  initProfileSave();
-  initAvatarUpload();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// ===========================
+// 🔵 아바타 저장 경로 설정
+// ===========================
+const avatarDir = path.join(__dirname, "../public/uploads/avatar");
+
+// Multer 설정
+const storage = multer.diskStorage({
+  destination: (_, __, cb) => cb(null, avatarDir),
+  filename: (_, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    const unique = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, `avatar-${unique}${ext}`);
+  }
+});
+const upload = multer({ storage });
+
+
+// ===========================
+// 📌 내 프로필 정보 가져오기
+// ===========================
+router.get("/", verifyToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const [[user]] = await db.query(
+      `SELECT id, username, name, role, department, position, intro, avatar, created_at 
+       FROM users
+       WHERE id = ?`,
+      [userId]
+    );
+
+    res.json({
+      ...user,
+      avatar: user.avatar ?? null
+    });
+
+  } catch (err) {
+    console.error("Profile Load Error:", err);
+    res.status(500).json({ message: "server error" });
+  }
 });
 
-// =======================================
-// 🔵 내 프로필 로드
-// =======================================
-async function loadMyProfile() {
+
+// ===========================
+// 📌 프로필 기본 정보 업데이트
+// ===========================
+router.put("/", verifyToken, async (req, res) => {
   try {
-    const res = await fetch(`${API_BASE}/users/me`, {
-      headers: authHeaders(),
-    });
+    const userId = req.user.id;
+    const { name, department, position, intro } = req.body;
 
-    if (!res.ok) {
-      console.error("내 프로필 로드 실패");
-      return;
-    }
+    await db.query(
+      `UPDATE users
+       SET name = ?, department = ?, position = ?, intro = ?
+       WHERE id = ?`,
+      [name, department, position, intro, userId]
+    );
 
-    const data = await res.json();
+    res.json({ message: "profile updated" });
 
-    document.getElementById("profileUsername").value = data.username || "";
-    document.getElementById("profileName").value = data.name || "";
-    document.getElementById("profileDept").value = data.department || "";
-    document.getElementById("profilePosition").value = data.position || "";
-    document.getElementById("profileIntro").value = data.intro || "";
-
-    document.getElementById("profileNameLabel").textContent =
-      data.name || data.username || "이름 없음";
-    document.getElementById("profileRoleLabel").textContent = data.role || "-";
-
-    // 🔥 avatar_url → avatar 로 수정
-    const avatarImg = document.getElementById("avatarPreview");
-    avatarImg.src = data.avatar || defaultAvatar;
-
-    const topName = document.getElementById("topbarUserName");
-    if (topName) topName.textContent = data.name || data.username || "사용자";
   } catch (err) {
-    console.error("loadMyProfile 오류:", err);
+    console.error("Profile Update Error:", err);
+    res.status(500).json({ message: "server error" });
   }
-}
+});
 
-// =======================================
-// 🔵 프로필 저장 (이름/부서/직급/소개)
-// =======================================
-function initProfileSave() {
-  const btn = document.getElementById("profileSaveBtn");
-  btn.addEventListener("click", async () => {
-    const body = {
-      name: document.getElementById("profileName").value.trim(),
-      department: document.getElementById("profileDept").value.trim(),
-      position: document.getElementById("profilePosition").value.trim(),
-      intro: document.getElementById("profileIntro").value.trim(),
-    };
 
-    const res = await fetch(`${API_BASE}/users/me`, {
-      method: "PUT",
-      headers: {
-        ...authHeaders(),
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
+// ===========================
+// 📌 비밀번호 변경
+// ===========================
+router.put("/password", verifyToken, async (req, res) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+    const userId = req.user.id;
 
-    if (!res.ok) {
-      alert("프로필 저장 실패");
-      return;
+    const [[user]] = await db.query(
+      `SELECT password FROM users WHERE id = ?`,
+      [userId]
+    );
+
+    const valid = await bcrypt.compare(oldPassword, user.password);
+    if (!valid) {
+      return res.status(401).json({ message: "기존 비밀번호가 틀립니다." });
     }
 
-    alert("프로필이 저장되었습니다.");
-    loadMyProfile(); // 저장 후 자동 리로드
-  });
-}
+    const newHash = await bcrypt.hash(newPassword, 10);
 
-// =======================================
-// 🔵 아바타 업로드
-// =======================================
-function initAvatarUpload() {
-  const fileInput = document.getElementById("avatarFile");
-  const btn = document.getElementById("avatarUploadBtn");
-  const preview = document.getElementById("avatarPreview");
+    await db.query(
+      `UPDATE users SET password = ? WHERE id = ?`,
+      [newHash, userId]
+    );
 
-  // 선택한 파일 미리보기 표시
-  fileInput.addEventListener("change", (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+    res.json({ message: "password changed" });
 
-    const url = URL.createObjectURL(file);
-    preview.src = url;
-  });
+  } catch (err) {
+    console.error("Password Update Error:", err);
+    res.status(500).json({ message: "server error" });
+  }
+});
 
-  // 파일 업로드
-  btn.addEventListener("click", async () => {
-    const file = fileInput.files[0];
-    if (!file) {
-      alert("업로드할 이미지를 선택하세요.");
-      return;
+
+// ===========================
+// 📌 아바타 업로드
+// ===========================
+router.post("/avatar", verifyToken, (req, res) => {
+  upload.single("avatar")(req, res, async (err) => {
+    if (err) {
+      console.error("Multer Upload Error:", err);
+      return res.status(400).json({ message: "Upload error" });
     }
 
-    const fd = new FormData();
-    fd.append("avatar", file);
+    try {
+      const userId = req.user.id;
 
-    const res = await fetch(`${API_BASE}/users/me/avatar`, {
-      method: "POST",
-      headers: authHeaders(), // FormData는 Content-Type 자동 설정됨
-      body: fd,
-    });
+      const avatarUrl = "/uploads/avatar/" + req.file.filename;
 
-    if (!res.ok) {
-      alert("아바타 업로드 실패");
-      return;
+      await db.query(
+        `UPDATE users SET avatar = ? WHERE id = ?`,
+        [avatarUrl, userId]
+      );
+
+      res.json({
+        message: "avatar uploaded",
+        avatar: avatarUrl
+      });
+
+    } catch (err) {
+      console.error("Avatar Upload Error:", err);
+      res.status(500).json({ message: "server error" });
     }
-
-    const data = await res.json();
-
-    // 🔥 avatar_url → avatar 로 변경
-    preview.src = data.avatar || defaultAvatar;
-
-    alert("아바타가 업데이트되었습니다.");
   });
-}
+});
+
+
+export default router;

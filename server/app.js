@@ -33,15 +33,11 @@ app.use(express.urlencoded({ extended: true, limit: "30mb" }));
 
 
 // ============================
-// 📌 업로드 폴더 정적 제공
+// 📌 업로드 폴더 정적 제공 ★ 수정됨
 // ============================
-//
-// /uploads/ → server/public/uploads 연결
-// 아바타 이미지 URL 예) /uploads/avatar/파일명.png
-//
 app.use(
   "/uploads",
-  express.static(path.join(__dirname, "public", "uploads"))
+  express.static(path.resolve(__dirname, "public/uploads"))
 );
 
 
@@ -55,10 +51,8 @@ app.use("/api/auth", authRouter);
 // 문의하기
 app.use("/api/inquiry", sendInquiryRouter);
 
-// 관리자 기능 (자료실 업로드 등)
+// 관리자 기능
 app.use("/api/admin", adminRouter);
-
-// 관리자 대시보드 (통계)
 app.use("/api/admin", adminDashboardRouter);
 
 // 뉴스룸 게시판
@@ -74,18 +68,13 @@ app.use("/api/uploads", uploadsRouter);
 app.use("/api/logs/login", loginLogsRouter);
 
 // ⭐ 사용자 프로필(Me) 기능
-// /api/users/me/...
 app.use("/api/users/me", userProfileRouter);
 
 
 // ============================
-// 📌 정적 페이지 제공
+// 📌 정적 페이지 제공 ★ 반드시 맨 마지막!
 // ============================
-//
-// 프로젝트 root(../) 전체를 정적으로 제공
-// kr/, en/, index.html, img/, css/, js/ 전체 자동 서빙
-//
-app.use(express.static(path.join(__dirname, "../")));
+app.use(express.static(path.resolve(__dirname, "../")));
 
 
 // ============================
@@ -95,7 +84,6 @@ app.use("/api/*", (req, res) => {
   res.status(404).json({ message: "API not found" });
 });
 
-
 // ============================
 // 📌 전역 에러 핸들러
 // ============================
@@ -103,7 +91,6 @@ app.use((err, req, res, next) => {
   console.error("🔥 서버 오류:", err);
   res.status(500).json({ message: "Server error" });
 });
-
 
 // ============================
 // 📌 서버 실행
