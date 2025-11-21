@@ -3,58 +3,140 @@
 <head>
   <meta charset="UTF-8">
   <title>수중커넥터 | Fine Defense</title>
+
+  <!-- 공통 스타일 -->
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/sub-banner.css">
 
   <style>
+    /* ===============================
+       메인 섹션
+    =============================== */
     .product-section {
       max-width: 1200px;
-      margin: 40px auto;
-      padding: 20px 40px;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      margin: 50px auto;
+      padding: 30px 40px;
+      background: #ffffff;
+      border-radius: 14px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.06);
     }
 
+    .product-section h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #0f2679;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .product-section p.section-desc {
+      font-size: 1.1rem;
+      text-align: center;
+      margin-bottom: 45px;
+      line-height: 1.7;
+      color: #444;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* ===============================
+       카드 그리드
+    =============================== */
     .product-cards {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
-      gap: 30px;
+      grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+      gap: 32px;
     }
 
+    /* ===============================
+       개별 카드
+    =============================== */
     .product-card {
-      display: flex;
       background: #fff;
-      border-radius: 14px;
+      border-radius: 16px;
       overflow: hidden;
       text-decoration: none;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      color: inherit;
+      display: flex;
+      align-items: stretch;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+      transition: .25s ease;
     }
 
+    .product-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 8px 22px rgba(0,0,0,0.14);
+    }
+
+    /* 이미지 박스 */
     .card-image {
       flex: 0 0 40%;
-      height: 200px;
+      height: 220px;
+      background: #f4f4f4;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #f9f9f9;
       overflow: hidden;
     }
+
     .card-image img {
       max-width: 100%;
       max-height: 100%;
       object-fit: contain;
+      padding: 6px;
     }
 
-    .card-content { padding: 24px; }
-    .card-content h3 { color: #0f2679; margin: 0 0 10px; }
+    /* 텍스트 영역 */
+    .card-content {
+      flex: 1;
+      padding: 24px 22px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-content h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #0f2679;
+      margin: 0 0 10px 0;
+    }
+
+    .card-content p {
+      margin: 0;
+      font-size: 0.95rem;
+      color: #555;
+      line-height: 1.55;
+      flex-grow: 1;
+
+      /* 텍스트 3줄 제한 */
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+    }
+
+    @media (max-width: 768px) {
+      .product-card {
+        flex-direction: column;
+      }
+      .card-image {
+        width: 100%;
+        height: 200px;
+      }
+      .product-cards {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 
 <body>
 
+<!-- 헤더 -->
 <div id="header"></div>
 
+<!-- 서브 배너 -->
 <section class="sub-banner">
   <img src="/img/sub-banners/cable.jpg" alt="">
   <div class="banner-text">
@@ -63,6 +145,7 @@
   </div>
 </section>
 
+<!-- breadcrumb -->
 <div class="breadcrumb">
   <a href="/kr/index.html">홈</a> &gt;
   <span class="crumb crumb-level1">제품소개</span> &gt;
@@ -70,50 +153,70 @@
   <div id="side-tabs" class="side-tabs"></div>
 </div>
 
+<!-- 본문 -->
 <section class="product-section">
   <h1>수중 커넥터</h1>
-  <p>
+  <p class="section-desc">
     고압·수밀 환경에서 안정적으로 전력·신호를 전달하기 위한 전문 수중 커넥터입니다.
   </p>
 
+  <!-- 제품 카드 자동 렌더링 -->
   <div id="productCards" class="product-cards"></div>
 </section>
 
+<!-- 푸터 -->
 <div id="footer"></div>
 
 <script src="/js/nav.js"></script>
 <script src="/js/language.js"></script>
 
 <script>
+  // HTML 태그 제거 후 텍스트만 추출
   function stripHtml(html) {
     const tmp = document.createElement("div");
     tmp.innerHTML = html;
-    return tmp.textContent || "";
+    return (tmp.textContent || tmp.innerText || "").trim();
   }
 
   async function loadProducts() {
-    const box = document.getElementById("productCards");
+    const container = document.getElementById("productCards");
 
     try {
       const res = await fetch("/api/products");
+      if (!res.ok) throw new Error("서버 오류");
+
       const all = await res.json();
 
-      const list = all.filter(p => p.category === "connector");
+      // "connector" 카테고리만 불러오기
+      const products = all.filter(p => p.category === "connector");
 
-      box.innerHTML = list.map(p => `
-        <a class="product-card" href="/kr/sub/products/product-view.html?id=${p.id}">
-          <div class="card-image">
-            <img src="${p.thumbnail || '/img/products/Image-placeholder.png'}" alt="">
-          </div>
-          <div class="card-content">
-            <h3>${p.title}</h3>
-            <p>${stripHtml(p.description_html).substring(0, 100)}...</p>
-          </div>
-        </a>
-      `).join("");
+      if (products.length === 0) {
+        container.innerHTML = "<p>등록된 수중 커넥터 제품이 없습니다.</p>";
+        return;
+      }
+
+      container.innerHTML = products.map(p => {
+        const img = p.thumbnail || "/img/products/Image-placeholder.png";
+        const link = `/kr/sub/products/product-view.html?id=${p.id}`;
+
+        const text = stripHtml(p.description_html || "");
+        const desc = text.length > 120 ? text.slice(0, 120) + "…" : text;
+
+        return `
+          <a class="product-card" href="${link}">
+            <div class="card-image">
+              <img src="${img}" alt="${p.title}">
+            </div>
+            <div class="card-content">
+              <h3>${p.title}</h3>
+              <p>${desc}</p>
+            </div>
+          </a>`;
+      }).join("");
 
     } catch (err) {
-      box.innerHTML = "<p>불러오기 오류</p>";
+      console.error("loadProducts 오류:", err);
+      container.innerHTML = "<p>제품 목록을 불러오는 중 오류가 발생했습니다.</p>";
     }
   }
 
