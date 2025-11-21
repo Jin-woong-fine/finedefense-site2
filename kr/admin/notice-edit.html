@@ -3,116 +3,91 @@
 <head>
   <meta charset="UTF-8" />
   <title>공지사항 수정 | Fine Defense 관리자</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- Toast UI Editor CSS -->
-  <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+  <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
 
   <!-- 공통 관리자 CSS -->
-  <link rel="stylesheet" href="/kr/admin/css/admin.css" />
+  <link rel="stylesheet" href="./css/admin.css">
 
   <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Noto Sans KR', sans-serif;
-      background: #f3f5fa;
+    .panel h2 { margin-top: 0; }
+    .file-list { margin-top: 10px; }
+    .file-item {
+      margin-bottom: 6px;
+      font-size: 0.9rem;
       display: flex;
-    }
-
-    .main {
-      flex: 1;
-      padding: 22px 24px;
-      min-height: 100vh;
-    }
-
-    .panel {
-      background: #fff;
-      padding: 25px;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-      margin-bottom: 35px;
-    }
-
-    .input {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ccc;
+      justify-content: space-between;
+      background: #f4f4f4;
+      padding: 8px;
       border-radius: 6px;
-      margin-bottom: 12px;
-      box-sizing: border-box;
     }
-
-    .btn {
-      padding: 10px 18px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.95rem;
-    }
-
-    .btn-primary { background: #0f2679; color: #fff; }
-    .btn-danger { background: #d62828; color: #fff; }
-
-    .thumb-preview img {
-      width: 160px;
-      height: 120px;
-      object-fit: cover;
-      border-radius: 8px;
-      border: 1px solid #ddd;
-      margin-top: 10px;
+    .file-item span.label {
+      color:#555;
     }
   </style>
-
 </head>
+
 <body>
 
-<div id="sidebar"></div>
+<div id="sidebar" data-active="notice"></div>
 
 <div class="main">
 
   <div class="topbar">
     <h2>공지사항 수정</h2>
-
     <div>
-      <button class="btn btn-primary" onclick="history.back()">뒤로가기</button>
+      <button class="btn btn-primary" onclick="location.href='./notice-list.html'">목록으로</button>
       <button id="logoutBtn" class="btn btn-danger">로그아웃</button>
     </div>
   </div>
 
   <form id="noticeForm" enctype="multipart/form-data">
 
-    <!-- 제목 / 언어 / 이미지 -->
     <section class="panel">
       <h2>공지 정보 수정</h2>
 
-      <input id="title" class="input" placeholder="제목을 입력하세요" />
+      <input id="title" class="input" placeholder="공지 제목" />
 
       <select id="lang" class="input">
         <option value="kr">한국어</option>
         <option value="en">English</option>
       </select>
 
-      <label><strong>대표 이미지 변경(선택)</strong></label>
-      <input type="file" id="image" name="images" accept="image/*" class="input" />
-
-      <div id="preview" class="thumb-preview"></div>
-    </section>
-
-    <!-- 내용 작성 -->
-    <section class="panel">
-      <h3>내용 수정 (Toast UI Editor)</h3>
+      <h3>공지 내용</h3>
       <div id="editor" style="border:1px solid #ccc;border-radius:6px;"></div>
     </section>
 
-    <button type="submit" class="btn btn-primary" style="margin-bottom:50px;">
-      공지사항 수정 완료
-    </button>
+    <section class="panel">
+      <h3>첨부파일</h3>
+
+      <div id="currentFiles" class="file-list" style="margin-bottom:10px;"></div>
+
+      <p style="font-size:0.9rem;color:#777;">
+        새로운 파일을 업로드하면 기존 첨부파일은 모두 교체됩니다.
+      </p>
+
+      <input
+        type="file"
+        id="files"
+        name="files"
+        multiple
+        class="input"
+      />
+
+      <div id="filePreview" class="file-list"></div>
+
+      <button type="submit" class="btn btn-primary" style="margin-top:15px;">
+        수정 완료
+      </button>
+    </section>
 
   </form>
 
 </div>
 
-<!-- 관리자 공통 JS -->
+<!-- 공통 JS -->
 <script src="/kr/admin/js/common_auth.js"></script>
 <script src="/kr/admin/js/sidebar.js"></script>
 
@@ -120,113 +95,111 @@
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 
 <script>
-  let postId = null;
-  let editor = null;
-
   (function () {
     requireAdminOrEditor();
-    loadSidebar("notice");
     document.getElementById("logoutBtn").addEventListener("click", logout);
-
-    const params = new URLSearchParams(location.search);
-    postId = params.get("id");
-
-    if (!postId) {
-      alert("잘못된 접근입니다.");
-      location.href = "./notice-list.html";
-      return;
-    }
-
-    loadNotice();
   })();
 
+  const params = new URLSearchParams(location.search);
+  const noticeId = params.get("id");
+  if (!noticeId) {
+    alert("잘못된 접근입니다. ID가 없습니다.");
+    location.href = "./notice-list.html";
+  }
 
-  /* -----------------------------------------
-     기존 공지사항 불러오기
-  ----------------------------------------- */
-  async function loadNotice() {
+  let editor; // 전역으로
+
+  // Toast Editor 초기화 + 데이터 로드
+  async function initPage() {
+    editor = new toastui.Editor({
+      el: document.querySelector('#editor'),
+      height: '500px',
+      initialEditType: 'wysiwyg',
+      previewStyle: 'vertical'
+    });
+
     try {
-      const res = await fetch(`/api/posts/notice/${postId}`);
-      const notice = await res.json();
+      const res = await fetch(`/api/posts/detail/${noticeId}`);
+      if (!res.ok) throw new Error("공지 불러오기 실패");
+      const data = await res.json();
 
-      document.getElementById("title").value = notice.title;
-      document.getElementById("lang").value = notice.lang;
+      document.getElementById("title").value = data.title || "";
+      document.getElementById("lang").value = data.lang || "kr";
+      editor.setHTML(data.content || "");
 
-      // 이미지 미리보기
-      if (notice.main_image) {
-        document.getElementById("preview").innerHTML =
-          `<img src="${notice.main_image}" />`;
+      const currentFiles = data.files || [];
+      const curBox = document.getElementById("currentFiles");
+      if (!currentFiles.length) {
+        curBox.innerHTML = `<div class="file-item"><span class="label">등록된 첨부파일이 없습니다.</span></div>`;
+      } else {
+        curBox.innerHTML = currentFiles.map(f => `
+          <div class="file-item">
+            <span class="label">${f.original_name || f.file_path}</span>
+          </div>
+        `).join("");
       }
 
-      // 에디터 초기화 + 기존 내용 적용
-      editor = new toastui.Editor({
-        el: document.querySelector('#editor'),
-        height: '500px',
-        initialEditType: 'wysiwyg',
-        previewStyle: 'vertical',
-        initialValue: notice.content
-      });
-
-    } catch (err) {
-      console.error("공지 불러오기 오류", err);
-      alert("공지 불러오기 실패");
+    } catch (e) {
+      console.error(e);
+      alert("공지 정보를 불러오는 중 오류가 발생했습니다.");
+      location.href = "./notice-list.html";
     }
   }
 
+  initPage();
 
-  /* -----------------------------------------
-     이미지 변경 시 미리보기
-  ----------------------------------------- */
-  document.getElementById("image").addEventListener("change", (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const url = URL.createObjectURL(file);
-    document.getElementById("preview").innerHTML = `<img src="${url}" />`;
+  // 새 첨부 미리보기
+  const fileInput = document.getElementById("files");
+  const filePreview = document.getElementById("filePreview");
+
+  fileInput.addEventListener("change", (e) => {
+    const files = [...e.target.files];
+    if (!files.length) {
+      filePreview.innerHTML = "";
+      return;
+    }
+    filePreview.innerHTML = files
+      .map(f => `<div class="file-item">${f.name}</div>`)
+      .join("");
   });
 
-
-  /* -----------------------------------------
-     수정 완료 요청
-  ----------------------------------------- */
+  // 수정 요청
   document.getElementById("noticeForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const title = document.getElementById("title").value.trim();
     const lang = document.getElementById("lang").value;
     const content = editor.getHTML();
-    const file = document.getElementById("image").files[0];
+    const files = document.getElementById("files").files;
 
     if (!title) return alert("제목을 입력하세요.");
     if (!content) return alert("내용을 입력하세요.");
 
-    const form = new FormData();
-    form.append("title", title);
-    form.append("lang", lang);
-    form.append("content", content);
-    form.append("category", "notice");
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("content", content);
+    formData.append("lang", lang);
 
-    if (file) {
-      form.append("images", file);
-    }
+    [...files].forEach(f => formData.append("files", f));
 
     const token = localStorage.getItem("token");
 
-    const res = await fetch(`/api/posts/notice/update/${postId}`, {
+    const res = await fetch(`/api/posts/notice/update/${noticeId}`, {
       method: "PUT",
       headers: {
         Authorization: `Bearer ${token}`
       },
-      body: form
+      body: formData
     });
 
     const result = await res.json();
 
     if (res.ok) {
-      alert("수정 완료되었습니다!");
-      location.href = `./notice-view.html?id=${postId}`;
+      alert("수정이 완료되었습니다.");
+      location.href = "./notice-list.html";
     } else {
       console.error(result);
-      alert("수정 실패: " + result.message);
+      alert("수정 실패: " + (result.message || "알 수 없는 오류"));
     }
   });
 </script>

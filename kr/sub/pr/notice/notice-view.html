@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>공지사항 상세 | 화인디펜스</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/sub-banner.css" />
+
+  <style>
+    .notice-view-section {
+      max-width: 900px;
+      margin: 50px auto 100px;
+      padding: 30px 40px;
+      background: #ffffff;
+      border-radius: 14px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+    }
+    .notice-title {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #0f2679;
+      margin-bottom: 10px;
+    }
+    .notice-meta {
+      font-size: 0.9rem;
+      color: #777;
+      margin-bottom: 20px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .notice-content {
+      margin-top: 20px;
+      line-height: 1.7;
+      color: #333;
+    }
+    .notice-attachments {
+      margin-top: 30px;
+      padding-top: 15px;
+      border-top: 1px solid #ddd;
+    }
+    .notice-attachments h3 {
+      font-size: 1rem;
+      margin-bottom: 8px;
+      color: #0f2679;
+    }
+    .notice-attachments ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+    }
+    .notice-attachments li {
+      margin-bottom: 6px;
+      font-size: 0.95rem;
+    }
+    .notice-attachments a {
+      color: #0f2679;
+      text-decoration: underline;
+    }
+    .notice-buttons {
+      margin-top: 30px;
+      text-align: right;
+    }
+    .btn-outline {
+      display:inline-block;
+      padding:8px 16px;
+      border:1px solid #0f2679;
+      border-radius:6px;
+      background:#fff;
+      color:#0f2679;
+      font-size:0.95rem;
+      cursor:pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- 헤더 -->
+<div id="header"></div>
+
+<!-- 서브 배너 -->
+<section class="sub-banner">
+  <img src="/img/sub-banners/pr-1_v2.jpg" alt="공지사항 배너" />
+  <div class="banner-text">
+    <h1>홍보센터</h1>
+    <p>화인디펜스의 주요 공지 및 안내사항을 확인하세요.</p>
+  </div>
+</section>
+
+<!-- breadcrumb -->
+<div class="breadcrumb">
+  <a href="/kr/index.html">홈</a> &gt;
+  <span class="crumb crumb-level1">홍보센터</span> &gt;
+  <span class="crumb crumb-level2">공지사항</span>
+  <div id="side-tabs" class="side-tabs"></div>
+</div>
+
+<section class="notice-view-section">
+  <div class="notice-title" id="noticeTitle">제목 로딩중...</div>
+  <div class="notice-meta">
+    <span id="noticeDate"></span>
+    <span id="noticeAuthor"></span>
+    <span id="noticeViews"></span>
+  </div>
+
+  <div id="noticeContent" class="notice-content"></div>
+
+  <div id="noticeAttachments" class="notice-attachments" style="display:none;">
+    <h3>첨부파일</h3>
+    <ul id="attachmentList"></ul>
+  </div>
+
+  <div class="notice-buttons">
+    <button class="btn-outline" onclick="goList()">목록으로</button>
+  </div>
+</section>
+
+<!-- 푸터 -->
+<div id="footer"></div>
+
+<script src="/js/nav.js"></script>
+
+<script>
+  const params = new URLSearchParams(location.search);
+  const id = params.get("id");
+
+  if (!id) {
+    alert("잘못된 접근입니다.");
+    location.href = "/kr/sub/pr/notice/notice.html";
+  }
+
+  function goList() {
+    location.href = "/kr/sub/pr/notice/notice.html";
+  }
+
+  function formatDate(dateStr) {
+    const d = new Date(dateStr);
+    if (Number.isNaN(d.getTime())) return "";
+    return d.toLocaleDateString();
+  }
+
+  async function loadNotice() {
+    try {
+      // 조회수 증가
+      await fetch(`/api/posts/view/${id}`, { method: "POST" });
+
+      // 상세 조회
+      const res = await fetch(`/api/posts/detail/${id}`);
+      if (!res.ok) throw new Error("공지 불러오기 실패");
+      const data = await res.json();
+
+      document.getElementById("noticeTitle").textContent = data.title || "제목 없음";
+      document.getElementById("noticeDate").textContent = data.created_at ? `작성일: ${formatDate(data.created_at)}` : "";
+      document.getElementById("noticeAuthor").textContent = data.author_name ? `작성자: ${data.author_name}` : "";
+      document.getElementById("noticeViews").textContent = typeof data.views === "number" ? `조회수: ${data.views}` : "";
+
+      document.getElementById("noticeContent").innerHTML = data.content || "";
+
+      const files = data.files || [];
+      const attachBox = document.getElementById("noticeAttachments");
+      const listEl = document.getElementById("attachmentList");
+
+      if (files.length) {
+        attachBox.style.display = "block";
+        listEl.innerHTML = files.map(f => `
+          <li>
+            <a href="${f.file_path}" target="_blank" download>
+              ${f.original_name || f.file_path}
+            </a>
+          </li>
+        `).join("");
+      } else {
+        attachBox.style.display = "none";
+      }
+
+    } catch (e) {
+      console.error(e);
+      alert("공지사항을 불러오는 중 오류가 발생했습니다.");
+      goList();
+    }
+  }
+
+  loadNotice();
+</script>
+
+</body>
+</html>
