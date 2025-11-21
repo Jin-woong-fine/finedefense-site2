@@ -15,7 +15,7 @@ import postsRouter from "./routes/posts.js";
 import productsRouter from "./routes/products.js";
 import uploadsRouter from "./routes/uploads.js";
 import loginLogsRouter from "./routes/login_logs.js";
-import userProfileRouter from "./routes/user_profile.js";   // ⭐ 추가!!!
+import userProfileRouter from "./routes/user_profile.js";
 
 // ============================
 // 📌 기본 설정
@@ -33,8 +33,9 @@ app.use(express.urlencoded({ extended: true, limit: "30mb" }));
 
 
 // ============================
-// 📌 업로드 폴더 정적 제공 ★ 수정됨
+// 📌 업로드 정적 제공 (절대경로) — MUST FIRST
 // ============================
+// /uploads → server/public/uploads
 app.use(
   "/uploads",
   express.static(path.resolve(__dirname, "public/uploads"))
@@ -44,7 +45,6 @@ app.use(
 // ============================
 // 📌 API 라우터 등록
 // ============================
-
 // 인증 / 로그인
 app.use("/api/auth", authRouter);
 
@@ -55,34 +55,36 @@ app.use("/api/inquiry", sendInquiryRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/admin", adminDashboardRouter);
 
-// 뉴스룸 게시판
+// 뉴스룸
 app.use("/api/posts", postsRouter);
 
 // 제품 관리
 app.use("/api/products", productsRouter);
 
-// 업로드 공통 처리
+// 업로드 (quill 이미지 등)
 app.use("/api/uploads", uploadsRouter);
 
 // 로그인 로그
 app.use("/api/logs/login", loginLogsRouter);
 
-// ⭐ 사용자 프로필(Me) 기능
+// 사용자 프로필
 app.use("/api/users/me", userProfileRouter);
 
 
 // ============================
-// 📌 정적 페이지 제공 ★ 반드시 맨 마지막!
+// 📌 정적 페이지 제공 — MUST BE THE LAST
 // ============================
+// ./server/../ → root 프로젝트 (html/css/js/img 등)
 app.use(express.static(path.resolve(__dirname, "../")));
 
 
 // ============================
-// 📌 404 핸들링 (API)
+// 📌 404 (API 전용)
 // ============================
 app.use("/api/*", (req, res) => {
   res.status(404).json({ message: "API not found" });
 });
+
 
 // ============================
 // 📌 전역 에러 핸들러
@@ -91,6 +93,7 @@ app.use((err, req, res, next) => {
   console.error("🔥 서버 오류:", err);
   res.status(500).json({ message: "Server error" });
 });
+
 
 // ============================
 // 📌 서버 실행
