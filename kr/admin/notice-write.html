@@ -1,38 +1,36 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <title>공지사항 작성 | Fine Defense 관리자</title>
+  <meta charset="UTF-8">
+  <title>공지사항 작성 | 관리자</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Toast UI Editor CSS -->
-  <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+  <!-- Toast UI Editor -->
+  <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
 
   <!-- 공통 관리자 CSS -->
-  <link rel="stylesheet" href="/kr/admin/css/admin.css" />
+  <link rel="stylesheet" href="/kr/admin/css/admin.css">
 
   <style>
     body {
       margin: 0;
       padding: 0;
+      background: #f4f6f9;
       font-family: 'Noto Sans KR', sans-serif;
-      background: #f3f5fa;
       display: flex;
     }
 
-    /* 메인 */
     .main {
       flex: 1;
-      padding: 22px 24px;
-      min-height: 100vh;
+      padding: 25px;
     }
 
-    /* 패널 */
     .panel {
       background: #fff;
       padding: 25px;
       border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-      margin-bottom: 35px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
     }
 
     .input {
@@ -40,8 +38,16 @@
       padding: 10px;
       border: 1px solid #ccc;
       border-radius: 6px;
-      margin-bottom: 12px;
+      margin-bottom: 15px;
+      font-size: 1rem;
       box-sizing: border-box;
+    }
+
+    #preview img {
+      width: 200px;
+      border-radius: 8px;
+      margin-top: 10px;
+      border: 1px solid #ddd;
     }
 
     .btn {
@@ -49,71 +55,67 @@
       border: none;
       border-radius: 6px;
       cursor: pointer;
-      font-size: 0.95rem;
+      font-size: 1rem;
     }
 
-    .btn-primary { background: #0f2679; color: #fff; }
-    .btn-danger { background: #d62828; color: #fff; }
+    .btn-primary {
+      background: #0f2679;
+      color: white;
+    }
 
-    .thumb-preview img {
-      width: 160px;
-      height: 120px;
-      object-fit: cover;
-      border-radius: 8px;
-      border: 1px solid #ddd;
-      margin-top: 10px;
+    .topbar {
+      background: #fff;
+      padding: 16px 24px;
+      border-radius: 10px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
   </style>
 </head>
 
 <body>
 
-<div id="sidebar"></div>
+<!-- ⭐ 관리자 사이드바 (자동 Active) -->
+<div id="sidebar" data-active="notice"></div>
 
 <div class="main">
 
   <div class="topbar">
-    <h2>공지 사항 작성</h2>
-    <div>
-      <button class="btn btn-primary" onclick="location.href='./notice-list.html'">목록으로</button>
-      <button id="logoutBtn" class="btn btn-danger">로그아웃</button>
-    </div>
+    <h2>공지사항 작성</h2>
+    <button id="logoutBtn" class="btn btn-primary">로그아웃</button>
   </div>
 
   <form id="noticeForm" enctype="multipart/form-data">
+    <div class="panel">
 
-    <!-- 제목 / 언어 / 이미지 -->
-    <section class="panel">
-      <h2>공지 정보 입력</h2>
-
-      <input id="title" class="input" placeholder="제목을 입력하세요" />
+      <input id="title" class="input" placeholder="공지 제목을 입력하세요" />
 
       <select id="lang" class="input">
         <option value="kr">한국어</option>
         <option value="en">English</option>
       </select>
 
-      <label><strong>대표 이미지 업로드</strong></label>
-      <input type="file" id="image" name="images" accept="image/*" class="input" />
+      <h3>내용</h3>
+      <div id="editor" style="border:1px solid #ddd; border-radius:8px;"></div>
 
-      <div id="preview" class="thumb-preview"></div>
-    </section>
+      <h3 style="margin-top:25px;">대표 이미지</h3>
+      <input type="file" id="image" accept="image/*" class="input">
 
-    <!-- 내용 작성 -->
-    <section class="panel">
-      <h3>내용 작성 (Toast UI Editor)</h3>
-      <div id="editor" style="border:1px solid #ccc;border-radius:6px;"></div>
-    </section>
+      <div id="preview"></div>
 
-    <button type="submit" class="btn btn-primary" style="margin-bottom:50px;">
-      공지사항 등록
-    </button>
+      <button type="submit" class="btn btn-primary" style="margin-top:20px;">
+        공지 등록
+      </button>
 
+    </div>
   </form>
 
 </div>
 
-<!-- 관리자 공통 JS -->
+<!-- 관리자 인증 / 사이드바 -->
 <script src="/kr/admin/js/common_auth.js"></script>
 <script src="/kr/admin/js/sidebar.js"></script>
 
@@ -121,75 +123,77 @@
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 
 <script>
-  (function () {
-    requireAdminOrEditor();
-    loadSidebar("notice");
-    document.getElementById("logoutBtn").addEventListener("click", logout);
-  })();
+/* -------------------------------
+   🔐 권한 체크 + 로그아웃 버튼
+-------------------------------- */
+(function () {
+  requireAdminOrEditor();
+  document.getElementById("logoutBtn").addEventListener("click", logout);
+})();
 
-  /* ---------------------------------
-      Toast UI Editor 초기화
-  --------------------------------- */
-  const editor = new toastui.Editor({
-    el: document.querySelector('#editor'),
-    height: '500px',
-    initialEditType: 'wysiwyg',
-    previewStyle: 'vertical'
+/* -------------------------------
+   ✏️ Toast UI Editor
+-------------------------------- */
+const editor = new toastui.Editor({
+  el: document.querySelector('#editor'),
+  height: '500px',
+  initialEditType: 'wysiwyg',
+  previewStyle: 'vertical'
+});
+
+/* -------------------------------
+   🖼 이미지 미리보기
+-------------------------------- */
+document.getElementById("image").addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const url = URL.createObjectURL(file);
+  document.getElementById("preview").innerHTML = `<img src="${url}" alt="preview">`;
+});
+
+/* -------------------------------
+   📌 공지 등록 요청
+-------------------------------- */
+document.getElementById("noticeForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const title = document.getElementById("title").value.trim();
+  const lang = document.getElementById("lang").value;
+  const content = editor.getHTML();
+  const imageFile = document.getElementById("image").files[0];
+
+  if (!title) return alert("제목을 입력하세요.");
+  if (!content.trim()) return alert("내용을 입력하세요.");
+  if (!imageFile) return alert("대표 이미지를 업로드하세요.");
+
+  const formData = new FormData();
+  formData.append("title", title);
+  formData.append("content", content);
+  formData.append("category", "notice");
+  formData.append("lang", lang);
+  formData.append("images", imageFile);
+
+  const token = localStorage.getItem("token");
+
+  const res = await fetch("/api/posts/notice/create", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`
+    },
+    body: formData
   });
 
-  /* ---------------------------------
-      이미지 미리보기
-  --------------------------------- */
-  document.getElementById("image").addEventListener("change", (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  const json = await res.json();
 
-    const url = URL.createObjectURL(file);
-    document.getElementById("preview").innerHTML = `<img src="${url}" />`;
-  });
-
-  /* ---------------------------------
-      공지 등록
-  --------------------------------- */
-  document.getElementById("noticeForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const title = document.getElementById("title").value.trim();
-    const lang = document.getElementById("lang").value;
-    const content = editor.getHTML();
-    const imageFile = document.getElementById("image").files[0];
-
-    if (!title) return alert("제목을 입력하세요.");
-    if (!content) return alert("내용을 입력하세요.");
-    if (!imageFile) return alert("대표 이미지를 업로드하세요.");
-
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("content", content);
-    formData.append("category", "notice");
-    formData.append("lang", lang);
-    formData.append("images", imageFile);
-
-    const token = localStorage.getItem("token");
-
-    const res = await fetch("/api/posts/notice/create", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`
-      },
-      body: formData
-    });
-
-    const result = await res.json();
-
-    if (res.ok) {
-      alert("공지사항이 등록되었습니다.");
-      location.href = "./notice-list.html";
-    } else {
-      console.log(result);
-      alert("등록 실패: " + result.message);
-    }
-  });
+  if (res.ok) {
+    alert("공지사항이 등록되었습니다.");
+    location.href = "/kr/admin/notice-list.html";
+  } else {
+    console.error(json);
+    alert("등록 오류: " + (json.message || "서버 오류"));
+  }
+});
 </script>
 
 </body>
