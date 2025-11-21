@@ -7,36 +7,31 @@
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- 공통 관리자 CSS -->
+  <!-- CSS -->
   <link rel="stylesheet" href="./css/admin.css">
 
-  <!-- 🔥 공통 인증 스크립트 -->
+  <!-- 공통 인증 스크립트 (로드만 함, 실행 안 함) -->
   <script src="./js/common_auth.js"></script>
-
-  <!-- 🔥 대시보드는 모든 로그인 사용자 허용 -->
-  <script>
-    requireAnyUser();  
-  </script>
 </head>
 
 <body>
+
+  <!-- 🔥 로그인 사용자만 접근 허용 (이 위치가 정답임) -->
+  <script>
+    requireAnyUser();
+  </script>
 
   <!-- 🔵 사이드바 -->
   <div id="sidebar"></div>
 
   <!-- 🔵 메인 -->
   <div class="main">
-
-    <!-- TOPBAR -->
     <div class="topbar">
       <div class="title">관리자 대시보드</div>
 
       <div style="display:flex; align-items:center; gap:12px;">
-        <!-- 프로필 드롭다운 -->
         <div class="topbar-user" id="topbarUser">
-          <span id="topbarUserName">관리자</span>
-          ▾
-          <!-- ⚠️ 동적 생성될 dropdown, HTML 비워둔다 -->
+          <span id="topbarUserName">관리자</span> ▾
           <div class="user-dropdown" id="userDropdown"></div>
         </div>
 
@@ -64,19 +59,19 @@
       </div>
     </section>
 
-    <!-- 월별 조회수 그래프 -->
+    <!-- 그래프 -->
     <section class="panel">
       <h2>월별 조회수 그래프</h2>
       <canvas id="monthlyChart" style="max-height:350px;"></canvas>
     </section>
 
-    <!-- TOP 5 게시물 -->
+    <!-- TOP 5 -->
     <section class="panel">
       <h2>조회수 TOP 5 게시물</h2>
       <ul id="topPostsList"></ul>
     </section>
 
-    <!-- 최근 등록 제품 -->
+    <!-- 최근 제품 -->
     <section class="panel">
       <h2>최근 등록 제품</h2>
       <div id="recentProducts"></div>
@@ -84,15 +79,15 @@
 
   </div>
 
-  <!-- 🔵 나머지 스크립트 -->
+  <!-- JS -->
   <script src="./js/sidebar.js"></script>
   <script src="./js/dashboard_core.js"></script>
 
   <script>
-    // 🔵 사이드바 로드
+    // 사이드바 로드
     loadSidebar("dashboard");
 
-    // 🔵 상단 사용자 드롭다운 권한별 생성
+    // 드롭다운 초기화
     (function initTopbarUser() {
       const name = localStorage.getItem("name") || "사용자";
       const role = localStorage.getItem("role");
@@ -102,28 +97,16 @@
 
       if (nameSpan) nameSpan.textContent = name;
 
-      // 🔥 dropdown 동적 생성
-      let html = `
-        <a href="/kr/admin/user_profile.html">내 프로필</a>
-      `;
-
-      // admin + superadmin 만 "사용자 관리"
+      let html = `<a href="/kr/admin/user_profile.html">내 프로필</a>`;
       if (role === "admin" || role === "superadmin") {
-        html += `
-          <a href="/kr/admin/users.html">사용자 관리</a>
-        `;
+        html += `<a href="/kr/admin/users.html">사용자 관리</a>`;
       }
-
-      html += `
-        <a href="javascript:void(0);" onclick="logout()">로그아웃</a>
-      `;
-
+      html += `<a href="javascript:void(0);" onclick="logout()">로그아웃</a>`;
       dropdown.innerHTML = html;
 
-      // 토글 기능
       userBox.addEventListener("click", (e) => {
         e.stopPropagation();
-        dropdown.style.display = 
+        dropdown.style.display =
           dropdown.style.display === "block" ? "none" : "block";
       });
 
