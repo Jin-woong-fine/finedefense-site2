@@ -16,6 +16,7 @@ import productsRouter from "./routes/products.js";
 import uploadsRouter from "./routes/uploads.js";
 import loginLogsRouter from "./routes/login_logs.js";
 import userProfileRouter from "./routes/user_profile.js";
+import usersRouter from "./routes/users.js";        // ⭐ 사용자 관리 라우터 추가
 
 // ============================
 // 📌 기본 설정
@@ -33,7 +34,7 @@ app.use(express.urlencoded({ extended: true, limit: "30mb" }));
 
 
 // ============================
-// 📌 업로드 정적 제공 (절대경로) — MUST FIRST
+// 📌 업로드 폴더 정적 제공 — 반드시 제일 먼저
 // ============================
 // /uploads → server/public/uploads
 app.use(
@@ -45,36 +46,40 @@ app.use(
 // ============================
 // 📌 API 라우터 등록
 // ============================
-// 인증 / 로그인
+
+// 1) 인증 / 로그인
 app.use("/api/auth", authRouter);
 
-// 문의하기
+// 2) 문의하기
 app.use("/api/inquiry", sendInquiryRouter);
 
-// 관리자 기능
+// 3) 관리자 기능
 app.use("/api/admin", adminRouter);
 app.use("/api/admin", adminDashboardRouter);
 
-// 뉴스룸
+// 4) 뉴스룸
 app.use("/api/posts", postsRouter);
 
-// 제품 관리
+// 5) 제품 관리
 app.use("/api/products", productsRouter);
 
-// 업로드 (quill 이미지 등)
+// 6) 공통 이미지 업로드 (Quill 등)
 app.use("/api/uploads", uploadsRouter);
 
-// 로그인 로그
+// 7) 로그인 로그
 app.use("/api/logs/login", loginLogsRouter);
 
-// 사용자 프로필
+// 8) 사용자 프로필 (내 정보)
 app.use("/api/users/me", userProfileRouter);
+
+// 9) 사용자 관리(목록/추가/삭제/역할변경 등) ⭐ 반드시 추가해야 users.html 동작함
+app.use("/api/users", usersRouter);
 
 
 // ============================
 // 📌 정적 페이지 제공 — MUST BE THE LAST
 // ============================
-// ./server/../ → root 프로젝트 (html/css/js/img 등)
+// 프로젝트 루트 전체를 정적으로 제공 (html/css/js/img)
 app.use(express.static(path.resolve(__dirname, "../")));
 
 
