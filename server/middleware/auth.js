@@ -27,7 +27,7 @@ export function verifyToken(req, res, next) {
 }
 
 /* ============================================================
-   💡 역할 체크 유틸 (여러 역할 허용)
+   💡 새 권한 시스템: allowRoles
 ============================================================ */
 export function allowRoles(...roles) {
   return function (req, res, next) {
@@ -58,10 +58,14 @@ export const canUpdate = allowRoles("superadmin", "admin", "editor");
 // 🔹 삭제(Delete) — superadmin만
 export const canDelete = allowRoles("superadmin");
 
-// 🔹 관리자 페이지 조회(Read) — superadmin + admin + editor
-export const canReadManagerPages = allowRoles("superadmin", "admin", "editor");
+// 🔹 관리자 페이지(제품/뉴스룸 등) — superadmin + admin + editor
+export const canReadManagerPages = allowRoles(
+  "superadmin",
+  "admin",
+  "editor"
+);
 
-// 🔹 대시보드 — 모든 로그인 사용자 가능
+// 🔹 대시보드 — 모든 로그인 사용자(viewer 포함)
 export const canAccessDashboard = allowRoles(
   "superadmin",
   "admin",
@@ -69,13 +73,17 @@ export const canAccessDashboard = allowRoles(
   "viewer"
 );
 
-// 🔹 사용자 목록 조회(뷰어 포함)
-export const canViewUsers = allowRoles(
-  "superadmin",
-  "admin",
-  "editor",
-  "viewer"
-);
+// 🔹 사용자 목록 조회 — superadmin + admin
+export const canViewUsers = allowRoles("superadmin", "admin");
 
-// 🔹 사용자 관리(생성/삭제/등급변경) — superadmin + admin
+// 🔹 사용자 관리(생성/삭제/권한변경) — superadmin + admin
 export const canManageUsers = allowRoles("superadmin", "admin");
+
+
+/* ============================================================
+   🔙 구버전 라우터 호환용 verifyRole
+   (다른 라우터들에서 import 중이므로 반드시 유지해야 함)
+============================================================ */
+export function verifyRole(...roles) {
+  return allowRoles(...roles);
+}
