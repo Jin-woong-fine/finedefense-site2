@@ -18,7 +18,7 @@
 </head>
 
 <body>
-  <!-- 사이드바 -->
+
   <div id="sidebar"></div>
 
   <div class="main">
@@ -43,14 +43,15 @@
     </table>
   </div>
 
-  <!-- Script -->
   <script src="./js/sidebar.js"></script>
   <script src="./js/common_auth.js"></script>
 
   <script>
     async function loadNews() {
       const res = await fetch(`/api/posts/list/news?lang=all`);
-      const list = await res.json();
+      const data = await res.json();   // 🔥 페이지네이션 추가 후 구조 변경
+
+      const list = data.list || [];    // 🔥 배열은 data.list 안에 있음
 
       document.getElementById("newsList").innerHTML = list
         .map(
@@ -66,8 +67,7 @@
             <button onclick="edit(${v.id})">수정</button>
             <button onclick="del(${v.id})">삭제</button>
           </td>
-        </tr>
-      `
+        </tr>`
         )
         .join("");
     }
