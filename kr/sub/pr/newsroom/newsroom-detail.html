@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <title>뉴스 상세 | Fine Defense</title>
+
+  <!-- 공통 CSS -->
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/sub-banner.css">
+
+  <style>
+    .view-container {
+      max-width: 900px;
+      margin: 60px auto;
+      padding: 20px;
+    }
+
+    .view-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #111;
+    }
+
+    .view-meta {
+      color: #777;
+      font-size: 0.9rem;
+      margin-bottom: 35px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 15px;
+    }
+
+    .view-content {
+      font-size: 1rem;
+      line-height: 1.6;
+      margin-bottom: 40px;
+    }
+
+    .view-images img {
+      width: 100%;
+      margin: 12px 0;
+      border-radius: 10px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+    }
+
+    .back-btn {
+      margin-top: 40px;
+      padding: 10px 18px;
+      border: none;
+      background: #0f2679;
+      color: #fff;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- header -->
+  <div id="header"></div>
+
+  <div class="sub-banner">
+    <h1>뉴스 상세</h1>
+  </div>
+
+  <div class="view-container">
+    <div class="view-title" id="title"></div>
+    <div class="view-meta" id="meta"></div>
+    <div class="view-content" id="content"></div>
+    <div id="images" class="view-images"></div>
+
+    <button class="back-btn" onclick="location.href='index.html'">목록으로 돌아가기</button>
+  </div>
+
+  <!-- footer -->
+  <div id="footer"></div>
+
+  <!-- header/footer scripts -->
+  <script src="/js/header.js"></script>
+  <script src="/js/footer.js"></script>
+
+  <script>
+    const id = new URLSearchParams(location.search).get("id");
+
+    if (!id) location.href = "index.html";
+
+    loadDetail();
+
+    async function loadDetail() {
+      // 📌 조회수 증가
+      fetch(`/api/posts/view/${id}`, { method: "POST" });
+
+      // 📌 상세 조회
+      const res = await fetch(`/api/posts/detail/${id}`);
+      const data = await res.json();
+
+      document.getElementById("title").innerHTML = data.title;
+      document.getElementById("meta").innerHTML =
+        `${data.created_at.substring(0,10)} | 조회수 ${data.views || 0}`;
+      document.getElementById("content").innerHTML = data.content;
+
+      // 📌 이미지들 표시
+      const box = document.getElementById("images");
+      if (data.images && data.images.length) {
+        box.innerHTML = data.images
+          .map(img => `<img src="/${img.replace(/^\/+/, '')}">`)
+          .join("");
+      }
+    }
+  </script>
+
+</body>
+</html>

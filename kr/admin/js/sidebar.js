@@ -26,16 +26,17 @@
     { key: "dashboard", label: "대시보드", link: "/kr/admin/dashboard.html", roles: ["superadmin","admin","editor","viewer"] },
     { key: "users", label: "사용자 관리", link: "/kr/admin/users.html", roles: ["superadmin","admin"] },
     { key: "products", label: "제품 관리", link: "/kr/admin/products.html", roles: ["superadmin","admin","editor"] },
-    { key: "newsroom", label: "뉴스룸 관리", link: "/kr/admin/newsroom.html", roles: ["superadmin","admin","editor"] },
+
+    // ⭐ 뉴스룸 관리자 메뉴 (수정 완료)
+    { key: "newsroom", label: "뉴스룸 관리", link: "/kr/admin/news-list.html", roles: ["superadmin","admin","editor"] },
+
     { key: "notice", label: "공지사항 관리", link: "/kr/admin/notice-list.html", roles: ["superadmin","admin","editor"] },
     { key: "inquiry", label: "1:1 문의 관리", link: "/kr/admin/inquiry.html", roles: ["superadmin","admin"] },
     { key: "loginlogs", label: "로그인 기록", link: "/kr/admin/login-logs.html", roles: ["superadmin"] }
   ];
 
-  // ⭐ 현재 페이지 키
   const currentPage = sidebarContainer.dataset.active || "";
 
-  // ⭐ 사이드바 HTML 렌더링
   sidebarContainer.innerHTML = `
     <div class="sidebar">
 

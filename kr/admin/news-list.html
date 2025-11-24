@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>뉴스 관리 | Fine Defense</title>
+  <link rel="stylesheet" href="./css/admin.css" />
+  <style>
+    .thumb {
+      width: 80px;
+      height: 50px;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+    table td {
+      vertical-align: middle;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 사이드바 -->
+  <div id="sidebar"></div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="title">뉴스 관리</div>
+      <button onclick="location.href='news-edit.html'">새 뉴스 등록</button>
+    </div>
+
+    <table class="list-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>썸네일</th>
+          <th>제목</th>
+          <th>언어</th>
+          <th>조회수</th>
+          <th>등록일</th>
+          <th>관리</th>
+        </tr>
+      </thead>
+      <tbody id="newsList"></tbody>
+    </table>
+  </div>
+
+  <!-- Script -->
+  <script src="./js/sidebar.js"></script>
+  <script src="./js/common_auth.js"></script>
+
+  <script>
+    async function loadNews() {
+      const res = await fetch(`/api/posts/list/news?lang=all`);
+      const list = await res.json();
+
+      document.getElementById("newsList").innerHTML = list
+        .map(
+          (v) => `
+        <tr>
+          <td>${v.id}</td>
+          <td><img src="${v.main_image}" class="thumb" /></td>
+          <td>${v.title}</td>
+          <td>${v.lang}</td>
+          <td>${v.views || 0}</td>
+          <td>${v.created_at?.replace("T", " ").substring(0, 16)}</td>
+          <td>
+            <button onclick="edit(${v.id})">수정</button>
+            <button onclick="del(${v.id})">삭제</button>
+          </td>
+        </tr>
+      `
+        )
+        .join("");
+    }
+
+    function edit(id) {
+      location.href = `news-edit.html?id=${id}`;
+    }
+
+    async function del(id) {
+      if (!confirm("삭제하시겠습니까?")) return;
+
+      const res = await fetch(`/api/news/delete/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: "Bearer " + localStorage.getItem("token") },
+      });
+
+      const out = await res.json();
+      if (out.message) {
+        alert("삭제 완료");
+        loadNews();
+      } else {
+        alert("삭제 실패");
+      }
+    }
+
+    loadNews();
+  </script>
+</body>
+</html>

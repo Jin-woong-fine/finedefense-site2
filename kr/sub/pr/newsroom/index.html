@@ -1,189 +1,178 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="화인디펜스 뉴스룸" />
-  <title>뉴스룸 | 화인디펜스</title>
+  <meta charset="UTF-8">
+  <title>뉴스룸 | Fine Defense</title>
 
   <!-- 공통 CSS -->
-  <link rel="stylesheet" href="/css/style.css" />
-  <link rel="stylesheet" href="/css/sub-banner.css" />
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/sub-banner.css">
 
   <style>
-    .newsroom-section {
+    .news-container {
       max-width: 1200px;
-      margin: 50px auto 120px;
-      padding: 20px;
-    }
-
-    .newsroom-title {
-      text-align: center;
-      margin-bottom: 50px;
-    }
-
-    .newsroom-title h1 {
-      font-size: 2.2rem;
-      color: #0f2679;
-      margin-bottom: 14px;
-    }
-
-    .newsroom-title p {
-      color: #555;
-      font-size: 1.05rem;
-      line-height: 1.6;
-    }
-
-    .news-grid {
+      margin: 50px auto 25px;
+      padding: 0 20px;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
       gap: 28px;
     }
 
     .news-card {
-      display: flex;
-      flex-direction: column;
       background: #fff;
       border-radius: 14px;
       overflow: hidden;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-      text-decoration: none;
-      color: inherit;
-      transition: transform .25s, box-shadow .25s;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+      cursor: pointer;
+      transition: 0.2s;
     }
 
     .news-card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+      transform: translateY(-4px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.12);
     }
 
-    .news-card img {
+    .news-thumb {
       width: 100%;
-      height: 200px;
+      height: 180px;
       object-fit: cover;
+      background: #eee;
     }
 
     .news-content {
-      padding: 18px 20px 25px;
+      padding: 18px 20px 24px;
     }
 
-    .news-content h3 {
-      color: #0f2679;
-      font-size: 1.2rem;
+    .news-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      min-height: 48px;
       margin-bottom: 12px;
-      line-height: 1.4;
-    }
-
-    .news-content p {
-      color: #555;
-      font-size: 0.92rem;
-      line-height: 1.55;
-      margin-bottom: 14px;
-      height: 45px;
-      overflow: hidden;
+      line-height: 1.35;
     }
 
     .news-date {
       font-size: 0.85rem;
-      color: #999;
+      color: #777;
+    }
+
+    /* pagination */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 60px;
+    }
+
+    .pagination button {
+      padding: 7px 12px;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .pagination button.active {
+      background: #0f2679;
+      color: #fff;
+      border-color: #0f2679;
     }
   </style>
 </head>
 
 <body>
 
+  <!-- HEADER -->
   <div id="header"></div>
 
-  <!-- 배너 -->
-  <section class="sub-banner">
-    <img src="/img/sub-banners/pr-1_v2.jpg" alt="홍보센터 배너" />
-    <div class="banner-text">
-      <h1>홍보센터</h1>
-      <p>화인디펜스의 기술과 활동 소식을 한 자리에서 만나보세요.</p>
-    </div>
-  </section>
-
-  <!-- breadcrumb -->
-  <div class="breadcrumb">
-    <a href="/">홈</a> &gt;
-    <span class="crumb crumb-level1">홍보센터</span> &gt;
-    <span class="crumb crumb-level2">뉴스룸</span>
-    <div id="side-tabs" class="side-tabs"></div>
+  <!-- 서브 배너 -->
+  <div class="sub-banner">
+    <h1>뉴스룸</h1>
   </div>
 
-  <!-- 뉴스룸 -->
-  <section class="newsroom-section">
-    <div class="newsroom-title">
-      <h1>화인디펜스 뉴스룸</h1>
-      <p>보도자료 · 기술자료 · 전시회 소식 등 다양한 업데이트를 확인해보세요.</p>
-    </div>
+  <!-- 뉴스 목록 -->
+  <div class="news-container" id="newsContainer"></div>
 
-    <div id="newsList" class="news-grid">
-      <p style="grid-column:1/-1;text-align:center;color:#666;">뉴스를 불러오는 중입니다...</p>
-    </div>
-  </section>
+  <!-- 페이지네이션 -->
+  <div class="pagination" id="pagination"></div>
 
+  <!-- FOOTER -->
   <div id="footer"></div>
 
-  <script src="/js/nav.js"></script>
-  <script src="/js/language.js"></script>
+  <!-- HEADER / FOOTER LOADER -->
+  <script src="/js/header.js"></script>
+  <script src="/js/footer.js"></script>
 
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      loadNews();
-    });
+    let currentPage = 1;
+    const pageSize = 9; // 3×3 그리드
 
-    async function loadNews() {
-      const list = document.getElementById("newsList");
+    document.addEventListener("DOMContentLoaded", () => loadNews(1));
 
-      try {
-        // ✅ 절대 경로로 API 호출
-        const res = await fetch(`${window.location.origin}/api/posts/list/news?lang=kr`);
+    async function loadNews(page) {
+      currentPage = page;
 
-        const posts = await res.json();
+      const res = await fetch(
+        `/api/posts/list/news?lang=kr&page=${page}&pageSize=${pageSize}`
+      );
+      const data = await res.json();
 
-        if (!posts || !posts.length) {
-          list.innerHTML = "<p style='grid-column:1/-1;text-align:center;color:#999;'>등록된 뉴스가 없습니다.</p>";
-          return;
-        }
+      const box = document.getElementById("newsContainer");
+      if (!data.list.length) {
+        box.innerHTML = "<p>등록된 뉴스가 없습니다.</p>";
+        return;
+      }
 
-        list.innerHTML = posts.map(p => {
-          const img = p.main_image
-            ? p.main_image
-            : "/img/newsroom/newsroom-placeholder_v2.png";
-
-          const cleanText = (p.content || "")
-            .replace(/<[^>]+>/g, "")
-            .slice(0, 80);
+      // 뉴스 카드 렌더링
+      box.innerHTML = data.list
+        .map((v) => {
+          const img = v.main_image ? v.main_image : "/img/no-image.jpg";
+          const date = v.created_at.substring(0, 10);
 
           return `
-            <a href="/kr/sub/pr/newsroom/post_template.html?id=${p.id}" class="news-card">
-              <img src="${img}" alt="${p.title}">
+            <div class="news-card" onclick="openNews(${v.id})">
+              <img src="${img}" class="news-thumb">
               <div class="news-content">
-                <h3>${p.title}</h3>
-                <p>${cleanText}...</p>
-                <span class="news-date">${new Date(p.created_at).toLocaleDateString()}</span>
+                <div class="news-title">${v.title}</div>
+                <div class="news-date">${date}</div>
               </div>
-            </a>
+            </div>
           `;
-        }).join("");
+        })
+        .join("");
 
-      } catch (err) {
-        console.error("뉴스로드 오류:", err);
-        list.innerHTML = "<p style='grid-column:1/-1;color:red;text-align:center;'>뉴스를 불러오는 중 오류 발생</p>";
-      }
+      // 페이지네이션 렌더
+      renderPagination(data.pages, data.page);
     }
 
+    function openNews(id) {
+      location.href = `/kr/sub/pr/newsroom/view.html?id=${id}`;
+    }
 
-    const id = new URLSearchParams(location.search).get("id");
+    function renderPagination(totalPages, current) {
+      const p = document.getElementById("pagination");
+      p.innerHTML = "";
 
-    fetch(`/api/posts/view/${id}`)
-      .then(res => res.json())
-      .then(data => console.log("조회수:", data));
+      // 이전 버튼
+      if (current > 1) {
+        p.innerHTML += `<button onclick="loadNews(${current - 1})">이전</button>`;
+      }
 
+      // 숫자 버튼
+      for (let i = 1; i <= totalPages; i++) {
+        p.innerHTML += `
+          <button class="${i === current ? "active" : ""}"
+                  onclick="loadNews(${i})">${i}</button>
+        `;
+      }
 
-
-
+      // 다음 버튼
+      if (current < totalPages) {
+        p.innerHTML += `<button onclick="loadNews(${current + 1})">다음</button>`;
+      }
+    }
   </script>
 
 </body>
