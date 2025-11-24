@@ -230,26 +230,28 @@ router.post(
     - GET /api/posts/list/notice?lang=kr
 ===================================================================== */
 router.get("/list/:category", async (req, res) => {
-  try {
-    const lang = req.query.lang || "kr";
+  const lang = req.query.lang || "kr";
 
-    const [posts] = await db.execute(
-      `SELECT 
-          p.*,
-          u.name AS author_name,
-          (SELECT COUNT(*) FROM post_view_logs v WHERE v.post_id = p.id) AS views
-         FROM posts p
+  let query = `
+    SELECT p.*, u.name AS author_name,
+      (SELECT COUNT(*) FROM post_view_logs v WHERE v.post_id = p.id) AS views
+    FROM posts p
     LEFT JOIN users u ON p.author_id = u.id
-        WHERE p.category=? AND p.lang=?
-        ORDER BY p.created_at DESC`,
-      [req.params.category, lang]
-    );
+    WHERE p.category = ?
+  `;
+  const params = [req.params.category];
 
-    res.json(posts);
-  } catch (err) {
-    console.error("목록 오류:", err);
-    res.status(500).json({ message: "목록 오류" });
+  // ALL이 아닌 경우만 lang 조건 추가
+  if (lang !== "all") {
+    query += " AND p.lang = ? ";
+    params.push(lang);
   }
+
+  query += " ORDER BY p.sort_order ASC, p.created_at DESC";
+
+  const [posts] = await db.execute(query, params);
+
+  res.json(posts);
 });
 
 /* =====================================================================
