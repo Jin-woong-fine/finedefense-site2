@@ -5,7 +5,8 @@
   <meta charset="UTF-8">
   <title>뉴스 작성/수정 | Fine Defense</title>
 
-  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+  <!-- Toast UI Editor -->
+  <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
   <link rel="stylesheet" href="./css/admin.css">
 
   <style>
@@ -27,7 +28,19 @@
 </head>
 
 <body>
+
+  <!-- 공통 인증 -->
+  <script src="./js/common_auth.js"></script>
+  <script>
+    requireAdminOrEditor();
+  </script>
+
+  <!-- 사이드바 -->
   <div id="sidebar"></div>
+  <script src="./js/sidebar.js"></script>
+  <script>
+    loadSidebar("newsroom");
+  </script>
 
   <div class="main">
     <div class="topbar">
@@ -45,7 +58,7 @@
       <label>제목</label>
       <input id="title" type="text">
 
-      <label>이미지 (여러개 가능)</label>
+      <label>이미지 (여러장)</label>
       <input id="images" type="file" accept="image/*" multiple>
       <div id="preview" class="image-row"></div>
 
@@ -56,30 +69,41 @@
     </div>
   </div>
 
-  <script src="./js/sidebar.js"></script>
-  <script src="./js/common_auth.js"></script>
-  <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+  <!-- Toast UI Editor JS -->
+  <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 
   <script>
-    const quill = new Quill("#editor", { theme: "snow" });
+    let editor;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      editor = new toastui.Editor({
+        el: document.querySelector('#editor'),
+        height: '600px',
+        initialEditType: 'wysiwyg',
+        previewStyle: 'vertical'
+      });
+    });
+
     const id = new URLSearchParams(location.search).get("id");
 
     /* ===============================
-       📌 기존 데이터 불러오기 (수정)
+       📌 기존 데이터 불러오기
     =============================== */
     async function load() {
-      if (!id) return; // 신규 작성
+      if (!id) return;
 
       const res = await fetch(`/api/posts/detail/${id}`);
       const v = await res.json();
 
       document.getElementById("lang").value = v.lang;
       document.getElementById("title").value = v.title;
-      quill.root.innerHTML = v.content;
+
+      // Toast Editor 본문 세팅
+      editor.setHTML(v.content || "");
 
       // 이미지 미리보기
-      v.images.forEach((img) => {
-        addPreview(`/` + img.replace(/^\/+/, ""));
+      (v.images || []).forEach((img) => {
+        addPreview("/" + img.replace(/^\/+/, ""));
       });
     }
 
@@ -95,36 +119,29 @@
     =============================== */
     document.getElementById("images").addEventListener("change", function () {
       document.getElementById("preview").innerHTML = "";
-      for (const file of this.files) {
+      for (const f of this.files) {
         const reader = new FileReader();
         reader.onload = (e) => addPreview(e.target.result);
-        reader.readAsDataURL(file);
+        reader.readAsDataURL(f);
       }
     });
 
     /* ===============================
-       📌 저장(등록 + 수정)
+       📌 저장
     =============================== */
     async function save() {
       const form = new FormData();
       form.append("title", document.getElementById("title").value);
       form.append("lang", document.getElementById("lang").value);
-      form.append("content", quill.root.innerHTML);
+      form.append("content", editor.getHTML());   // ⭐ Toast Editor 본문 추출
 
-      // 이미지
       const imgs = document.getElementById("images").files;
       for (const img of imgs) form.append("images", img);
 
       const token = localStorage.getItem("token");
 
-      let url, method;
-      if (id) {
-        url = `/api/news/edit/${id}`;
-        method = "PUT";
-      } else {
-        url = `/api/news/create`;
-        method = "POST";
-      }
+      const url = id ? `/api/news/edit/${id}` : `/api/news/create`;
+      const method = id ? "PUT" : "POST";
 
       const res = await fetch(url, {
         method,
@@ -134,7 +151,7 @@
 
       const out = await res.json();
       if (out.message) {
-        alert(id ? "수정 완료" : "등록 완료");
+        alert(id ? "수정 완료!" : "등록 완료!");
         location.href = "news-list.html";
       } else {
         alert("저장 실패");

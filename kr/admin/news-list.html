@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>뉴스 관리 | Fine Defense</title>
+
   <link rel="stylesheet" href="./css/admin.css" />
   <style>
     .thumb {
@@ -10,24 +11,28 @@
       height: 50px;
       object-fit: cover;
       border-radius: 6px;
+      background: #ddd;
     }
-    table td {
-      vertical-align: middle;
-    }
+    table td { vertical-align: middle; }
   </style>
 </head>
 
 <body>
 
-  <!-- 로그인 권한 체크 (중요) -->
+  <!-- 🔐 로그인 권한 체크 (공통 인증) -->
   <script src="./js/common_auth.js"></script>
   <script>
-    requireEditorOrAdmin();
+    requireAdminOrEditor();  // editor/admin/superadmin 허용
   </script>
 
-  <!-- 사이드바 -->
+  <!-- 🔵 사이드바 -->
   <div id="sidebar"></div>
+  <script src="./js/sidebar.js"></script>
+  <script>
+    loadSidebar("newsroom");   // active 표시
+  </script>
 
+  <!-- 🔵 메인 -->
   <div class="main">
     <div class="topbar">
       <div class="title">뉴스 관리</div>
@@ -50,33 +55,52 @@
     </table>
   </div>
 
-  <script src="./js/sidebar.js"></script>
-
   <script>
-    loadSidebar("newsroom");
+    document.addEventListener("DOMContentLoaded", () => {
+      loadNews();
+    });
 
     async function loadNews() {
-      const res = await fetch(`/api/posts/list/news?lang=all`);
-      const data = await res.json();      // 🔥 페이지네이션 포함 응답
+      try {
+        const res = await fetch(`/api/posts/list/news?lang=all`);
+        const data = await res.json();     // 페이지네이션 구조
+        const list = data.list || [];
 
-      const list = data.list || [];       // 🔥 핵심 수정
+        if (!Array.isArray(list)) {
+          console.error("뉴스 API 구조 오류:", data);
+          document.getElementById("newsList").innerHTML =
+            "<tr><td colspan='7'>불러오기 오류</td></tr>";
+          return;
+        }
 
-      document.getElementById("newsList").innerHTML = list
-        .map((v) => `
-          <tr>
-            <td>${v.id}</td>
-            <td><img src="${v.main_image}" class="thumb" /></td>
-            <td>${v.title}</td>
-            <td>${v.lang}</td>
-            <td>${v.views || 0}</td>
-            <td>${v.created_at?.replace("T", " ").substring(0, 16)}</td>
-            <td>
-              <button onclick="edit(${v.id})">수정</button>
-              <button onclick="del(${v.id})">삭제</button>
-            </td>
-          </tr>
-        `)
-        .join("");
+        document.getElementById("newsList").innerHTML = list
+          .map((v) => {
+            const img = v.main_image
+              ? v.main_image
+              : "/kr/admin/img/no-thumb.png";
+
+            return `
+              <tr>
+                <td>${v.id}</td>
+                <td><img src="${img}" class="thumb" /></td>
+                <td>${v.title}</td>
+                <td>${v.lang}</td>
+                <td>${v.views || 0}</td>
+                <td>${v.created_at?.replace("T", " ").substring(0, 16)}</td>
+                <td>
+                  <button onclick="edit(${v.id})">수정</button>
+                  <button onclick="del(${v.id})">삭제</button>
+                </td>
+              </tr>
+            `;
+          })
+          .join("");
+
+      } catch (err) {
+        console.error("뉴스 불러오기 오류:", err);
+        document.getElementById("newsList").innerHTML =
+          "<tr><td colspan='7'>로드 오류</td></tr>";
+      }
     }
 
     function edit(id) {
@@ -99,8 +123,7 @@
         alert("삭제 실패");
       }
     }
-
-    loadNews();
   </script>
+
 </body>
 </html>
