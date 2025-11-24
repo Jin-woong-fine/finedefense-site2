@@ -26,21 +26,17 @@
       align-items: center;
     }
 
-    .remove-file {
-      background: crimson;
-      border: none;
-      color: white;
-      padding: 2px 6px;
+    .help-text {
       font-size: 0.8rem;
-      border-radius: 4px;
-      cursor: pointer;
+      color: #777;
+      margin-top: 4px;
     }
   </style>
 </head>
 
 <body>
 
-<!-- ⭐ 사이드바 (자동 로드 & active=notice) -->
+<!-- ⭐ 사이드바 -->
 <div id="sidebar" data-active="notice"></div>
 
 <div class="main">
@@ -55,9 +51,9 @@
 
   <form id="noticeForm" enctype="multipart/form-data">
 
-    <!-- ============================
-         📌 공지 정보 입력
-    ============================ -->
+    <!-- ============================ -->
+    <!-- 📌 공지 정보 입력 -->
+    <!-- ============================ -->
     <section class="panel">
       <h2>공지 정보 입력</h2>
 
@@ -68,23 +64,30 @@
         <option value="en">English</option>
       </select>
 
-      <h3>공지 내용</h3>
+      <!-- 정렬순번 -->
+      <input
+        id="sort_order"
+        class="input"
+        type="number"
+        placeholder="정렬 순번 (작을수록 상단)"
+        min="1"
+      />
+      <div class="help-text">
+        *메인공지처럼 상단 고정하고 싶은 경우 낮은 숫자(예: 1,2,3)를 입력하세요.  
+        미입력 시 기본값 = 9999
+      </div>
+
+      <h3 style="margin-top:20px;">공지 내용</h3>
       <div id="editor" style="border:1px solid #ccc;border-radius:6px;"></div>
     </section>
 
-    <!-- ============================
-         📎 첨부파일 업로드
-    ============================ -->
+    <!-- ============================ -->
+    <!-- 📎 첨부파일 업로드 -->
+    <!-- ============================ -->
     <section class="panel">
       <h3>첨부파일 업로드 (여러 개 가능)</h3>
 
-      <input
-        type="file"
-        id="files"
-        name="files"
-        multiple
-        class="input"
-      />
+      <input type="file" id="files" name="files" multiple class="input" />
 
       <div id="filePreview" class="file-list"></div>
 
@@ -105,18 +108,18 @@
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 
 <script>
-  /* ============================================
-     🔐 권한 체크 + 사이드바 + 로그아웃
-  ============================================ */
+  /* ───────────────────────────────
+      🔐 권한 체크 + 로그아웃 설정
+  ─────────────────────────────── */
   (function () {
-    requireAdminOrEditor(); // 에디터/관리자만 접근 가능
+    requireAdminOrEditor();
     document.getElementById("logoutBtn").addEventListener("click", logout);
   })();
 
 
-  /* ============================================
-     ✏️ Toast UI Editor 초기화
-  ============================================ */
+  /* ───────────────────────────────
+      ✏️ Toast UI Editor 초기화
+  ─────────────────────────────── */
   const editor = new toastui.Editor({
     el: document.querySelector('#editor'),
     height: '500px',
@@ -128,14 +131,15 @@
       ['heading', 'bold', 'italic', 'strike'],
       ['hr', 'quote'],
       ['ul', 'ol'],
-      ['table', 'image', 'link']
+      ['table', 'link']
+      /* 이미지 업로드 버튼 제거됨 (뉴스룸만 이미지 사용) */
     ]
   });
 
 
-  /* ============================================
-     📎 첨부파일 미리보기 (파일 이름만 표시)
-  ============================================ */
+  /* ───────────────────────────────
+      📎 첨부파일 미리보기
+  ─────────────────────────────── */
   const fileInput = document.getElementById("files");
   const filePreview = document.getElementById("filePreview");
 
@@ -148,24 +152,21 @@
     }
 
     filePreview.innerHTML = files
-      .map((f, i) => `
-        <div class="file-item">
-          ${f.name}
-        </div>
-      `)
+      .map(f => `<div class="file-item">${f.name}</div>`)
       .join("");
   });
 
 
-
-  /* ============================================
-     🚀 공지사항 등록 요청
-  ============================================ */
+  /* ───────────────────────────────
+      🚀 공지사항 등록 요청
+  ─────────────────────────────── */
   document.getElementById("noticeForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const title = document.getElementById("title").value.trim();
     const lang = document.getElementById("lang").value;
+    const sortOrderRaw = document.getElementById("sort_order").value;
+    const sortOrder = sortOrderRaw === "" ? 9999 : Number(sortOrderRaw);
     const content = editor.getHTML();
     const files = document.getElementById("files").files;
 
@@ -176,8 +177,8 @@
     formData.append("title", title);
     formData.append("content", content);
     formData.append("lang", lang);
+    formData.append("sort_order", isNaN(sortOrder) ? 9999 : sortOrder);
 
-    // 여러 파일 추가
     [...files].forEach(f => formData.append("files", f));
 
     const token = localStorage.getItem("token");

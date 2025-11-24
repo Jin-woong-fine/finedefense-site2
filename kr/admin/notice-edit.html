@@ -23,7 +23,7 @@
       font-size: 0.9rem;
     }
 
-    .remove-old-btn, .remove-new-btn {
+    .remove-old-btn {
       background: crimson;
       color: white;
       border: none;
@@ -34,6 +34,12 @@
     }
 
     .panel h2 { margin-top: 0; }
+
+    .help-text {
+      font-size: 0.8rem;
+      color: #777;
+      margin-top: 4px;
+    }
   </style>
 </head>
 
@@ -64,7 +70,19 @@
         <option value="en">English</option>
       </select>
 
-      <h3>공지 내용</h3>
+      <!-- 🔢 정렬 순번 -->
+      <input
+        id="sort_order"
+        class="input"
+        type="number"
+        placeholder="정렬 순번 (숫자가 작을수록 상단에 노출)"
+        min="1"
+      />
+      <div class="help-text">
+        * 메인 공지처럼 위에 고정하고 싶은 글은 작은 숫자(예: 1, 2, 3)를 사용하세요. 미설정 시 기본값 9999.
+      </div>
+
+      <h3 style="margin-top:20px;">공지 내용</h3>
       <div id="editor" style="border:1px solid #ccc;border-radius:6px;"></div>
     </section>
 
@@ -72,6 +90,9 @@
     <section class="panel">
       <h3>기존 첨부파일</h3>
       <div id="oldFiles"></div>
+      <div class="help-text">
+        * 체크한 파일만 삭제됩니다. 삭제하지 않은 첨부파일은 그대로 유지됩니다.
+      </div>
 
       <h3 style="margin-top:20px;">새 첨부파일 추가</h3>
       <input type="file" id="newFiles" name="files" multiple class="input">
@@ -95,8 +116,8 @@
 <script>
   let editor;
   let noticeId;
-  let oldFileList = []; // 기존 파일 목록
-  let removeOldFiles = []; // 삭제할 파일들 기록
+  let oldFileList = [];    // 기존 파일 목록 [{id, file_path, original_name}, ... 예상]
+  let removeOldFiles = []; // 삭제할 파일 경로(or id) 목록
 
   /* ===========================================================
       🔐 권한 + 초기 설정
@@ -110,6 +131,7 @@
     if (!noticeId) {
       alert("잘못된 접근입니다.");
       location.href = "./notice-list.html";
+      return;
     }
 
     loadNotice();
@@ -131,7 +153,8 @@
         ['heading', 'bold', 'italic', 'strike'],
         ['hr', 'quote'],
         ['ul', 'ol'],
-        ['table', 'image', 'link']
+        ['table', 'link']
+        // 이미지 업로드는 사용 안 하므로 image 버튼 제거
       ]
     });
   }
@@ -143,20 +166,27 @@
   async function loadNotice() {
     try {
       const res = await fetch(`/api/posts/detail/${noticeId}`);
+      if (!res.ok) throw new Error("공지 상세 불러오기 실패");
+
       const data = await res.json();
 
-      document.getElementById("title").value = data.title;
-      document.getElementById("lang").value = data.lang;
+      document.getElementById("title").value = data.title || "";
+      document.getElementById("lang").value  = data.lang || "kr";
+      document.getElementById("sort_order").value =
+        (data.sort_order !== null && data.sort_order !== undefined)
+          ? data.sort_order
+          : "";
 
-      initEditor(data.content);
+      initEditor(data.content || "");
 
       // 기존 첨부파일
-      oldFileList = data.files || [];
+      oldFileList = Array.isArray(data.files) ? data.files : [];
       renderOldFiles();
 
     } catch (e) {
       console.error(e);
       alert("공지사항 정보를 불러올 수 없습니다.");
+      location.href = "./notice-list.html";
     }
   }
 
@@ -175,17 +205,21 @@
     wrap.innerHTML = oldFileList.map((f, i) => `
       <div class="file-item">
         <a href="${f.file_path}" target="_blank">${f.original_name}</a>
-        <button class="remove-old-btn" onclick="markFileForDelete(${i})">삭제</button>
+        <button type="button" class="remove-old-btn" onclick="markFileForDelete(${i})">삭제</button>
       </div>
     `).join("");
   }
 
+  // 🔥 삭제할 파일 표시 (화면에서 제거 + 삭제목록에 추가)
   function markFileForDelete(index) {
     const file = oldFileList[index];
+    if (!file) return;
 
-    removeOldFiles.push(file.file_path); // 삭제 목록에 기록
-    oldFileList.splice(index, 1); // 화면에서 제거
+    // 여기서는 file_path 기준으로 삭제 목록을 서버에 전달
+    removeOldFiles.push(file.file_path);
 
+    // 화면에서 제거
+    oldFileList.splice(index, 1);
     renderOldFiles();
   }
 
@@ -217,6 +251,8 @@
 
     const title = document.getElementById("title").value.trim();
     const lang = document.getElementById("lang").value;
+    const sortOrderRaw = document.getElementById("sort_order").value;
+    const sortOrder = sortOrderRaw === "" ? 9999 : Number(sortOrderRaw);
     const content = editor.getHTML();
     const newFiles = document.getElementById("newFiles").files;
 
@@ -227,8 +263,9 @@
     formData.append("title", title);
     formData.append("content", content);
     formData.append("lang", lang);
+    formData.append("sort_order", isNaN(sortOrder) ? 9999 : sortOrder);
 
-    // 🗑 삭제할 기존 파일 목록
+    // 🗑 삭제할 기존 파일 목록 (JSON 문자열로 전송)
     formData.append("removeFiles", JSON.stringify(removeOldFiles));
 
     // 🆕 새 파일 추가
@@ -236,20 +273,25 @@
 
     const token = localStorage.getItem("token");
 
-    const res = await fetch(`/api/posts/notice/update/${noticeId}`, {
-      method: "PUT",
-      headers: { Authorization: `Bearer ${token}` },
-      body: formData
-    });
+    try {
+      const res = await fetch(`/api/posts/notice/update/${noticeId}`, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData
+      });
 
-    const result = await res.json();
+      const result = await res.json();
 
-    if (res.ok) {
-      alert("공지사항이 수정되었습니다.");
-      location.href = "./notice-list.html";
-    } else {
-      console.error(result);
-      alert("수정 실패: " + (result.message || "알 수 없는 오류"));
+      if (res.ok) {
+        alert("공지사항이 수정되었습니다.");
+        location.href = "./notice-list.html";
+      } else {
+        console.error(result);
+        alert("수정 실패: " + (result.message || "알 수 없는 오류"));
+      }
+    } catch (err) {
+      console.error(err);
+      alert("수정 중 오류가 발생했습니다.");
     }
   });
 

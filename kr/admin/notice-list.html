@@ -17,16 +17,33 @@
       margin-bottom:35px;
     }
 
-    h1 {
-      margin:0 0 20px 0;
-    }
-
     .search-input {
       width: 240px;
       padding: 8px 12px;
       border: 1px solid #ccc;
       border-radius: 6px;
       font-size: 0.95rem;
+    }
+
+    .lang-filter {
+      display:flex;
+      gap:6px;
+      align-items:center;
+    }
+
+    .lang-btn {
+      padding:7px 14px;
+      border-radius:6px;
+      border:1px solid #ccc;
+      background:white;
+      cursor:pointer;
+      font-size:0.85rem;
+    }
+
+    .lang-btn.active {
+      background:#0f2679;
+      border-color:#0f2679;
+      color:white;
     }
 
     .notice-table {
@@ -50,7 +67,7 @@
 
     .notice-table tr:hover td {
       background: #f3f6ff;
-      cursor: pointer;
+      cursor:pointer;
     }
 
     .actions {
@@ -85,7 +102,6 @@
 
 <body>
 
-<!-- ⭐ 공통 관리자 인증 + 사이드바 -->
 <div id="sidebar" data-active="notice"></div>
 
 <div class="main">
@@ -100,15 +116,25 @@
 
   <section class="panel">
 
+    <!-- 상단바 -->
     <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
       <input type="text" id="searchInput" class="search-input" placeholder="제목 검색" />
+
+      <div class="lang-filter">
+        <button class="lang-btn active" data-lang="kr">KR</button>
+        <button class="lang-btn" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="all">ALL</button>
+      </div>
+
       <button class="btn btn-primary" onclick="goWrite()">공지 작성하기</button>
     </div>
 
+    <!-- 공지 테이블 -->
     <table class="notice-table">
       <thead>
         <tr>
           <th style="width:70px;">번호</th>
+          <th style="width:70px;">정렬</th>
           <th>제목</th>
           <th style="width:120px;">작성일</th>
           <th style="width:80px;">조회수</th>
@@ -116,17 +142,14 @@
         </tr>
       </thead>
       <tbody id="noticeTbody">
-        <tr><td colspan="5">불러오는 중...</td></tr>
+        <tr><td colspan="6">불러오는 중...</td></tr>
       </tbody>
     </table>
 
     <div class="pagination" id="pagination"></div>
-
   </section>
-
 </div>
 
-<!-- 공통 JS -->
 <script src="/kr/admin/js/common_auth.js"></script>
 <script src="/kr/admin/js/sidebar.js"></script>
 
@@ -137,64 +160,79 @@
   const PAGE_SIZE = 10;
   let allNotices = [];
   let filteredNotices = [];
+  let currentLang = "kr";
   let currentPage = 1;
 
   function goWrite() {
     location.href = "/kr/admin/notice-write.html";
   }
 
-  function formatDate(dateStr) {
-    const d = new Date(dateStr);
-    if (Number.isNaN(d.getTime())) return "-";
-    return d.toLocaleDateString();
+  function formatDate(d) {
+    const date = new Date(d);
+    return date.toLocaleDateString();
   }
+
+  /* 언어 필터 선택 */
+  document.querySelectorAll(".lang-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".lang-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      currentLang = btn.dataset.lang;
+      applyFilter();
+    });
+  });
+
+  /* 검색 필터 */
+  document.getElementById("searchInput").addEventListener("input", applyFilter);
 
   function applyFilter() {
     const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
 
-    filteredNotices = keyword
-      ? allNotices.filter(n => (n.title || "").toLowerCase().includes(keyword))
-      : [...allNotices];
+    filteredNotices = allNotices.filter(n => {
+      const matchLang = currentLang === "all" ? true : (n.lang === currentLang);
+      const matchTitle = n.title.toLowerCase().includes(keyword);
+      return matchLang && matchTitle;
+    });
 
     currentPage = 1;
     renderTable();
     renderPagination();
   }
 
+  /* 테이블 렌더링 */
   function renderTable() {
     const tbody = document.getElementById("noticeTbody");
+
     if (!filteredNotices.length) {
-      tbody.innerHTML =
-        `<tr><td colspan="5" style="text-align:center;color:#777;">등록된 공지사항이 없습니다.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#777;">공지 없음</td></tr>`;
       return;
     }
 
     const start = (currentPage - 1) * PAGE_SIZE;
     const end = start + PAGE_SIZE;
+
     const pageItems = filteredNotices.slice(start, end);
     const total = filteredNotices.length;
 
-    tbody.innerHTML = pageItems
-      .map((n, idx) => {
-        const listIndex = total - (start + idx);
-        const views = n.views ?? "-";
-        return `
-        <tr>
-          <td>${listIndex}</td>
-          <td onclick="openPublicView(${n.id})">${n.title}</td>
-          <td>${formatDate(n.created_at)}</td>
-          <td>${views}</td>
-          <td>
-            <div class="actions">
-              <button class="btn btn-small btn-gray" onclick="editNotice(${n.id})">수정</button>
-              <button class="btn btn-small btn-danger" onclick="deleteNotice(${n.id})">삭제</button>
-            </div>
-          </td>
-        </tr>`;
-      })
-      .join("");
+    tbody.innerHTML = pageItems.map((n, idx) => `
+      <tr>
+        <td>${total - (start + idx)}</td>
+        <td>${n.sort_order ?? "-"}</td>
+        <td onclick="openPublicView(${n.id})">${n.title}</td>
+        <td>${formatDate(n.created_at)}</td>
+        <td>${n.views ?? "-"}</td>
+        <td>
+          <div class="actions">
+            <button class="btn btn-small btn-gray" onclick="editNotice(${n.id})">수정</button>
+            <button class="btn btn-small btn-danger" onclick="deleteNotice(${n.id})">삭제</button>
+          </div>
+        </td>
+      </tr>
+    `).join("");
   }
 
+  /* 페이지네이션 */
   function renderPagination() {
     const pag = document.getElementById("pagination");
     pag.innerHTML = "";
@@ -207,16 +245,17 @@
       btn.textContent = p;
       if (p === currentPage) btn.classList.add("active");
 
-      btn.addEventListener("click", () => {
+      btn.onclick = () => {
         currentPage = p;
         renderTable();
         renderPagination();
-      });
+      };
 
       pag.appendChild(btn);
     }
   }
 
+  /* 수정 / 삭제 / 보기 */
   function openPublicView(id) {
     window.open(`/kr/sub/pr/notice/notice-view.html?id=${id}`, "_blank");
   }
@@ -226,50 +265,30 @@
   }
 
   async function deleteNotice(id) {
-    if (!confirm("정말 삭제하시겠습니까?")) return;
+    if (!confirm("삭제하시겠습니까?")) return;
 
-    try {
-      const res = await fetch(`/api/posts/notice/delete/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`
-        }
-      });
+    const res = await fetch(`/api/posts/notice/delete/${id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+    });
 
-      const result = await res.json();
-
-      if (res.ok) {
-        alert("삭제되었습니다.");
-        loadNotices();
-      } else {
-        alert("삭제 실패: " + result.message);
-      }
-    } catch (e) {
-      console.error(e);
-      alert("삭제 중 오류 발생");
+    const json = await res.json();
+    if (res.ok) {
+      alert("삭제 완료");
+      loadNotices();
+    } else {
+      alert("삭제 실패: " + json.message);
     }
   }
 
+  /* 목록 불러오기 */
   async function loadNotices() {
-    try {
-      const res = await fetch(`/api/posts/notice?lang=kr`);
-      if (!res.ok) throw new Error("공지 목록 불러오기 실패");
+    const res = await fetch(`/api/posts/notice?lang=all`);
+    const data = await res.json();
 
-      const data = await res.json();
-
-      allNotices = [...data];
-      filteredNotices = [...data];
-
-      renderTable();
-      renderPagination();
-    } catch (e) {
-      console.error(e);
-      document.getElementById("noticeTbody").innerHTML =
-        `<tr><td colspan="5">불러오기 오류 발생</td></tr>`;
-    }
+    allNotices = data.sort((a, b) => a.sort_order - b.sort_order);
+    applyFilter();
   }
-
-  document.getElementById("searchInput").addEventListener("input", applyFilter);
 
   loadNotices();
 </script>
