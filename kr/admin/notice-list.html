@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>공지사항 관리 | 관리자</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- 공통 관리자 CSS -->
   <link rel="stylesheet" href="./css/admin.css" />
 
   <style>
@@ -25,11 +24,7 @@
       font-size: 0.95rem;
     }
 
-    .lang-filter {
-      display:flex;
-      gap:6px;
-      align-items:center;
-    }
+    .lang-filter { display:flex; gap:6px; align-items:center; }
 
     .lang-btn {
       padding:7px 14px;
@@ -39,63 +34,28 @@
       cursor:pointer;
       font-size:0.85rem;
     }
-
     .lang-btn.active {
-      background:#0f2679;
-      border-color:#0f2679;
-      color:white;
+      background:#0f2679; color:white; border-color:#0f2679;
     }
 
-    .notice-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-      font-size: 0.95rem;
+    .notice-table { width:100%; border-collapse:collapse; margin-top:10px; }
+    .notice-table th, .notice-table td {
+      padding:10px 12px; border-bottom:1px solid #ddd; text-align:left;
     }
+    .notice-table th { background:#0f2679; color:#fff; }
+    .notice-table tr:hover td { background:#f3f6ff; cursor:pointer; }
 
-    .notice-table th,
-    .notice-table td {
-      padding: 10px 12px;
-      border-bottom: 1px solid #ddd;
-      text-align: left;
-    }
-
-    .notice-table th {
-      background: #0f2679;
-      color: #fff;
-    }
-
-    .notice-table tr:hover td {
-      background: #f3f6ff;
-      cursor:pointer;
-    }
-
-    .actions {
-      display: flex;
-      gap: 6px;
-    }
+    .actions { display:flex; gap:6px; }
 
     .pagination {
-      display: flex;
-      justify-content: center;
-      gap: 4px;
-      margin-top: 18px;
+      display:flex; justify-content:center; gap:4px; margin-top:18px;
     }
-
     .pagination button {
-      min-width: 32px;
-      padding: 6px 10px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-      background: #fff;
-      cursor: pointer;
-      font-size: 0.85rem;
+      min-width:32px; padding:6px 10px; border-radius:4px;
+      border:1px solid #ccc; background:#fff; cursor:pointer;
     }
-
     .pagination button.active {
-      background: #0f2679;
-      color: #fff;
-      border-color: #0f2679;
+      background:#0f2679; color:white; border-color:#0f2679;
     }
   </style>
 </head>
@@ -116,7 +76,6 @@
 
   <section class="panel">
 
-    <!-- 상단바 -->
     <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
       <input type="text" id="searchInput" class="search-input" placeholder="제목 검색" />
 
@@ -129,7 +88,6 @@
       <button class="btn btn-primary" onclick="goWrite()">공지 작성하기</button>
     </div>
 
-    <!-- 공지 테이블 -->
     <table class="notice-table">
       <thead>
         <tr>
@@ -172,27 +130,24 @@
     return date.toLocaleDateString();
   }
 
-  /* 언어 필터 선택 */
+  /* 언어 버튼 */
   document.querySelectorAll(".lang-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       document.querySelectorAll(".lang-btn").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
-
       currentLang = btn.dataset.lang;
       applyFilter();
     });
   });
 
-  /* 검색 필터 */
   document.getElementById("searchInput").addEventListener("input", applyFilter);
 
   function applyFilter() {
     const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
 
     filteredNotices = allNotices.filter(n => {
-      const matchLang = currentLang === "all" ? true : (n.lang === currentLang);
-      const matchTitle = n.title.toLowerCase().includes(keyword);
-      return matchLang && matchTitle;
+      return (currentLang === "all" ? true : n.lang === currentLang)
+          && n.title.toLowerCase().includes(keyword);
     });
 
     currentPage = 1;
@@ -200,7 +155,6 @@
     renderPagination();
   }
 
-  /* 테이블 렌더링 */
   function renderTable() {
     const tbody = document.getElementById("noticeTbody");
 
@@ -210,14 +164,12 @@
     }
 
     const start = (currentPage - 1) * PAGE_SIZE;
-    const end = start + PAGE_SIZE;
-
-    const pageItems = filteredNotices.slice(start, end);
+    const pageItems = filteredNotices.slice(start, start + PAGE_SIZE);
     const total = filteredNotices.length;
 
-    tbody.innerHTML = pageItems.map((n, idx) => `
+    tbody.innerHTML = pageItems.map((n, i) => `
       <tr>
-        <td>${total - (start + idx)}</td>
+        <td>${total - (start + i)}</td>
         <td>${n.sort_order ?? "-"}</td>
         <td onclick="openPublicView(${n.id})">${n.title}</td>
         <td>${formatDate(n.created_at)}</td>
@@ -232,11 +184,9 @@
     `).join("");
   }
 
-  /* 페이지네이션 */
   function renderPagination() {
     const pag = document.getElementById("pagination");
     pag.innerHTML = "";
-
     const totalPages = Math.ceil(filteredNotices.length / PAGE_SIZE);
     if (totalPages <= 1) return;
 
@@ -244,46 +194,34 @@
       const btn = document.createElement("button");
       btn.textContent = p;
       if (p === currentPage) btn.classList.add("active");
-
-      btn.onclick = () => {
-        currentPage = p;
-        renderTable();
-        renderPagination();
-      };
-
+      btn.onclick = () => { currentPage = p; renderTable(); renderPagination(); };
       pag.appendChild(btn);
     }
   }
 
-  /* 수정 / 삭제 / 보기 */
   function openPublicView(id) {
     window.open(`/kr/sub/pr/notice/notice-view.html?id=${id}`, "_blank");
   }
-
   function editNotice(id) {
     location.href = `/kr/admin/notice-edit.html?id=${id}`;
   }
-
   async function deleteNotice(id) {
     if (!confirm("삭제하시겠습니까?")) return;
-
     const res = await fetch(`/api/posts/notice/delete/${id}`, {
       method: "DELETE",
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      headers: { Authorization: "Bearer " + localStorage.getItem("token") }
     });
-
-    const json = await res.json();
+    const out = await res.json();
     if (res.ok) {
       alert("삭제 완료");
       loadNotices();
     } else {
-      alert("삭제 실패: " + json.message);
+      alert("삭제 실패: " + out.message);
     }
   }
 
-  /* 목록 불러오기 */
   async function loadNotices() {
-    const res = await fetch(`/api/posts/notice?lang=all`);
+    const res = await fetch(`/api/posts/list/notice?lang=all`);
     const data = await res.json();
 
     allNotices = data.sort((a, b) => a.sort_order - b.sort_order);
