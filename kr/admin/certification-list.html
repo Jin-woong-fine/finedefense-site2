@@ -64,6 +64,12 @@
 <script src="/kr/admin/js/common_auth.js"></script>
 
 <script>
+  loadSidebar("certifications");  /* ⭐ 추가해야 함 */
+  loadItems();
+</script>
+
+
+<script>
 async function loadItems(){
   const type = document.getElementById("filterType").value;
   const lang = document.getElementById("filterLang").value;
