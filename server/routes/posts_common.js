@@ -92,22 +92,36 @@ router.get("/detail/:id", async (req, res) => {
 
 
 /* =====================================================
-   📤 목록 조회
+   📤 목록 조회 (KR/EN 전체 조회 지원)
 ===================================================== */
 router.get("/list/:category", async (req, res) => {
   try {
     const lang = req.query.lang || "kr";
+    const category = req.params.category;
 
-    const [posts] = await db.execute(
-      `SELECT p.*, u.name AS author_name,
-              (SELECT COUNT(*) FROM post_view_logs v WHERE v.post_id = p.id) AS views
-         FROM posts p
-         LEFT JOIN users u ON p.author_id = u.id
-        WHERE p.category=? AND p.lang=?
-        ORDER BY p.created_at DESC`,
-      [req.params.category, lang]
-    );
+    // 기본 SQL
+    let sql = `
+      SELECT p.*, 
+             u.name AS author_name,
+             (SELECT COUNT(*) 
+                FROM post_view_logs v 
+               WHERE v.post_id = p.id) AS views
+        FROM posts p
+        LEFT JOIN users u ON p.author_id = u.id
+       WHERE p.category = ?
+    `;
 
+    const params = [category];
+
+    // ⭐ lang = all 이면 전체 출력 (조건 추가 X)
+    if (lang !== "all") {
+      sql += ` AND p.lang = ?`;
+      params.push(lang);
+    }
+
+    sql += ` ORDER BY p.sort_order, p.created_at DESC`;
+
+    const [posts] = await db.execute(sql, params);
     res.json(posts);
 
   } catch (err) {
@@ -115,5 +129,6 @@ router.get("/list/:category", async (req, res) => {
     res.status(500).json({ message: "목록 오류" });
   }
 });
+
 
 export default router;
