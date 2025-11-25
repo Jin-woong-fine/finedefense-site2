@@ -84,14 +84,18 @@
     }
 
     .modal-box img {
-    max-width: 100%;
-    max-height: 80vh;  /* 화면 세로 80% 안 넘도록 */
-    width: auto;
-    height: auto;
+    max-height: 80vh;        /* 화면 세로의 80%까지만 */
+    max-width: 90vw;         /* 가로도 화면 넘지 않게 */
+    width: auto;             /* A4 비율 유지 */
+    height: auto;            /* A4 비율 유지 */
+    aspect-ratio: 1 / 1.414; /* A4 비율 강제 */
     object-fit: contain;
     background: #fff;
     border-radius: 12px;
+    display: block;
+    margin: 0 auto;
     }
+
 
     .modal-box iframe {
       width: 100%;
