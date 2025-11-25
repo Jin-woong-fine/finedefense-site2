@@ -20,6 +20,11 @@ import usersRouter from "./routes/users.js";
 import postsCommonRouter from "./routes/posts_common.js";
 import postsNewsRouter from "./routes/posts_news.js";
 import postsGalleryRouter from "./routes/posts_gallery.js";  // 갤러리 전용
+import postsCertificationRouter from "./routes/posts_certification.js";
+
+
+
+
 
 // ============================
 // 📌 기본 설정
@@ -56,7 +61,7 @@ app.use(
 // ============================
 
 // 인증
-app.use("/api/auth", authRouter);
+app.use("/api/cert-items", postsCertificationRouter);
 
 // 문의
 app.use("/api/inquiry", sendInquiryRouter);

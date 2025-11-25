@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>인증/특허 관리 | 관리자</title>
+  <link rel="stylesheet" href="/kr/admin/css/admin.css">
+  <style>
+    .filter-box { display:flex; gap:10px; margin-bottom:20px; }
+    select, input { padding:8px; }
+    .thumb { width:80px; aspect-ratio:1/1.414; object-fit:contain; background:#eee; }
+    table { width:100%; border-collapse:collapse; margin-top:20px; }
+    th,td { border-bottom:1px solid #ddd; padding:10px; text-align:left; }
+    th { background:#f5f7fb; }
+    .btn-blue { padding:6px 12px; background:#0f2679;color:#fff;border-radius:6px; }
+  </style>
+</head>
+
+<body>
+
+<div id="sidebar"></div>
+
+<div class="main">
+  <div class="topbar">
+    <div class="title">인증 / 특허 관리</div>
+  </div>
+
+  <button class="btn-blue" onclick="location.href='certification-add.html'">+ 새 항목 추가</button>
+
+  <div class="filter-box">
+    <select id="filterType">
+      <option value="all">전체</option>
+      <option value="cert">인증</option>
+      <option value="patent">특허</option>
+    </select>
+
+    <select id="filterLang">
+      <option value="all">전체 언어</option>
+      <option value="kr">한국어</option>
+      <option value="en">영어</option>
+    </select>
+    
+    <input type="text" id="search" placeholder="검색(제목)">
+    <button onclick="loadItems()">검색</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>썸네일</th>
+        <th>종류</th>
+        <th>제목(KR)</th>
+        <th>제목(EN)</th>
+        <th>언어</th>
+        <th>정렬</th>
+        <th>수정</th>
+        <th>삭제</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+
+<script src="/kr/admin/js/sidebar.js"></script>
+<script src="/kr/admin/js/common_auth.js"></script>
+
+<script>
+async function loadItems(){
+  const type = document.getElementById("filterType").value;
+  const lang = document.getElementById("filterLang").value;
+  const search = document.getElementById("search").value;
+
+  const res = await fetch(`/api/cert-items/list?type=${type}&lang=${lang}&search=${search}`);
+  const data = await res.json();
+
+  document.getElementById("tbody").innerHTML = data.map(i => `
+    <tr>
+      <td><img src="${i.thumb_url}" class="thumb"></td>
+      <td>${i.type === 'cert' ? '인증' : '특허'}</td>
+      <td>${i.title_kr}</td>
+      <td>${i.title_en}</td>
+      <td>${i.lang.toUpperCase()}</td>
+      <td>${i.sort_order}</td>
+      <td><button onclick="location.href='certification-edit.html?id=${i.id}'">수정</button></td>
+      <td><button style="color:red;" onclick="deleteItem(${i.id})">삭제</button></td>
+    </tr>
+  `).join("");
+}
+
+async function deleteItem(id){
+  if(!confirm("삭제하시겠습니까?")) return;
+
+  const res = await fetch(`/api/cert-items/delete/${id}`, {
+    method:"DELETE",
+    headers:{ Authorization:"Bearer " + localStorage.getItem("token") }
+  });
+  const out = await res.json();
+
+  if(res.ok){
+    alert("삭제 완료");
+    loadItems();
+  } else {
+    alert(out.message);
+  }
+}
+
+loadItems();
+</script>
+
+</body>
+</html>
