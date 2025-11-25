@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title>뉴스 관리 | Fine Defense</title>
 
-  <link rel="stylesheet" href="./css/admin.css" />
+  <link rel="stylesheet" href="/kr/admin/css/admin.css" />
   <style>
     .thumb {
       width: 80px;
@@ -19,17 +19,17 @@
 
 <body>
 
-  <!-- 🔐 로그인 권한 체크 (공통 인증) -->
-  <script src="./js/common_auth.js"></script>
+  <!-- 🔐 공통 인증 -->
+  <script src="/kr/admin/js/common_auth.js"></script>
   <script>
-    requireAdminOrEditor();  // editor/admin/superadmin 허용
+    requireAdminOrEditor();   // editor / admin / superadmin
   </script>
 
   <!-- 🔵 사이드바 -->
   <div id="sidebar"></div>
-  <script src="./js/sidebar.js"></script>
+  <script src="/kr/admin/js/sidebar.js"></script>
   <script>
-    loadSidebar("newsroom");   // active 표시
+    loadSidebar("newsroom");
   </script>
 
   <!-- 🔵 메인 -->
@@ -56,28 +56,23 @@
   </div>
 
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      loadNews();
-    });
-
     async function loadNews() {
       try {
         const res = await fetch(`/api/posts/list/news?lang=all`);
-        const data = await res.json();     // 페이지네이션 구조
-        const list = data.list || [];
+        const data = await res.json();
 
-        if (!Array.isArray(list)) {
-          console.error("뉴스 API 구조 오류:", data);
+        // 🔥 여기서 배열/객체 모두 처리
+        const list = Array.isArray(data) ? data : (data.list || []);
+
+        if (!Array.isArray(list) || list.length === 0) {
           document.getElementById("newsList").innerHTML =
-            "<tr><td colspan='7'>불러오기 오류</td></tr>";
+            `<tr><td colspan="7" style="text-align:center;color:#777;">뉴스 없음</td></tr>`;
           return;
         }
 
         document.getElementById("newsList").innerHTML = list
           .map((v) => {
-            const img = v.main_image
-              ? v.main_image
-              : "/kr/admin/img/no-thumb.png";
+            const img = v.main_image || "/kr/admin/img/no-thumb.png";
 
             return `
               <tr>
@@ -99,7 +94,7 @@
       } catch (err) {
         console.error("뉴스 불러오기 오류:", err);
         document.getElementById("newsList").innerHTML =
-          "<tr><td colspan='7'>로드 오류</td></tr>";
+          `<tr><td colspan="7" style="text-align:center;color:#c00;">불러오기 오류</td></tr>`;
       }
     }
 
@@ -116,13 +111,15 @@
       });
 
       const out = await res.json();
-      if (out.message) {
+      if (res.ok) {
         alert("삭제 완료");
         loadNews();
       } else {
-        alert("삭제 실패");
+        alert("삭제 실패: " + (out.message || "알 수 없는 오류"));
       }
     }
+
+    loadNews();
   </script>
 
 </body>
