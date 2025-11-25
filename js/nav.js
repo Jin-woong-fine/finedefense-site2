@@ -216,39 +216,74 @@ function initBreadcrumbTabs() {
 }
 
 /* ------------------------------------------------------------
-   7) Admin Mode Bar + 헤더 겹침 방지
+   7) Admin Mode Bar (Home / Dashboard / Logout)
 ------------------------------------------------------------ */
 function initAdminBar() {
   const role = localStorage.getItem("role");
   const token = localStorage.getItem("token");
+
   if (!["admin", "superadmin"].includes(role) || !token) return;
 
   const bar = document.createElement("div");
   bar.id = "adminBar";
 
   bar.innerHTML = `
-    <div><strong>FINE DEFENSE ADMIN MODE</strong></div>
-    <div>
-      <a href="/${LANG}/admin/dashboard.html">관리자</a>
-      <a href="#" id="adminLogout">로그아웃</a>
+    <div class="admin-left">
+      <strong>FINE DEFENSE ADMIN MODE</strong>
+    </div>
+    <div class="admin-right">
+      <a href="/${LANG}/index.html" class="admin-btn">홈</a>
+      <a href="/${LANG}/admin/dashboard.html" class="admin-btn">대시보드</a>
+      <a href="#" id="adminLogout" class="admin-btn">로그아웃</a>
     </div>
   `;
 
   bar.style.cssText = `
-    width:100%; height:48px; background:#0f2679; color:white;
-    display:flex; justify-content:space-between; align-items:center;
-    padding:0 20px; position:fixed; top:0; left:0; z-index:9999;
+    width:100%;
+    height:48px;
+    background:#0f2679;
+    color:white;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:0 20px;
+    position:fixed;
+    top:0;
+    left:0;
+    z-index:9999;
+    font-size:14px;
   `;
+
+  // 버튼 공통 스타일
+  const style = document.createElement("style");
+  style.textContent = `
+    #adminBar .admin-right .admin-btn {
+      color:white;
+      margin-left:16px;
+      text-decoration:none;
+      padding:6px 10px;
+      border-radius:4px;
+      transition:0.2s;
+    }
+    #adminBar .admin-right .admin-btn:hover {
+      background:rgba(255,255,255,0.2);
+    }
+  `;
+  document.head.appendChild(style);
+
+  // body padding 조정 (겹침 방지)
+  document.body.classList.add("admin-mode");
+  document.body.style.paddingTop = "48px";
 
   document.body.prepend(bar);
 
-  document.body.classList.add("admin-mode");  // 헤더 내려가게
-
+  // 로그아웃
   document.getElementById("adminLogout").addEventListener("click", () => {
     localStorage.clear();
     location.href = `/${LANG}/admin/login.html`;
   });
 }
+
 
 /* ------------------------------------------------------------
    8) Header & Footer Load + 전체 초기화
