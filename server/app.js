@@ -19,7 +19,7 @@ import usersRouter from "./routes/users.js";
 
 import postsCommonRouter from "./routes/posts_common.js";
 import postsNewsRouter from "./routes/posts_news.js";
-import postsGalleryRouter from "./routes/posts_gallery.js";   // ★ 갤러리 전용
+import postsGalleryRouter from "./routes/posts_gallery.js";
 
 
 // ============================
@@ -38,67 +38,40 @@ app.use(express.urlencoded({ extended: true, limit: "30mb" }));
 // 📌 업로드 폴더 정적 제공 (최우선)
 // ============================
 //
-// ✔ 업로드 저장 위치: /home/ubuntu/finedefense_homepage/server/uploads/...
-// ✔ URL 접근:        http://서버주소/uploads/파일명
+// ✔ 저장 위치: /home/ubuntu/finedefense_homepage/server/uploads
+// ✔ URL 접근: http://서버주소/uploads/파일명
 //
-// ※ gallery/news/notice 이미지 모두 여기에 저장됨
-// ============================
 app.use(
   "/uploads",
-  express.static(path.join(__dirname, "server/uploads"))
+  express.static(path.join(__dirname, "uploads"))   // ★ 수정된 부분
 );
 
 
 // ============================
 // 📌 API 라우터 등록
 // ============================
-
-// 인증
 app.use("/api/auth", authRouter);
-
-// 문의
 app.use("/api/inquiry", sendInquiryRouter);
-
-// 관리자
 app.use("/api/admin", adminDashboardRouter);
 app.use("/api/admin", adminRouter);
-
-// 게시물 공통 조회 (공지/뉴스/갤러리 읽기)
 app.use("/api/posts", postsCommonRouter);
-
-// 뉴스 CRUD
 app.use("/api/news", postsNewsRouter);
-
-// 갤러리 CRUD
 app.use("/api/gallery", postsGalleryRouter);
-
-// 제품 관리
 app.use("/api/products", productsRouter);
-
-// Quill / 공통 이미지 업로드
 app.use("/api/uploads", uploadsRouter);
-
-// 로그인 기록
 app.use("/api/logs/login", loginLogsRouter);
-
-// 내 프로필
 app.use("/api/users/me", userProfileRouter);
-
-// 사용자 관리
 app.use("/api/users", usersRouter);
 
 
 // ============================
-// 📌 정적 페이지 제공 (마지막에)
-// ============================
-//
-// /home/ubuntu/finedefense_homepage 전체를 프론트로 공개
+// 📌 정적 페이지 제공 (마지막)
 // ============================
 app.use(express.static(path.resolve(__dirname, "../")));
 
 
 // ============================
-// 📌 API 404 처리
+// 📌 API 404
 // ============================
 app.use("/api/*", (req, res) => {
   res.status(404).json({ message: "API not found" });
@@ -106,7 +79,7 @@ app.use("/api/*", (req, res) => {
 
 
 // ============================
-// 📌 전역 에러 핸들러
+// 📌 에러 핸들러
 // ============================
 app.use((err, req, res, next) => {
   console.error("🔥 서버 오류:", err);

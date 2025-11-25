@@ -5,17 +5,19 @@ import path from "path";
 import fs from "fs";
 import db from "../config/db.js";
 import { verifyToken } from "../middleware/auth.js";
+import { fileURLToPath } from "url";
 
 const router = express.Router();
 
 /* ===========================================================
-   📁 업로드 경로 (절대경로)
+   📁 server 절대경로 계산 (process.cwd() 절대 사용 ❌)
 =========================================================== */
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-// ✔ 올바른 gallery 디렉토리
-const UPLOAD_DIR = path.join(process.cwd(), "uploads", "gallery");
+// → 항상 /server/uploads/gallery 로 저장됨
+const UPLOAD_DIR = path.join(__dirname, "../uploads/gallery");
 
-// ✔ 폴더 없으면 생성
 if (!fs.existsSync(UPLOAD_DIR)) {
   fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 }
@@ -30,7 +32,7 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
     cb(null, Date.now() + "_" + Math.round(Math.random() * 1e9) + ext);
-  },
+  }
 });
 
 const uploadGallery = multer({ storage });
@@ -38,68 +40,28 @@ const uploadGallery = multer({ storage });
 /* ===========================================================
    📌 갤러리 생성
 =========================================================== */
-router.post("/create", verifyToken, uploadGallery.array("images", 20), async (req, res) => {
-  try {
-    const { title, description, lang } = req.body;
+router.post(
+  "/create",
+  verifyToken,
+  uploadGallery.array("images", 20),
+  async (req, res) => {
+    try {
+      const { title, description, lang } = req.body;
 
-    if (!title) return res.status(400).json({ message: "제목은 필수입니다." });
-    if (!req.files.length) return res.status(400).json({ message: "이미지는 최소 1개 필요" });
+      if (!title)
+        return res.status(400).json({ message: "제목은 필수입니다." });
+      if (!req.files.length)
+        return res.status(400).json({ message: "이미지는 최소 1개 필요" });
 
-    const coverImage = `/uploads/gallery/${req.files[0].filename}`;
+      const coverImage = `/uploads/gallery/${req.files[0].filename}`;
 
-    const [result] = await db.execute(
-      `INSERT INTO posts (title, content, category, lang, author_id, main_image)
-       VALUES (?, ?, 'gallery', ?, ?, ?)`,
-      [title, description || "", lang, req.user.id, coverImage]
-    );
-
-    const postId = result.insertId;
-
-    for (const f of req.files) {
-      await db.execute(
-        `INSERT INTO post_images (post_id, image_path) VALUES (?, ?)`,
-        [postId, `/uploads/gallery/${f.filename}`]
-      );
-    }
-
-    res.json({ message: "갤러리 생성 완료", postId });
-
-  } catch (err) {
-    console.error("갤러리 생성 오류:", err);
-    res.status(500).json({ message: "갤러리 생성 오류" });
-  }
-});
-
-/* ===========================================================
-   📌 갤러리 수정
-=========================================================== */
-router.put("/edit/:id", verifyToken, uploadGallery.array("images", 20), async (req, res) => {
-  try {
-    const postId = req.params.id;
-    const { title, description, lang } = req.body;
-
-    const hasNewImages = req.files.length > 0;
-    const coverImage = hasNewImages ? `/uploads/gallery/${req.files[0].filename}` : null;
-
-    await db.execute(
-      `UPDATE posts
-         SET title=?, content=?, lang=?, main_image = IFNULL(?, main_image)
-       WHERE id=? AND category='gallery'`,
-      [title, description, lang, coverImage, postId]
-    );
-
-    if (hasNewImages) {
-      const [oldImages] = await db.execute(
-        `SELECT image_path FROM post_images WHERE post_id=?`,
-        [postId]
+      const [result] = await db.execute(
+        `INSERT INTO posts (title, content, category, lang, author_id, main_image)
+         VALUES (?, ?, 'gallery', ?, ?, ?)`,
+        [title, description || "", lang, req.user.id, coverImage]
       );
 
-      for (const img of oldImages) {
-        const realPath = path.join(process.cwd(), img.image_path);
-        try { fs.unlinkSync(realPath); } catch {}
-      }
-
-      await db.execute(`DELETE FROM post_images WHERE post_id=?`, [postId]);
+      const postId = result.insertId;
 
       for (const f of req.files) {
         await db.execute(
@@ -107,18 +69,72 @@ router.put("/edit/:id", verifyToken, uploadGallery.array("images", 20), async (r
           [postId, `/uploads/gallery/${f.filename}`]
         );
       }
+
+      res.json({ message: "갤러리 생성 완료", postId });
+    } catch (err) {
+      console.error("갤러리 생성 오류:", err);
+      res.status(500).json({ message: "갤러리 생성 오류" });
     }
-
-    res.json({ message: "갤러리 수정 완료" });
-
-  } catch (err) {
-    console.error("갤러리 수정 오류:", err);
-    res.status(500).json({ message: "갤러리 수정 오류" });
   }
-});
+);
 
 /* ===========================================================
-   📌 삭제
+   📌 갤러리 수정
+=========================================================== */
+router.put(
+  "/edit/:id",
+  verifyToken,
+  uploadGallery.array("images", 20),
+  async (req, res) => {
+    try {
+      const postId = req.params.id;
+      const { title, description, lang } = req.body;
+
+      const hasNewImages = req.files.length > 0;
+      const coverImage = hasNewImages
+        ? `/uploads/gallery/${req.files[0].filename}`
+        : null;
+
+      await db.execute(
+        `UPDATE posts
+         SET title=?, content=?, lang=?, main_image = IFNULL(?, main_image)
+         WHERE id=? AND category='gallery'`,
+        [title, description, lang, coverImage, postId]
+      );
+
+      if (hasNewImages) {
+        const [old] = await db.execute(
+          `SELECT image_path FROM post_images WHERE post_id=?`,
+          [postId]
+        );
+
+        for (const img of old) {
+          const realPath = path.join(__dirname, "../", img.image_path);
+          try {
+            fs.unlinkSync(realPath);
+          } catch {}
+        }
+
+        await db.execute(`DELETE FROM post_images WHERE post_id=?`, [postId]);
+
+        for (const f of req.files) {
+          await db.execute(
+            `INSERT INTO post_images (post_id, image_path) VALUES (?, ?)`,
+            [postId, `/uploads/gallery/${f.filename}`]
+          );
+        }
+      }
+
+      res.json({ message: "갤러리 수정 완료" });
+    } catch (err) {
+      console.error("갤러리 수정 오류:", err);
+      res.status(500).json({ message: "갤러리 수정 오류" });
+    }
+  }
+);
+
+/* ===========================================================
+   📌 갤러리 삭제
 =========================================================== */
 router.delete("/delete/:id", verifyToken, async (req, res) => {
   try {
@@ -130,15 +146,18 @@ router.delete("/delete/:id", verifyToken, async (req, res) => {
     );
 
     for (const img of images) {
-      const real = path.join(process.cwd(), img.image_path);
-      try { fs.unlinkSync(real); } catch {}
+      const real = path.join(__dirname, "../", img.image_path);
+      try {
+        fs.unlinkSync(real);
+      } catch {}
     }
 
     await db.execute(`DELETE FROM post_images WHERE post_id=?`, [postId]);
-    await db.execute(`DELETE FROM posts WHERE id=? AND category='gallery'`, [postId]);
+    await db.execute(`DELETE FROM posts WHERE id=? AND category='gallery'`, [
+      postId
+    ]);
 
     res.json({ message: "갤러리 삭제 완료" });
-
   } catch (err) {
     console.error("갤러리 삭제 오류:", err);
     res.status(500).json({ message: "갤러리 삭제 오류" });
@@ -173,7 +192,6 @@ router.get("/list", async (req, res) => {
 
     const [rows] = await db.execute(sql, params);
     res.json(rows);
-
   } catch (err) {
     console.error("갤러리 목록 오류:", err);
     res.status(500).json({ message: "갤러리 목록 오류" });
