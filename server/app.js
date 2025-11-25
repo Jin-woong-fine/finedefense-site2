@@ -15,11 +15,14 @@ import productsRouter from "./routes/products.js";
 import uploadsRouter from "./routes/uploads.js";
 import loginLogsRouter from "./routes/login_logs.js";
 import userProfileRouter from "./routes/user_profile.js";
-import usersRouter from "./routes/users.js";   // 사용자 관리
+import usersRouter from "./routes/users.js";
 
-// ✨ 게시물(Post) 구조 (신규 적용)
-import postsCommonRouter from "./routes/posts_common.js"; // 조회/상세/목록
-import postsNewsRouter from "./routes/posts_news.js";     // 뉴스 등록/수정/삭제
+// ✨ 게시물(Post) 구조 (공지 + 뉴스 공통)
+import postsCommonRouter from "./routes/posts_common.js";
+import postsNewsRouter from "./routes/posts_news.js";
+
+// ✨ 갤러리
+import galleryRouter from "./routes/gallery.js";
 
 
 // ============================
@@ -29,18 +32,15 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// CORS 허용
 app.use(cors());
 
-// Body 파서
 app.use(express.json({ limit: "30mb" }));
 app.use(express.urlencoded({ extended: true, limit: "30mb" }));
 
 
 // ============================
-// 📌 업로드 폴더 정적 제공 — 반드시 최우선
+// 📌 업로드 폴더 정적 제공 (최우선)
 // ============================
-// serve: /uploads → server/public/uploads/*
 app.use(
   "/uploads",
   express.static(path.resolve(__dirname, "public/uploads"))
@@ -58,41 +58,42 @@ app.use("/api/auth", authRouter);
 app.use("/api/inquiry", sendInquiryRouter);
 
 // 3) 관리자 기능
-app.use("/api/admin", adminDashboardRouter);  // 대시보드
-app.use("/api/admin", adminRouter);           // 게시판/기본 관리
+app.use("/api/admin", adminDashboardRouter);
+app.use("/api/admin", adminRouter);
 
-// 4) 게시물 (new 구조)
-// 공통 조회 기능 (공지/뉴스/자료 모두)
+// 4) 게시물 공통 조회 (공지 / 뉴스 / 자료)
 app.use("/api/posts", postsCommonRouter);
 
-// 뉴스 전용 (이미지 업로드 포함: create/edit/delete)
+// 5) 뉴스 (등록/수정/삭제)
 app.use("/api/news", postsNewsRouter);
 
-// 5) 제품 관리
+// 6) 갤러리 (등록/수정/삭제/목록) ★ 신규 추가 ★
+app.use("/api/gallery", galleryRouter);
+
+// 7) 제품 관리
 app.use("/api/products", productsRouter);
 
-// 6) 공통 이미지 업로드 (Quill 포함)
+// 8) 공통 업로드 (Quill 이미지 등)
 app.use("/api/uploads", uploadsRouter);
 
-// 7) 로그인 기록
+// 9) 로그인 기록
 app.use("/api/logs/login", loginLogsRouter);
 
-// 8) 사용자 - 내 프로필
+// 10) 사용자 - 내 프로필
 app.use("/api/users/me", userProfileRouter);
 
-// 9) 사용자 관리 (목록/추가/수정/삭제)
+// 11) 사용자 관리
 app.use("/api/users", usersRouter);
 
 
 // ============================
 // 📌 정적 페이지 제공 — MUST BE LAST
 // ============================
-// server/../ → 프로젝트 전체 HTML/CSS/JS 제공
 app.use(express.static(path.resolve(__dirname, "../")));
 
 
 // ============================
-// 📌 404 (API 전용)
+// 📌 API 404 처리
 // ============================
 app.use("/api/*", (req, res) => {
   res.status(404).json({ message: "API not found" });
