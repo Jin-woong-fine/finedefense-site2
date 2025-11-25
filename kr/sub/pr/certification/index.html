@@ -21,7 +21,7 @@
       color: #0f2679;
     }
 
-    /* 카드(인증/특허 동일) */
+    /* 카드(인증/특허 공용) */
     .card-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -44,11 +44,11 @@
     }
 
     .card-item img {
-    width: 100%;
-    aspect-ratio: 1 / 1.414; /* A4 비율 */
-    object-fit: contain;
-    background: #f1f1f1;
-    border-radius: 8px;
+      width: 100%;
+      aspect-ratio: 1 / 1.414; /* A4 비율 */
+      object-fit: contain;
+      background: #f1f1f1;
+      border-radius: 8px;
     }
 
     .card-title {
@@ -80,19 +80,18 @@
     }
 
     .modal-box img {
-    width: 100%;
-    aspect-ratio: 1 / 1.414; /* A4 비율 */
-    object-fit: contain;
-    background: #fff;
-    border-radius: 12px;
+      width: 100%;
+      aspect-ratio: 1 / 1.414;
+      object-fit: contain;
+      background: #fff;
+      border-radius: 12px;
     }
 
     .modal-box iframe {
-    width: 100%;
-    height: 80vh; /* PDF는 세로 스크롤 필요 */
-    border-radius: 12px;
+      width: 100%;
+      height: 80vh;
+      border-radius: 12px;
     }
-
 
     .modal-close {
       position: absolute;
@@ -109,7 +108,7 @@
 
 <div id="header"></div>
 
-<!-- PR 배너 동일 적용 -->
+<!-- PR 공통 배너 -->
 <section class="sub-banner">
   <img src="/img/sub-banners/pr-1_v2.jpg" alt="홍보센터 배너" />
   <div class="banner-text">
@@ -118,7 +117,7 @@
   </div>
 </section>
 
-<!-- breadcrumb + side-tabs 동일 적용 -->
+<!-- breadcrumb + side-tabs -->
 <div class="breadcrumb">
   <a href="/kr/index.html">홈</a> &gt;
   <span class="crumb crumb-level1">홍보센터</span> &gt;
@@ -130,17 +129,11 @@
 
   <!-- 인증 -->
   <h2 class="section-title">📄 기업 인증</h2>
-
-  <div class="card-grid" id="certGrid">
-    <!-- JS로 카드 생성 -->
-  </div>
+  <div class="card-grid" id="certGrid"></div>
 
   <!-- 특허 -->
   <h2 class="section-title">🔬 기술 특허</h2>
-
-  <div class="card-grid" id="patentGrid">
-    <!-- JS로 카드 생성 -->
-  </div>
+  <div class="card-grid" id="patentGrid"></div>
 
 </div>
 
@@ -156,65 +149,50 @@
 <script src="/js/nav.js"></script>
 
 <script>
-/* ------------------------------
-   1) 인증/특허 카드 데이터
---------------------------------*/
-const certifications = [
-  {
-    title: "ISO 9001 품질경영시스템",
-    thumb: "/uploads/certifications/iso9001_thumb.jpg",
-    file:  "/uploads/certifications/iso9001.jpg"
-  },
-  {
-    title: "ISO 14001 환경경영시스템",
-    thumb: "/uploads/certifications/iso14001_thumb.jpg",
-    file:  "/uploads/certifications/iso14001.jpg"
-  },
-  {
-    title: "케이블 내압 성능시험 인증",
-    thumb: "/uploads/certifications/performance_thumb.jpg",
-    file:  "/uploads/certifications/performance.jpg"
-  }
-];
 
-const patents = [
-  {
-    title: "수밀 엔드패킹 구조 특허 (2024)",
-    thumb: "/uploads/patents/p1_thumb.jpg",
-    file:  "/uploads/patents/p1.jpg"
-  },
-  {
-    title: "광/전력 복합 아머드 케이블 응력완화 특허 (2024)",
-    thumb: "/uploads/patents/p2_thumb.jpg",
-    file:  "/uploads/patents/p2.jpg"
-  },
-  {
-    title: "고압 몰딩 패키지 구조 특허 (2023)",
-    thumb: "/uploads/patents/p3_thumb.jpg",
-    file:  "/uploads/patents/p3.jpg"
-  }
-];
+/* --------------------------------------
+   데이터 로딩 (KR 페이지 → lang=kr or all)
+-----------------------------------------*/
+async function loadCertItems() {
+  try {
+    const certRes = await fetch('/api/cert-items/list?type=cert&lang=kr');
+    const certList = await certRes.json();
 
-/* ------------------------------
-   2) 카드 렌더링
---------------------------------*/
+    const patentRes = await fetch('/api/cert-items/list?type=patent&lang=kr');
+    const patentList = await patentRes.json();
+
+    renderCards(certList, "certGrid");
+    renderCards(patentList, "patentGrid");
+
+  } catch (err) {
+    console.error("로딩 오류:", err);
+  }
+}
+
+
+/* --------------------------------------
+   카드 렌더링
+-----------------------------------------*/
 function renderCards(list, containerId) {
   const wrap = document.getElementById(containerId);
 
+  if (!list.length) {
+    wrap.innerHTML = `<div style="color:#777;font-size:0.9rem;">등록된 데이터가 없습니다.</div>`;
+    return;
+  }
+
   wrap.innerHTML = list.map(item => `
-    <div class="card-item" onclick="openModal('${item.file}')">
-      <img src="${item.thumb}" alt="">
-      <div class="card-title">${item.title}</div>
+    <div class="card-item" onclick="openModal('${item.file_url}')">
+      <img src="${item.thumb_url}" alt="">
+      <div class="card-title">${item.title_kr}</div>
     </div>
   `).join("");
 }
 
-renderCards(certifications, "certGrid");
-renderCards(patents, "patentGrid");
 
-/* ------------------------------
-   3) 모달 열기/닫기
---------------------------------*/
+/* --------------------------------------
+   모달 제어
+-----------------------------------------*/
 function openModal(fileUrl) {
   const modalBg = document.getElementById("modalBg");
   const modalContent = document.getElementById("modalContent");
@@ -222,19 +200,20 @@ function openModal(fileUrl) {
   modalBg.style.display = "flex";
 
   if (fileUrl.endsWith(".pdf")) {
-    modalContent.innerHTML = `
-      <iframe src="${fileUrl}" style="height:80vh;"></iframe>
-    `;
+    modalContent.innerHTML = `<iframe src="${fileUrl}"></iframe>`;
   } else {
-    modalContent.innerHTML = `
-      <img src="${fileUrl}">
-    `;
+    modalContent.innerHTML = `<img src="${fileUrl}">`;
   }
 }
 
 function closeModal() {
   document.getElementById("modalBg").style.display = "none";
 }
+
+
+/* 시작 */
+loadCertItems();
+
 </script>
 
 </body>
