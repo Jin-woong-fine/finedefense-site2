@@ -129,14 +129,29 @@
       const res = await fetch(`/api/posts/list/news?lang=kr&page=${page}&pageSize=${pageSize}`);
       const data = await res.json();
 
-      // 서버 pagination이 없을 때 대비
-      const list = data.list || data || [];
-      const totalPages = data.pages || 1;
-      const nowPage = data.page || page;
+      /*
+        🔥 응답 형태 완전 통합 처리
+        가능성:
+          1) [ {...}, {...} ]  ← 배열
+          2) { list: [ ... ], pages: x, page: y }
+          3) { } 빈 객체
+      */
+      const list = Array.isArray(data)
+        ? data
+        : (Array.isArray(data.list) ? data.list : []);
+
+      const totalPages =
+        data.pages ||
+        Math.ceil(list.length / pageSize) ||
+        1;
+
+      const nowPage = data.page || currentPage;
 
       const box = document.getElementById("newsContainer");
+
       if (!list.length) {
         box.innerHTML = "<p>등록된 뉴스가 없습니다.</p>";
+        renderPagination(1, 1);
         return;
       }
 
@@ -171,12 +186,12 @@
 
       if (totalPages <= 1) return;
 
-      // 이전 버튼
+      // 이전
       if (current > 1) {
         p.innerHTML += `<button onclick="loadNews(${current - 1})">이전</button>`;
       }
 
-      // 숫자 버튼
+      // 숫자 리스트
       for (let i = 1; i <= totalPages; i++) {
         p.innerHTML += `
           <button class="${i === current ? "active" : ""}"
@@ -184,12 +199,13 @@
         `;
       }
 
-      // 다음 버튼
+      // 다음
       if (current < totalPages) {
         p.innerHTML += `<button onclick="loadNews(${current + 1})">다음</button>`;
       }
     }
   </script>
+
 
 </body>
 </html>
