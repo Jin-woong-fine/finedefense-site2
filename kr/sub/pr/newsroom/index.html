@@ -89,7 +89,7 @@
 
   <!-- 서브 배너 -->
   <section class="sub-banner">
-    <img src="/img/sub-banners/pr-1_v2.jpg" alt="뉴스룸 배너" />
+    <img src="/img/sub-banners/pr-1_v2.jpg" alt="홍보센터 배너" />
     <div class="banner-text">
       <h1>뉴스룸</h1>
       <p>화인디펜스의 최신 소식과 홍보 자료를 확인하세요.</p>
@@ -129,28 +129,28 @@
   async function loadNews(page) {
     currentPage = page;
 
-    // 🔥 서버는 page/pageSize 지원 X → 제거해야 정상
     const res = await fetch(`/api/posts/list/news?lang=kr`);
     const data = await res.json();
 
     console.log("🔥 서버 응답:", data);
 
-    // 서버는 배열을 반환함
-    const list = Array.isArray(data) ? data : [];
+    // 🔥 배열 또는 객체 모두 대응
+    const list = Array.isArray(data)
+      ? data
+      : (Array.isArray(data.list) ? data.list : []);
 
-    // 페이지 계산
-    const totalPages = Math.ceil(list.length / pageSize);
-    const nowPage = page;
-
-    const sliced = list.slice((page - 1) * pageSize, page * pageSize);
-
-    const box = document.getElementById("newsContainer");
-
-    if (!sliced.length) {
-      box.innerHTML = "<p>등록된 뉴스가 없습니다.</p>";
+    if (!list.length) {
+      document.getElementById("newsContainer").innerHTML =
+        "<p>등록된 뉴스가 없습니다.</p>";
       renderPagination(1, 1);
       return;
     }
+
+    // 페이지 계산
+    const totalPages = Math.ceil(list.length / pageSize);
+    const sliced = list.slice((page - 1) * pageSize, page * pageSize);
+
+    const box = document.getElementById("newsContainer");
 
     box.innerHTML = sliced
       .map((v) => {
@@ -169,7 +169,7 @@
       })
       .join("");
 
-    renderPagination(totalPages, nowPage);
+    renderPagination(totalPages, currentPage);
   }
 
   function openNews(id) {
@@ -198,6 +198,7 @@
     }
   }
 </script>
+
 
 
 
