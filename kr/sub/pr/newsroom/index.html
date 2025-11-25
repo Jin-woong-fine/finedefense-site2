@@ -120,65 +120,84 @@
    <!-- nav.js가 header/footer 로드 -->
   <script src="/js/nav.js"></script>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", loadNews);
+<script>
+  let currentPage = 1;
+  const pageSize = 9;
 
-    async function loadNews() {
-      const box = document.getElementById("newsContainer");
-      const pag = document.getElementById("pagination");
-      pag.innerHTML = ""; // 일단 페이지네이션 비활성화
+  document.addEventListener("DOMContentLoaded", () => loadNews(1));
 
-      try {
-        const res = await fetch("/api/posts/list/news?lang=kr");
+  async function loadNews(page) {
+    currentPage = page;
 
-        if (!res.ok) {
-          console.error("뉴스 API 오류:", res.status);
-          box.innerHTML = "<p>뉴스를 불러오는 중 오류가 발생했습니다.</p>";
-          return;
-        }
+    // 🔥 서버는 page/pageSize 지원 X → 제거해야 정상
+    const res = await fetch(`/api/posts/list/news?lang=kr`);
+    const data = await res.json();
 
-        const data = await res.json();
-        // console.log("🔥 PARSED DATA:", data);
+    console.log("🔥 서버 응답:", data);
 
-        // 응답이 배열이든 { list: [...] }든 다 처리
-        const list = Array.isArray(data)
-          ? data
-          : (data && Array.isArray(data.list) ? data.list : []);
+    // 서버는 배열을 반환함
+    const list = Array.isArray(data) ? data : [];
 
-        // 방어 코드: list가 배열이 아니면 빈 배열로
-        if (!Array.isArray(list) || list.length === 0) {
-          box.innerHTML = "<p>등록된 뉴스가 없습니다.</p>";
-          return;
-        }
+    // 페이지 계산
+    const totalPages = Math.ceil(list.length / pageSize);
+    const nowPage = page;
 
-        // 카드 렌더링
-        box.innerHTML = list
-          .map((v) => {
-            const img = v.main_image || "/img/no-image.jpg";
-            const date = (v.created_at || "").toString().substring(0, 10);
+    const sliced = list.slice((page - 1) * pageSize, page * pageSize);
 
-            return `
-              <div class="news-card" onclick="openNews(${v.id})">
-                <img src="${img}" class="news-thumb">
-                <div class="news-content">
-                  <div class="news-title">${v.title}</div>
-                  <div class="news-date">${date}</div>
-                </div>
-              </div>
-            `;
-          })
-          .join("");
+    const box = document.getElementById("newsContainer");
 
-      } catch (e) {
-        console.error("뉴스 불러오기 예외:", e);
-        box.innerHTML = "<p>뉴스를 불러오는 중 오류가 발생했습니다.</p>";
-      }
+    if (!sliced.length) {
+      box.innerHTML = "<p>등록된 뉴스가 없습니다.</p>";
+      renderPagination(1, 1);
+      return;
     }
 
-    function openNews(id) {
-      location.href = `/kr/sub/pr/newsroom/news-view.html?id=${id}`;
+    box.innerHTML = sliced
+      .map((v) => {
+        const img = v.main_image || "/img/no-image.jpg";
+        const date = v.created_at?.substring(0, 10) || "";
+
+        return `
+          <div class="news-card" onclick="openNews(${v.id})">
+            <img src="${img}" class="news-thumb">
+            <div class="news-content">
+              <div class="news-title">${v.title}</div>
+              <div class="news-date">${date}</div>
+            </div>
+          </div>
+        `;
+      })
+      .join("");
+
+    renderPagination(totalPages, nowPage);
+  }
+
+  function openNews(id) {
+    location.href = `/kr/sub/pr/newsroom/news-view.html?id=${id}`;
+  }
+
+  function renderPagination(totalPages, current) {
+    const p = document.getElementById("pagination");
+    p.innerHTML = "";
+
+    if (totalPages <= 1) return;
+
+    if (current > 1) {
+      p.innerHTML += `<button onclick="loadNews(${current - 1})">이전</button>`;
     }
-  </script>
+
+    for (let i = 1; i <= totalPages; i++) {
+      p.innerHTML += `
+        <button class="${i === current ? "active" : ""}"
+                onclick="loadNews(${i})">${i}</button>
+      `;
+    }
+
+    if (current < totalPages) {
+      p.innerHTML += `<button onclick="loadNews(${current + 1})">다음</button>`;
+    }
+  }
+</script>
 
 
 
