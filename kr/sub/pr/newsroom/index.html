@@ -117,102 +117,69 @@
   <!-- nav.js가 header/footer 로드 -->
   <script src="/js/nav.js"></script>
 
+   <!-- nav.js가 header/footer 로드 -->
+  <script src="/js/nav.js"></script>
+
   <script>
-    let currentPage = 1;
-    const pageSize = 9;
+    document.addEventListener("DOMContentLoaded", loadNews);
 
-    document.addEventListener("DOMContentLoaded", () => loadNews(1));
-
-    async function loadNews(page) {
-      currentPage = page;
-
-      let res;
-      try {
-        res = await fetch(`/api/posts/list/news?lang=kr&page=${page}&pageSize=${pageSize}`);
-        console.log("🔥 RAW RESPONSE:", res);
-      } catch (e) {
-        console.error("🚨 fetch 실패:", e);
-        return;
-      }
-
-      let data;
-      try {
-        data = await res.json();
-        console.log("🔥 PARSED DATA:", data);
-      } catch (e) {
-        console.error("🚨 JSON 파싱 실패:", e);
-        return;
-      }
-
-      // 서버 응답이 배열 형태인지 체크
-      const list = Array.isArray(data)
-        ? data
-        : (Array.isArray(data.list) ? data.list : []);
-
+    async function loadNews() {
       const box = document.getElementById("newsContainer");
+      const pag = document.getElementById("pagination");
+      pag.innerHTML = ""; // 일단 페이지네이션 비활성화
 
-      // 데이터 없음 처리
-      if (!Array.isArray(list) || list.length === 0) {
-        box.innerHTML = "<p>등록된 뉴스가 없습니다.</p>";
-        renderPagination(1, 1);
-        return;
-      }
+      try {
+        const res = await fetch("/api/posts/list/news?lang=kr");
 
-      // 총 페이지 계산
-      const totalPages = Math.ceil(list.length / pageSize);
-      const nowPage = currentPage;
+        if (!res.ok) {
+          console.error("뉴스 API 오류:", res.status);
+          box.innerHTML = "<p>뉴스를 불러오는 중 오류가 발생했습니다.</p>";
+          return;
+        }
 
-      // 화면에 카드 렌더링
-      box.innerHTML = list
-        .map((v) => {
-          const img = v.main_image || "/img/no-image.jpg";
-          const date = v.created_at?.substring(0, 10) || "";
+        const data = await res.json();
+        // console.log("🔥 PARSED DATA:", data);
 
-          return `
-            <div class="news-card" onclick="openNews(${v.id})">
-              <img src="${img}" class="news-thumb">
-              <div class="news-content">
-                <div class="news-title">${v.title}</div>
-                <div class="news-date">${date}</div>
+        // 응답이 배열이든 { list: [...] }든 다 처리
+        const list = Array.isArray(data)
+          ? data
+          : (data && Array.isArray(data.list) ? data.list : []);
+
+        // 방어 코드: list가 배열이 아니면 빈 배열로
+        if (!Array.isArray(list) || list.length === 0) {
+          box.innerHTML = "<p>등록된 뉴스가 없습니다.</p>";
+          return;
+        }
+
+        // 카드 렌더링
+        box.innerHTML = list
+          .map((v) => {
+            const img = v.main_image || "/img/no-image.jpg";
+            const date = (v.created_at || "").toString().substring(0, 10);
+
+            return `
+              <div class="news-card" onclick="openNews(${v.id})">
+                <img src="${img}" class="news-thumb">
+                <div class="news-content">
+                  <div class="news-title">${v.title}</div>
+                  <div class="news-date">${date}</div>
+                </div>
               </div>
-            </div>
-          `;
-        })
-        .join("");
+            `;
+          })
+          .join("");
 
-      // 페이지네이션 생성
-      renderPagination(totalPages, nowPage);
+      } catch (e) {
+        console.error("뉴스 불러오기 예외:", e);
+        box.innerHTML = "<p>뉴스를 불러오는 중 오류가 발생했습니다.</p>";
+      }
     }
 
     function openNews(id) {
       location.href = `/kr/sub/pr/newsroom/news-view.html?id=${id}`;
     }
-
-    function renderPagination(totalPages, current) {
-      const p = document.getElementById("pagination");
-      p.innerHTML = "";
-
-      if (totalPages <= 1) return;
-
-      // 이전 버튼
-      if (current > 1) {
-        p.innerHTML += `<button onclick="loadNews(${current - 1})">이전</button>`;
-      }
-
-      // 페이지 숫자 버튼
-      for (let i = 1; i <= totalPages; i++) {
-        p.innerHTML += `
-          <button class="${i === current ? "active" : ""}"
-                  onclick="loadNews(${i})">${i}</button>
-        `;
-      }
-
-      // 다음 버튼
-      if (current < totalPages) {
-        p.innerHTML += `<button onclick="loadNews(${current + 1})">다음</button>`;
-      }
-    }
   </script>
+
 
 
 </body>
