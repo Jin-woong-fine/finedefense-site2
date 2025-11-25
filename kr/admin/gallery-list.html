@@ -190,8 +190,8 @@
     const items = filteredGallery.slice(start, start + PAGE_SIZE);
 
     tbody.innerHTML = items.map(item => {
-      const thumb = item.cover_image || (item.main_image) || "/kr/admin/img/no-thumb.png";
-      const imgCount = item.image_count ?? (item.images ? item.images.length : "-");
+      const thumb = item.main_image || "/kr/admin/img/no-thumb.png";
+      const imgCount = item.image_count ?? "-";
       const views = item.views ?? "-";
 
       return `

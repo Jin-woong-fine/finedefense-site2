@@ -10,16 +10,18 @@ import { fileURLToPath } from "url";
 const router = express.Router();
 
 /* ===========================================================
-   📁 server 절대경로 계산 (process.cwd() 절대 사용 ❌)
+   📁 server 절대경로 계산
 =========================================================== */
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// → 항상 /server/uploads/gallery 로 저장됨
-const UPLOAD_DIR = path.join(__dirname, "../uploads/gallery");
+// 🔹 업로드 루트: /server/uploads
+const UPLOAD_ROOT = path.join(__dirname, "../uploads");
+// 🔹 갤러리 폴더: /server/uploads/gallery
+const GALLERY_DIR = path.join(UPLOAD_ROOT, "gallery");
 
-if (!fs.existsSync(UPLOAD_DIR)) {
-  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+if (!fs.existsSync(GALLERY_DIR)) {
+  fs.mkdirSync(GALLERY_DIR, { recursive: true });
 }
 
 /* ===========================================================
@@ -27,15 +29,34 @@ if (!fs.existsSync(UPLOAD_DIR)) {
 =========================================================== */
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, UPLOAD_DIR);
+    cb(null, GALLERY_DIR);
   },
   filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, Date.now() + "_" + Math.round(Math.random() * 1e9) + ext);
+    const ext = path.extname(file.originalname || "");
+    const safeExt = ext || ".jpg";
+    cb(
+      null,
+      `${Date.now()}_${Math.round(Math.random() * 1e9)}${safeExt}`
+    );
   }
 });
 
 const uploadGallery = multer({ storage });
+
+/* ===========================================================
+   🔧 헬퍼 함수
+=========================================================== */
+
+// 디스크 파일명 -> 공개 URL(/uploads/gallery/...)
+const toPublicPath = (filename) => `/uploads/gallery/${filename}`;
+
+// DB에 저장된 공개 URL(/uploads/...) -> 실제 디스크 경로
+const toDiskPathFromPublic = (publicPath) => {
+  if (!publicPath) return null;
+  // "/uploads/gallery/xxx" → "gallery/xxx"
+  const rel = publicPath.replace(/^\/+uploads\/?/, "");
+  return path.join(UPLOAD_ROOT, rel);
+};
 
 /* ===========================================================
    📌 갤러리 생성
@@ -47,26 +68,31 @@ router.post(
   async (req, res) => {
     try {
       const { title, description, lang } = req.body;
+      const files = req.files || [];
 
-      if (!title)
+      if (!title) {
         return res.status(400).json({ message: "제목은 필수입니다." });
-      if (!req.files.length)
-        return res.status(400).json({ message: "이미지는 최소 1개 필요" });
+      }
+      if (!files.length) {
+        return res.status(400).json({ message: "이미지는 최소 1개 필요합니다." });
+      }
 
-      const coverImage = `/uploads/gallery/${req.files[0].filename}`;
+      const postLang = lang || "kr";
+      const coverImage = toPublicPath(files[0].filename);
 
       const [result] = await db.execute(
         `INSERT INTO posts (title, content, category, lang, author_id, main_image)
          VALUES (?, ?, 'gallery', ?, ?, ?)`,
-        [title, description || "", lang, req.user.id, coverImage]
+        [title, description || "", postLang, req.user.id, coverImage]
       );
 
       const postId = result.insertId;
 
-      for (const f of req.files) {
+      // 이미지 목록 저장
+      for (const f of files) {
         await db.execute(
           `INSERT INTO post_images (post_id, image_path) VALUES (?, ?)`,
-          [postId, `/uploads/gallery/${f.filename}`]
+          [postId, toPublicPath(f.filename)]
         );
       }
 
@@ -87,40 +113,57 @@ router.put(
   uploadGallery.array("images", 20),
   async (req, res) => {
     try {
-      const postId = req.params.id;
+      const postId = Number(req.params.id);
+      if (!postId) {
+        return res.status(400).json({ message: "잘못된 ID입니다." });
+      }
+
       const { title, description, lang } = req.body;
+      const files = req.files || [];
+      const hasNewImages = files.length > 0;
+      const postLang = lang || "kr";
 
-      const hasNewImages = req.files.length > 0;
-      const coverImage = hasNewImages
-        ? `/uploads/gallery/${req.files[0].filename}`
-        : null;
+      const coverImage = hasNewImages ? toPublicPath(files[0].filename) : null;
 
+      // 기본 정보 수정
       await db.execute(
         `UPDATE posts
-         SET title=?, content=?, lang=?, main_image = IFNULL(?, main_image)
-         WHERE id=? AND category='gallery'`,
-        [title, description, lang, coverImage, postId]
+           SET title = ?,
+               content = ?,
+               lang = ?,
+               main_image = IFNULL(?, main_image)
+         WHERE id = ? AND category = 'gallery'`,
+        [title, description || "", postLang, coverImage, postId]
       );
 
       if (hasNewImages) {
-        const [old] = await db.execute(
-          `SELECT image_path FROM post_images WHERE post_id=?`,
+        // 기존 이미지 경로 조회
+        const [oldImages] = await db.execute(
+          `SELECT image_path FROM post_images WHERE post_id = ?`,
           [postId]
         );
 
-        for (const img of old) {
-          const realPath = path.join(__dirname, "../", img.image_path);
+        // 디스크에서 기존 파일 삭제
+        for (const img of oldImages) {
+          const diskPath = toDiskPathFromPublic(img.image_path);
+          if (!diskPath) continue;
           try {
-            fs.unlinkSync(realPath);
-          } catch {}
+            fs.unlinkSync(diskPath);
+          } catch (e) {
+            if (e.code !== "ENOENT") {
+              console.warn("갤러리 이미지 삭제 실패:", e.message);
+            }
+          }
         }
 
-        await db.execute(`DELETE FROM post_images WHERE post_id=?`, [postId]);
+        // DB에서 기존 이미지 레코드 삭제
+        await db.execute(`DELETE FROM post_images WHERE post_id = ?`, [postId]);
 
-        for (const f of req.files) {
+        // 새 이미지 레코드 추가
+        for (const f of files) {
           await db.execute(
             `INSERT INTO post_images (post_id, image_path) VALUES (?, ?)`,
-            [postId, `/uploads/gallery/${f.filename}`]
+            [postId, toPublicPath(f.filename)]
           );
         }
       }
@@ -138,24 +181,38 @@ router.put(
 =========================================================== */
 router.delete("/delete/:id", verifyToken, async (req, res) => {
   try {
-    const postId = req.params.id;
+    const postId = Number(req.params.id);
+    if (!postId) {
+      return res.status(400).json({ message: "잘못된 ID입니다." });
+    }
 
+    // 이미지 경로 조회
     const [images] = await db.execute(
-      `SELECT image_path FROM post_images WHERE post_id=?`,
+      `SELECT image_path FROM post_images WHERE post_id = ?`,
       [postId]
     );
 
+    // 디스크 파일 삭제
     for (const img of images) {
-      const real = path.join(__dirname, "../", img.image_path);
+      const diskPath = toDiskPathFromPublic(img.image_path);
+      if (!diskPath) continue;
       try {
-        fs.unlinkSync(real);
-      } catch {}
+        fs.unlinkSync(diskPath);
+      } catch (e) {
+        if (e.code !== "ENOENT") {
+          console.warn("갤러리 이미지 삭제 실패:", e.message);
+        }
+      }
     }
 
-    await db.execute(`DELETE FROM post_images WHERE post_id=?`, [postId]);
-    await db.execute(`DELETE FROM posts WHERE id=? AND category='gallery'`, [
-      postId
-    ]);
+    // 이미지 레코드 삭제
+    await db.execute(`DELETE FROM post_images WHERE post_id = ?`, [postId]);
+
+    // 게시글 삭제(카테고리 한 번 더 체크)
+    await db.execute(
+      `DELETE FROM posts WHERE id = ? AND category = 'gallery'`,
+      [postId]
+    );
 
     res.json({ message: "갤러리 삭제 완료" });
   } catch (err) {
@@ -165,7 +222,7 @@ router.delete("/delete/:id", verifyToken, async (req, res) => {
 });
 
 /* ===========================================================
-   📌 목록 조회
+   📌 갤러리 목록 조회
 =========================================================== */
 router.get("/list", async (req, res) => {
   try {
@@ -178,13 +235,13 @@ router.get("/list", async (req, res) => {
              (SELECT COUNT(*) FROM post_view_logs v WHERE v.post_id = p.id) AS views
         FROM posts p
         LEFT JOIN users u ON u.id = p.author_id
-       WHERE p.category='gallery'
+       WHERE p.category = 'gallery'
     `;
 
     const params = [];
 
     if (lang !== "all") {
-      sql += ` AND p.lang=?`;
+      sql += ` AND p.lang = ?`;
       params.push(lang);
     }
 
