@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>갤러리 상세 | Fine Defense</title>
+
+  <!-- 공통 CSS -->
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/sub-banner.css">
+
+  <style>
+    .gallery-view-wrap {
+      max-width: 1000px;
+      margin: 50px auto 80px;
+      padding: 0 20px;
+    }
+
+    .gallery-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #111;
+    }
+
+    .gallery-meta {
+      font-size: 0.9rem;
+      color: #777;
+      margin-bottom: 25px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 12px;
+    }
+
+    .gallery-main-image {
+      width: 100%;
+      max-height: 520px;
+      object-fit: contain;
+      background:#000;
+      border-radius: 12px;
+    }
+
+    .gallery-thumb-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .gallery-thumb {
+      width: 90px;
+      height: 60px;
+      border-radius: 6px;
+      object-fit: cover;
+      cursor: pointer;
+      opacity: 0.7;
+      border:2px solid transparent;
+      background:#eee;
+    }
+
+    .gallery-thumb.active {
+      opacity: 1;
+      border-color:#0f2679;
+    }
+
+    .gallery-desc {
+      margin-top: 30px;
+      line-height: 1.7;
+      font-size: 0.98rem;
+    }
+
+    .gallery-desc img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .back-btn {
+      margin-top: 35px;
+      padding: 9px 18px;
+      border-radius: 6px;
+      border:1px solid #0f2679;
+      background:#fff;
+      color:#0f2679;
+      cursor:pointer;
+      font-size:0.9rem;
+    }
+
+    .back-btn:hover {
+      background:#0f2679;
+      color:#fff;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- HEADER (nav.js가 불러옴) -->
+<div id="header"></div>
+
+<!-- 서브 배너 -->
+<section class="sub-banner">
+  <img src="/img/sub-banners/pr-3_v2.jpg" alt="갤러리 배너" />
+  <div class="banner-text">
+    <h1>갤러리</h1>
+    <p>화인디펜스의 전시, 시험, 현장 사진을 확인하세요.</p>
+  </div>
+</section>
+
+<!-- breadcrumb -->
+<div class="breadcrumb">
+  <a href="/kr/index.html">홈</a> &gt;
+  <span class="crumb crumb-level1">홍보센터</span> &gt;
+  <span class="crumb crumb-level2">갤러리</span>
+  <div id="side-tabs" class="side-tabs"></div>
+</div>
+
+<!-- 본문 -->
+<div class="gallery-view-wrap">
+  <div class="gallery-title" id="title">로딩 중...</div>
+  <div class="gallery-meta" id="meta"></div>
+
+  <div id="imageArea">
+    <img id="mainImage" class="gallery-main-image" src="/img/no-image.jpg" alt="">
+    <div id="thumbRow" class="gallery-thumb-row"></div>
+  </div>
+
+  <div class="gallery-desc" id="description"></div>
+
+  <button class="back-btn" onclick="location.href='/kr/sub/pr/gallery/index.html'">
+    목록으로 돌아가기
+  </button>
+</div>
+
+<!-- FOOTER -->
+<div id="footer"></div>
+
+<!-- nav.js: header/footer + breadcrumb tabs + admin bar -->
+<script src="/js/nav.js"></script>
+
+<script>
+  const params = new URLSearchParams(location.search);
+  const id = params.get("id");
+
+  if (!id) {
+    location.href = "/kr/sub/pr/gallery/index.html";
+  }
+
+  async function loadGalleryDetail() {
+    try {
+      // 조회수 증가 (선택)
+      fetch(`/api/gallery/view/${id}`, { method: "POST" }).catch(() => {});
+
+      const res = await fetch(`/api/gallery/detail/${id}`);
+      const data = await res.json();
+
+      document.getElementById("title").textContent = data.title || "제목 없음";
+
+      const dateText = data.created_at
+        ? new Date(data.created_at).toLocaleDateString()
+        : "";
+      const views = data.views ?? 0;
+      document.getElementById("meta").textContent =
+        `${dateText}${dateText ? " | " : ""}조회수 ${views}`;
+
+      // 설명 (HTML)
+      document.getElementById("description").innerHTML = data.description || "";
+
+      const images = data.images || [];
+      const mainImgEl = document.getElementById("mainImage");
+      const thumbRow = document.getElementById("thumbRow");
+
+      if (!images.length) {
+        mainImgEl.src = "/img/no-image.jpg";
+        thumbRow.innerHTML = "";
+        return;
+      }
+
+      // 메인 이미지
+      mainImgEl.src = images[0];
+
+      // 썸네일
+      thumbRow.innerHTML = images.map((src, idx) => `
+        <img src="${src}" class="gallery-thumb ${idx === 0 ? "active" : ""}" data-idx="${idx}">
+      `).join("");
+
+      // 썸네일 클릭 시 메인 변경
+      thumbRow.addEventListener("click", (e) => {
+        const img = e.target;
+        if (!img.classList.contains("gallery-thumb")) return;
+        const idx = Number(img.dataset.idx);
+
+        mainImgEl.src = images[idx];
+
+        document.querySelectorAll(".gallery-thumb").forEach(t => t.classList.remove("active"));
+        img.classList.add("active");
+      });
+
+    } catch (e) {
+      console.error("갤러리 상세 로드 오류:", e);
+      document.getElementById("title").textContent = "데이터를 불러오는 중 오류가 발생했습니다.";
+    }
+  }
+
+  loadGalleryDetail();
+</script>
+
+</body>
+</html>
