@@ -123,42 +123,46 @@
 
     document.addEventListener("DOMContentLoaded", () => loadNews(1));
 
-   async function loadNews(page) {
-    currentPage = page;
+    async function loadNews(page) {
+      currentPage = page;
 
-    const res = await fetch(`/api/posts/list/news?lang=kr&page=${page}&pageSize=${pageSize}`);
+      let res;
+      try {
+        res = await fetch(`/api/posts/list/news?lang=kr&page=${page}&pageSize=${pageSize}`);
+        console.log("🔥 RAW RESPONSE:", res);
+      } catch (e) {
+        console.error("🚨 fetch 실패:", e);
+        return;
+      }
 
-    // ★★★ 여기 추가 (가장 위)
-    console.log("🔥 RAW RESPONSE:", res);
+      let data;
+      try {
+        data = await res.json();
+        console.log("🔥 PARSED DATA:", data);
+      } catch (e) {
+        console.error("🚨 JSON 파싱 실패:", e);
+        return;
+      }
 
-    const data = await res.json();
-
-    // ★★★ 여기 추가 (무조건 찍히는 위치)
-    console.log("🔥 PARSED DATA:", data);
-
-
-    console.log("🔥 서버 응답:", data);  // ★★★ 반드시 필요
-
-    const list = Array.isArray(data)
-      ? data
-      : (Array.isArray(data.list) ? data.list : []);
-
-    const totalPages =
-      data.pages ||
-      (Array.isArray(list) ? Math.ceil(list.length / pageSize) : 1) ||
-      1;
-
-    const nowPage = data.page || currentPage;
+      // 서버 응답이 배열 형태인지 체크
+      const list = Array.isArray(data)
+        ? data
+        : (Array.isArray(data.list) ? data.list : []);
 
       const box = document.getElementById("newsContainer");
 
-      if (!list.length) {
+      // 데이터 없음 처리
+      if (!Array.isArray(list) || list.length === 0) {
         box.innerHTML = "<p>등록된 뉴스가 없습니다.</p>";
         renderPagination(1, 1);
         return;
       }
 
-      // 카드 렌더링
+      // 총 페이지 계산
+      const totalPages = Math.ceil(list.length / pageSize);
+      const nowPage = currentPage;
+
+      // 화면에 카드 렌더링
       box.innerHTML = list
         .map((v) => {
           const img = v.main_image || "/img/no-image.jpg";
@@ -176,6 +180,7 @@
         })
         .join("");
 
+      // 페이지네이션 생성
       renderPagination(totalPages, nowPage);
     }
 
@@ -189,12 +194,12 @@
 
       if (totalPages <= 1) return;
 
-      // 이전
+      // 이전 버튼
       if (current > 1) {
         p.innerHTML += `<button onclick="loadNews(${current - 1})">이전</button>`;
       }
 
-      // 숫자 리스트
+      // 페이지 숫자 버튼
       for (let i = 1; i <= totalPages; i++) {
         p.innerHTML += `
           <button class="${i === current ? "active" : ""}"
@@ -202,7 +207,7 @@
         `;
       }
 
-      // 다음
+      // 다음 버튼
       if (current < totalPages) {
         p.innerHTML += `<button onclick="loadNews(${current + 1})">다음</button>`;
       }
