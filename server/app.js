@@ -44,9 +44,14 @@ app.use(express.urlencoded({ extended: true, limit: "30mb" }));
 //
 // ※ gallery/news/notice/products 등 모든 업로드가 여기로 통일됨
 //
+
+// server/app.js
+
 app.use(
   "/uploads",
-  express.static(path.join(__dirname, "uploads"))
+  express.static(path.join(__dirname, "../uploads"))
+  // 또는 더 확실하게
+  // express.static(path.resolve(__dirname, "../uploads"))
 );
 
 // ============================
