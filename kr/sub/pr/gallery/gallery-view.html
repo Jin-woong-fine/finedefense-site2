@@ -2,240 +2,199 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>인증 및 특허 | Fine Defense</title>
+  <title>갤러리 상세 | Fine Defense</title>
 
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/sub-banner.css">
 
   <style>
-    .page-wrap {
-      max-width: 1200px;
+    .gallery-view-wrap {
+      max-width: 1000px;
       margin: 50px auto 80px;
       padding: 0 20px;
     }
 
-    h2.section-title {
+    .gallery-title {
       font-size: 1.8rem;
       font-weight: 700;
-      margin-bottom: 20px;
-      color: #0f2679;
+      margin-bottom: 8px;
+      color: #111;
     }
 
-    /* 카드(인증/특허 동일) */
-    .card-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 22px;
-      margin-bottom: 60px;
+    .gallery-meta {
+      font-size: 0.9rem;
+      color: #777;
+      margin-bottom: 25px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 12px;
     }
 
-    .card-item {
-      background: #fff;
+    .gallery-main-image {
+      width: 100%;
+      max-height: 520px;
+      object-fit: contain;
+      background: #000;
       border-radius: 12px;
-      padding: 15px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .gallery-thumb-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .gallery-thumb {
+      width: 90px;
+      height: 60px;
+      border-radius: 6px;
+      object-fit: cover;
       cursor: pointer;
-      transition: 0.25s ease;
+      opacity: 0.7;
+      border: 2px solid transparent;
     }
 
-    .card-item:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 6px 16px rgba(0,0,0,0.11);
+    .gallery-thumb.active {
+      opacity: 1;
+      border-color: #0f2679;
     }
 
-    .card-item img {
-    width: 100%;
-    aspect-ratio: 1 / 1.414; /* A4 비율 */
-    object-fit: contain;
-    background: #f1f1f1;
-    border-radius: 8px;
+    .gallery-desc {
+      margin-top: 30px;
+      line-height: 1.7;
+      font-size: 0.98rem;
     }
 
-    .card-title {
-      margin-top: 10px;
-      font-size: 1rem;
-      color: #0f2679;
-      font-weight: 600;
+    .back-btn {
+      margin-top: 35px;
+      padding: 9px 18px;
+      border-radius: 6px;
+      border:1px solid #0f2679;
+      background:#fff;
+      color:#0f2679;
+      cursor:pointer;
+      font-size:0.9rem;
     }
-
-    /* 모달 */
-    .modal-bg {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.65);
-      z-index: 9999;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .modal-box {
-      background: #fff;
-      padding: 20px;
-      border-radius: 14px;
-      max-width: 900px;
-      width: 90%;
-      position: relative;
-    }
-
-    .modal-box img {
-    width: 100%;
-    aspect-ratio: 1 / 1.414; /* A4 비율 */
-    object-fit: contain;
-    background: #fff;
-    border-radius: 12px;
-    }
-
-    .modal-box iframe {
-    width: 100%;
-    height: 80vh; /* PDF는 세로 스크롤 필요 */
-    border-radius: 12px;
-    }
-
-
-    .modal-close {
-      position: absolute;
-      top: 14px;
-      right: 14px;
-      font-size: 22px;
-      cursor: pointer;
-      color: #333;
+    .back-btn:hover {
+      background:#0f2679;
+      color:#fff;
     }
   </style>
 </head>
 
 <body>
 
-<div id="header"></div>
+  <div id="header"></div>
 
-<!-- PR 배너 동일 적용 -->
-<section class="sub-banner">
-  <img src="/img/sub-banners/pr-1_v2.jpg" alt="홍보센터 배너" />
-  <div class="banner-text">
-    <h1>홍보센터</h1>
-    <p>화인디펜스의 인증 및 기술 특허를 확인하세요.</p>
-  </div>
-</section>
-
-<!-- breadcrumb + side-tabs 동일 적용 -->
-<div class="breadcrumb">
-  <a href="/kr/index.html">홈</a> &gt;
-  <span class="crumb crumb-level1">홍보센터</span> &gt;
-  <span class="crumb crumb-level2">인증 및 특허</span>
-  <div id="side-tabs" class="side-tabs"></div>
-</div>
-
-<div class="page-wrap">
-
-  <!-- 인증 -->
-  <h2 class="section-title">📄 기업 인증</h2>
-
-  <div class="card-grid" id="certGrid">
-    <!-- JS로 카드 생성 -->
-  </div>
-
-  <!-- 특허 -->
-  <h2 class="section-title">🔬 기술 특허</h2>
-
-  <div class="card-grid" id="patentGrid">
-    <!-- JS로 카드 생성 -->
-  </div>
-
-</div>
-
-<!-- 모달 -->
-<div id="modalBg" class="modal-bg">
-  <div class="modal-box">
-    <div class="modal-close" onclick="closeModal()">✕</div>
-    <div id="modalContent"></div>
-  </div>
-</div>
-
-<div id="footer"></div>
-<script src="/js/nav.js"></script>
-
-<script>
-/* ------------------------------
-   1) 인증/특허 카드 데이터
---------------------------------*/
-const certifications = [
-  {
-    title: "ISO 9001 품질경영시스템",
-    thumb: "/uploads/certifications/iso9001_thumb.jpg",
-    file:  "/uploads/certifications/iso9001.jpg"
-  },
-  {
-    title: "ISO 14001 환경경영시스템",
-    thumb: "/uploads/certifications/iso14001_thumb.jpg",
-    file:  "/uploads/certifications/iso14001.jpg"
-  },
-  {
-    title: "케이블 내압 성능시험 인증",
-    thumb: "/uploads/certifications/performance_thumb.jpg",
-    file:  "/uploads/certifications/performance.jpg"
-  }
-];
-
-const patents = [
-  {
-    title: "수밀 엔드패킹 구조 특허 (2024)",
-    thumb: "/uploads/patents/p1_thumb.jpg",
-    file:  "/uploads/patents/p1.jpg"
-  },
-  {
-    title: "광/전력 복합 아머드 케이블 응력완화 특허 (2024)",
-    thumb: "/uploads/patents/p2_thumb.jpg",
-    file:  "/uploads/patents/p2.jpg"
-  },
-  {
-    title: "고압 몰딩 패키지 구조 특허 (2023)",
-    thumb: "/uploads/patents/p3_thumb.jpg",
-    file:  "/uploads/patents/p3.jpg"
-  }
-];
-
-/* ------------------------------
-   2) 카드 렌더링
---------------------------------*/
-function renderCards(list, containerId) {
-  const wrap = document.getElementById(containerId);
-
-  wrap.innerHTML = list.map(item => `
-    <div class="card-item" onclick="openModal('${item.file}')">
-      <img src="${item.thumb}" alt="">
-      <div class="card-title">${item.title}</div>
+  <!-- 서브 배너 -->
+  <section class="sub-banner">
+    <img src="/img/sub-banners/pr-1_v2.jpg" alt="홍보센터 배너" />
+    <div class="banner-text">
+      <h1>홍보센터</h1>
+      <p>화인디펜스의 전시, 시험, 현장 사진을 확인하세요.</p>
     </div>
-  `).join("");
-}
+  </section>
 
-renderCards(certifications, "certGrid");
-renderCards(patents, "patentGrid");
+  <!-- 브레드크럼 + 사이드탭 -->
+  <div class="breadcrumb">
+    <a href="/kr/index.html">홈</a> &gt;
+    <span class="crumb crumb-level1">홍보센터</span> &gt;
+    <span class="crumb crumb-level2">갤러리</span>
+    <div id="side-tabs" class="side-tabs"></div>
+  </div>
 
-/* ------------------------------
-   3) 모달 열기/닫기
---------------------------------*/
-function openModal(fileUrl) {
-  const modalBg = document.getElementById("modalBg");
-  const modalContent = document.getElementById("modalContent");
+  <!-- 상세 페이지 -->
+  <div class="gallery-view-wrap">
+    <div class="gallery-title" id="title">로딩 중...</div>
+    <div class="gallery-meta" id="meta"></div>
 
-  modalBg.style.display = "flex";
+    <img id="mainImage" class="gallery-main-image" src="/img/no-image.jpg">
+    <div id="thumbRow" class="gallery-thumb-row"></div>
 
-  if (fileUrl.endsWith(".pdf")) {
-    modalContent.innerHTML = `
-      <iframe src="${fileUrl}" style="height:80vh;"></iframe>
-    `;
-  } else {
-    modalContent.innerHTML = `
-      <img src="${fileUrl}">
-    `;
-  }
-}
+    <div class="gallery-desc" id="description"></div>
 
-function closeModal() {
-  document.getElementById("modalBg").style.display = "none";
-}
-</script>
+    <button class="back-btn" onclick="location.href='/kr/sub/pr/gallery/index.html'">
+      목록으로 돌아가기
+    </button>
+  </div>
 
+  <div id="footer"></div>
+  <script src="/js/nav.js"></script>
+
+  <script>
+    const params = new URLSearchParams(location.search);
+    const id = params.get("id");
+
+    if (!id) {
+      location.href = "/kr/sub/pr/gallery/index.html";
+    }
+
+    async function loadGalleryDetail() {
+      try {
+        // 조회수 증가
+        fetch(`/api/posts/view/${id}`, { method: "POST" }).catch(() => {});
+
+        // 상세 데이터
+        const res = await fetch(`/api/posts/detail/${id}`);
+        const data = await res.json();
+
+        document.getElementById("title").textContent = data.title ?? "제목 없음";
+
+        const dateText = data.created_at
+          ? new Date(data.created_at).toLocaleDateString()
+          : "";
+        const views = data.views ?? 0;
+
+        document.getElementById("meta").textContent =
+          `${dateText}${dateText ? " | " : ""}조회수 ${views}`;
+
+        document.getElementById("description").innerHTML = data.content || "";
+
+        const images = data.images || [];
+
+        const mainImgEl = document.getElementById("mainImage");
+        const thumbRow = document.getElementById("thumbRow");
+
+        if (!images.length) {
+          mainImgEl.src = "/img/no-image.jpg";
+          thumbRow.innerHTML = "";
+          return;
+        }
+
+        mainImgEl.src = images[0];
+
+        thumbRow.innerHTML = images
+          .map(
+            (src, idx) => `
+          <img src="${src}" 
+               class="gallery-thumb ${idx === 0 ? "active" : ""}" 
+               data-idx="${idx}">
+        `
+          )
+          .join("");
+
+        thumbRow.addEventListener("click", (e) => {
+          const img = e.target;
+          if (!img.classList.contains("gallery-thumb")) return;
+
+          const idx = Number(img.dataset.idx);
+          mainImgEl.src = images[idx];
+
+          document
+            .querySelectorAll(".gallery-thumb")
+            .forEach(t => t.classList.remove("active"));
+
+          img.classList.add("active");
+        });
+
+      } catch (err) {
+        console.error(err);
+        document.getElementById("title").textContent =
+          "데이터를 불러오는 중 오류가 발생했습니다.";
+      }
+    }
+
+    loadGalleryDetail();
+  </script>
 </body>
 </html>
