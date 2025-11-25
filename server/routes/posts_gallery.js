@@ -11,7 +11,8 @@ const router = express.Router();
 /* ===========================================================
    📁 업로드 경로 (절대경로)
 =========================================================== */
-const UPLOAD_DIR = path.join(process.cwd(), "server/uploads/gallery");
+const uploadDir = path.join(process.cwd(), "uploads/gallery");
+
 
 if (!fs.existsSync(UPLOAD_DIR)) {
   fs.mkdirSync(UPLOAD_DIR, { recursive: true });
