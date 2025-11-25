@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>갤러리 작성/수정 | Fine Defense Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Toast UI Editor -->
+  <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+
+  <!-- 공통 관리자 CSS -->
+  <link rel="stylesheet" href="/kr/admin/css/admin.css" />
+
+  <style>
+    .form-box {
+      background:#fff;
+      padding:25px 30px;
+      border-radius:10px;
+      box-shadow:0 2px 10px rgba(0,0,0,0.06);
+      max-width:900px;
+      margin:30px auto 60px;
+    }
+
+    .form-box label {
+      display:block;
+      margin:14px 0 6px;
+      font-weight:600;
+    }
+
+    .form-box input[type="text"],
+    .form-box select {
+      width:100%;
+      padding:8px 10px;
+      border-radius:6px;
+      border:1px solid #ccc;
+      font-size:0.95rem;
+      box-sizing:border-box;
+    }
+
+    .preview-row {
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:8px;
+    }
+
+    .preview-item img {
+      width:120px;
+      height:80px;
+      object-fit:cover;
+      border-radius:8px;
+      border:1px solid #ddd;
+    }
+
+    .preview-label {
+      font-size:0.8rem;
+      color:#666;
+      margin-top:3px;
+      text-align:center;
+    }
+
+    .btn-row {
+      margin-top:24px;
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="sidebar" data-active="gallery"></div>
+
+<div class="main">
+  <div class="topbar">
+    <h2>갤러리 작성 / 수정</h2>
+    <div>
+      <button class="btn btn-primary" onclick="location.href='gallery-list.html'">목록</button>
+      <button id="logoutBtn" class="btn btn-danger">로그아웃</button>
+    </div>
+  </div>
+
+  <div class="form-box">
+    <label>언어</label>
+    <select id="lang">
+      <option value="kr">KR</option>
+      <option value="en">EN</option>
+    </select>
+
+    <label>제목 <span style="color:#c00;">*</span></label>
+    <input id="title" type="text" placeholder="갤러리 제목을 입력하세요.">
+
+    <label>대표 이미지 (썸네일)</label>
+    <input id="cover" type="file" accept="image/*">
+    <div id="coverPreview" class="preview-row"></div>
+
+    <label>추가 이미지 (여러 장 업로드 가능)</label>
+    <input id="images" type="file" accept="image/*" multiple>
+    <div id="imagesPreview" class="preview-row"></div>
+
+    <label>설명 (선택)</label>
+    <div id="editor" style="margin-top:8px;"></div>
+
+    <div class="btn-row">
+      <button class="btn btn-gray" onclick="location.href='gallery-list.html'">취소</button>
+      <button class="btn btn-primary" onclick="saveGallery()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 공통 스크립트 -->
+<script src="/kr/admin/js/common_auth.js"></script>
+<script src="/kr/admin/js/sidebar.js"></script>
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+
+<script>
+  // 권한 체크 & 사이드바
+  requireAdminOrEditor();
+  document.getElementById("logoutBtn").addEventListener("click", logout);
+  loadSidebar("gallery");
+
+  const urlParams = new URLSearchParams(location.search);
+  const galleryId = urlParams.get("id");
+
+  // Toast UI Editor
+  const editor = new toastui.Editor({
+    el: document.querySelector('#editor'),
+    height: '400px',
+    initialEditType: 'wysiwyg',
+    previewStyle: 'vertical',
+    initialValue: ''
+  });
+
+  // 이미지 미리보기 공통 함수
+  function createPreview(containerId, files) {
+    const box = document.getElementById(containerId);
+    box.innerHTML = "";
+
+    Array.from(files).forEach((file, idx) => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const div = document.createElement("div");
+        div.className = "preview-item";
+        div.innerHTML = `
+          <img src="${e.target.result}" alt="">
+          <div class="preview-label">${idx === 0 && containerId === 'coverPreview' ? '대표' : '이미지'}</div>
+        `;
+        box.appendChild(div);
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  document.getElementById("cover").addEventListener("change", (e) => {
+    if (e.target.files.length) {
+      createPreview("coverPreview", e.target.files);
+    } else {
+      document.getElementById("coverPreview").innerHTML = "";
+    }
+  });
+
+  document.getElementById("images").addEventListener("change", (e) => {
+    if (e.target.files.length) {
+      createPreview("imagesPreview", e.target.files);
+    } else {
+      document.getElementById("imagesPreview").innerHTML = "";
+    }
+  });
+
+  async function loadDetail() {
+    if (!galleryId) return;
+
+    try {
+      const res = await fetch(`/api/gallery/detail/${galleryId}`);
+      const data = await res.json();
+
+      document.getElementById("lang").value = data.lang || "kr";
+      document.getElementById("title").value = data.title || "";
+      editor.setHTML(data.description || "");
+
+      // 기존 대표 이미지 프리뷰
+      if (data.cover_image) {
+        const box = document.getElementById("coverPreview");
+        box.innerHTML = `
+          <div class="preview-item">
+            <img src="${data.cover_image}" alt="">
+            <div class="preview-label">현재 대표 이미지</div>
+          </div>
+        `;
+      }
+
+      // 기존 추가 이미지 프리뷰
+      if (data.images && data.images.length) {
+        const box = document.getElementById("imagesPreview");
+        box.innerHTML = data.images.map(src => `
+          <div class="preview-item">
+            <img src="${src}" alt="">
+            <div class="preview-label">등록된 이미지</div>
+          </div>
+        `).join("");
+      }
+
+    } catch (e) {
+      console.error("갤러리 상세 불러오기 오류:", e);
+      alert("데이터 불러오기에 실패했습니다.");
+    }
+  }
+
+  async function saveGallery() {
+    const title = document.getElementById("title").value.trim();
+    const lang = document.getElementById("lang").value;
+    const description = editor.getHTML() || "";
+
+    if (!title) {
+      alert("제목은 필수입니다.");
+      document.getElementById("title").focus();
+      return;
+    }
+
+    const form = new FormData();
+    form.append("title", title);
+    form.append("lang", lang);
+    form.append("description", description);
+
+    // 대표 이미지
+    const coverFile = document.getElementById("cover").files[0];
+    if (coverFile) form.append("cover", coverFile);
+
+    // 추가 이미지
+    const images = document.getElementById("images").files;
+    for (const img of images) {
+      form.append("images", img);
+    }
+
+    const token = localStorage.getItem("token");
+    let url, method;
+    if (galleryId) {
+      url = `/api/gallery/edit/${galleryId}`;
+      method = "PUT";
+    } else {
+      url = `/api/gallery/create`;
+      method = "POST";
+    }
+
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: { Authorization: "Bearer " + token },
+        body: form,
+      });
+
+      const out = await res.json().catch(() => ({}));
+
+      if (res.ok) {
+        alert(galleryId ? "수정 완료" : "등록 완료");
+        location.href = "gallery-list.html";
+      } else {
+        alert("저장 실패: " + (out.message || "알 수 없는 오류"));
+      }
+    } catch (e) {
+      console.error("갤러리 저장 오류:", e);
+      alert("통신 중 오류가 발생했습니다.");
+    }
+  }
+
+  // 수정 모드일 경우 데이터 로드
+  loadDetail();
+</script>
+
+</body>
+</html>
