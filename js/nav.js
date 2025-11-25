@@ -184,7 +184,7 @@ function initBreadcrumbTabs() {
               { name: "공지사항", link: `${base}/pr/notice/index.html` },
               { name: "뉴스룸", link: `${base}/pr/newsroom/index.html` },
               { name: "갤러리", link: `${base}/pr/gallery/index.html` },
-              { name: "인증/특허", link: `${base}/pr/cert/index.html` },
+              { name: "인증/특허", link: `${base}/pr/certification/index.html` },
               { name: "카탈로그", link: `${base}/pr/catalog/index.html` },
             ]
           : [
