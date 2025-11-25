@@ -123,29 +123,24 @@
 
     document.addEventListener("DOMContentLoaded", () => loadNews(1));
 
-    async function loadNews(page) {
-      currentPage = page;
+   async function loadNews(page) {
+    currentPage = page;
 
-      const res = await fetch(`/api/posts/list/news?lang=kr&page=${page}&pageSize=${pageSize}`);
-      const data = await res.json();
+    const res = await fetch(`/api/posts/list/news?lang=kr&page=${page}&pageSize=${pageSize}`);
+    const data = await res.json();
 
-      /*
-        🔥 응답 형태 완전 통합 처리
-        가능성:
-          1) [ {...}, {...} ]  ← 배열
-          2) { list: [ ... ], pages: x, page: y }
-          3) { } 빈 객체
-      */
-      const list = Array.isArray(data)
-        ? data
-        : (Array.isArray(data.list) ? data.list : []);
+    console.log("🔥 서버 응답:", data);  // ★★★ 반드시 필요
 
-      const totalPages =
-        data.pages ||
-        Math.ceil(list.length / pageSize) ||
-        1;
+    const list = Array.isArray(data)
+      ? data
+      : (Array.isArray(data.list) ? data.list : []);
 
-      const nowPage = data.page || currentPage;
+    const totalPages =
+      data.pages ||
+      (Array.isArray(list) ? Math.ceil(list.length / pageSize) : 1) ||
+      1;
+
+    const nowPage = data.page || currentPage;
 
       const box = document.getElementById("newsContainer");
 
