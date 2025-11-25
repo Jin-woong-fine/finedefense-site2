@@ -183,16 +183,16 @@ function initBreadcrumbTabs() {
           ? [
               { name: "공지사항", link: `${base}/pr/notice/index.html` },
               { name: "뉴스룸", link: `${base}/pr/newsroom/index.html` },
-              { name: "갤러리", link: `${base}/pr/gallery/gallery.html` },
-              { name: "인증/특허", link: `${base}/pr/cert/cert.html` },
-              { name: "카탈로그", link: `${base}/pr/catalog/catalog.html` },
+              { name: "갤러리", link: `${base}/pr/gallery/index.html` },
+              { name: "인증/특허", link: `${base}/pr/cert/index.html` },
+              { name: "카탈로그", link: `${base}/pr/catalog/index.html` },
             ]
           : [
               { name: "Notice", link: `${base}/pr/notice/index.html` },
               { name: "Newsroom", link: `${base}/pr/newsroom/index.html` },
-              { name: "Gallery", link: `${base}/pr/gallery/gallery.html` },
-              { name: "Certificates", link: `${base}/pr/cert/cert.html` },
-              { name: "Catalog", link: `${base}/pr/catalog/catalog.html` },
+              { name: "Gallery", link: `${base}/pr/gallery/index.html` },
+              { name: "Certificates", link: `${base}/pr/cert/index.html` },
+              { name: "Catalog", link: `${base}/pr/catalog/index.html` },
             ];
       }
 
