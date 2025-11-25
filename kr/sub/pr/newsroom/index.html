@@ -127,7 +127,15 @@
     currentPage = page;
 
     const res = await fetch(`/api/posts/list/news?lang=kr&page=${page}&pageSize=${pageSize}`);
+
+    // ★★★ 여기 추가 (가장 위)
+    console.log("🔥 RAW RESPONSE:", res);
+
     const data = await res.json();
+
+    // ★★★ 여기 추가 (무조건 찍히는 위치)
+    console.log("🔥 PARSED DATA:", data);
+
 
     console.log("🔥 서버 응답:", data);  // ★★★ 반드시 필요
 
