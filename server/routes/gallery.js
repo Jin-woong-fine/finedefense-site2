@@ -9,10 +9,10 @@ import { verifyToken } from "../middleware/auth.js";
 const router = express.Router();
 
 /* ===========================================================
-   📁 Multer 설정 (갤러리 업로드) — 절대경로 통일
+   📁 Multer 설정 — 모든 업로드 경로 통일
+   실제 저장: server/uploads/gallery
+   URL 접근:  /uploads/gallery/파일명
 =========================================================== */
-
-// 서버 /server/uploads/gallery 경로
 const galleryDir = path.join(process.cwd(), "server/uploads/gallery");
 
 if (!fs.existsSync(galleryDir)) {
@@ -30,7 +30,6 @@ const storage = multer.diskStorage({
 });
 
 const uploadGallery = multer({ storage });
-
 
 /* ===========================================================
    📌 갤러리 생성
@@ -66,7 +65,6 @@ router.post("/create", verifyToken, uploadGallery.array("images", 20), async (re
     res.status(500).json({ message: "갤러리 생성 오류" });
   }
 });
-
 
 /* ===========================================================
    📌 갤러리 수정
@@ -106,7 +104,6 @@ router.put("/edit/:id", verifyToken, uploadGallery.array("images", 20), async (r
   }
 });
 
-
 /* ===========================================================
    📌 갤러리 삭제
 =========================================================== */
@@ -135,7 +132,6 @@ router.delete("/delete/:id", verifyToken, async (req, res) => {
     res.status(500).json({ message: "갤러리 삭제 오류" });
   }
 });
-
 
 /* ===========================================================
    📌 갤러리 목록
