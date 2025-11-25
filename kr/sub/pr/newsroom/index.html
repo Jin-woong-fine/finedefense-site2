@@ -101,35 +101,37 @@
   <!-- FOOTER -->
   <div id="footer"></div>
 
-  <!-- HEADER / FOOTER LOADER -->
-  <script src="/js/header.js"></script>
-  <script src="/js/footer.js"></script>
+  <!-- nav.js가 header/footer 로드 -->
+  <script src="/js/nav.js"></script>
 
   <script>
     let currentPage = 1;
-    const pageSize = 9; // 3×3 그리드
+    const pageSize = 9;
 
     document.addEventListener("DOMContentLoaded", () => loadNews(1));
 
     async function loadNews(page) {
       currentPage = page;
 
-      const res = await fetch(
-        `/api/posts/list/news?lang=kr&page=${page}&pageSize=${pageSize}`
-      );
+      const res = await fetch(`/api/posts/list/news?lang=kr&page=${page}&pageSize=${pageSize}`);
       const data = await res.json();
 
+      // 서버 pagination이 없을 때 대비
+      const list = data.list || data || [];
+      const totalPages = data.pages || 1;
+      const nowPage = data.page || page;
+
       const box = document.getElementById("newsContainer");
-      if (!data.list.length) {
+      if (!list.length) {
         box.innerHTML = "<p>등록된 뉴스가 없습니다.</p>";
         return;
       }
 
-      // 뉴스 카드 렌더링
-      box.innerHTML = data.list
+      // 카드 렌더링
+      box.innerHTML = list
         .map((v) => {
-          const img = v.main_image ? v.main_image : "/img/no-image.jpg";
-          const date = v.created_at.substring(0, 10);
+          const img = v.main_image || "/img/no-image.jpg";
+          const date = v.created_at?.substring(0, 10) || "";
 
           return `
             <div class="news-card" onclick="openNews(${v.id})">
@@ -143,18 +145,18 @@
         })
         .join("");
 
-      // 페이지네이션 렌더
-      renderPagination(data.pages, data.page);
+      renderPagination(totalPages, nowPage);
     }
 
     function openNews(id) {
       location.href = `/kr/sub/pr/newsroom/news-view.html?id=${id}`;
     }
 
-
     function renderPagination(totalPages, current) {
       const p = document.getElementById("pagination");
       p.innerHTML = "";
+
+      if (totalPages <= 1) return;
 
       // 이전 버튼
       if (current > 1) {
