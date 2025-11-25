@@ -9,13 +9,20 @@ import { verifyToken } from "../middleware/auth.js";
 const router = express.Router();
 
 /* ===========================================================
-   📁 Multer 설정 (갤러리 업로드)
+   📁 Multer 설정 (갤러리 업로드) — 절대경로 적용
 =========================================================== */
+const galleryDir = path.join(
+  path.resolve(),
+  "server/public/uploads/gallery"
+);
+
+if (!fs.existsSync(galleryDir)) {
+  fs.mkdirSync(galleryDir, { recursive: true });
+}
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const dir = "uploads/gallery";
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-    cb(null, dir);
+    cb(null, galleryDir);
   },
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
@@ -47,7 +54,8 @@ router.post("/create", verifyToken, uploadGallery.array("images", 20), async (re
 
     for (const f of req.files) {
       await db.execute(
-        `INSERT INTO post_images (post_id, image_path) VALUES (?, ?)`,
+        `INSERT INTO post_images (post_id, image_path) VALUES (?, ?)`
+        ,
         [postId, `/uploads/gallery/${f.filename}`]
       );
     }
@@ -68,16 +76,14 @@ router.put("/edit/:id", verifyToken, uploadGallery.array("images", 20), async (r
     const postId = req.params.id;
     const { title, description, lang } = req.body;
 
-    let coverImage = null;
     const hasNewImages = req.files.length > 0;
-
-    if (hasNewImages) {
-      coverImage = `/uploads/gallery/${req.files[0].filename}`;
-    }
+    const coverImage = hasNewImages
+      ? `/uploads/gallery/${req.files[0].filename}`
+      : null;
 
     await db.execute(
       `UPDATE posts
-         SET title=?, content=?, lang=?, 
+         SET title=?, content=?, lang=?,
              main_image = IFNULL(?, main_image)
        WHERE id=? AND category='gallery'`,
       [title, description, lang, coverImage, postId]
@@ -88,7 +94,8 @@ router.put("/edit/:id", verifyToken, uploadGallery.array("images", 20), async (r
 
       for (const f of req.files) {
         await db.execute(
-          `INSERT INTO post_images (post_id, image_path) VALUES (?, ?)`,
+          `INSERT INTO post_images (post_id, image_path) VALUES (?, ?)`
+          ,
           [postId, `/uploads/gallery/${f.filename}`]
         );
       }
@@ -115,7 +122,9 @@ router.delete("/delete/:id", verifyToken, async (req, res) => {
     );
 
     for (const img of images) {
-      try { fs.unlinkSync("." + img.image_path); } catch {}
+      try {
+        fs.unlinkSync(path.join(path.resolve(), "server/public", img.image_path));
+      } catch {}
     }
 
     await db.execute(`DELETE FROM post_images WHERE post_id=?`, [postId]);
@@ -130,7 +139,7 @@ router.delete("/delete/:id", verifyToken, async (req, res) => {
 });
 
 /* ===========================================================
-   📌 목록 조회
+   📌 갤러리 목록
 =========================================================== */
 router.get("/list", async (req, res) => {
   try {
