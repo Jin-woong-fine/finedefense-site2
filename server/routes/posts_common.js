@@ -99,11 +99,12 @@ router.get("/list/:category", async (req, res) => {
 
     const page = Number(req.query.page) || 1;
     const pageSize = Number(req.query.pageSize) || 99999;
+
     const offset = (page - 1) * pageSize;
 
-    /* -------------------------------
-       1) 전체 개수 조회
-    -------------------------------- */
+    /* ---------------------------
+       전체 개수
+    ---------------------------- */
     let countSQL = `SELECT COUNT(*) AS cnt FROM posts WHERE category=?`;
     const countParams = [category];
 
@@ -116,10 +117,10 @@ router.get("/list/:category", async (req, res) => {
     const total = countRows[0].cnt;
     const pages = Math.ceil(total / pageSize);
 
-
-    /* -------------------------------
-       2) 실제 리스트 조회
-    -------------------------------- */
+    /* ---------------------------
+       실제 데이터 조회
+       LIMIT/OFFSET → 문자열 삽입
+    ---------------------------- */
     let listSQL = `
       SELECT p.*,
              u.name AS author_name,
@@ -131,23 +132,21 @@ router.get("/list/:category", async (req, res) => {
     const listParams = [category];
 
     if (lang !== "all") {
-      listSQL += ` AND p.lang=?`;
+      listSQL += ` AND p.lang=? `;
       listParams.push(lang);
     }
 
     listSQL += `
       ORDER BY p.sort_order, p.created_at DESC
-      LIMIT ? OFFSET ?
+      LIMIT ${pageSize} OFFSET ${offset}
     `;
-
-    listParams.push(pageSize, offset);
 
     const [rows] = await db.execute(listSQL, listParams);
 
-    /* -------------------------------
-       3) 응답
-    -------------------------------- */
-    return res.json({
+    /* ---------------------------
+       응답
+    ---------------------------- */
+    res.json({
       list: rows,
       total,
       page,
@@ -157,8 +156,9 @@ router.get("/list/:category", async (req, res) => {
 
   } catch (err) {
     console.error("🔥 목록 오류:", err);
-    return res.status(500).json({ message: "목록 오류" });
+    res.status(500).json({ message: "목록 오류" });
   }
 });
+
 
 export default router;
