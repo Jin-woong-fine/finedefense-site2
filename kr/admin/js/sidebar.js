@@ -1,5 +1,5 @@
 /* ============================================================
-   ⭐ Fine Defense Admin Sidebar (Stable Version)
+   ⭐ Fine Defense Admin Sidebar (Stable Version - with loadSidebar)
    ============================================================ */
 
 window.loadSidebar = function(activeKey) {
