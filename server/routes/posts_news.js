@@ -8,12 +8,14 @@ import { verifyToken } from "../middleware/auth.js";
 
 const router = express.Router();
 
-/* ==========================================
-   📁 Multer 설정 (뉴스 이미지 업로드)
-========================================== */
+/* ======================================================
+   📁 Multer 설정 (정적 경로와 100% 일치하도록 수정)
+   저장 경로: server/public/uploads/news
+   URL 접근: /uploads/news/파일명
+====================================================== */
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const dir = "uploads/news";
+    const dir = path.join("public", "uploads", "news");
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     cb(null, dir);
   },
@@ -24,9 +26,9 @@ const storage = multer.diskStorage({
 });
 const uploadNews = multer({ storage });
 
-/* ==========================================
+/* ======================================================
    📌 뉴스 등록
-========================================== */
+====================================================== */
 router.post("/create", verifyToken, uploadNews.array("images", 10), async (req, res) => {
   try {
     const { title, content, lang } = req.body;
@@ -48,6 +50,7 @@ router.post("/create", verifyToken, uploadNews.array("images", 10), async (req, 
     for (const f of req.files) {
       await db.execute(
         `INSERT INTO post_images (post_id, image_path) VALUES (?, ?)`,
+
         [postId, `/uploads/news/${f.filename}`]
       );
     }
@@ -60,9 +63,9 @@ router.post("/create", verifyToken, uploadNews.array("images", 10), async (req, 
   }
 });
 
-/* ==========================================
+/* ======================================================
    📌 뉴스 수정
-========================================== */
+====================================================== */
 router.put("/edit/:id", verifyToken, uploadNews.array("images", 10), async (req, res) => {
   try {
     const postId = req.params.id;
@@ -83,13 +86,28 @@ router.put("/edit/:id", verifyToken, uploadNews.array("images", 10), async (req,
       [title, content, lang, mainImage, postId]
     );
 
-    // 기존 이미지 삭제 후 재등록 (요청했을 때만)
+    // 기존 이미지 삭제 후 재등록
     if (hasNewImages) {
+      // 기존 이미지 목록 가져오기
+      const [oldImages] = await db.execute(
+        `SELECT image_path FROM post_images WHERE post_id=?`,
+        [postId]
+      );
+
+      // 실제 파일 삭제
+      for (const img of oldImages) {
+        const filePath = path.join("public", img.image_path);
+        try { fs.unlinkSync(filePath); } catch {}
+      }
+
+      // DB 삭제
       await db.execute(`DELETE FROM post_images WHERE post_id=?`, [postId]);
 
+      // 새 이미지 등록
       for (const f of req.files) {
         await db.execute(
           `INSERT INTO post_images (post_id, image_path) VALUES (?, ?)`,
+
           [postId, `/uploads/news/${f.filename}`]
         );
       }
@@ -103,9 +121,9 @@ router.put("/edit/:id", verifyToken, uploadNews.array("images", 10), async (req,
   }
 });
 
-/* ==========================================
+/* ======================================================
    📌 뉴스 삭제
-========================================== */
+====================================================== */
 router.delete("/delete/:id", verifyToken, async (req, res) => {
   try {
     const postId = req.params.id;
@@ -116,11 +134,10 @@ router.delete("/delete/:id", verifyToken, async (req, res) => {
       [postId]
     );
 
-    // 파일 삭제
+    // 실제 파일 삭제
     for (const img of images) {
-      try {
-        fs.unlinkSync("." + img.image_path);
-      } catch {}
+      const filePath = path.join("public", img.image_path);
+      try { fs.unlinkSync(filePath); } catch {}
     }
 
     await db.execute(`DELETE FROM post_images WHERE post_id=?`, [postId]);
