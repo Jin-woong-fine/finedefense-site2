@@ -3,14 +3,14 @@
    - KR/EN 자동 감지
    - Header/Footer 자동 로딩
    - Breadcrumb / SideTabs
-   - Newsroom 상세페이지 active fix
-   - AdminBar 겹침 해결 (자동 padding-top)
+   - Newsroom 상세 active fix
+   - AdminBar 겹침 해결 (body padding 자동 조정)
 ============================================================ */
 
 let hideTimer = null;
 
 /* ------------------------------------------------------------
-   1) 언어 자동 감지
+   1) 언어 자동 감지 (URL 기반)
 ------------------------------------------------------------ */
 function detectLang() {
   const p = location.pathname.toLowerCase();
@@ -19,7 +19,7 @@ function detectLang() {
 const LANG = detectLang();
 
 /* ------------------------------------------------------------
-   2) Header/Footer 경로 세팅
+   2) Header / Footer 경로
 ------------------------------------------------------------ */
 const PATH = {
   header: `/${LANG}/components/header.html`,
@@ -43,7 +43,7 @@ async function loadComponent(targetId, url) {
 }
 
 /* ------------------------------------------------------------
-   4) 상단 메뉴 활성화
+   4) 메인 메뉴 활성화
 ------------------------------------------------------------ */
 function highlightTopMenu() {
   const path = location.pathname.toLowerCase();
@@ -77,8 +77,8 @@ function highlightTopMenu() {
 ------------------------------------------------------------ */
 function showSideTabs(list, trigger) {
   const side = document.getElementById("side-tabs");
-  const crumb = document.querySelector(".breadcrumb");
-  if (!side || !crumb || !trigger) return;
+  const bc = document.querySelector(".breadcrumb");
+  if (!side || !bc || !trigger) return;
 
   clearTimeout(hideTimer);
 
@@ -92,14 +92,15 @@ function showSideTabs(list, trigger) {
 
     if (current === href) a.classList.add("active");
 
-    // 🔥 Newsroom 상세 => Newsroom 탭 활성화
-    if (current.includes("/pr/newsroom/news-view") && href.includes("/pr/newsroom/index.html")) {
+    // 🔥 newsroom 상세페이지 -> newsroom 탭강제 active
+    if (current.includes("/pr/newsroom/news-view") &&
+        href.includes("/pr/newsroom/index.html")) {
       a.classList.add("active");
     }
   });
 
   const r1 = trigger.getBoundingClientRect();
-  const r2 = crumb.getBoundingClientRect();
+  const r2 = bc.getBoundingClientRect();
 
   side.style.left = `${r1.left - r2.left}px`;
   side.style.top = `${r1.bottom - r2.top + 8}px`;
@@ -107,7 +108,7 @@ function showSideTabs(list, trigger) {
 }
 
 /* ------------------------------------------------------------
-   6) Breadcrumb Tabs
+   6) Breadcrumb 탭 로직
 ------------------------------------------------------------ */
 function initBreadcrumbTabs() {
   const lv1 = document.querySelector(".crumb-level1");
@@ -216,7 +217,7 @@ function initBreadcrumbTabs() {
 }
 
 /* ------------------------------------------------------------
-   7) Admin Mode Bar (Home / Dashboard / Logout)
+   7) Admin Mode Bar
 ------------------------------------------------------------ */
 function initAdminBar() {
   const role = localStorage.getItem("role");
@@ -254,48 +255,46 @@ function initAdminBar() {
     font-size:14px;
   `;
 
-  // 버튼 공통 스타일
   const style = document.createElement("style");
   style.textContent = `
-    #adminBar .admin-right .admin-btn {
+    #adminBar .admin-btn {
       color:white;
       margin-left:16px;
       text-decoration:none;
       padding:6px 10px;
       border-radius:4px;
       transition:0.2s;
+      white-space:nowrap;
     }
-    #adminBar .admin-right .admin-btn:hover {
+    #adminBar .admin-btn:hover {
       background:rgba(255,255,255,0.2);
+    }
+    #adminBar .admin-right {
+      display:flex;
+      align-items:center;
+      flex-shrink:1;
+      white-space:nowrap;
     }
   `;
   document.head.appendChild(style);
 
-  // body padding 조정 (겹침 방지)
   document.body.classList.add("admin-mode");
   document.body.style.paddingTop = "48px";
 
   document.body.prepend(bar);
 
-  // 로그아웃
   document.getElementById("adminLogout").addEventListener("click", () => {
     localStorage.clear();
     location.href = `/${LANG}/admin/login.html`;
   });
 }
 
-
 /* ------------------------------------------------------------
-   8) Header & Footer Load + 전체 초기화
+   8) 전체 초기화
 ------------------------------------------------------------ */
 document.addEventListener("DOMContentLoaded", async () => {
   await loadComponent("header", PATH.header);
   await loadComponent("footer", PATH.footer);
-
-  // AdminBar 겹침 해결 → Header 아래로 자동 padding
-  if (document.body.classList.contains("admin-mode")) {
-    document.body.style.paddingTop = "48px";
-  }
 
   highlightTopMenu();
   initBreadcrumbTabs();
