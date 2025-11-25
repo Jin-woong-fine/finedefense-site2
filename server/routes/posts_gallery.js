@@ -15,9 +15,9 @@ const router = express.Router();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// 🔹 업로드 루트: /server/uploads
-const UPLOAD_ROOT = path.join(__dirname, "../uploads");
-// 🔹 갤러리 폴더: /server/uploads/gallery
+// 🔹 업로드 루트: /home/ubuntu/finedefense_homepage/server/uploads
+const UPLOAD_ROOT = path.join(__dirname, "uploads");
+// 🔹 갤러리 폴더: /home/ubuntu/finedefense_homepage/server/uploads/gallery
 const GALLERY_DIR = path.join(UPLOAD_ROOT, "gallery");
 
 if (!fs.existsSync(GALLERY_DIR)) {
@@ -83,6 +83,7 @@ router.post(
       const [result] = await db.execute(
         `INSERT INTO posts (title, content, category, lang, author_id, main_image)
          VALUES (?, ?, 'gallery', ?, ?, ?)`,
+
         [title, description || "", postLang, req.user.id, coverImage]
       );
 
@@ -92,6 +93,7 @@ router.post(
       for (const f of files) {
         await db.execute(
           `INSERT INTO post_images (post_id, image_path) VALUES (?, ?)`,
+
           [postId, toPublicPath(f.filename)]
         );
       }
