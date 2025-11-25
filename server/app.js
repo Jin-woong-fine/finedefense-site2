@@ -45,7 +45,7 @@ app.use(express.urlencoded({ extended: true, limit: "30mb" }));
 // ============================
 app.use(
   "/uploads",
-  express.static(path.join(__dirname, "uploads"))
+  express.static(path.join(__dirname, "server/uploads"))
 );
 
 
