@@ -15,10 +15,12 @@ const router = express.Router();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// 🔹 업로드 루트: /home/ubuntu/finedefense_homepage/server/uploads
-const UPLOAD_ROOT = path.join(__dirname, "../uploads");
-// 🔹 갤러리 폴더: /home/ubuntu/finedefense_homepage/server/uploads/gallery
+// 업로드 루트: server/public/uploads
+const UPLOAD_ROOT = path.join(__dirname, "../public/uploads");
+
+// 갤러리 폴더: server/public/uploads/gallery
 const GALLERY_DIR = path.join(UPLOAD_ROOT, "gallery");
+
 
 if (!fs.existsSync(GALLERY_DIR)) {
   fs.mkdirSync(GALLERY_DIR, { recursive: true });
