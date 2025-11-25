@@ -264,7 +264,19 @@
     const res = await fetch(`/api/posts/list/notice?lang=all`);
     const data = await res.json();
 
-    allNotices = data.sort((a, b) => a.sort_order - b.sort_order);
+    console.log("🔥 공지 응답:", data);
+
+    // 배열 or 객체(list) 모두 안정적으로 처리
+    const list = Array.isArray(data) ? data : (data.list || []);
+
+    if (!Array.isArray(list)) {
+      console.error("❌ list가 배열이 아님:", list);
+      return;
+    }
+
+    // 기존 정렬 그대로
+    allNotices = list.sort((a, b) => a.sort_order - b.sort_order);
+
     applyFilter();
   }
 
