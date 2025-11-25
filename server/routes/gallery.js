@@ -22,13 +22,16 @@ if (!fs.existsSync(galleryDir)) {
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, galleryDir);
+    const dir = path.join(process.cwd(), "server/public/uploads/gallery");
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    cb(null, dir);
   },
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
     cb(null, Date.now() + "_" + Math.round(Math.random() * 1e9) + ext);
   }
 });
+
 
 const uploadGallery = multer({ storage });
 

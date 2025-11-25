@@ -17,11 +17,11 @@ import loginLogsRouter from "./routes/login_logs.js";
 import userProfileRouter from "./routes/user_profile.js";
 import usersRouter from "./routes/users.js";
 
-// ✨ 게시물(Post) 구조
+// 게시물 공통 / 뉴스 전용
 import postsCommonRouter from "./routes/posts_common.js";
 import postsNewsRouter from "./routes/posts_news.js";
 
-// ✨ 갤러리
+// 갤러리 전용
 import galleryRouter from "./routes/gallery.js";
 
 
@@ -32,6 +32,7 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// POST Body
 app.use(cors());
 app.use(express.json({ limit: "30mb" }));
 app.use(express.urlencoded({ extended: true, limit: "30mb" }));
@@ -40,12 +41,16 @@ app.use(express.urlencoded({ extended: true, limit: "30mb" }));
 // ============================
 // 📌 업로드 폴더 정적 제공 (최우선)
 // ============================
-// 결론: 모든 업로드는 /server/uploads 에 저장됨
-// → URL 요청: /uploads/파일명
-// → 실제 경로: server/uploads/파일명  ← 이 구조로 통일
+//
+// 🎯 업로드 저장 경로(서버 내부)
+//    /home/ubuntu/finedefense_homepage/server/uploads
+//
+// 🎯 URL 요청 경로(프론트엔드)
+//    http://서버주소/uploads/파일명
+//
 app.use(
   "/uploads",
-  express.static(path.resolve(__dirname, "uploads"))
+  express.static(path.join(process.cwd(), "server/uploads"))
 );
 
 
@@ -53,45 +58,47 @@ app.use(
 // 📌 API 라우터 등록
 // ============================
 
-// 1) 인증 / 로그인
+// 인증
 app.use("/api/auth", authRouter);
 
-// 2) 문의하기
+// 문의
 app.use("/api/inquiry", sendInquiryRouter);
 
-// 3) 관리자 기능
+// 관리자
 app.use("/api/admin", adminDashboardRouter);
 app.use("/api/admin", adminRouter);
 
-// 4) 게시물 공통 조회 (공지 · 뉴스)
+// 게시물 공통(공지/뉴스)
 app.use("/api/posts", postsCommonRouter);
 
-// 5) 뉴스 CRUD
+// 뉴스 CRUD
 app.use("/api/news", postsNewsRouter);
 
-// 6) 갤러리 CRUD ★ 추가됨
+// 갤러리 CRUD
 app.use("/api/gallery", galleryRouter);
 
-// 7) 제품 관리
+// 제품 관리
 app.use("/api/products", productsRouter);
 
-// 8) 공통 이미지 업로드(Quill 포함)
+// Quill 이미지 업로드
 app.use("/api/uploads", uploadsRouter);
 
-// 9) 로그인 기록
+// 로그인 기록
 app.use("/api/logs/login", loginLogsRouter);
 
-// 10) 사용자 - 내 프로필
+// 내 프로필
 app.use("/api/users/me", userProfileRouter);
 
-// 11) 사용자 관리
+// 사용자 관리
 app.use("/api/users", usersRouter);
 
 
 // ============================
-// 📌 정적 페이지 제공 — MUST BE LAST
+// 📌 정적 페이지 제공 (마지막에)
 // ============================
-// "/server/../" → 프로젝트 최상위 전체 HTML 제공
+//
+// frontend root = finededefense_homepage/
+//
 app.use(express.static(path.resolve(__dirname, "../")));
 
 
