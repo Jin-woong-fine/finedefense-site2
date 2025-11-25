@@ -1,4 +1,4 @@
-// server/routes/gallery.js
+// server/routes/posts_gallery.js
 import express from "express";
 import multer from "multer";
 import path from "path";
@@ -9,19 +9,20 @@ import { verifyToken } from "../middleware/auth.js";
 const router = express.Router();
 
 /* ===========================================================
-   📁 Multer 설정 — 모든 업로드 경로 통일
-   실제 저장: server/uploads/gallery
-   URL 접근:  /uploads/gallery/파일명
+   📁 업로드 경로 (절대경로)
 =========================================================== */
-const galleryDir = path.join(process.cwd(), "server/uploads/gallery");
+const UPLOAD_DIR = path.join(process.cwd(), "server/uploads/gallery");
 
-if (!fs.existsSync(galleryDir)) {
-  fs.mkdirSync(galleryDir, { recursive: true });
+if (!fs.existsSync(UPLOAD_DIR)) {
+  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 }
 
+/* ===========================================================
+   📁 Multer 설정
+=========================================================== */
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, galleryDir);
+    cb(null, UPLOAD_DIR);
   },
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
@@ -39,7 +40,7 @@ router.post("/create", verifyToken, uploadGallery.array("images", 20), async (re
     const { title, description, lang } = req.body;
 
     if (!title) return res.status(400).json({ message: "제목은 필수입니다." });
-    if (!req.files.length) return res.status(400).json({ message: "이미지는 1개 이상 필요합니다." });
+    if (!req.files.length) return res.status(400).json({ message: "이미지는 최소 1개 필요" });
 
     const coverImage = `/uploads/gallery/${req.files[0].filename}`;
 
@@ -79,13 +80,22 @@ router.put("/edit/:id", verifyToken, uploadGallery.array("images", 20), async (r
 
     await db.execute(
       `UPDATE posts
-         SET title=?, content=?, lang=?,
-             main_image = IFNULL(?, main_image)
+         SET title=?, content=?, lang=?, main_image = IFNULL(?, main_image)
        WHERE id=? AND category='gallery'`,
       [title, description, lang, coverImage, postId]
     );
 
     if (hasNewImages) {
+      const [oldImages] = await db.execute(
+        `SELECT image_path FROM post_images WHERE post_id=?`,
+        [postId]
+      );
+
+      for (const img of oldImages) {
+        const realPath = path.join(process.cwd(), "server", img.image_path);
+        try { fs.unlinkSync(realPath); } catch {}
+      }
+
       await db.execute(`DELETE FROM post_images WHERE post_id=?`, [postId]);
 
       for (const f of req.files) {
@@ -105,7 +115,7 @@ router.put("/edit/:id", verifyToken, uploadGallery.array("images", 20), async (r
 });
 
 /* ===========================================================
-   📌 갤러리 삭제
+   📌 삭제
 =========================================================== */
 router.delete("/delete/:id", verifyToken, async (req, res) => {
   try {
@@ -117,9 +127,8 @@ router.delete("/delete/:id", verifyToken, async (req, res) => {
     );
 
     for (const img of images) {
-      try {
-        fs.unlinkSync(path.join(process.cwd(), "server", img.image_path));
-      } catch {}
+      const real = path.join(process.cwd(), "server", img.image_path);
+      try { fs.unlinkSync(real); } catch {}
     }
 
     await db.execute(`DELETE FROM post_images WHERE post_id=?`, [postId]);
@@ -134,7 +143,7 @@ router.delete("/delete/:id", verifyToken, async (req, res) => {
 });
 
 /* ===========================================================
-   📌 갤러리 목록
+   📌 목록 조회
 =========================================================== */
 router.get("/list", async (req, res) => {
   try {

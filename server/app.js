@@ -17,12 +17,9 @@ import loginLogsRouter from "./routes/login_logs.js";
 import userProfileRouter from "./routes/user_profile.js";
 import usersRouter from "./routes/users.js";
 
-// 게시물 공통 / 뉴스
 import postsCommonRouter from "./routes/posts_common.js";
 import postsNewsRouter from "./routes/posts_news.js";
-
-// 갤러리
-import galleryRouter from "./routes/gallery.js";
+import postsGalleryRouter from "./routes/posts_gallery.js";   // ★ 갤러리 전용
 
 
 // ============================
@@ -41,15 +38,15 @@ app.use(express.urlencoded({ extended: true, limit: "30mb" }));
 // 📌 업로드 폴더 정적 제공 (최우선)
 // ============================
 //
-// PM2 실행 폴더 = /home/ubuntu/finedefense_homepage/server
-// 업로드 폴더 = /home/ubuntu/finedefense_homepage/server/uploads
+// ✔ 업로드 저장 위치: /home/ubuntu/finedefense_homepage/server/uploads/...
+// ✔ URL 접근:        http://서버주소/uploads/파일명
 //
-// URL: http://서버/uploads/파일명
-//
-const UPLOAD_DIR = path.join(__dirname, "uploads");
-console.log("📁 Upload Serve Path:", UPLOAD_DIR);
-
-app.use("/uploads", express.static(UPLOAD_DIR));
+// ※ gallery/news/notice 이미지 모두 여기에 저장됨
+// ============================
+app.use(
+  "/uploads",
+  express.static(path.join(__dirname, "uploads"))
+);
 
 
 // ============================
@@ -66,19 +63,19 @@ app.use("/api/inquiry", sendInquiryRouter);
 app.use("/api/admin", adminDashboardRouter);
 app.use("/api/admin", adminRouter);
 
-// 공통 게시물(공지/뉴스)
+// 게시물 공통 조회 (공지/뉴스/갤러리 읽기)
 app.use("/api/posts", postsCommonRouter);
 
 // 뉴스 CRUD
 app.use("/api/news", postsNewsRouter);
 
 // 갤러리 CRUD
-app.use("/api/gallery", galleryRouter);
+app.use("/api/gallery", postsGalleryRouter);
 
 // 제품 관리
 app.use("/api/products", productsRouter);
 
-// Quill 이미지 업로드
+// Quill / 공통 이미지 업로드
 app.use("/api/uploads", uploadsRouter);
 
 // 로그인 기록
@@ -92,11 +89,11 @@ app.use("/api/users", usersRouter);
 
 
 // ============================
-// 📌 정적 페이지 제공 (마지막)
+// 📌 정적 페이지 제공 (마지막에)
 // ============================
 //
-// frontend root = finededefense_homepage/
-//
+// /home/ubuntu/finedefense_homepage 전체를 프론트로 공개
+// ============================
 app.use(express.static(path.resolve(__dirname, "../")));
 
 
@@ -122,5 +119,5 @@ app.use((err, req, res, next) => {
 // ============================
 const PORT = 3000;
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`🚀 Fine Defense Server Running on http://0.0.0.0:${PORT}`);
+  console.log(`🚀 Fine Defense Server Running: http://0.0.0.0:${PORT}`);
 });
