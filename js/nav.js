@@ -4,13 +4,13 @@
    - Header/Footer 자동 로딩
    - Breadcrumb / SideTabs
    - Newsroom 상세 active fix
-   - AdminBar 겹침 해결 (body padding 자동 조정)
+   - AdminBar 겹침 해결 (header 로딩 후 자동 padding)
 ============================================================ */
 
 let hideTimer = null;
 
 /* ------------------------------------------------------------
-   1) 언어 자동 감지 (URL 기반)
+   1) 언어 자동 감지
 ------------------------------------------------------------ */
 function detectLang() {
   const p = location.pathname.toLowerCase();
@@ -19,7 +19,7 @@ function detectLang() {
 const LANG = detectLang();
 
 /* ------------------------------------------------------------
-   2) Header / Footer 경로
+   2) Header / Footer 경로 세팅
 ------------------------------------------------------------ */
 const PATH = {
   header: `/${LANG}/components/header.html`,
@@ -33,10 +33,11 @@ async function loadComponent(targetId, url) {
   try {
     const res = await fetch(url);
     if (!res.ok) throw new Error(url + " not found");
-
     const html = await res.text();
+
     const el = document.getElementById(targetId);
     if (el) el.innerHTML = html;
+
   } catch (e) {
     console.error("Component Load Error:", e);
   }
@@ -87,12 +88,13 @@ function showSideTabs(list, trigger) {
     .join("");
 
   const current = location.pathname.toLowerCase();
+
   side.querySelectorAll(".tab-item").forEach(a => {
     const href = new URL(a.href).pathname.toLowerCase();
 
     if (current === href) a.classList.add("active");
 
-    // 🔥 newsroom 상세페이지 -> newsroom 탭강제 active
+    // 🔥 뉴스 상세 → 뉴스룸 텝 활성
     if (current.includes("/pr/newsroom/news-view") &&
         href.includes("/pr/newsroom/index.html")) {
       a.classList.add("active");
@@ -108,7 +110,7 @@ function showSideTabs(list, trigger) {
 }
 
 /* ------------------------------------------------------------
-   6) Breadcrumb 탭 로직
+   6) Breadcrumb Tabs 초기화
 ------------------------------------------------------------ */
 function initBreadcrumbTabs() {
   const lv1 = document.querySelector(".crumb-level1");
@@ -213,11 +215,12 @@ function initBreadcrumbTabs() {
     });
   }
 
-  document.querySelector(".breadcrumb")?.addEventListener("mouseleave", scheduleHideTabs);
+  document.querySelector(".breadcrumb")
+    ?.addEventListener("mouseleave", scheduleHideTabs);
 }
 
 /* ------------------------------------------------------------
-   7) Admin Mode Bar
+   7) Admin Mode Bar (홈 + 대시보드 + 로그아웃)
 ------------------------------------------------------------ */
 function initAdminBar() {
   const role = localStorage.getItem("role");
@@ -239,50 +242,59 @@ function initAdminBar() {
     </div>
   `;
 
-  bar.style.cssText = `
-    width:100%;
-    height:48px;
-    background:#0f2679;
-    color:white;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:0 20px;
-    position:fixed;
-    top:0;
-    left:0;
-    z-index:9999;
-    font-size:14px;
-  `;
-
+  // 스타일 삽입
   const style = document.createElement("style");
   style.textContent = `
+    #adminBar {
+      width:100%;
+      height:48px;
+      background:#0f2679;
+      color:white;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:0 20px;
+      position:fixed;
+      top:0;
+      left:0;
+      z-index:9999;
+      font-size:14px;
+    }
+
+    #adminBar .admin-right {
+      display:flex;
+      align-items:center;
+      white-space:nowrap;
+      gap:14px;
+      flex-shrink:1;
+    }
+
     #adminBar .admin-btn {
       color:white;
-      margin-left:16px;
       text-decoration:none;
       padding:6px 10px;
       border-radius:4px;
       transition:0.2s;
       white-space:nowrap;
     }
+
     #adminBar .admin-btn:hover {
       background:rgba(255,255,255,0.2);
-    }
-    #adminBar .admin-right {
-      display:flex;
-      align-items:center;
-      flex-shrink:1;
-      white-space:nowrap;
     }
   `;
   document.head.appendChild(style);
 
-  document.body.classList.add("admin-mode");
-  document.body.style.paddingTop = "48px";
-
+  // DOM에 삽입
   document.body.prepend(bar);
 
+  // header 높이 측정 후 padding 적용
+  setTimeout(() => {
+    const header = document.querySelector("header, .header-inner");
+    const h = header ? header.offsetHeight : 0;
+    document.body.style.paddingTop = (h + 48) + "px";
+  }, 50);
+
+  // 로그아웃
   document.getElementById("adminLogout").addEventListener("click", () => {
     localStorage.clear();
     location.href = `/${LANG}/admin/login.html`;
