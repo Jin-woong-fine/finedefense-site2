@@ -60,11 +60,15 @@ app.use(
 // 📌 API 라우터 등록
 // ============================
 
-// 인증
+// 로그인 (auth)
+app.use("/api/auth", authRouter);
+
+// 인증/특허
 app.use("/api/cert-items", postsCertificationRouter);
 
 // 문의
 app.use("/api/inquiry", sendInquiryRouter);
+
 
 // 관리자
 app.use("/api/admin", adminDashboardRouter);
