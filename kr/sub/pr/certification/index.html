@@ -23,40 +23,43 @@
 
     /* 카드(인증/특허 공용) */
     .card-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 22px;
-      margin-bottom: 60px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* 260 → 200 */
+    gap: 18px; /* 22 → 18 */
+    margin-bottom: 60px;
     }
 
     .card-item {
-      background: #fff;
-      border-radius: 12px;
-      padding: 15px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-      cursor: pointer;
-      transition: 0.25s ease;
+    background: #fff;
+    border-radius: 12px;
+    padding: 10px; /* 15 → 10 */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    cursor: pointer;
+    transition: 0.25s ease;
     }
 
+    /* hover 효과 유지 */
     .card-item:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 6px 16px rgba(0,0,0,0.11);
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.11);
     }
 
     .card-item img {
-      width: 100%;
-      aspect-ratio: 1 / 1.414; /* A4 비율 */
-      object-fit: contain;
-      background: #f1f1f1;
-      border-radius: 8px;
+    width: 100%;
+    aspect-ratio: 1 / 1.414; /* A4 비율 유지 */
+    object-fit: contain;
+    background: #f1f1f1;
+    border-radius: 8px;
+    max-height: 260px; /* 카드 전체 크기 더 작게 보이도록 제한 */
     }
 
     .card-title {
-      margin-top: 10px;
-      font-size: 1rem;
-      color: #0f2679;
-      font-weight: 600;
+    margin-top: 8px; /* 10 → 8 */
+    font-size: 0.9rem; /* 1rem → 0.9rem */
+    color: #0f2679;
+    font-weight: 600;
     }
+
 
     /* 모달 */
     .modal-bg {
@@ -80,11 +83,13 @@
     }
 
     .modal-box img {
-      width: 100%;
-      aspect-ratio: 1 / 1.414;
-      object-fit: contain;
-      background: #fff;
-      border-radius: 12px;
+    max-width: 100%;
+    max-height: 80vh;  /* 화면 세로 80% 안 넘도록 */
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    background: #fff;
+    border-radius: 12px;
     }
 
     .modal-box iframe {
