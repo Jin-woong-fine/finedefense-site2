@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
   <meta charset="UTF-8">
   <title>갤러리 | Fine Defense</title>
@@ -10,9 +9,6 @@
   <link rel="stylesheet" href="/css/sub-banner.css" />
 
   <style>
-    /* ===============================
-       Gallery Grid
-    =============================== */
     .gallery-container {
       max-width: 1200px;
       margin: 50px auto 70px;
@@ -58,89 +54,22 @@
       font-size: 0.85rem;
       color: #777;
     }
-
-    /* ===============================
-       Modal (네이버 스타일)
-    =============================== */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.7);
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-    }
-
-    .modal-content {
-      background: #fff;
-      max-width: 900px;
-      width: 90%;
-      padding: 20px;
-      border-radius: 10px;
-      position: relative;
-      animation: fadeIn .22s ease;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: scale(0.93);
-      }
-
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-
-    .modal img {
-      width: 100%;
-      border-radius: 10px;
-    }
-
-    .modal-title {
-      font-size: 1.4rem;
-      font-weight: 700;
-      margin-top: 18px;
-      color: #222;
-    }
-
-    .modal-date {
-      font-size: 0.9rem;
-      margin-top: 6px;
-      color: #777;
-    }
-
-    .modal-close {
-      position: absolute;
-      top: 12px;
-      right: 16px;
-      font-size: 2rem;
-      cursor: pointer;
-      color: #333;
-    }
   </style>
 </head>
 
 <body>
 
-  <!-- Header -->
   <div id="header"></div>
 
   <!-- Banner -->
   <section class="sub-banner">
-    <img src="/img/sub-banners/pr-3_v2.jpg" alt="갤러리 배너" />
+    <img src="/img/sub-banners/pr-1_v2.jpg" alt="갤러리 배너" />
     <div class="banner-text">
       <h1>갤러리</h1>
       <p>Fine Defense의 주요 생산 · 시험 · 행사 사진을 확인하세요.</p>
     </div>
   </section>
 
-  <!-- breadcrumb -->
   <div class="breadcrumb">
     <a href="/kr/index.html">홈</a> &gt;
     <span class="crumb crumb-level1">홍보센터</span> &gt;
@@ -148,40 +77,25 @@
     <div id="side-tabs" class="side-tabs"></div>
   </div>
 
-  <!-- Gallery -->
   <div class="gallery-container" id="galleryContainer"></div>
 
-  <!-- Footer -->
   <div id="footer"></div>
-
-  <!-- nav.js (header/footer 자동 로딩) -->
   <script src="/js/nav.js"></script>
-
-  <!-- Modal -->
-  <div id="galleryModal" class="modal">
-    <div class="modal-content">
-      <span class="modal-close" onclick="closeModal()">&times;</span>
-      <img id="modalImage" src="">
-      <div class="modal-title" id="modalTitle"></div>
-      <div class="modal-date" id="modalDate"></div>
-    </div>
-  </div>
 
   <script>
     async function loadGallery() {
-      const res = await fetch(`/api/posts/list/gallery?lang=kr`);
-      const data = await res.json();
+      const res = await fetch(`/api/gallery/list?lang=kr`);
+      const list = await res.json();
 
-      const list = data.list || data || [];
       const box = document.getElementById("galleryContainer");
 
-      if (!list.length) {
+      if (!Array.isArray(list) || !list.length) {
         box.innerHTML = "<p>등록된 갤러리가 없습니다.</p>";
         return;
       }
 
       box.innerHTML = list.map(v => `
-        <div class="gallery-card" onclick="openModal('${v.main_image}', '${v.title}', '${v.created_at.substring(0, 10)}')">
+        <div class="gallery-card" onclick="location.href='/kr/sub/pr/gallery/gallery-view.html?id=${v.id}'">
           <img src="${v.main_image}" class="gallery-thumb">
           <div class="gallery-info">
             <div class="gallery-title">${v.title}</div>
@@ -191,20 +105,8 @@
       `).join("");
     }
 
-    function openModal(img, title, date) {
-      document.getElementById("modalImage").src = img;
-      document.getElementById("modalTitle").innerText = title;
-      document.getElementById("modalDate").innerText = date;
-      document.getElementById("galleryModal").style.display = "flex";
-    }
-
-    function closeModal() {
-      document.getElementById("galleryModal").style.display = "none";
-    }
-
     loadGallery();
   </script>
 
 </body>
-
 </html>
