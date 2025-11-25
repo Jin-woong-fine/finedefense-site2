@@ -1,8 +1,7 @@
 /* ============================================================
-   ⭐ Fine Defense Admin Sidebar (Final Stable Version)
-   - 역할별 메뉴 필터
-   - 갤러리 메뉴 추가
-   - 프로필 영역 안정화
+   ⭐ Fine Defense Admin Sidebar (Final + Certification Integrated)
+   - 역할별 메뉴 필터링
+   - 인증/특허 메뉴 추가
 ============================================================ */
 
 window.loadSidebar = function(activeKey) {
@@ -30,14 +29,15 @@ window.loadSidebar = function(activeKey) {
 
     { key: "notice", label: "공지사항 관리", link: "/kr/admin/notice-list.html", roles: ["superadmin","admin","editor"] },
 
-    /* ⭐ 신규 추가 */
     { key: "gallery", label: "갤러리 관리", link: "/kr/admin/gallery-list.html", roles: ["superadmin","admin","editor"] },
+
+    /* ⭐ 신규 추가: 인증/특허 통합 관리 */
+    { key: "certifications", label: "인증/특허 관리", link: "/kr/admin/certification-list.html", roles: ["superadmin","admin","editor"] },
 
     { key: "inquiry", label: "1:1 문의 관리", link: "/kr/admin/inquiry.html", roles: ["superadmin","admin"] },
 
     { key: "loginlogs", label: "로그인 기록", link: "/kr/admin/login-logs.html", roles: ["superadmin"] }
   ];
-
 
   /* ------------------------------------------------------------
      📌 사이드바 렌더링
@@ -57,13 +57,14 @@ window.loadSidebar = function(activeKey) {
 
       <nav class="sidebar-menu">
         ${menuItems
-          .filter(item => item.roles.includes(role))   /* 권한 체크 */
+          .filter(item => item.roles.includes(role))
           .map(item => `
             <a href="${item.link}"
                class="menu-item ${activeKey === item.key ? "active" : ""}">
               ${item.label}
             </a>
-          `).join("")}
+          `)
+          .join("")}
       </nav>
 
     </div>
