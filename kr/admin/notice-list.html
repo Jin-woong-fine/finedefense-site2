@@ -2,10 +2,11 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>공지사항 관리 | 관리자</title>
+  <title>공지사항 관리 | Fine Defense Admin</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="stylesheet" href="./css/admin.css" />
+  <!-- 공통 관리자 CSS -->
+  <link rel="stylesheet" href="/kr/admin/css/admin.css" />
 
   <style>
     .panel {
@@ -62,8 +63,10 @@
 
 <body>
 
+<!-- ⭐ 사이드바 -->
 <div id="sidebar" data-active="notice"></div>
 
+<!-- ⭐ 메인 -->
 <div class="main">
 
   <div class="topbar">
@@ -106,15 +109,22 @@
 
     <div class="pagination" id="pagination"></div>
   </section>
+
 </div>
 
+<!-- 공통 JS -->
 <script src="/kr/admin/js/common_auth.js"></script>
 <script src="/kr/admin/js/sidebar.js"></script>
 
 <script>
+  /* 🔐 권한 체크 */
   requireAdminOrEditor();
+
   document.getElementById("logoutBtn").addEventListener("click", logout);
 
+  /* ===========================
+      전역 변수
+  =========================== */
   const PAGE_SIZE = 10;
   let allNotices = [];
   let filteredNotices = [];
@@ -130,7 +140,9 @@
     return date.toLocaleDateString();
   }
 
-  /* 언어 버튼 */
+  /* ===========================
+      언어 필터
+  =========================== */
   document.querySelectorAll(".lang-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       document.querySelectorAll(".lang-btn").forEach(b => b.classList.remove("active"));
@@ -140,14 +152,19 @@
     });
   });
 
+  /* ===========================
+      검색 이벤트
+  =========================== */
   document.getElementById("searchInput").addEventListener("input", applyFilter);
 
+  /* 필터 적용 */
   function applyFilter() {
     const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
 
     filteredNotices = allNotices.filter(n => {
-      return (currentLang === "all" ? true : n.lang === currentLang)
-          && n.title.toLowerCase().includes(keyword);
+      const langOk = (currentLang === "all" || n.lang === currentLang);
+      const matchTitle = n.title.toLowerCase().includes(keyword);
+      return langOk && matchTitle;
     });
 
     currentPage = 1;
@@ -155,6 +172,9 @@
     renderPagination();
   }
 
+  /* ===========================
+      표 렌더링
+  =========================== */
   function renderTable() {
     const tbody = document.getElementById("noticeTbody");
 
@@ -184,9 +204,13 @@
     `).join("");
   }
 
+  /* ===========================
+      페이지네이션
+  =========================== */
   function renderPagination() {
     const pag = document.getElementById("pagination");
     pag.innerHTML = "";
+
     const totalPages = Math.ceil(filteredNotices.length / PAGE_SIZE);
     if (totalPages <= 1) return;
 
@@ -194,24 +218,36 @@
       const btn = document.createElement("button");
       btn.textContent = p;
       if (p === currentPage) btn.classList.add("active");
-      btn.onclick = () => { currentPage = p; renderTable(); renderPagination(); };
+      btn.onclick = () => {
+        currentPage = p;
+        renderTable();
+        renderPagination();
+      };
       pag.appendChild(btn);
     }
   }
 
+  /* ===========================
+      CRUD
+  =========================== */
   function openPublicView(id) {
     window.open(`/kr/sub/pr/notice/notice-view.html?id=${id}`, "_blank");
   }
+
   function editNotice(id) {
     location.href = `/kr/admin/notice-edit.html?id=${id}`;
   }
+
   async function deleteNotice(id) {
     if (!confirm("삭제하시겠습니까?")) return;
+
     const res = await fetch(`/api/posts/notice/delete/${id}`, {
       method: "DELETE",
       headers: { Authorization: "Bearer " + localStorage.getItem("token") }
     });
+
     const out = await res.json();
+
     if (res.ok) {
       alert("삭제 완료");
       loadNotices();
@@ -220,6 +256,10 @@
     }
   }
 
+  /* ===========================
+      공지 데이터 로드
+      (KR/EN/ALL 전체)
+  =========================== */
   async function loadNotices() {
     const res = await fetch(`/api/posts/list/notice?lang=all`);
     const data = await res.json();
@@ -228,7 +268,11 @@
     applyFilter();
   }
 
+  /* 초기 실행 */
   loadNotices();
+
+  /* 사이드바 활성화 */
+  loadSidebar("notice");
 </script>
 
 </body>
