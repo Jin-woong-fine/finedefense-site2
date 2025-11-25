@@ -11,9 +11,11 @@ const router = express.Router();
 /* ===========================================================
    📁 업로드 경로 (절대경로)
 =========================================================== */
-const uploadDir = path.join(process.cwd(), "uploads/gallery");
 
+// ✔ 올바른 gallery 디렉토리
+const UPLOAD_DIR = path.join(process.cwd(), "uploads", "gallery");
 
+// ✔ 폴더 없으면 생성
 if (!fs.existsSync(UPLOAD_DIR)) {
   fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 }
@@ -28,7 +30,7 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
     cb(null, Date.now() + "_" + Math.round(Math.random() * 1e9) + ext);
-  }
+  },
 });
 
 const uploadGallery = multer({ storage });
@@ -93,7 +95,7 @@ router.put("/edit/:id", verifyToken, uploadGallery.array("images", 20), async (r
       );
 
       for (const img of oldImages) {
-        const realPath = path.join(process.cwd(), "server", img.image_path);
+        const realPath = path.join(process.cwd(), img.image_path);
         try { fs.unlinkSync(realPath); } catch {}
       }
 
@@ -128,7 +130,7 @@ router.delete("/delete/:id", verifyToken, async (req, res) => {
     );
 
     for (const img of images) {
-      const real = path.join(process.cwd(), "server", img.image_path);
+      const real = path.join(process.cwd(), img.image_path);
       try { fs.unlinkSync(real); } catch {}
     }
 
