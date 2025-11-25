@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>갤러리 관리 | Fine Defense Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- 공통 관리자 CSS -->
+  <link rel="stylesheet" href="/kr/admin/css/admin.css" />
+
+  <style>
+    .panel {
+      background:#fff;
+      padding:25px;
+      border-radius:10px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.06);
+      margin-bottom:35px;
+    }
+
+    .search-input {
+      width: 240px;
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 0.95rem;
+    }
+
+    .lang-filter { display:flex; gap:6px; align-items:center; }
+
+    .lang-btn {
+      padding:7px 14px;
+      border-radius:6px;
+      border:1px solid #ccc;
+      background:white;
+      cursor:pointer;
+      font-size:0.85rem;
+    }
+    .lang-btn.active {
+      background:#0f2679; color:white; border-color:#0f2679;
+    }
+
+    .gallery-table { width:100%; border-collapse:collapse; margin-top:10px; }
+    .gallery-table th, .gallery-table td {
+      padding:10px 12px; border-bottom:1px solid #ddd; text-align:left;
+    }
+    .gallery-table th { background:#0f2679; color:#fff; }
+
+    .gallery-table tr:hover td {
+      background:#f3f6ff;
+      cursor:pointer;
+    }
+
+    .thumb {
+      width: 80px;
+      height: 55px;
+      object-fit: cover;
+      background: #ddd;
+      border-radius: 6px;
+    }
+
+    .actions { display:flex; gap:6px; }
+
+    .pagination {
+      display:flex; justify-content:center; gap:4px; margin-top:18px;
+    }
+    .pagination button {
+      min-width:32px; padding:6px 10px; border-radius:4px;
+      border:1px solid #ccc; background:#fff; cursor:pointer;
+    }
+    .pagination button.active {
+      background:#0f2679; color:white; border-color:#0f2679;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- ⭐ 사이드바 -->
+<div id="sidebar" data-active="gallery"></div>
+
+<!-- ⭐ 메인 -->
+<div class="main">
+
+  <div class="topbar">
+    <h2>갤러리 관리</h2>
+    <div>
+      <button class="btn btn-primary" onclick="location.href='../index.html'">홈으로</button>
+      <button id="logoutBtn" class="btn btn-danger">로그아웃</button>
+    </div>
+  </div>
+
+  <section class="panel">
+
+    <div style="display:flex; justify-content:space-between; gap:16px; margin-bottom:15px;">
+      <input type="text" id="searchInput" class="search-input" placeholder="제목 검색" />
+
+      <div class="lang-filter">
+        <button class="lang-btn active" data-lang="kr">KR</button>
+        <button class="lang-btn" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="all">ALL</button>
+      </div>
+
+      <button class="btn btn-primary" onclick="location.href='gallery-edit.html'">갤러리 작성하기</button>
+    </div>
+
+    <table class="gallery-table">
+      <thead>
+        <tr>
+          <th style="width:70px;">ID</th>
+          <th style="width:90px;">썸네일</th>
+          <th>제목</th>
+          <th style="width:80px;">언어</th>
+          <th style="width:80px;">이미지수</th>
+          <th style="width:80px;">조회수</th>
+          <th style="width:140px;">작성일</th>
+          <th style="width:120px;">관리</th>
+        </tr>
+      </thead>
+      <tbody id="galleryTbody">
+        <tr><td colspan="8">불러오는 중...</td></tr>
+      </tbody>
+    </table>
+
+    <div class="pagination" id="pagination"></div>
+  </section>
+
+</div>
+
+<!-- 공통 JS -->
+<script src="/kr/admin/js/common_auth.js"></script>
+<script src="/kr/admin/js/sidebar.js"></script>
+
+<script>
+  // 🔐 권한 체크
+  requireAdminOrEditor();
+  document.getElementById("logoutBtn").addEventListener("click", logout);
+
+  // ⭐ 사이드바 활성화
+  loadSidebar("gallery");
+
+  const PAGE_SIZE = 10;
+  let allGallery = [];
+  let filteredGallery = [];
+  let currentLang = "kr";
+  let currentPage = 1;
+
+  function formatDate(d) {
+    if (!d) return "";
+    const date = new Date(d);
+    if (isNaN(date.getTime())) return "";
+    return date.toLocaleDateString();
+  }
+
+  // 언어 필터 버튼
+  document.querySelectorAll(".lang-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".lang-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      currentLang = btn.dataset.lang;
+      applyFilter();
+    });
+  });
+
+  // 검색 필터
+  document.getElementById("searchInput").addEventListener("input", applyFilter);
+
+  function applyFilter() {
+    const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
+
+    filteredGallery = allGallery.filter(item => {
+      const langOk = (currentLang === "all" || item.lang === currentLang);
+      const title = (item.title || "").toLowerCase();
+      return langOk && title.includes(keyword);
+    });
+
+    currentPage = 1;
+    renderTable();
+    renderPagination();
+  }
+
+  function renderTable() {
+    const tbody = document.getElementById("galleryTbody");
+
+    if (!filteredGallery.length) {
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:#777;">갤러리 항목이 없습니다.</td></tr>`;
+      return;
+    }
+
+    const start = (currentPage - 1) * PAGE_SIZE;
+    const items = filteredGallery.slice(start, start + PAGE_SIZE);
+
+    tbody.innerHTML = items.map(item => {
+      const thumb = item.cover_image || (item.main_image) || "/kr/admin/img/no-thumb.png";
+      const imgCount = item.image_count ?? (item.images ? item.images.length : "-");
+      const views = item.views ?? "-";
+
+      return `
+        <tr>
+          <td>${item.id}</td>
+          <td><img src="${thumb}" class="thumb" alt=""></td>
+          <td onclick="openPublicView(${item.id})">${item.title}</td>
+          <td>${item.lang || ""}</td>
+          <td>${imgCount}</td>
+          <td>${views}</td>
+          <td>${formatDate(item.created_at)}</td>
+          <td>
+            <div class="actions">
+              <button class="btn btn-small btn-gray" onclick="editGallery(${item.id})">수정</button>
+              <button class="btn btn-small btn-danger" onclick="deleteGallery(${item.id})">삭제</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join("");
+  }
+
+  function renderPagination() {
+    const pag = document.getElementById("pagination");
+    pag.innerHTML = "";
+
+    const totalPages = Math.ceil(filteredGallery.length / PAGE_SIZE);
+    if (totalPages <= 1) return;
+
+    for (let p = 1; p <= totalPages; p++) {
+      const btn = document.createElement("button");
+      btn.textContent = p;
+      if (p === currentPage) btn.classList.add("active");
+      btn.onclick = () => {
+        currentPage = p;
+        renderTable();
+        renderPagination();
+      };
+      pag.appendChild(btn);
+    }
+  }
+
+  function openPublicView(id) {
+    window.open(`/kr/sub/pr/gallery/gallery-view.html?id=${id}`, "_blank");
+  }
+
+  function editGallery(id) {
+    location.href = `/kr/admin/gallery-edit.html?id=${id}`;
+  }
+
+  async function deleteGallery(id) {
+    if (!confirm("삭제하시겠습니까?")) return;
+
+    const res = await fetch(`/api/gallery/delete/${id}`, {
+      method: "DELETE",
+      headers: { Authorization: "Bearer " + localStorage.getItem("token") }
+    });
+
+    const out = await res.json().catch(() => ({}));
+
+    if (res.ok) {
+      alert("삭제 완료");
+      loadGallery();
+    } else {
+      alert("삭제 실패: " + (out.message || "알 수 없는 오류"));
+    }
+  }
+
+  async function loadGallery() {
+    try {
+      const res = await fetch(`/api/gallery/list?lang=all`);
+      const data = await res.json();
+
+      allGallery = Array.isArray(data) ? data : (data.list || []);
+      applyFilter();
+    } catch (e) {
+      console.error("갤러리 목록 불러오기 오류:", e);
+      document.getElementById("galleryTbody").innerHTML =
+        `<tr><td colspan="8" style="color:#c00;text-align:center;">불러오기 오류</td></tr>`;
+    }
+  }
+
+  // 초기 로드
+  loadGallery();
+</script>
+
+</body>
+</html>
