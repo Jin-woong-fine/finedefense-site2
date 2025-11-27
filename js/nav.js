@@ -276,28 +276,11 @@ function initAdminBar() {
     font-size:14px;
   `;
 
-  // 스타일: body에 패딩 줘서 헤더랑 안 겹치게
-  const style = document.createElement("style");
-  style.textContent = `
-    body.has-admin-bar { padding-top:48px; }
-    #adminBar .admin-right { display:flex; align-items:center; }
-    #adminBar .admin-btn {
-      color:white;
-      margin-left:16px;
-      text-decoration:none;
-      padding:6px 10px;
-      border-radius:4px;
-      white-space:nowrap;
-      transition:0.2s;
-    }
-    #adminBar .admin-btn:hover { background:rgba(255,255,255,0.25); }
-  `;
-  document.head.appendChild(style);
+  // 헤더 안 덮치게 body에 패딩만 줌
+  document.body.style.paddingTop = "48px";
 
-  document.body.classList.add("has-admin-bar");
   document.body.prepend(bar);
 
-  // 로그아웃
   document.getElementById("adminLogout").addEventListener("click", (e) => {
     e.preventDefault();
     localStorage.clear();
