@@ -3,23 +3,28 @@ import express from "express";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import iconv from "iconv-lite";
 import db from "../config/db.js";
 import { verifyToken } from "../middleware/auth.js";
 
 const router = express.Router();
 
 /* ============================================================
-   📁 Multer - 공지 첨부파일 저장
+   📁 Multer - 공지 첨부파일 저장 (public/uploads로 이동)
 ============================================================ */
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const dir = "uploads/notice_files";
+    const dir = "public/uploads/notice_files";
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     cb(null, dir);
   },
+
   filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, Date.now() + "_" + Math.round(Math.random() * 1e9) + ext);
+    // 한글 파일명 깨짐 방지
+    const decoded = iconv.decode(Buffer.from(file.originalname, "latin1"), "utf8");
+    const ext = path.extname(decoded);
+    const filename = Date.now() + "_" + Math.round(Math.random() * 1e9) + ext;
+    cb(null, filename);
   }
 });
 
@@ -46,7 +51,11 @@ router.post("/create", verifyToken, uploadNotice.array("files", 10), async (req,
       await db.execute(
         `INSERT INTO post_files (post_id, file_path, original_name)
          VALUES (?, ?, ?)`,
-        [postId, `/uploads/notice_files/${f.filename}`, f.originalname]
+        [
+          postId,
+          `/uploads/notice_files/${f.filename}`,
+          f.originalname
+        ]
       );
     }
 
@@ -67,7 +76,7 @@ router.put("/update/:id", verifyToken, uploadNotice.array("files", 10), async (r
     const { title, content, lang } = req.body;
     const sort_order = Number(req.body.sort_order || 9999);
 
-    // DB 업데이트
+    // 기본 정보 업데이트
     await db.execute(
       `UPDATE posts 
          SET title=?, content=?, lang=?, sort_order=? 
@@ -76,38 +85,37 @@ router.put("/update/:id", verifyToken, uploadNotice.array("files", 10), async (r
     );
 
     /* ============================================================
-       🗑 삭제할 기존 파일 처리 (removeFiles[])
-    ============================================================ */
+       🗑 기존 파일 삭제 목록 처리
+    ============================================================= */
     let removeList = [];
     try {
       removeList = JSON.parse(req.body.removeFiles || "[]");
-    } catch {
-      removeList = [];
-    }
+    } catch { /* ignore */ }
 
     if (removeList.length > 0) {
-      // 파일 삭제
       for (const filePath of removeList) {
-        const localPath = filePath.replace(/^\//, "");
+        const localPath = ("public" + filePath).replace(/^\//, "");
         if (fs.existsSync(localPath)) fs.unlinkSync(localPath);
       }
 
-      // DB 삭제
       await db.execute(
-        `DELETE FROM post_files 
-         WHERE post_id=? AND file_path IN (${removeList.map(() => "?").join(",")})`,
+        `DELETE FROM post_files WHERE post_id=? AND file_path IN (${removeList.map(() => "?").join(",")})`,
         [id, ...removeList]
       );
     }
 
     /* ============================================================
        🆕 새 파일 저장
-    ============================================================ */
+    ============================================================= */
     for (const f of req.files) {
       await db.execute(
         `INSERT INTO post_files (post_id, file_path, original_name)
          VALUES (?, ?, ?)`,
-        [id, `/uploads/notice_files/${f.filename}`, f.originalname]
+        [
+          id,
+          `/uploads/notice_files/${f.filename}`,
+          f.originalname
+        ]
       );
     }
 
@@ -115,7 +123,7 @@ router.put("/update/:id", verifyToken, uploadNotice.array("files", 10), async (r
 
   } catch (err) {
     console.error("📌 공지 수정 오류:", err);
-    res.status(500).json({ message: "수정 오류" });
+    res.status(500).json({ message: "공지 수정 오류" });
   }
 });
 
@@ -131,9 +139,9 @@ router.delete("/delete/:id", verifyToken, async (req, res) => {
       [id]
     );
 
-    // 로컬 파일 제거
+    // 파일 삭제
     for (const f of files) {
-      const localPath = f.file_path.replace(/^\//, "");
+      const localPath = ("public" + f.file_path).replace(/^\//, "");
       if (fs.existsSync(localPath)) fs.unlinkSync(localPath);
     }
 
@@ -149,7 +157,7 @@ router.delete("/delete/:id", verifyToken, async (req, res) => {
 });
 
 /* ============================================================
-   📥 공지 첨부파일 다운로드 로그
+   📥 다운로드 로그 저장
 ============================================================ */
 router.post("/download", async (req, res) => {
   try {
