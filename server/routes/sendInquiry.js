@@ -1,8 +1,9 @@
 // server/routes/sendInquiry.js
 import express from "express";
-import db from "../config/db.js";   // 🔥 반드시 이걸로!
+import db from "../config/db.js";
 import nodemailer from "nodemailer";
-
+import dotenv from "dotenv";
+dotenv.config();
 
 const router = express.Router();
 
@@ -14,8 +15,8 @@ const transporter = nodemailer.createTransport({
   port: 465,
   secure: true,
   auth: {
-    user: "inquiry@finedefense.co.kr", // 문의용 메일 계정
-    pass: "fine!202310"             // 하이웍스 SMTP 비밀번호
+    user: process.env.HIWORKS_USER,   // 🔥 환경변수로 이동
+    pass: process.env.HIWORKS_PASS
   }
 });
 
@@ -30,12 +31,10 @@ router.post("/send", async (req, res) => {
       return res.status(400).json({ message: "필수 값 누락" });
     }
 
-    // ===========================================
-    // 🔵 1) 회사 메일로 문의 내용 보내기
-    // ===========================================
+    // 회사 메일로 전달
     await transporter.sendMail({
-      from: `"Fine Defense Inquiry" <inquiry@fine-defense.com>`,
-      to: "inquiry@fine-defense.com",
+      from: `"Fine Defense Inquiry" <${process.env.HIWORKS_USER}>`,
+      to: process.env.HIWORKS_USER,
       subject: subject || "새로운 1:1 문의",
       html: `
         <h3>새로운 1:1 문의 접수</h3>
@@ -43,24 +42,17 @@ router.post("/send", async (req, res) => {
         <p><b>이메일:</b> ${email}</p>
         <p><b>제목:</b> ${subject}</p>
         <p><b>내용:</b><br>${message.replace(/\n/g, "<br>")}</p>
-        <hr>
-        <p style="color:#888;font-size:12px;">Fine Defense 문의 시스템 자동 발송</p>
       `
     });
 
-    // ===========================================
-    // 🔵 2) 문의자에게 자동 안내 메일 보내기
-    // ===========================================
+    // 문의자에게 자동 안내
     await transporter.sendMail({
-      from: `"Fine Defense" <inquiry@finedefense.co.kr>`,
+      from: `"Fine Defense" <${process.env.HIWORKS_USER}>`,
       to: email,
       subject: "[Fine Defense] 문의가 접수되었습니다",
       html: `
-        <p>${name}님,</p>
-        <p>문의해주셔서 감사합니다.</p>
-        <p>담당자가 확인 후 빠르게 회신 드리겠습니다.</p>
-        <br>
-        <p style="color:#888;font-size:12px;">이 메일은 자동 발송되었습니다.</p>
+        <p>${name}님, 문의가 접수되었습니다.</p>
+        <p>담당자가 빠르게 확인 후 회신 드립니다.</p>
       `
     });
 
@@ -68,9 +60,7 @@ router.post("/send", async (req, res) => {
 
   } catch (err) {
     console.error("[Inquiry Error] ", err);
-    return res.status(500).json({
-      message: "문의 전송 중 오류가 발생했습니다."
-    });
+    return res.status(500).json({ message: "문의 전송 중 오류 발생" });
   }
 });
 
