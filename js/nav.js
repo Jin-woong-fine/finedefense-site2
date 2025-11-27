@@ -113,35 +113,16 @@ function highlightTopMenu() {
 }
 
 /* ------------------------------------------------------------
-   6) Breadcrumb Level1 / Level2 Active
+   6) Breadcrumb Level1 / Level2 Active (심플 버전)
 ------------------------------------------------------------ */
 function highlightBreadcrumb() {
-  const path = location.pathname.toLowerCase();
-
   const lv1 = document.querySelector(".crumb-level1");
   const lv2 = document.querySelector(".crumb-level2");
   if (!lv1 || !lv2) return;
 
-  // 경로 매핑 테이블 (언제나 확장 가능)
-  const sectionMap = {
-    company:  ["/company/", "/sub/company/"],
-    products: ["/products/", "/product/", "/sub/products/", "/sub/product/"],
-    pr:       ["/pr/", "/sub/pr/"],
-    support:  ["/support/", "/sub/support/"]
-  };
-
-  // Level1 활성화
-  for (const key in sectionMap) {
-    const arr = sectionMap[key];
-    for (const k of arr) {
-      if (path.includes(k)) {
-        lv1.classList.add("active");
-        break;
-      }
-    }
-  }
-
-  // Level2 활성화
+  // 레벨1, 레벨2는 페이지에서 이미 올바른 텍스트로 작성되어 있으므로
+  // 경로 검사 없이 무조건 active 준다.
+  lv1.classList.add("active");
   lv2.classList.add("active");
 }
 
