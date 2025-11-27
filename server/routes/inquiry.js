@@ -2,18 +2,17 @@
 import express from "express";
 import db from "../config/db.js";
 
-
 const router = express.Router();
 
-// ============================
-// 📌 GET /api/inquiry/list
-// 전체 목록 조회 (최신순)
-// ============================
+/* ============================
+   📌 GET /api/inquiry/list
+   전체 목록 조회 (최신순)
+============================ */
 router.get("/list", async (req, res) => {
   try {
-    const [rows] = await pool.query(`
-      SELECT id, name, email, subject, created_at, status
-      FROM inquiries
+    const [rows] = await db.query(`
+      SELECT id, name, email, subject, created_at, status, admin_note
+      FROM inquiry
       ORDER BY id DESC
     `);
 
@@ -24,17 +23,17 @@ router.get("/list", async (req, res) => {
   }
 });
 
-// ============================
-// 📌 GET /api/inquiry/view/:id
-// 단건 상세 조회
-// ============================
+/* ============================
+   📌 GET /api/inquiry/view/:id
+   단건 상세 조회
+============================ */
 router.get("/view/:id", async (req, res) => {
   const id = req.params.id;
 
   try {
-    const [rows] = await pool.query(`
+    const [rows] = await db.query(`
       SELECT *
-      FROM inquiries
+      FROM inquiry
       WHERE id = ?
       LIMIT 1
     `, [id]);
@@ -50,17 +49,17 @@ router.get("/view/:id", async (req, res) => {
   }
 });
 
-// ============================
-// 📌 PATCH /api/inquiry/status/:id
-// 상태 변경 (0=미확인, 1=확인)
-// ============================
+/* ============================
+   📌 PATCH /api/inquiry/status/:id
+   상태 변경 (0=미확인, 1=확인)
+============================ */
 router.patch("/status/:id", async (req, res) => {
   const id = req.params.id;
   const { status } = req.body;
 
   try {
-    await pool.query(`
-      UPDATE inquiries
+    await db.query(`
+      UPDATE inquiry
       SET status = ?
       WHERE id = ?
     `, [status, id]);
@@ -72,17 +71,17 @@ router.patch("/status/:id", async (req, res) => {
   }
 });
 
-// ============================
-// 📌 PATCH /api/inquiry/note/:id
-// 관리자 메모 저장
-// ============================
+/* ============================
+   📌 PATCH /api/inquiry/note/:id
+   관리자 메모 저장
+============================ */
 router.patch("/note/:id", async (req, res) => {
   const id = req.params.id;
   const { note } = req.body;
 
   try {
-    await pool.query(`
-      UPDATE inquiries
+    await db.query(`
+      UPDATE inquiry
       SET admin_note = ?
       WHERE id = ?
     `, [note, id]);
