@@ -186,7 +186,7 @@
       const res = await fetch("/api/inquiry/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, subject, message }),
+        body: JSON.stringify({ name, email, subject, message, lang: "kr" }),
       });
 
       const out = await res.json();

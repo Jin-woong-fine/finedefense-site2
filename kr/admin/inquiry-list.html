@@ -30,6 +30,7 @@
     table {
       width:100%;
       border-collapse:collapse;
+      margin-top:10px;
     }
 
     th, td {
@@ -54,6 +55,7 @@
       display:flex;
       gap:10px;
       align-items:center;
+      margin-bottom:15px;
     }
 
     .filter-btn {
@@ -69,7 +71,6 @@
       color:white;
       border-color:#0f2679;
     }
-
   </style>
 </head>
 
@@ -81,7 +82,7 @@
 <!-- ⭐ 메인 -->
 <div class="main">
 
-  <!-- ★ TOPBAR -->
+  <!-- TOPBAR -->
   <div class="topbar">
     <h2>문의 관리</h2>
     <div>
@@ -93,16 +94,19 @@
   <section class="panel">
 
     <!-- 필터 영역 -->
-    <div class="filter-box" style="margin-bottom:15px;">
+    <div class="filter-box">
       <button class="filter-btn active" data-filter="all">전체</button>
       <button class="filter-btn" data-filter="unread">미확인</button>
+      <button class="filter-btn" data-filter="kr">KR</button>
+      <button class="filter-btn" data-filter="en">EN</button>
     </div>
 
     <!-- 테이블 -->
     <table>
       <thead>
         <tr>
-          <th style="width:70px;">번호</th>
+          <th style="width:70px;">ID</th>
+          <th style="width:90px;">언어</th>
           <th style="width:150px;">이름</th>
           <th>제목</th>
           <th style="width:180px;">이메일</th>
@@ -111,7 +115,7 @@
         </tr>
       </thead>
       <tbody id="inquiryTable">
-        <tr><td colspan="6" style="text-align:center;">불러오는 중...</td></tr>
+        <tr><td colspan="7" style="text-align:center;">불러오는 중...</td></tr>
       </tbody>
     </table>
 
@@ -160,11 +164,15 @@
     let filtered = allData;
 
     if (currentFilter === "unread") {
-      filtered = allData.filter(item => item.status === 0);
+      filtered = filtered.filter(item => item.status === 0);
+    } else if (currentFilter === "kr") {
+      filtered = filtered.filter(item => item.lang === "kr");
+    } else if (currentFilter === "en") {
+      filtered = filtered.filter(item => item.lang === "en");
     }
 
     if (!filtered.length) {
-      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#777;">문의 없음</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#777;">문의 없음</td></tr>`;
       return;
     }
 
@@ -172,6 +180,7 @@
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td>${row.id}</td>
+        <td>${(row.lang || "kr").toUpperCase()}</td>
         <td>${row.name}</td>
         <td>${row.subject || "-"}</td>
         <td>${row.email}</td>
