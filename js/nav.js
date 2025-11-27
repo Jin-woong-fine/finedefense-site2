@@ -1,11 +1,11 @@
 /* ============================================================
-   🌐 Fine Defense NAV System — FINAL STABLE VERSION (2025)
+   🌐 Fine Defense NAV System — ULTRA-STABLE VERSION (2025)
    - Header/Footer Auto Load (KR/EN)
    - Active Menu Highlight
    - Breadcrumb SideTabs
-   - Newsroom Detail Active Fix
+   - Newsroom / Downloads 상세 Active Fix
    - AdminBar (Home / Dashboard / Logout)
-   - Header + AdminBar Perfect Stacking (No Overlap)
+   - Header + AdminBar Stack Fix
 ============================================================ */
 
 let hideTimer = null;
@@ -43,7 +43,7 @@ async function loadComponent(targetId, url) {
 }
 
 /* ------------------------------------------------------------
-   4) 메인 메뉴 강조
+   4) 상단 메뉴 강조
 ------------------------------------------------------------ */
 function highlightTopMenu() {
   const path = location.pathname.toLowerCase();
@@ -73,7 +73,7 @@ function highlightTopMenu() {
 }
 
 /* ------------------------------------------------------------
-   5) Side Tabs
+   5) Side Tabs 표시
 ------------------------------------------------------------ */
 function showSideTabs(list, trigger) {
   const side = document.getElementById("side-tabs");
@@ -87,14 +87,22 @@ function showSideTabs(list, trigger) {
     .join("");
 
   const current = location.pathname.toLowerCase();
+
   side.querySelectorAll(".tab-item").forEach(a => {
     const href = new URL(a.href).pathname.toLowerCase();
 
+    // 일반 경로 매칭
     if (current === href) a.classList.add("active");
 
-    // Newsroom 상세 → index.html active 처리
+    // PR > Newsroom 상세 페이지 → index.html 강조
     if (current.includes("/pr/newsroom/news-view") &&
         href.includes("/pr/newsroom/index.html")) {
+      a.classList.add("active");
+    }
+
+    // Support > Downloads 상세 페이지 → index.html 강조
+    if (current.includes("/support/downloads/") &&
+        href.includes("/support/downloads/index.html")) {
       a.classList.add("active");
     }
   });
@@ -132,14 +140,16 @@ function initBreadcrumbTabs() {
         { name: "Support", link: `${base}/support/` },
       ];
 
+  /* --- 1단계 메뉴 --- */
   if (lv1) lv1.addEventListener("mouseenter", () => showSideTabs(TOP, lv1));
 
+  /* --- 2단계 메뉴 --- */
   if (lv2) {
     lv2.addEventListener("mouseenter", () => {
       const p = location.pathname.toLowerCase();
       let tabs = [];
 
-      // 회사소개
+      /* 회사소개 */
       if (p.includes("/company/")) {
         tabs = LANG === "kr"
           ? [
@@ -160,7 +170,7 @@ function initBreadcrumbTabs() {
             ];
       }
 
-      // 제품소개
+      /* 제품소개 */
       if (p.includes("/products/") || p.includes("/product/")) {
         tabs = LANG === "kr"
           ? [
@@ -177,7 +187,7 @@ function initBreadcrumbTabs() {
             ];
       }
 
-      // 홍보센터
+      /* 홍보센터 */
       if (p.includes("/pr/")) {
         tabs = LANG === "kr"
           ? [
@@ -196,16 +206,16 @@ function initBreadcrumbTabs() {
             ];
       }
 
-      // 고객지원
+      /* 고객지원 */
       if (p.includes("/support/")) {
         tabs = LANG === "kr"
           ? [
               { name: "1:1 문의", link: `${base}/support/inquiry/index.html` },
-              { name: "자료실", link: `${base}/support/download/index.html` },
+              { name: "자료실", link: `${base}/support/downloads/index.html` },
             ]
           : [
               { name: "Inquiry", link: `${base}/support/inquiry/index.html` },
-              { name: "Download", link: `${base}/support/download/index.html` },
+              { name: "Download", link: `${base}/support/downloads/index.html` },
             ];
       }
 
@@ -252,7 +262,6 @@ function initAdminBar() {
     font-size:14px;
   `;
 
-  // 스타일 추가
   const style = document.createElement("style");
   style.textContent = `
     #adminBar .admin-right { display:flex; align-items:center; }
@@ -265,17 +274,12 @@ function initAdminBar() {
       white-space:nowrap;
       transition:0.2s;
     }
-    #adminBar .admin-btn:hover {
-      background:rgba(255,255,255,0.25);
-    }
+    #adminBar .admin-btn:hover { background:rgba(255,255,255,0.25); }
   `;
   document.head.appendChild(style);
 
-  // 헤더 아래로 밀기: header.marginTop = 48px
   const header = document.querySelector("header.header-inner");
-  if (header) {
-    header.style.marginTop = "48px";
-  }
+  if (header) header.style.marginTop = "48px";
 
   document.body.prepend(bar);
 
