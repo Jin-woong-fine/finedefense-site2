@@ -1,11 +1,13 @@
 /* ============================================================
-   🌐 Fine Defense NAV System — ULTRA-STABLE FINAL (2025)
+   🌐 Fine Defense NAV System — ULTRA-STABLE FINAL EDITION (2025)
+   ------------------------------------------------------------
    - Header/Footer Auto Load
-   - Active Menu Highlight (href 기반)
-   - Breadcrumb SideTabs (Downloads / Newsroom 상세 포함)
-   - Perfect matching for support/downloads/*
+   - Top Menu Active (href 기반, 완전 안정)
+   - Breadcrumb / SideTabs (PR·Support 상세 active fix)
    - AdminBar (Home / Dashboard / Logout)
-=========================================================== */
+   - Header + AdminBar Stack Fix (절대 겹치지 않음)
+   - Load 순서 / 비동기 문제 완전 해결
+============================================================ */
 
 let hideTimer = null;
 
@@ -27,7 +29,7 @@ const PATH = {
 };
 
 /* ------------------------------------------------------------
-   3) HTML 로더
+   3) 컴포넌트 로딩
 ------------------------------------------------------------ */
 async function loadComponent(targetId, url) {
   try {
@@ -36,13 +38,13 @@ async function loadComponent(targetId, url) {
     const html = await res.text();
     const el = document.getElementById(targetId);
     if (el) el.innerHTML = html;
-  } catch (e) {
-    console.error("Component Load Error:", e);
+  } catch (err) {
+    console.error("Component Load Error:", err);
   }
 }
 
 /* ------------------------------------------------------------
-   4) 상단 메뉴 강조 — HREF 기반 완전 안정 버전
+   4) Top Menu Active (href 기반 완전 안정)
 ------------------------------------------------------------ */
 function highlightTopMenu() {
   const path = location.pathname.toLowerCase();
@@ -67,7 +69,7 @@ function highlightTopMenu() {
 ------------------------------------------------------------ */
 function showSideTabs(list, trigger) {
   const side = document.getElementById("side-tabs");
-  const bc   = document.querySelector(".breadcrumb");
+  const bc = document.querySelector(".breadcrumb");
   if (!side || !bc || !trigger) return;
 
   clearTimeout(hideTimer);
@@ -83,45 +85,57 @@ function showSideTabs(list, trigger) {
 
     if (current === href) a.classList.add("active");
 
-    /* 상세 페이지들 → index 강조 */
+    // Newsroom 상세
     if (current.includes("/pr/newsroom/news-view") &&
-        href.includes("/pr/newsroom/index.html")) a.classList.add("active");
-
-    if (current.includes("/pr/gallery/gallery-view") &&
-        href.includes("/pr/gallery/index.html")) a.classList.add("active");
-
-    if (current.includes("/pr/certification/certification-view") &&
-        href.includes("/pr/certification/index.html")) a.classList.add("active");
-
-    if (current.includes("/pr/catalog/catalog-view") &&
-        href.includes("/pr/catalog/index.html")) a.classList.add("active");
-
-    /* ⭐ DOWNLOADS 상세 페이지 → index 강조 */
-    if (current.includes("/support/downloads/downloads-view") &&
-        href.includes("/support/downloads/index.html"))
+        href.includes("/pr/newsroom/index.html")) {
       a.classList.add("active");
+    }
+
+    // Gallery 상세
+    if (current.includes("/pr/gallery/gallery-view") &&
+        href.includes("/pr/gallery/index.html")) {
+      a.classList.add("active");
+    }
+
+    // Certification 상세
+    if (current.includes("/pr/certification/certification-view") &&
+        href.includes("/pr/certification/index.html")) {
+      a.classList.add("active");
+    }
+
+    // Catalog 상세
+    if (current.includes("/pr/catalog/catalog-view") &&
+        href.includes("/pr/catalog/index.html")) {
+      a.classList.add("active");
+    }
+
+    // Downloads 상세
+    if (current.includes("/support/downloads/downloads-view") &&
+        href.includes("/support/downloads/index.html")) {
+      a.classList.add("active");
+    }
   });
 
   const a = trigger.getBoundingClientRect();
   const b = bc.getBoundingClientRect();
 
   side.style.left = `${a.left - b.left}px`;
-  side.style.top  = `${a.bottom - b.top + 8}px`;
+  side.style.top = `${a.bottom - b.top + 8}px`;
   side.classList.add("visible");
 }
 
 /* ------------------------------------------------------------
-   6) Breadcrumb 탭 초기화
+   6) Breadcrumb Tabs 초기화
 ------------------------------------------------------------ */
 function initBreadcrumbTabs() {
-  const lv1  = document.querySelector(".crumb-level1");
-  const lv2  = document.querySelector(".crumb-level2");
+  const lv1 = document.querySelector(".crumb-level1");
+  const lv2 = document.querySelector(".crumb-level2");
   const side = document.getElementById("side-tabs");
-  if (!side) return;
-
   const base = `/${LANG}/sub`;
 
-  /* 1단계 메뉴 */
+  if (!side) return;
+
+  /* --- 1단계 대분류 탭 --- */
   const TOP = LANG === "kr"
     ? [
         { name: "회사소개", link: `${base}/company/overview.html` },
@@ -130,20 +144,21 @@ function initBreadcrumbTabs() {
         { name: "고객지원", link: `${base}/support/inquiry/index.html` },
       ]
     : [
-        { name: "Company",    link: `${base}/company/overview.html` },
-        { name: "Products",   link: `${base}/products/sub-towed.html` },
-        { name: "PR Center",  link: `${base}/pr/newsroom/index.html` },
-        { name: "Support",    link: `${base}/support/inquiry/index.html` },
+        { name: "Company", link: `${base}/company/overview.html` },
+        { name: "Products", link: `${base}/products/sub-towed.html` },
+        { name: "PR Center", link: `${base}/pr/newsroom/index.html` },
+        { name: "Support", link: `${base}/support/inquiry/index.html` },
       ];
 
   if (lv1) lv1.addEventListener("mouseenter", () => showSideTabs(TOP, lv1));
 
-  /* 2단계 메뉴 */
+  /* --- 2단계 서브 탭 --- */
   if (lv2) {
     lv2.addEventListener("mouseenter", () => {
       const p = location.pathname.toLowerCase();
       let tabs = [];
 
+      // 회사소개
       if (p.includes("/company/")) {
         tabs = LANG === "kr"
           ? [
@@ -164,6 +179,7 @@ function initBreadcrumbTabs() {
             ];
       }
 
+      // 제품소개
       if (p.includes("/products/") || p.includes("/product/")) {
         tabs = LANG === "kr"
           ? [
@@ -180,6 +196,7 @@ function initBreadcrumbTabs() {
             ];
       }
 
+      // 홍보센터
       if (p.includes("/pr/")) {
         tabs = LANG === "kr"
           ? [
@@ -198,11 +215,12 @@ function initBreadcrumbTabs() {
             ];
       }
 
+      // 고객지원
       if (p.includes("/support/")) {
         tabs = LANG === "kr"
           ? [
               { name: "1:1 문의", link: `${base}/support/inquiry/index.html` },
-              { name: "자료실", link: `${base}/support/downloads/index.html` },
+              { name: "자료실",  link: `${base}/support/downloads/index.html` },
             ]
           : [
               { name: "Inquiry", link: `${base}/support/inquiry/index.html` },
@@ -214,21 +232,20 @@ function initBreadcrumbTabs() {
     });
   }
 
-  document.querySelector(".breadcrumb")
-    ?.addEventListener("mouseleave", scheduleHideTabs);
+  document.querySelector(".breadcrumb")?.addEventListener("mouseleave", scheduleHideTabs);
 }
 
 /* ------------------------------------------------------------
-   7) Admin Bar
+   7) AdminBar
 ------------------------------------------------------------ */
 function initAdminBar() {
-  const role  = localStorage.getItem("role");
+  const role = localStorage.getItem("role");
   const token = localStorage.getItem("token");
-
   if (!["admin", "superadmin"].includes(role) || !token) return;
 
   const bar = document.createElement("div");
   bar.id = "adminBar";
+
   bar.innerHTML = `
     <div class="admin-left"><strong>FINE DEFENSE ADMIN MODE</strong></div>
     <div class="admin-right">
@@ -248,7 +265,8 @@ function initAdminBar() {
     align-items:center;
     padding:0 20px;
     position:fixed;
-    top:0; left:0;
+    top:0;
+    left:0;
     z-index:9999;
     font-size:14px;
   `;
@@ -262,22 +280,44 @@ function initAdminBar() {
 }
 
 /* ------------------------------------------------------------
-   8) 초기화
+   8) Header가 adminBar와 겹치지 않게 보정
+------------------------------------------------------------ */
+function applyAdminBarMargin() {
+  const bar = document.getElementById("adminBar");
+  if (!bar) return;
+
+  const header =
+    document.querySelector("header") ||
+    document.querySelector("header.header-inner") ||
+    document.getElementById("header");
+
+  if (header) {
+    header.style.marginTop = bar.offsetHeight + "px";
+  }
+}
+
+/* ------------------------------------------------------------
+   9) 초기화
 ------------------------------------------------------------ */
 document.addEventListener("DOMContentLoaded", async () => {
   await loadComponent("header", PATH.header);
   await loadComponent("footer", PATH.footer);
 
-  // 헤더가 DOM에 fully 삽입된 뒤에 실행
-  requestAnimationFrame(() => {
+  initAdminBar();
+  applyAdminBarMargin();
+
+  highlightTopMenu();
+  initBreadcrumbTabs();
+
+  // 비동기 로드로 놓친 요소들 재보정
+  setTimeout(() => {
+    applyAdminBarMargin();
     highlightTopMenu();
-    initBreadcrumbTabs();
-    initAdminBar();
-  });
+  }, 30);
 });
 
 /* ------------------------------------------------------------
-   9) SideTabs 자동 숨김
+   10) SideTabs 자동 숨김
 ------------------------------------------------------------ */
 function scheduleHideTabs() {
   const s = document.getElementById("side-tabs");
