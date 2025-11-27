@@ -22,14 +22,14 @@ if (!fs.existsSync(uploadDir)) {
 }
 
 /* ============================================================
-   📁 Multer: 한글 파일명 UTF-8 변환하여 저장
+   📁 Multer: 한글 파일명 UTF-8 변환하여 저장 (fileFilter 포함)
 ============================================================ */
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
-    // 🔥 한글 파일명 변환 (latin1 → utf8)
     const utf8Name = Buffer.from(file.originalname, "latin1").toString("utf8");
 
     const timestamp = Date.now();
@@ -40,7 +40,14 @@ const storage = multer.diskStorage({
   }
 });
 
-const uploadNotice = multer({ storage });
+const uploadNotice = multer({
+  storage,
+  fileFilter(req, file, cb) {
+    // 🔥 한글 파일명 필터 완료 (multer가 size를 정상적으로 읽도록 보장)
+    file.originalname = Buffer.from(file.originalname, "latin1").toString("utf8");
+    cb(null, true);
+  }
+});
 
 /* ============================================================
    📌 공지 등록
@@ -62,14 +69,24 @@ router.post("/create", verifyToken, uploadNotice.array("files", 10), async (req,
 
     const postId = result.insertId;
 
+    /* ============================
+       🔥 업로드된 파일 사이즈 로그
+    ============================ */
+    console.log("📁 업로드된 파일 목록:");
+    req.files.forEach(f => {
+      console.log("   👉", {
+        originalname: f.originalname,
+        filename: f.filename,
+        size: f.size
+      });
+    });
+
     // 🔥 첨부파일 저장
     for (const f of req.files) {
-      const utf8Original = Buffer.from(f.originalname, "latin1").toString("utf8");
-
       await db.execute(
         `INSERT INTO post_files (post_id, file_path, original_name, file_size)
          VALUES (?, ?, ?, ?)`,
-        [postId, `/uploads/notice_files/${f.filename}`, utf8Original, f.size]
+        [postId, `/uploads/notice_files/${f.filename}`, f.originalname, f.size]
       );
     }
 
@@ -94,7 +111,6 @@ router.put("/update/:id", verifyToken, uploadNotice.array("files", 10), async (r
       return res.status(400).json({ message: "필수 값 누락" });
     }
 
-    // 🔥 기본 정보 업데이트
     await db.execute(
       `UPDATE posts
          SET title=?, content=?, lang=?, sort_order=?
@@ -102,9 +118,7 @@ router.put("/update/:id", verifyToken, uploadNotice.array("files", 10), async (r
       [title, content, lang, sort_order, id]
     );
 
-    /* ============================
-       🗑 삭제할 기존 파일 처리
-    ============================ */
+    // 삭제할 파일 처리
     let removeList = [];
 
     try {
@@ -114,15 +128,11 @@ router.put("/update/:id", verifyToken, uploadNotice.array("files", 10), async (r
     }
 
     if (removeList.length > 0) {
-      // 실제 파일 삭제
       for (const filePath of removeList) {
-        const relative = filePath.replace(/^\//, "");
-        const absPath = path.join(__dirname, "..", relative);
-
+        const absPath = path.join(__dirname, "..", filePath.replace(/^\//, ""));
         if (fs.existsSync(absPath)) fs.unlinkSync(absPath);
       }
 
-      // DB 삭제
       await db.execute(
         `DELETE FROM post_files
           WHERE post_id=? AND file_path IN (${removeList.map(() => "?").join(",")})`,
@@ -131,15 +141,21 @@ router.put("/update/:id", verifyToken, uploadNotice.array("files", 10), async (r
     }
 
     /* ============================
-       🆕 새 파일 저장
+       🔥 새 파일 업로드 시 size 로그
     ============================ */
-    for (const f of req.files) {
-      const utf8Original = Buffer.from(f.originalname, "latin1").toString("utf8");
+    console.log("📁 수정 - 새로 업로드된 파일:");
+    req.files.forEach(f => console.log("   👉", {
+      originalname: f.originalname,
+      filename: f.filename,
+      size: f.size
+    }));
 
+    // 새 파일 저장
+    for (const f of req.files) {
       await db.execute(
         `INSERT INTO post_files (post_id, file_path, original_name, file_size)
          VALUES (?, ?, ?, ?)`,
-        [id, `/uploads/notice_files/${f.filename}`, utf8Original, f.size]
+        [id, `/uploads/notice_files/${f.filename}`, f.originalname, f.size]
       );
     }
 
@@ -164,9 +180,7 @@ router.delete("/delete/:id", verifyToken, async (req, res) => {
     );
 
     for (const f of files) {
-      const relative = f.file_path.replace(/^\//, "");
-      const absPath = path.join(__dirname, "..", relative);
-
+      const absPath = path.join(__dirname, "..", f.file_path.replace(/^\//, ""));
       if (fs.existsSync(absPath)) fs.unlinkSync(absPath);
     }
 
@@ -182,7 +196,7 @@ router.delete("/delete/:id", verifyToken, async (req, res) => {
 });
 
 /* ============================================================
-   📥 실다운로드 (한글 파일명 깨짐 방지)
+   📥 파일 다운로드
 ============================================================ */
 router.get("/download-file", async (req, res) => {
   const filePath = req.query.path;
@@ -198,7 +212,6 @@ router.get("/download-file", async (req, res) => {
     return res.status(404).json({ message: "file not found" });
   }
 
-  // 🔥 한글 파일명 깨짐 방지
   res.setHeader(
     "Content-Disposition",
     `attachment; filename*=UTF-8''${encodeURIComponent(originalName)}`
@@ -208,7 +221,7 @@ router.get("/download-file", async (req, res) => {
 });
 
 /* ============================================================
-   📥 다운로드 로그 기록
+   📥 다운로드 로그
 ============================================================ */
 router.post("/download", async (req, res) => {
   try {
