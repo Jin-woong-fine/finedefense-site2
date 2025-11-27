@@ -99,8 +99,26 @@ function showSideTabs(list, trigger) {
       a.classList.add("active");
     }
 
+    // Gallery 상세 페이지: index.html 강조
+    if (current.includes("/pr/gallery/gallery-view") &&
+        href.includes("/pr/gallery/index.html")) {
+      a.classList.add("active");
+    }
+
+    // Certification 상세 페이지: index.html 강조
+    if (current.includes("/pr/certification/certification-view") &&
+        href.includes("/pr/certification/index.html")) {
+      a.classList.add("active");
+    }
+
+    // Catalog 상세 페이지: index.html 강조
+    if (current.includes("/pr/catalog/catalog-view") &&
+        href.includes("/pr/catalog/index.html")) {
+      a.classList.add("active");
+    }
+
     // Downloads 상세 페이지: index.html 강조
-    if (current.includes("/support/downloads/") &&
+    if (current.includes("/support/downloads/downloads-view") &&
         href.includes("/support/downloads/index.html")) {
       a.classList.add("active");
     }
