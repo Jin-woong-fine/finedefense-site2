@@ -28,6 +28,9 @@ import catalogRouter from "./routes/catalog.js";
 
 import downloadsRouter from "./routes/downloads.js";
 
+import uploadsEditorRouter from "./routes/uploads_editor.js";
+
+
 
 
 const app = express();
@@ -78,7 +81,13 @@ app.use("/api/inquiry", sendInquiryRouter);
 
 app.use("/api/catalog", catalogRouter);
 
+
+app.use("/api/uploads/editor", uploadsEditorRouter);
+
 app.use("/api/downloads", downloadsRouter);
+
+
+
 
 
 // 🔥 중요! posts_common보다 notice 라우터가 항상 위에 있어야 함
