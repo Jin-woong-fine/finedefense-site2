@@ -4,7 +4,7 @@ import mysql from "mysql2/promise";
 const pool = mysql.createPool({
   host: "localhost",
   user: "finedefense_user",
-  password: "YOUR_PASSWORD",
+  password: "fine!202310",
   database: "finedefense",
   waitForConnections: true,
   connectionLimit: 10,
