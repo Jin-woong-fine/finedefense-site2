@@ -94,19 +94,6 @@
   transition: color 0.25s ease;
 }
 
-/* 레벨1 활성 강조 */
-.crumb-level1.active {
-  color: #0f2679 !important;
-  font-weight: 800 !important;
-  border-bottom: 2px solid #0f2679;
-  padding-bottom: 2px;
-}
-
-/* 레벨2 활성 강조 */
-.crumb-level2.active {
-  color: #333 !important;
-  font-weight: 800 !important;
-}
 
 
 /* ===============================
