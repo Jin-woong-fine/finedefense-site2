@@ -3,29 +3,90 @@
 <head>
   <meta charset="UTF-8">
   <title>인증/특허 관리 | 관리자</title>
+
   <link rel="stylesheet" href="/kr/admin/css/admin.css">
+
   <style>
-    .filter-box { display:flex; gap:10px; margin-bottom:20px; }
-    select, input { padding:8px; }
-    .thumb { width:80px; aspect-ratio:1/1.414; object-fit:contain; background:#eee; }
-    table { width:100%; border-collapse:collapse; margin-top:20px; }
-    th,td { border-bottom:1px solid #ddd; padding:10px; text-align:left; }
-    th { background:#f5f7fb; }
-    .btn-blue { padding:6px 12px; background:#0f2679;color:#fff;border-radius:6px; }
+    .filter-box { 
+      display:flex; 
+      gap:10px; 
+      margin:20px 0; 
+      align-items: center;
+    }
+    select, input { 
+      padding:8px; 
+      border:1px solid #ccc;
+      border-radius:6px;
+    }
+    .thumb { 
+      width:80px; 
+      aspect-ratio:1/1.414; 
+      object-fit:contain; 
+      background:#f3f3f3; 
+      border:1px solid #ddd;
+      border-radius:6px;
+    }
+    table { 
+      width:100%; 
+      border-collapse:collapse; 
+      margin-top:20px; 
+      font-size:14px;
+    }
+    th,td {
+      border-bottom:1px solid #e2e5ec; 
+      padding:12px 10px; 
+      text-align:left;
+    }
+    th {
+      background:#f5f7fb;
+      font-weight:600;
+    }
+    .btn-blue { 
+      padding:8px 14px; 
+      background:#0f2679; 
+      color:#fff; 
+      border-radius:6px; 
+      cursor:pointer;
+      border: none;
+    }
+    .btn-small {
+      padding:6px 12px;
+      border:none;
+      border-radius:6px;
+      cursor:pointer;
+      background:#eee;
+    }
+    .btn-delete {
+      color:#fff;
+      background:#d9534f;
+      padding:6px 12px;
+      border-radius:6px;
+      border:none;
+      cursor:pointer;
+    }
   </style>
 </head>
 
 <body>
 
+<!-- 🔵 Sidebar -->
 <div id="sidebar"></div>
 
+<!-- 🔵 Main -->
 <div class="main">
+
+  <!-- 🔵 Topbar -->
   <div class="topbar">
     <div class="title">인증 / 특허 관리</div>
+    <button class="home-btn" onclick="location.href='/kr/admin/index.html'">홈으로</button>
   </div>
 
-  <button class="btn-blue" onclick="location.href='certification-add.html'">+ 새 항목 추가</button>
+  <!-- 새 항목 추가 버튼 -->
+  <button class="btn-blue" onclick="location.href='certification-add.html'">
+    + 새 항목 추가
+  </button>
 
+  <!-- 필터 영역 -->
   <div class="filter-box">
     <select id="filterType">
       <option value="all">전체</option>
@@ -38,11 +99,12 @@
       <option value="kr">한국어</option>
       <option value="en">영어</option>
     </select>
-    
+
     <input type="text" id="search" placeholder="검색(제목)">
-    <button onclick="loadItems()">검색</button>
+    <button class="btn-small" onclick="loadItems()">검색</button>
   </div>
 
+  <!-- 테이블 -->
   <table>
     <thead>
       <tr>
@@ -58,16 +120,17 @@
     </thead>
     <tbody id="tbody"></tbody>
   </table>
+
 </div>
 
+<!-- 공통 스크립트 -->
 <script src="/kr/admin/js/sidebar.js"></script>
 <script src="/kr/admin/js/common_auth.js"></script>
 
 <script>
-  loadSidebar("certifications");  /* ⭐ 추가해야 함 */
+  loadSidebar("certifications"); 
   loadItems();
 </script>
-
 
 <script>
 async function loadItems(){
@@ -86,8 +149,15 @@ async function loadItems(){
       <td>${i.title_en}</td>
       <td>${i.lang.toUpperCase()}</td>
       <td>${i.sort_order}</td>
-      <td><button onclick="location.href='certification-edit.html?id=${i.id}'">수정</button></td>
-      <td><button style="color:red;" onclick="deleteItem(${i.id})">삭제</button></td>
+      <td>
+        <button class="btn-small"
+          onclick="location.href='certification-edit.html?id=${i.id}'">
+          수정
+        </button>
+      </td>
+      <td>
+        <button class="btn-delete" onclick="deleteItem(${i.id})">삭제</button>
+      </td>
     </tr>
   `).join("");
 }
@@ -109,7 +179,6 @@ async function deleteItem(id){
   }
 }
 
-loadItems();
 </script>
 
 </body>
