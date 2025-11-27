@@ -120,12 +120,9 @@ function highlightBreadcrumb() {
   const lv2 = document.querySelector(".crumb-level2");
   if (!lv1 || !lv2) return;
 
-  // 레벨1, 레벨2는 페이지에서 이미 올바른 텍스트로 작성되어 있으므로
-  // 경로 검사 없이 무조건 active 준다.
   lv1.classList.add("active");
   lv2.classList.add("active");
 }
-
 
 /* ------------------------------------------------------------
    7) Side Tabs + 상세페이지 index 활성화

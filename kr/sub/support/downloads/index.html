@@ -60,6 +60,30 @@
       color:#777;
     }
 
+    /* ===== Breadcrumb Active 강화 ===== */
+    .breadcrumb .crumb-level1.active {
+    color: #0f2679 !important;
+    font-weight: 700 !important;
+    }
+
+    .breadcrumb .crumb-level2.active {
+    color: #333 !important;
+    font-weight: 700 !important;
+    }
+
+    /* '>' 텍스트 주변 간격 강제 */
+    .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 6px;    /* 텍스트와 span 사이 자동 간격 */
+    }
+
+    .breadcrumb > * {
+    display: inline-block;
+}
+
+
+
   </style>
 </head>
 
