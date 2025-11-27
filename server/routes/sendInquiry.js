@@ -3,6 +3,10 @@ import express from "express";
 import db from "../config/db.js";   // 🔥 반드시 이걸로!
 import nodemailer from "nodemailer";
 
+import dotenv from "dotenv";
+dotenv.config();
+
+
 
 const router = express.Router();
 
