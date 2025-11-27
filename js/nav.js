@@ -1,10 +1,11 @@
 /* ============================================================
-   🌐 Fine Defense NAV — FINAL STABLE (2025.12)
-   - AdminBar 먼저 로드 (중요!!)
-   - Header / Footer 정상 로딩
-   - Top Menu Active
-   - Breadcrumb Level1/2 Active
-   - SideTabs + 상세페이지 index Active
+   🌐 Fine Defense NAV — PERFECT FINAL (2025.12)
+   - AdminBar 먼저 로드
+   - Header / Footer 자동 로드
+   - Top Menu Highlight
+   - Breadcrumb Lv1 / Lv2 Highlight
+   - SideTabs Lv1 / Lv2 Active
+   - 상세페이지 index Active 매핑
 ============================================================ */
 
 let hideTimer = null;
@@ -19,7 +20,7 @@ function detectLang() {
 const LANG = detectLang();
 
 /* ------------------------------------------------------------
-   2) Header / Footer 경로 (⭐ 상대 경로로 변경)
+   2) Header / Footer 경로
 ------------------------------------------------------------ */
 const PATH = {
   header: `/${LANG}/components/header.html`,
@@ -32,7 +33,7 @@ const PATH = {
 async function loadComponent(targetId, url) {
   try {
     const res = await fetch(url);
-    if (!res.ok) throw new Error(url + " not found");
+    if (!res.ok) throw new Error(`${url} not found`);
 
     const html = await res.text();
     const el = document.getElementById(targetId);
@@ -44,7 +45,7 @@ async function loadComponent(targetId, url) {
 }
 
 /* ------------------------------------------------------------
-   4) Admin Bar (⭐ 헤더보다 먼저 로드해야 함!)
+   4) Admin Bar (⭐ 헤더보다 먼저!)
 ------------------------------------------------------------ */
 function initAdminBar() {
   const role = localStorage.getItem("role");
@@ -79,9 +80,7 @@ function initAdminBar() {
     font-size: 14px;
   `;
 
-  // 헤더 밀림 방지 → body padding만 추가
   document.body.style.paddingTop = "48px";
-
   document.body.prepend(bar);
 
   document.getElementById("adminLogout")?.addEventListener("click", e => {
@@ -92,7 +91,7 @@ function initAdminBar() {
 }
 
 /* ------------------------------------------------------------
-   5) Top Menu Active (회사소개/제품소개/홍보센터/고객지원)
+   5) Top Menu Active
 ------------------------------------------------------------ */
 function highlightTopMenu() {
   const path = location.pathname.toLowerCase();
@@ -101,10 +100,10 @@ function highlightTopMenu() {
     const href = (a.getAttribute("href") || "").toLowerCase();
 
     if (
-      (path.includes("/company/")  && href.includes("/company/"))  ||
+      (path.includes("/company/")  && href.includes("/company/")) ||
       (path.includes("/products/") && href.includes("/products/")) ||
       (path.includes("/product/")  && href.includes("/products/")) ||
-      (path.includes("/pr/")       && href.includes("/pr/"))       ||
+      (path.includes("/pr/")       && href.includes("/pr/")) ||
       (path.includes("/support/")  && href.includes("/support/"))
     ) {
       a.classList.add("active");
@@ -113,29 +112,31 @@ function highlightTopMenu() {
 }
 
 /* ------------------------------------------------------------
-   6) Breadcrumb Level1 / Level2 Active (심플 버전)
+   6) Breadcrumb 레벨1/2 + 카테고리 저장
 ------------------------------------------------------------ */
 function highlightBreadcrumb() {
-  function tryActivateBreadcrumb() {
+  function tryActivate() {
     const lv1 = document.querySelector(".crumb-level1");
     const lv2 = document.querySelector(".crumb-level2");
 
-    if (lv1 && lv2) {
-      lv1.classList.add("active");
-      lv2.classList.add("active");
-      return; // 성공 → 종료
-    }
+    if (!lv1 || !lv2) return setTimeout(tryActivate, 50);
 
-    // 아직 못 찾으면 50ms 후 다시 시도
-    setTimeout(tryActivateBreadcrumb, 50);
+    lv1.classList.add("active");
+    lv2.classList.add("active");
+
+    const path = location.pathname.toLowerCase();
+
+    if (path.includes("/company/")) window.currentCategory = "company";
+    else if (path.includes("/products/") || path.includes("/product/")) window.currentCategory = "products";
+    else if (path.includes("/pr/")) window.currentCategory = "pr";
+    else if (path.includes("/support/")) window.currentCategory = "support";
+    else window.currentCategory = null;
   }
-
-  tryActivateBreadcrumb();
+  tryActivate();
 }
 
-
 /* ------------------------------------------------------------
-   7) Side Tabs + 상세페이지 index 활성화
+   7) SideTabs + 상세 index Active + Lv1 Active
 ------------------------------------------------------------ */
 function showSideTabs(list, trigger) {
   const side = document.getElementById("side-tabs");
@@ -146,16 +147,20 @@ function showSideTabs(list, trigger) {
 
   const current = location.pathname.toLowerCase();
 
+  // HTML 생성
   side.innerHTML = list
     .map(t => `<a href="${t.link}" class="tab-item">${t.name}</a>`)
     .join("");
 
-  side.querySelectorAll(".tab-item").forEach(a => {
+  const items = side.querySelectorAll(".tab-item");
+
+  // 📌 레벨2 Active 처리
+  items.forEach(a => {
     const href = new URL(a.href).pathname.toLowerCase();
 
     if (current === href) a.classList.add("active");
 
-    const DETAIL_MAPPING = [
+    const DETAIL = [
       { d: "/pr/notice/notice-view",         i: "/pr/notice/index.html" },
       { d: "/pr/newsroom/news-view",         i: "/pr/newsroom/index.html" },
       { d: "/pr/gallery/gallery-view",       i: "/pr/gallery/index.html" },
@@ -164,24 +169,26 @@ function showSideTabs(list, trigger) {
       { d: "/support/downloads/downloads-view", i: "/support/downloads/index.html" },
     ];
 
-    DETAIL_MAPPING.forEach(m => {
+    DETAIL.forEach(m => {
       if (current.includes(m.d) && href.includes(m.i)) {
         a.classList.add("active");
       }
     });
   });
 
+  // ⭐ 레벨1 Active 처리 (TOP 목록일 때만)
+  if (list.isTop && window.currentCategory) {
+    const map = { company: 0, products: 1, pr: 2, support: 3 };
+    const idx = map[window.currentCategory];
+    if (items[idx]) items[idx].classList.add("active");
+  }
+
+  // 위치 조정
   const a = trigger.getBoundingClientRect();
   const b = bc.getBoundingClientRect();
   side.style.left = `${a.left - b.left}px`;
   side.style.top  = `${a.bottom - b.top + 8}px`;
   side.classList.add("visible");
-}
-
-function scheduleHideTabs() {
-  const s = document.getElementById("side-tabs");
-  if (!s) return;
-  hideTimer = setTimeout(() => s.classList.remove("visible"), 150);
 }
 
 /* ------------------------------------------------------------
@@ -195,6 +202,7 @@ function initBreadcrumbTabs() {
 
   const base = `/${LANG}/sub`;
 
+  // ⭐ 레벨1 목록 정의 + 표식 추가
   const TOP = LANG === "kr"
     ? [
         { name: "회사소개", link: `${base}/company/overview.html` },
@@ -203,16 +211,18 @@ function initBreadcrumbTabs() {
         { name: "고객지원", link: `${base}/support/inquiry/index.html` },
       ]
     : [
-        { name: "Company",   link: `${base}/company/overview.html` },
-        { name: "Products",  link: `${base}/products/sub-towed.html` },
+        { name: "Company", link: `${base}/company/overview.html` },
+        { name: "Products", link: `${base}/products/sub-towed.html` },
         { name: "PR Center", link: `${base}/pr/newsroom/index.html` },
-        { name: "Support",   link: `${base}/support/inquiry/index.html` },
+        { name: "Support", link: `${base}/support/inquiry/index.html` },
       ];
 
-  // lv1 탭
+  TOP.isTop = true; // ⭐ TOP임을 표시
+
+  // 레벨1 Hover
   lv1?.addEventListener("mouseenter", () => showSideTabs(TOP, lv1));
 
-  // lv2 탭
+  // 레벨2 Hover
   lv2?.addEventListener("mouseenter", () => {
     const p = location.pathname.toLowerCase();
     let tabs = [];
@@ -290,15 +300,16 @@ function initBreadcrumbTabs() {
     showSideTabs(tabs, lv2);
   });
 
-  document.querySelector(".breadcrumb")?.addEventListener("mouseleave", scheduleHideTabs);
+  document.querySelector(".breadcrumb")?.addEventListener("mouseleave", () => {
+    hideTimer = setTimeout(() => side.classList.remove("visible"), 150);
+  });
 }
 
 /* ------------------------------------------------------------
-   9) DOM 로드 후 초기화 — ⭐ AdminBar 먼저 실행
+   9) DOM 로드 후 실행
 ------------------------------------------------------------ */
 document.addEventListener("DOMContentLoaded", async () => {
-  initAdminBar();   // ⭐ 반드시 먼저 실행
-
+  initAdminBar();
   await loadComponent("header", PATH.header);
   await loadComponent("footer", PATH.footer);
 
@@ -307,6 +318,5 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 window.addEventListener("load", () => {
-  highlightBreadcrumb();  // ⭐ 페이지 전체 렌더링 후 실행
+  highlightBreadcrumb();
 });
-
