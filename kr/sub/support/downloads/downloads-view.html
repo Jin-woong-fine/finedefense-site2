@@ -7,10 +7,6 @@
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/sub-banner.css">
 
-  <!-- ⭐ ToastUI Editor (Viewer만 사용) -->
-  <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
-  <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
-
   <style>
     .view-wrap {
       max-width: 900px;
@@ -34,6 +30,20 @@
       margin-bottom: 30px;
     }
 
+    /* 본문 스타일 (에디터 없이 HTML만 표시) */
+    .article-body {
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color:#333;
+    }
+    .article-body img {
+      max-width: 100%;
+      height: auto;
+    }
+    .article-body p {
+      margin: 0 0 12px;
+    }
+
     .files {
       border-top:1px solid #ddd;
       margin-top:40px;
@@ -47,6 +57,8 @@
       margin-bottom:10px;
       display:flex;
       justify-content:space-between;
+      align-items: center;
+      font-size: 0.9rem;
     }
 
     .back-btn {
@@ -81,8 +93,8 @@
   <h1 class="title" id="title"></h1>
   <div class="info" id="info"></div>
 
-  <!-- Viewer -->
-  <div id="viewer"></div>
+  <!-- 🔥 여기 안에 HTML 그대로 뿌림 -->
+  <div id="viewer" class="article-body"></div>
 
   <div class="files" id="fileWrap" style="display:none;">
     <h3>첨부파일</h3>
@@ -98,7 +110,6 @@
 
 <script>
   const id = new URLSearchParams(location.search).get("id");
-
   if (!id) location.href = "index.html";
 
   loadData();
@@ -108,19 +119,13 @@
     const data = await res.json();
 
     document.getElementById("title").textContent = data.title;
-
     document.getElementById("info").textContent =
       `${printCategory(data.category)} · ${data.lang.toUpperCase()} · ${new Date(data.created_at).toLocaleDateString()}`;
 
-    /* ⭐ Toast UI Editor Viewer 모드 */
-    new toastui.Editor({
-      el: document.querySelector('#viewer'),
-      viewer: true,
-      initialValue: data.content || "",
-      height: "auto"
-    });
+    // 🔥 에디터 없이, 저장된 HTML을 그대로 렌더
+    document.getElementById("viewer").innerHTML = data.content || "";
 
-    /* 첨부파일 */
+    // 첨부파일
     if (data.files?.length) {
       const wrap = document.getElementById("fileWrap");
       const list = document.getElementById("fileList");
