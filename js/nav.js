@@ -43,30 +43,21 @@ async function loadComponent(targetId, url) {
 }
 
 /* ------------------------------------------------------------
-   4) 상단 메뉴 강조
+   4) 상단 메뉴 강조 — HREF 기반 완전 안정 버전
 ------------------------------------------------------------ */
 function highlightTopMenu() {
   const path = location.pathname.toLowerCase();
 
-  const MAP = LANG === "kr"
-    ? [
-        { k: "/company/", t: "회사소개" },
-        { k: "/products/", t: "제품소개" },
-        { k: "/product/", t: "제품소개" },
-        { k: "/pr/", t: "홍보센터" },
-        { k: "/support/", t: "고객지원" },
-      ]
-    : [
-        { k: "/company/", t: "Company" },
-        { k: "/products/", t: "Products" },
-        { k: "/product/", t: "Products" },
-        { k: "/pr/", t: "PR Center" },
-        { k: "/support/", t: "Support" },
-      ];
-
   document.querySelectorAll(".main-menu > li > a").forEach(a => {
-    const txt = a.textContent.trim();
-    if (MAP.some(m => path.includes(m.k) && m.t === txt)) {
+    const href = a.getAttribute("href")?.toLowerCase() || "";
+
+    if (
+      (path.includes("/company/")  && href.includes("/company/")) ||
+      (path.includes("/products/") && href.includes("/products/")) ||
+      (path.includes("/product/")  && href.includes("/products/")) ||
+      (path.includes("/pr/")       && href.includes("/pr/")) ||
+      (path.includes("/support/")  && href.includes("/support/"))
+    ) {
       a.classList.add("active");
     }
   });
