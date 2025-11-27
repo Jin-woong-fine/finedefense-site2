@@ -20,10 +20,13 @@ window.loadSidebar = function (activeKey) {
     { key: "notice", label: "공지사항 관리", link: "/kr/admin/notice-list.html", roles: ["superadmin", "admin", "editor"] },
     { key: "gallery", label: "갤러리 관리", link: "/kr/admin/gallery-list.html", roles: ["superadmin", "admin", "editor"] },
 
-    // 인증/특허 메뉴
+    // ⭐ 인증/특허
     { key: "certifications", label: "인증/특허 관리", link: "/kr/admin/certification-list.html", roles: ["superadmin", "admin", "editor"] },
 
-    // 🔥 Inquiry 관리 (경로 수정)
+    // ⭐ 카탈로그 (추가됨)
+    { key: "catalog", label: "카탈로그 관리", link: "/kr/admin/catalog-list.html", roles: ["superadmin", "admin", "editor"] },
+
+    // ⭐ 1:1 문의 관리
     { key: "inquiry", label: "1:1 문의 관리", link: "/kr/admin/inquiry-list.html", roles: ["superadmin", "admin"] },
 
     { key: "loginlogs", label: "로그인 기록", link: "/kr/admin/login_logs.html", roles: ["superadmin", "admin"] },
