@@ -441,3 +441,18 @@ footer {
   color: #ffdddd;
   font-weight: 600;
 }
+
+
+
+
+/* HEADER FIX — 2025 FINAL */
+.header-inner {
+  min-height: 80px !important;
+  position: relative !important;
+  z-index: 9000 !important;
+}
+
+/* submenu는 너무 아래로 내려가므로 조정 */
+.submenu {
+  top: 150% !important;
+}
