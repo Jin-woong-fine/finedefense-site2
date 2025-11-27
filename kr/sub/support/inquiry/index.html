@@ -1,9 +1,13 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8">
   <title>1:1 문의 | Fine Defense</title>
+
+  <!-- 공통 CSS -->
   <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/sub-banner.css">
 
   <style>
     body {
@@ -74,7 +78,6 @@
       transition: all 0.18s ease;
     }
 
-    /* floating label */
     .form-group input:focus + label,
     .form-group input:not(:placeholder-shown) + label,
     .form-group textarea:focus + label,
@@ -112,61 +115,90 @@
 
 <body>
 
-<div class="inquiry-wrapper">
-  <div class="inquiry-title">1:1 문의</div>
-  <div class="inquiry-desc">제품 문의, 기술 문의, 협력 문의 등 어떤 내용이든 편하게 작성해주세요.</div>
+  <!-- HEADER -->
+  <div id="header"></div>
 
-  <div class="form-group">
-    <input id="name" type="text" placeholder=" " autocomplete="off">
-    <label for="name">이름</label>
+  <!-- 서브 배너 -->
+  <section class="sub-banner">
+    <img src="/img/sub-banners/pr-1_v2.jpg" alt="문의 배너 이미지" />
+    <div class="banner-text">
+      <h1>1:1 문의</h1>
+      <p>제품·기술·협력 문의를 남기시면 빠르게 확인 후 답변드립니다.</p>
+    </div>
+  </section>
+
+  <!-- breadcrumb -->
+  <div class="breadcrumb">
+    <a href="/kr/index.html">홈</a> &gt;
+    <span class="crumb crumb-level1">홍보센터</span> &gt;
+    <span class="crumb crumb-level2">1:1 문의</span>
+    <div id="side-tabs" class="side-tabs"></div>
   </div>
 
-  <div class="form-group">
-    <input id="email" type="email" placeholder=" " autocomplete="off">
-    <label for="email">이메일</label>
+
+  <!-- 문의 영역 -->
+  <div class="inquiry-wrapper">
+    <div class="inquiry-title">1:1 문의</div>
+    <div class="inquiry-desc">제품 문의, 기술 문의, 협력 문의 등 어떤 내용이든 편하게 작성해주세요.</div>
+
+    <div class="form-group">
+      <input id="name" type="text" placeholder=" " autocomplete="off">
+      <label for="name">이름</label>
+    </div>
+
+    <div class="form-group">
+      <input id="email" type="email" placeholder=" " autocomplete="off">
+      <label for="email">이메일</label>
+    </div>
+
+    <div class="form-group">
+      <input id="subject" type="text" placeholder=" " autocomplete="off">
+      <label for="subject">제목</label>
+    </div>
+
+    <div class="form-group">
+      <textarea id="message" placeholder=" "></textarea>
+      <label for="message">문의 내용</label>
+    </div>
+
+    <button class="btn-submit" onclick="sendInquiry()">문의 보내기</button>
   </div>
 
-  <div class="form-group">
-    <input id="subject" type="text" placeholder=" " autocomplete="off">
-    <label for="subject">제목</label>
-  </div>
 
-  <div class="form-group">
-    <textarea id="message" placeholder=" "></textarea>
-    <label for="message">문의 내용</label>
-  </div>
+  <!-- FOOTER -->
+  <div id="footer"></div>
 
-  <button class="btn-submit" onclick="sendInquiry()">문의 보내기</button>
-</div>
+  <!-- 공통 네비 로딩(nav.js) -->
+  <script src="/js/nav.js"></script>
 
-<script>
-  async function sendInquiry() {
-    const name = document.getElementById("name").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const subject = document.getElementById("subject").value.trim();
-    const message = document.getElementById("message").value.trim();
+  <script>
+    async function sendInquiry() {
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const subject = document.getElementById("subject").value.trim();
+      const message = document.getElementById("message").value.trim();
 
-    if (!name || !email || !message) {
-      alert("필수 항목을 입력해주세요.");
-      return;
+      if (!name || !email || !message) {
+        alert("필수 항목을 입력해주세요.");
+        return;
+      }
+
+      const res = await fetch("/api/inquiry/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, subject, message }),
+      });
+
+      const out = await res.json();
+
+      if (res.ok) {
+        alert("문의가 정상적으로 접수되었습니다.\n빠르게 확인 후 답변드리겠습니다.");
+        location.reload();
+      } else {
+        alert("오류 발생: " + out.message);
+      }
     }
-
-    const res = await fetch("/api/inquiry/send", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, subject, message }),
-    });
-
-    const out = await res.json();
-
-    if (res.ok) {
-      alert("문의가 정상적으로 접수되었습니다.\n빠르게 확인 후 답변드리겠습니다.");
-      location.reload();
-    } else {
-      alert("오류 발생: " + out.message);
-    }
-  }
-</script>
+  </script>
 
 </body>
 </html>
