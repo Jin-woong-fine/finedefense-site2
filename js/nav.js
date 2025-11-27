@@ -303,18 +303,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   await loadComponent("header", PATH.header);
   await loadComponent("footer", PATH.footer);
 
-  initAdminBar();
-  applyAdminBarMargin();
-
+  // ⭐ header 로딩 후 즉시 실행
   highlightTopMenu();
   initBreadcrumbTabs();
+  initAdminBar();
 
-  // 비동기 로드로 놓친 요소들 재보정
-  setTimeout(() => {
-    applyAdminBarMargin();
-    highlightTopMenu();
-  }, 30);
+  // ⭐ DOM이 실제로 렌더된 직후 다시 실행 (가장 중요)
+  requestAnimationFrame(() => highlightTopMenu());
+
+  // ⭐ 혹시 지연된 렌더링 대비
+  setTimeout(() => highlightTopMenu(), 100);
 });
+
 
 /* ------------------------------------------------------------
    10) SideTabs 자동 숨김
