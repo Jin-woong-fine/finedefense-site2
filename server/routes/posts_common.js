@@ -57,12 +57,16 @@ router.post("/view/:id", async (req, res) => {
 ===================================================== */
 router.get("/detail/:id", async (req, res) => {
   try {
+    const postId = req.params.id;
+
     const [rows] = await db.execute(
-      `SELECT p.*, u.name AS author_name
+      `SELECT p.*,
+              u.name AS author_name,
+              (SELECT COUNT(*) FROM post_view_logs v WHERE v.post_id = p.id) AS views
          FROM posts p
          LEFT JOIN users u ON p.author_id = u.id
         WHERE p.id = ?`,
-      [req.params.id]
+      [postId]
     );
 
     if (!rows.length) return res.json({});
@@ -70,13 +74,16 @@ router.get("/detail/:id", async (req, res) => {
 
     const [images] = await db.execute(
       `SELECT image_path FROM post_images WHERE post_id=?`,
-      [req.params.id]
+      [postId]
     );
     post.images = images.map(i => i.image_path);
 
+    // 🔥 여기! file_size 포함해야 프론트에서 읽을 수 있다.
     const [files] = await db.execute(
-      `SELECT file_path, original_name FROM post_files WHERE post_id=?`,
-      [req.params.id]
+      `SELECT file_path, original_name, file_size
+         FROM post_files
+        WHERE post_id=?`,
+      [postId]
     );
     post.files = files;
 
