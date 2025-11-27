@@ -110,6 +110,17 @@
         padding: 40px 30px;
       }
     }
+
+    .breadcrumb .crumb {
+      color: #0f2679 !important;
+      font-weight: 600 !important;
+    }
+
+    .breadcrumb .crumb.active {
+      color: #0f2679 !important;
+      font-weight: 700 !important;
+    }
+
   </style>
 </head>
 
@@ -127,14 +138,13 @@
     </div>
   </section>
 
-  <!-- breadcrumb -->
+    <!-- breadcrumb -->
   <div class="breadcrumb">
     <a href="/kr/index.html">홈</a> &gt;
-    <span class="crumb-level1">고객지원</span> &gt;
-    <span class="crumb-level2">1:1 문의</span>
+    <span class="crumb crumb-level1 active">고객지원</span> &gt;
+    <span class="crumb crumb-level2 active">1:1 문의</span>
     <div id="side-tabs"></div>
   </div>
-
 
   <!-- 문의 영역 -->
   <div class="inquiry-wrapper">
