@@ -131,13 +131,13 @@ function initBreadcrumbTabs() {
         { name: "회사소개", link: `${base}/company/overview.html` },
         { name: "제품소개", link: `${base}/products/sub-towed.html` },
         { name: "홍보센터", link: `${base}/pr/newsroom/index.html` },
-        { name: "고객지원", link: `${base}/support/` },
+        { name: "고객지원", link: `${base}/support/inquiry/index.html` },
       ]
     : [
         { name: "Company", link: `${base}/company/overview.html` },
         { name: "Products", link: `${base}/products/sub-towed.html` },
         { name: "PR Center", link: `${base}/pr/newsroom/index.html` },
-        { name: "Support", link: `${base}/support/` },
+        { name: "Support", link: `${base}/support/inquiry/index.html` },
       ];
 
   /* --- 1단계 메뉴 --- */
