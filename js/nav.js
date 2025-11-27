@@ -1,6 +1,6 @@
 /* ============================================================
-   🌐 Fine Defense NAV System — ULTRA-STABLE VERSION (2025)
-   - Header/Footer Auto Load (KR/EN)
+   🌐 Fine Defense NAV System — ULTRA-STABLE FINAL (2025)
+   - Header/Footer Auto Load
    - Active Menu Highlight
    - Breadcrumb SideTabs
    - Newsroom / Downloads 상세 Active Fix
@@ -91,16 +91,15 @@ function showSideTabs(list, trigger) {
   side.querySelectorAll(".tab-item").forEach(a => {
     const href = new URL(a.href).pathname.toLowerCase();
 
-    // 일반 경로 매칭
     if (current === href) a.classList.add("active");
 
-    // PR > Newsroom 상세 페이지 → index.html 강조
+    // Newsroom 상세 페이지: index.html 강조
     if (current.includes("/pr/newsroom/news-view") &&
         href.includes("/pr/newsroom/index.html")) {
       a.classList.add("active");
     }
 
-    // Support > Downloads 상세 페이지 → index.html 강조
+    // Downloads 상세 페이지: index.html 강조
     if (current.includes("/support/downloads/") &&
         href.includes("/support/downloads/index.html")) {
       a.classList.add("active");
@@ -122,10 +121,12 @@ function initBreadcrumbTabs() {
   const lv1 = document.querySelector(".crumb-level1");
   const lv2 = document.querySelector(".crumb-level2");
   const side = document.getElementById("side-tabs");
+
   if (!side) return;
 
   const base = `/${LANG}/sub`;
 
+  /* 1단계 대분류 */
   const TOP = LANG === "kr"
     ? [
         { name: "회사소개", link: `${base}/company/overview.html` },
@@ -140,16 +141,15 @@ function initBreadcrumbTabs() {
         { name: "Support", link: `${base}/support/inquiry/index.html` },
       ];
 
-  /* --- 1단계 메뉴 --- */
   if (lv1) lv1.addEventListener("mouseenter", () => showSideTabs(TOP, lv1));
 
-  /* --- 2단계 메뉴 --- */
+  /* 2단계 서브 탭 */
   if (lv2) {
     lv2.addEventListener("mouseenter", () => {
       const p = location.pathname.toLowerCase();
       let tabs = [];
 
-      /* 회사소개 */
+      /* --- 회사소개 --- */
       if (p.includes("/company/")) {
         tabs = LANG === "kr"
           ? [
@@ -170,7 +170,7 @@ function initBreadcrumbTabs() {
             ];
       }
 
-      /* 제품소개 */
+      /* --- 제품소개 --- */
       if (p.includes("/products/") || p.includes("/product/")) {
         tabs = LANG === "kr"
           ? [
@@ -187,7 +187,7 @@ function initBreadcrumbTabs() {
             ];
       }
 
-      /* 홍보센터 */
+      /* --- 홍보센터 --- */
       if (p.includes("/pr/")) {
         tabs = LANG === "kr"
           ? [
@@ -206,7 +206,7 @@ function initBreadcrumbTabs() {
             ];
       }
 
-      /* 고객지원 */
+      /* --- 고객지원 --- */
       if (p.includes("/support/")) {
         tabs = LANG === "kr"
           ? [
@@ -299,6 +299,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   highlightTopMenu();
   initBreadcrumbTabs();
   initAdminBar();
+
+  // ⭐ 비동기 의존성 보정 (header 로딩 후 Active 재계산)
+  setTimeout(() => highlightTopMenu(), 50);
 });
 
 /* ------------------------------------------------------------
