@@ -1,6 +1,7 @@
 // server/routes/inquiry.js
 import express from "express";
-import pool from "../db.js";
+import db from "../config/db.js";
+
 
 const router = express.Router();
 

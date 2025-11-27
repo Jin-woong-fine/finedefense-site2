@@ -1,6 +1,8 @@
 // server/routes/sendInquiry.js
 import express from "express";
+import db from "../config/db.js";   // 🔥 반드시 이걸로!
 import nodemailer from "nodemailer";
+
 
 const router = express.Router();
 
@@ -12,8 +14,8 @@ const transporter = nodemailer.createTransport({
   port: 465,
   secure: true,
   auth: {
-    user: "inquiry@fine-defense.com", // 문의용 메일 계정
-    pass: "YOUR_PASSWORD"             // 하이웍스 SMTP 비밀번호
+    user: "inquiry@finedefense.co.kr", // 문의용 메일 계정
+    pass: "fine!202310"             // 하이웍스 SMTP 비밀번호
   }
 });
 
@@ -50,7 +52,7 @@ router.post("/send", async (req, res) => {
     // 🔵 2) 문의자에게 자동 안내 메일 보내기
     // ===========================================
     await transporter.sendMail({
-      from: `"Fine Defense" <inquiry@fine-defense.com>`,
+      from: `"Fine Defense" <inquiry@finedefense.co.kr>`,
       to: email,
       subject: "[Fine Defense] 문의가 접수되었습니다",
       html: `
