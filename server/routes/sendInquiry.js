@@ -6,8 +6,6 @@ import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 dotenv.config();
 
-
-
 const router = express.Router();
 
 // ============================
@@ -18,7 +16,7 @@ const transporter = nodemailer.createTransport({
   port: 465,
   secure: true,
   auth: {
-    user: process.env.HIWORKS_USER,   // 🔥 환경변수로 이동
+    user: process.env.HIWORKS_USER,
     pass: process.env.HIWORKS_PASS
   }
 });
@@ -35,7 +33,20 @@ router.post("/send", async (req, res) => {
     }
 
     // ===========================================
-    // 🔵 1) 회사 메일로 문의 내용 보내기
+    // 🔵 1) DB 저장
+    // ===========================================
+    const [result] = await db.query(
+      `
+        INSERT INTO inquiry (name, email, subject, message, status)
+        VALUES (?, ?, ?, ?, 0)
+      `,
+      [name, email, subject || null, message]
+    );
+
+    const insertedId = result.insertId;
+
+    // ===========================================
+    // 🔵 2) 회사 메일 발송
     // ===========================================
     await transporter.sendMail({
       from: `"Fine Defense Inquiry" <inquiry@finedefense.co.kr>`,
@@ -43,6 +54,7 @@ router.post("/send", async (req, res) => {
       subject: subject || "새로운 1:1 문의",
       html: `
         <h3>새로운 1:1 문의 접수</h3>
+        <p><b>번호:</b> ${insertedId}</p>
         <p><b>이름:</b> ${name}</p>
         <p><b>이메일:</b> ${email}</p>
         <p><b>제목:</b> ${subject}</p>
@@ -53,7 +65,7 @@ router.post("/send", async (req, res) => {
     });
 
     // ===========================================
-    // 🔵 2) 문의자에게 자동 안내 메일 보내기
+    // 🔵 3) 문의자 자동회신
     // ===========================================
     await transporter.sendMail({
       from: `"Fine Defense" <inquiry@finedefense.co.kr>`,
@@ -68,7 +80,7 @@ router.post("/send", async (req, res) => {
       `
     });
 
-    return res.json({ success: true });
+    return res.json({ success: true, id: insertedId });
 
   } catch (err) {
     console.error("[Inquiry Error] ", err);
