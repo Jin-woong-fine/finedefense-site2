@@ -7,84 +7,123 @@
   <link rel="stylesheet" href="./css/admin.css" />
 
   <style>
+    /* ===== 기본 레이아웃 ===== */
     body {
-      font-family: 'Noto Sans KR', sans-serif;
-      margin: 0;
-      background: #f5f7fb;
+    font-family: 'Noto Sans KR', sans-serif;
+    margin: 0;
+    background: #f5f7fb;
     }
 
+    /* ===== 사이드바 영역 확보 ===== */
     .container {
-      margin-left: 240px;
-      padding: 40px 50px;
+    margin-left: 240px; /* sidebar width */
+    padding: 40px 50px;
     }
 
-    h2 {
-      margin-bottom: 25px;
-      font-size: 22px;
-      font-weight: 700;
-      color: #0f2679;
+    /* ===== Topbar ===== */
+    .topbar {
+    margin-left: 240px;        /* sidebar 공간 */
+    height: 60px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0px 30px;
+    border-bottom: 1px solid #ddd;
+    position: sticky;
+    top: 0;
+    z-index: 50;
     }
+
+    .topbar h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #0f2679;
+    margin: 0;
+    }
+
+    .btn {
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    }
+
+    .btn-primary {
+    background: #0f2679;
+    color: #fff;
+    }
+
+    .btn-danger {
+    background: #e60000;
+    color: #fff;
+    }
+
+    /* ===== 테이블 및 목록 ===== */
 
     .status-chip {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
     }
     .status-0 { background: #ffe8e8; color: #d10000; }
     .status-1 { background: #e8f5ff; color: #0058c6; }
 
     table {
-      width: 100%;
-      border-collapse: collapse;
-      background: white;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
     }
 
     th {
-      background: #eef1f7;
-      padding: 14px 12px;
-      text-align: left;
-      font-size: 14px;
-      font-weight: 600;
-      color: #333;
-      border-bottom: 1px solid #ddd;
+    background: #eef1f7;
+    padding: 14px 12px;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    border-bottom: 1px solid #ddd;
     }
 
     td {
-      padding: 14px 12px;
-      font-size: 14px;
-      border-bottom: 1px solid #eee;
+    padding: 14px 12px;
+    font-size: 14px;
+    border-bottom: 1px solid #eee;
     }
 
     tr:hover {
-      background: #f9fbff;
-      cursor: pointer;
+    background: #f9fbff;
+    cursor: pointer;
     }
 
+    /* ===== Filter Buttons ===== */
     .filter-box {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
     }
 
     .filter-btn {
-      background: #fff;
-      border: 1px solid #ccc;
-      padding: 7px 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 13px;
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 7px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
     }
 
     .filter-btn.active {
-      border-color: #0f2679;
-      background: #0f2679;
-      color: white;
+    border-color: #0f2679;
+    background: #0f2679;
+    color: white;
     }
+
   </style>
 </head>
 
