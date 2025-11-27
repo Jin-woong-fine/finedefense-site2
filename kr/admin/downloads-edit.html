@@ -1,192 +1,234 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8">
   <title>자료 수정 | 관리자</title>
   <link rel="stylesheet" href="/kr/admin/css/admin.css">
 
-  <!-- Toast UI -->
-  <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
+  <!-- Toast UI Editor 2.x -->
+  <link rel="stylesheet" href="https://uicdn.toast.com/tui-editor/latest/tui-editor.min.css">
+  <link rel="stylesheet" href="https://uicdn.toast.com/tui-editor/latest/tui-editor-contents.min.css">
+  <script src="https://uicdn.toast.com/tui-editor/latest/tui-editor-Editor.min.js"></script>
 
-  <!-- 이미지 반응형 -->
+  <!-- Dependencies -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.6/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.24.0/codemirror.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.24.0/codemirror.min.css">
+
+  <!-- Image Resize Plugin -->
+  <script src="https://uicdn.toast.com/editor-plugin-image-resize/v1.0.2/image-resize.min.js"></script>
+
+  <!-- 반응형 이미지 CSS -->
   <style>
-    .toastui-editor-contents img {
+    .tui-editor-contents img {
       max-width: 100%;
       height: auto;
     }
+
     .form-box {
       max-width: 900px;
       margin: 30px auto;
-      background:#fff;
-      padding:30px;
-      border-radius:10px;
-      box-shadow:0 4px 10px rgba(0,0,0,0.08);
+      padding: 30px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
     }
-    input, select {
-      padding:10px; 
-      width:100%;
-      margin-bottom:15px;
+
+    input,
+    select {
+      padding: 10px;
+      width: 100%;
+      margin-bottom: 15px;
     }
-    label { font-weight:600; margin-top:10px; display:block; }
-    .file-item { 
-      display:flex; 
-      justify-content:space-between; 
-      padding:8px; 
-      background:#f6f6f6;
-      margin-bottom:6px;
-      border-radius:6px;
+
+    label {
+      font-weight: 600;
+      margin-top: 10px;
+      display: block;
     }
-    .remove-check { margin-right:10px; }
+
+    .file-item {
+      padding: 8px;
+      background: #f6f6f6;
+      border-radius: 6px;
+      margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .file-left {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
   </style>
 </head>
 
 <body>
 
-<div id="sidebar"></div>
+  <div id="sidebar"></div>
 
-<div class="main">
-  <div class="topbar">
-    <div class="title">자료 수정</div>
-    <button class="home-btn" onclick="location.href='/kr/index.html'">홈으로</button>
+  <div class="main">
+    <div class="topbar">
+      <div class="title">자료 수정</div>
+      <button class="home-btn" onclick="location.href='/kr/index.html'">홈으로</button>
+    </div>
+
+    <div class="form-box">
+      <label>카테고리</label>
+      <select id="category">
+        <option value="kr_catalog">한국어 종합카탈로그</option>
+        <option value="en_catalog">영어 종합카탈로그</option>
+        <option value="company">회사 소개서</option>
+        <option value="etc">기타</option>
+      </select>
+
+      <label>언어</label>
+      <select id="lang">
+        <option value="kr">한국어</option>
+        <option value="en">영어</option>
+      </select>
+
+      <label>자료 제목</label>
+      <input type="text" id="title">
+
+      <label>본문</label>
+      <div id="editor" style="height:500px;"></div>
+
+      <label>기존 첨부파일</label>
+      <div id="oldFiles"></div>
+
+      <label>새 첨부파일 추가</label>
+      <input type="file" id="newFiles" multiple>
+
+      <button class="btn-blue" style="margin-top:20px;" onclick="updateItem()">수정 완료</button>
+    </div>
   </div>
 
-  <div class="form-box">
-    <label>카테고리</label>
-    <select id="category">
-      <option value="kr_catalog">한국어 종합카탈로그</option>
-      <option value="en_catalog">영어 종합카탈로그</option>
-      <option value="company">회사 소개서</option>
-      <option value="etc">기타</option>
-    </select>
+  <script src="/kr/admin/js/sidebar.js"></script>
+  <script src="/kr/admin/js/common_auth.js"></script>
 
-    <label>언어</label>
-    <select id="lang">
-      <option value="kr">한국어</option>
-      <option value="en">영어</option>
-    </select>
+  <script>
+    loadSidebar("downloads");
 
-    <label>자료 제목</label>
-    <input type="text" id="title">
+    const params = new URLSearchParams(location.search);
+    const id = params.get("id");
 
-    <label>본문</label>
-    <div id="editor" style="height:500px;"></div>
+    if (!id) {
+      alert("잘못된 접근입니다.");
+      location.href = "/kr/admin/downloads-list.html";
+    }
 
-    <label>기존 첨부파일</label>
-    <div id="oldFiles"></div>
+    // 삭제할 파일 ID 저장용
+    let removeFiles = [];
 
-    <label>새 첨부파일 추가</label>
-    <input type="file" id="newFiles" multiple>
+    /* ============================================================
+        📝 Editor 생성 (Toast 2.x + ImageResize)
+    ============================================================ */
+    const editor = new tui.Editor({
+      el: document.querySelector('#editor'),
+      height: '500px',
+      initialEditType: 'wysiwyg',
+      previewStyle: 'vertical',
+      plugins: [imageResize],
+      hooks: {
+        addImageBlobHook: async (blob, callback) => {
+          const fd = new FormData();
+          fd.append("image", blob);
 
-    <button class="btn-blue" style="margin-top:20px;" onclick="update()">수정 완료</button>
-  </div>
-</div>
+          const res = await fetch("/api/uploads/editor/image", {
+            method: "POST",
+            body: fd
+          });
+          const out = await res.json();
 
-<script src="/kr/admin/js/sidebar.js"></script>
-<script src="/kr/admin/js/common_auth.js"></script>
+          callback(out.url, blob.name);
+        }
+      }
+    });
 
-<!-- Toast UI Editor + Image Resize Plugin -->
-<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
-<script src="https://uicdn.toast.com/editor-plugin-image-resize/v1.0.2/image-resize.min.js"></script>
+    /* ============================================================
+        🔥 데이터 로드
+    ============================================================ */
+    loadData();
 
-<script>
-  loadSidebar("downloads");
+    async function loadData() {
+      const res = await fetch(`/api/downloads/detail/${id}`);
+      const data = await res.json();
 
-  const params = new URLSearchParams(location.search);
-  const id = params.get("id");
-  if (!id) location.href = "/kr/admin/downloads-list.html";
+      document.getElementById("title").value = data.title;
+      document.getElementById("category").value = data.category;
+      document.getElementById("lang").value = data.lang;
 
-  let removeFiles = [];
+      editor.setValue(data.content || "");
 
-  const editor = new toastui.Editor({
-    el: document.querySelector('#editor'),
-    height: '500px',
-    initialEditType: 'wysiwyg',
-    previewStyle: 'vertical',
-    plugins: [toastui.Editor.plugin.imageResize],
-    hooks: {
-      addImageBlobHook: async (blob, callback) => {
-        const fd = new FormData();
-        fd.append("image", blob);
+      // 기존 파일 출력
+      const wrap = document.getElementById("oldFiles");
 
-        const res = await fetch("/api/uploads/editor/image", {
-          method: "POST",
-          body: fd
+      wrap.innerHTML = data.files.map(f => `
+        <div class="file-item">
+          <div class="file-left">
+            <input type="checkbox" class="remove-check" data-id="${f.id}">
+            <span>${f.original_name}</span>
+            <small>(${formatSize(f.file_size)})</small>
+          </div>
+        </div>
+      `).join("");
+
+      // 삭제 체크 이벤트 등록
+      document.querySelectorAll(".remove-check").forEach(chk => {
+        chk.addEventListener("change", (e) => {
+          const fileId = Number(e.target.dataset.id);
+          if (e.target.checked) removeFiles.push(fileId);
+          else removeFiles = removeFiles.filter(id => id !== fileId);
         });
-        const out = await res.json();
+      });
+    }
 
-        callback(out.url, blob.name);
+    function formatSize(bytes) {
+      if (!bytes) return "";
+      if (bytes < 1024) return bytes + " B";
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+      return (bytes / 1024 / 1024).toFixed(2) + " MB";
+    }
+
+    /* ============================================================
+        🔥 수정 요청
+    ============================================================ */
+    async function updateItem() {
+      const title = document.getElementById("title").value.trim();
+      if (!title) return alert("제목을 입력하세요.");
+
+      const fd = new FormData();
+
+      fd.append("title", title);
+      fd.append("category", document.getElementById("category").value);
+      fd.append("lang", document.getElementById("lang").value);
+      fd.append("content", editor.getValue());
+      fd.append("removeFiles", JSON.stringify(removeFiles));
+
+      const newFiles = document.getElementById("newFiles").files;
+      [...newFiles].forEach(f => fd.append("files", f));
+
+      const res = await fetch(`/api/downloads/update/${id}`, {
+        method: "PUT",
+        headers: { Authorization: "Bearer " + localStorage.getItem("token") },
+        body: fd
+      });
+
+      const out = await res.json();
+
+      if (res.ok) {
+        alert("수정 완료");
+        location.href = "/kr/admin/downloads-list.html";
+      } else {
+        alert(out.message);
       }
     }
-  });
-
-  loadData();
-
-  async function loadData() {
-    const res = await fetch(`/api/downloads/detail/${id}`);
-    const data = await res.json();
-
-    document.getElementById("title").value = data.title;
-    document.getElementById("category").value = data.category;
-    document.getElementById("lang").value = data.lang;
-    editor.setHTML(data.content || "");
-
-    // 기존 파일 리스트
-    const wrap = document.getElementById("oldFiles");
-    wrap.innerHTML = data.files.map(f => `
-      <div class="file-item">
-        <div>
-          <input type="checkbox" class="remove-check" data-path="${f.file_path}">
-          ${f.original_name} (${formatSize(f.file_size)})
-        </div>
-      </div>
-    `).join("");
-
-    document.querySelectorAll(".remove-check").forEach(chk => {
-      chk.addEventListener("change", e => {
-        const path = e.target.dataset.path;
-        if (e.target.checked) removeFiles.push(path);
-        else removeFiles = removeFiles.filter(p => p !== path);
-      });
-    });
-  }
-
-  function formatSize(bytes) {
-    if (!bytes) return "";
-    if (bytes < 1024) return bytes + " B";
-    if (bytes < 1024 * 1024) return (bytes/1024).toFixed(1) + " KB";
-    return (bytes/1024/1024).toFixed(2) + " MB";
-  }
-
-  async function update() {
-    const title = document.getElementById("title").value.trim();
-    if (!title) return alert("제목을 입력하세요.");
-
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("category", document.getElementById("category").value);
-    formData.append("lang", document.getElementById("lang").value);
-    formData.append("content", editor.getHTML());
-    formData.append("removeFiles", JSON.stringify(removeFiles));
-
-    const newFiles = document.getElementById("newFiles").files;
-    [...newFiles].forEach(f => formData.append("files", f));
-
-    const res = await fetch(`/api/downloads/update/${id}`, {
-      method: "PUT",
-      headers: { Authorization: "Bearer " + localStorage.getItem("token") },
-      body: formData
-    });
-
-    const out = await res.json();
-
-    if (res.ok) {
-      alert("수정 완료");
-      location.href = "/kr/admin/downloads-list.html";
-    } else {
-      alert(out.message);
-    }
-  }
-</script>
+  </script>
 
 </body>
+
 </html>
