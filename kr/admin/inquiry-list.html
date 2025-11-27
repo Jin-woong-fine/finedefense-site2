@@ -32,14 +32,8 @@
       font-size: 12px;
       font-weight: 600;
     }
-    .status-0 {
-      background: #ffe8e8;
-      color: #d10000;
-    }
-    .status-1 {
-      background: #e8f5ff;
-      color: #0058c6;
-    }
+    .status-0 { background: #ffe8e8; color: #d10000; }
+    .status-1 { background: #e8f5ff; color: #0058c6; }
 
     table {
       width: 100%;
@@ -100,13 +94,11 @@
   <div class="container">
     <h2>문의 목록</h2>
 
-    <!-- 필터 -->
     <div class="filter-box">
       <button class="filter-btn active" data-filter="all">전체</button>
       <button class="filter-btn" data-filter="unread">미확인</button>
     </div>
 
-    <!-- 테이블 -->
     <table>
       <thead>
         <tr>
@@ -122,8 +114,16 @@
     </table>
   </div>
 
-  <script src="./js/sidebar.js"></script>
+  <!-- 🔥 관리자 로그인 체크 -->
+  <script src="./js/common_auth.js"></script>
 
+  <!-- 🔥 사이드바 로드 -->
+  <script src="./js/sidebar.js"></script>
+  <script>
+    loadSidebar("inquiry");
+  </script>
+
+  <!-- 🔥 문의 목록 스크립트 -->
   <script>
     let allData = [];
     let currentFilter = "all";
@@ -141,9 +141,6 @@
       });
     });
 
-    // ============================
-    // 📌 전체 목록 불러오기
-    // ============================
     async function loadInquiryList() {
       const res = await fetch("/api/inquiry/list", {
         headers: { Authorization: "Bearer " + localStorage.getItem("token") }
@@ -154,9 +151,6 @@
       renderTable();
     }
 
-    // ============================
-    // 📌 테이블 렌더링
-    // ============================
     function renderTable() {
       const tbody = document.getElementById("inquiryTable");
       tbody.innerHTML = "";
@@ -181,11 +175,9 @@
             </span>
           </td>
         `;
-
         tr.onclick = () => {
           location.href = `/kr/admin/inquiry-view.html?id=${row.id}`;
         };
-
         tbody.appendChild(tr);
       });
     }
