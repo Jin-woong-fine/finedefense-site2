@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>카탈로그 관리 | 관리자</title>
+  <link rel="stylesheet" href="/kr/admin/css/admin.css">
+
+  <style>
+    .filter-box { display:flex; gap:10px; margin:20px 0; }
+    select, input { padding:8px; border-radius:6px; border:1px solid #ccc; }
+    .thumb { width:70px; height:100px; object-fit:contain; background:#f3f3f3; border:1px solid #ddd; border-radius:6px; }
+    .btn-blue { background:#0f2679; color:#fff; padding:8px 14px; border-radius:6px; cursor:pointer; border:none; }
+    .btn-small { padding:6px 10px; border-radius:6px; border:none; cursor:pointer; background:#eee; }
+    .btn-delete { background:#d9534f; color:#fff; padding:6px 10px; border-radius:6px; cursor:pointer; border:none; }
+    table { width:100%; border-collapse: collapse; margin-top:20px; }
+    th,td { padding:12px 10px; border-bottom:1px solid #ddd; }
+    th { background:#f5f7fb; }
+  </style>
+</head>
+
+<body>
+
+<!-- 사이드바 -->
+<div id="sidebar"></div>
+
+<div class="main">
+
+  <!-- 상단바 -->
+  <div class="topbar">
+    <div class="title">카탈로그 관리</div>
+    <button class="home-btn" onclick="location.href='/kr/admin/index.html'">홈으로</button>
+  </div>
+
+  <button class="btn-blue" onclick="location.href='catalog-add.html'">+ 새 항목 추가</button>
+
+  <div class="filter-box">
+    <select id="filterCategory">
+      <option value="all">전체 카테고리</option>
+      <option value="kr_catalog">한국어 종합 카탈로그</option>
+      <option value="en_catalog">영어 종합 카탈로그</option>
+      <option value="company_intro">회사 소개서</option>
+      <option value="etc">기타</option>
+    </select>
+
+    <select id="filterLang">
+      <option value="all">전체 언어</option>
+      <option value="kr">한국어</option>
+      <option value="en">영어</option>
+    </select>
+
+    <input type="text" id="search" placeholder="검색(제목)">
+    <button class="btn-small" onclick="loadItems()">검색</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>썸네일</th>
+        <th>제목</th>
+        <th>카테고리</th>
+        <th>언어</th>
+        <th>정렬</th>
+        <th>파일</th>
+        <th>수정</th>
+        <th>삭제</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+
+</div>
+
+<script src="/kr/admin/js/sidebar.js"></script>
+<script src="/kr/admin/js/common_auth.js"></script>
+
+<script>
+loadSidebar("catalog");
+
+async function loadItems() {
+  const category = document.getElementById("filterCategory").value;
+  const lang = document.getElementById("filterLang").value;
+  const search = document.getElementById("search").value;
+
+  const res = await fetch(`/api/catalog/list?category=${category}&lang=${lang}&search=${search}`);
+  const data = await res.json();
+
+  document.getElementById("tbody").innerHTML = data.map(i => `
+    <tr>
+      <td><img src="${i.thumb_url}" class="thumb"></td>
+      <td>${i.title}</td>
+      <td>${categoryName(i.category)}</td>
+      <td>${i.lang.toUpperCase()}</td>
+      <td>${i.sort_order}</td>
+      <td>
+        ${i.file_url
+          ? `<a href="${i.file_url}" target="_blank">다운로드</a>`
+          : '-'
+        }
+      </td>
+      <td><button class="btn-small" onclick="location.href='catalog-edit.html?id=${i.id}'">수정</button></td>
+      <td><button class="btn-delete" onclick="deleteItem(${i.id})">삭제</button></td>
+    </tr>
+  `).join("");
+}
+
+function categoryName(c){
+  return {
+    kr_catalog:"한국어 종합 카탈로그",
+    en_catalog:"영어 종합 카탈로그",
+    company_intro:"회사 소개서",
+    etc:"기타"
+  }[c] || c;
+}
+
+async function deleteItem(id){
+  if(!confirm("삭제하시겠습니까?")) return;
+
+  const res = await fetch(`/api/catalog/delete/${id}`, {
+    method:"DELETE",
+    headers:{ Authorization:"Bearer " + localStorage.getItem("token") }
+  });
+  
+  const out = await res.json();
+
+  if(res.ok){
+    alert("삭제 완료");
+    loadItems();
+  } else {
+    alert(out.message);
+  }
+}
+
+loadItems();
+</script>
+
+</body>
+</html>

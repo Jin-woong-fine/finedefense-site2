@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>카탈로그 추가 | 관리자</title>
+  <link rel="stylesheet" href="/kr/admin/css/admin.css">
+  <style>
+    .form-box { max-width:650px; background:#fff; padding:30px; border-radius:12px; box-shadow:0 4px 14px rgba(0,0,0,0.08); margin:30px; }
+    .form-box input, select { width:100%; padding:10px; margin-top:8px; margin-bottom:20px; border:1px solid #ccc; border-radius:6px; }
+    .btn-blue { padding:10px 16px; background:#0f2679; color:#fff; border-radius:6px; cursor:pointer; border:none; }
+  </style>
+</head>
+
+<body>
+
+<div id="sidebar"></div>
+
+<div class="main">
+
+  <div class="topbar">
+    <div class="title">카탈로그 추가</div>
+    <button class="home-btn" onclick="location.href='/kr/admin/index.html'">홈으로</button>
+  </div>
+
+  <div class="form-box">
+
+    <label>카테고리</label>
+    <select id="category">
+      <option value="kr_catalog">한국어 종합 카탈로그</option>
+      <option value="en_catalog">영어 종합 카탈로그</option>
+      <option value="company_intro">회사 소개서</option>
+      <option value="etc">기타</option>
+    </select>
+
+    <label>언어</label>
+    <select id="lang">
+      <option value="kr">한국어</option>
+      <option value="en">영어</option>
+    </select>
+
+    <label>제목</label>
+    <input type="text" id="title">
+
+    <label>썸네일 이미지</label>
+    <input type="file" id="thumb" accept="image/*">
+
+    <label>PDF 파일</label>
+    <input type="file" id="file" accept="application/pdf">
+
+    <label>정렬(작을수록 위)</label>
+    <input type="number" id="sort" value="9999">
+
+    <button class="btn-blue" onclick="save()">등록</button>
+  </div>
+
+</div>
+
+<script src="/kr/admin/js/sidebar.js"></script>
+<script src="/kr/admin/js/common_auth.js"></script>
+
+<script>
+loadSidebar("catalog");
+
+async function save(){
+  const fd = new FormData();
+
+  fd.append("category", document.getElementById("category").value);
+  fd.append("lang", document.getElementById("lang").value);
+  fd.append("title", document.getElementById("title").value);
+  fd.append("sort_order", document.getElementById("sort").value);
+
+  if (document.getElementById("thumb").files[0]) {
+    fd.append("thumb", document.getElementById("thumb").files[0]);
+  }
+
+  if (document.getElementById("file").files[0]) {
+    fd.append("file", document.getElementById("file").files[0]);
+  }
+
+  const res = await fetch("/api/catalog/create", {
+    method:"POST",
+    headers:{ Authorization:"Bearer " + localStorage.getItem("token") },
+    body: fd
+  });
+
+  const out = await res.json();
+
+  if(res.ok){
+    alert("등록 완료!");
+    location.href="catalog-list.html";
+  } else {
+    alert(out.message);
+  }
+}
+</script>
+
+</body>
+</html>

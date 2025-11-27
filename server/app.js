@@ -24,6 +24,9 @@ import postsGalleryRouter from "./routes/posts_gallery.js";
 import postsCertificationRouter from "./routes/posts_certification.js";
 import postsNoticeRouter from "./routes/posts_notice.js";
 
+import catalogRouter from "./routes/catalog.js";
+
+
 const app = express();
 
 // 경로 설정
@@ -68,6 +71,9 @@ app.use("/api/users", usersRouter);
 
 app.use("/api/inquiry", inquiryRouter);
 app.use("/api/inquiry", sendInquiryRouter);
+
+
+app.use("/api/catalog", catalogRouter);
 
 // 🔥 중요! posts_common보다 notice 라우터가 항상 위에 있어야 함
 app.use("/api/posts/notice", postsNoticeRouter);
