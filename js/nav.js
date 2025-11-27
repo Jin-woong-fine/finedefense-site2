@@ -33,9 +33,12 @@ async function loadComponent(targetId, url) {
   try {
     const res = await fetch(url);
     if (!res.ok) throw new Error(url + " not found");
+
     const html = await res.text();
     const el = document.getElementById(targetId);
+
     if (el) el.innerHTML = html;
+
   } catch (e) {
     console.error("Component Load Error:", e);
   }
@@ -262,31 +265,32 @@ function initAdminBar() {
   `;
 
   bar.style.cssText = `
-    width:100%;
-    height:48px;
-    background:#0f2679;
-    color:white;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:0 20px;
-    position:fixed;
-    top:0; left:0;
-    z-index:9999;
-    font-size:14px;
+    width: 100%;
+    height: 48px;
+    background: #0f2679;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    position: fixed;
+    top: 0; left: 0;
+    z-index: 9999;
+    font-size: 14px;
   `;
 
-  // 헤더 안 덮치게 body에 패딩만 줌
+  // ⭐ 헤더가 밀리도록 body에 padding만 추가 (header 건드리지 않음)
   document.body.style.paddingTop = "48px";
 
   document.body.prepend(bar);
 
-  document.getElementById("adminLogout").addEventListener("click", (e) => {
+  document.getElementById("adminLogout")?.addEventListener("click", e => {
     e.preventDefault();
     localStorage.clear();
     location.href = `/${LANG}/admin/login.html`;
   });
 }
+
 
 /* ------------------------------------------------------------
    9) DOM 로드 후 초기화
