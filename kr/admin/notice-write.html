@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8" />
   <title>공지사항 작성 | Fine Defense 관리자</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <!-- 공통 관리자 CSS -->
+  <link rel="stylesheet" href="/kr/admin/css/admin.css">
+
   <!-- Toast UI Editor CSS -->
   <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
-
-  <!-- 관리자 공통 CSS -->
-  <link rel="stylesheet" href="./css/admin.css">
 
   <style>
     .panel h2 { margin-top: 0; }
@@ -36,171 +37,143 @@
 
 <body>
 
-<!-- ⭐ 사이드바 -->
-<div id="sidebar" data-active="notice"></div>
+  <!-- ⭐ 사이드바 -->
+  <div id="sidebar" data-active="notice"></div>
 
-<div class="main">
+  <!-- ⭐ 메인 -->
+  <div class="main">
 
-  <div class="topbar">
-    <h2>공지사항 작성</h2>
-    <div>
-      <button class="btn btn-primary" onclick="location.href='./notice-list.html'">목록으로</button>
-      <button id="logoutBtn" class="btn btn-danger">로그아웃</button>
+    <div class="topbar">
+      <h2>공지사항 작성</h2>
+      <div>
+        <button class="btn btn-primary" onclick="location.href='./notice-list.html'">목록으로</button>
+        <button id="logoutBtn" class="btn btn-danger">로그아웃</button>
+      </div>
     </div>
+
+    <form id="noticeForm" enctype="multipart/form-data">
+
+      <!-- ============================ -->
+      <!-- 📌 공지 정보 입력 -->
+      <!-- ============================ -->
+      <section class="panel">
+        <h2>공지 정보 입력</h2>
+
+        <input id="title" class="input" placeholder="공지 제목을 입력하세요" />
+
+        <select id="lang" class="input">
+          <option value="kr">한국어</option>
+          <option value="en">English</option>
+        </select>
+
+        <input
+          id="sort_order"
+          class="input"
+          type="number"
+          placeholder="정렬 순번 (작을수록 상단)"
+          min="1"
+        />
+
+        <div class="help-text">
+          *메인공지처럼 상단 고정하고 싶은 경우 낮은 숫자(예: 1,2,3)를 입력하세요.<br>
+          *미입력 시 기본값 = 9999
+        </div>
+
+        <h3 style="margin-top:20px;">공지 내용</h3>
+        <div id="editor" style="border:1px solid #ccc;border-radius:6px;"></div>
+      </section>
+
+      <!-- ============================ -->
+      <!-- 📎 첨부파일 업로드 -->
+      <!-- ============================ -->
+      <section class="panel">
+        <h3>첨부파일 업로드 (여러 개 가능)</h3>
+
+        <input type="file" id="files" name="files" multiple class="input" />
+        <div id="filePreview" class="file-list"></div>
+
+        <button type="submit" class="btn btn-primary" style="margin-top:15px;">
+          등록
+        </button>
+      </section>
+
+    </form>
+
   </div>
 
-  <form id="noticeForm" enctype="multipart/form-data">
+  <!-- 공통 JS -->
+  <script src="/kr/admin/js/common_auth.js"></script>
+  <script src="/kr/admin/js/sidebar.js"></script>
 
-    <!-- ============================ -->
-    <!-- 📌 공지 정보 입력 -->
-    <!-- ============================ -->
-    <section class="panel">
-      <h2>공지 정보 입력</h2>
+  <!-- Toast UI Editor -->
+  <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 
-      <input id="title" class="input" placeholder="공지 제목을 입력하세요" />
-
-      <select id="lang" class="input">
-        <option value="kr">한국어</option>
-        <option value="en">English</option>
-      </select>
-
-      <!-- 정렬순번 -->
-      <input
-        id="sort_order"
-        class="input"
-        type="number"
-        placeholder="정렬 순번 (작을수록 상단)"
-        min="1"
-      />
-      <div class="help-text">
-        *메인공지처럼 상단 고정하고 싶은 경우 낮은 숫자(예: 1,2,3)를 입력하세요.  
-        미입력 시 기본값 = 9999
-      </div>
-
-      <h3 style="margin-top:20px;">공지 내용</h3>
-      <div id="editor" style="border:1px solid #ccc;border-radius:6px;"></div>
-    </section>
-
-    <!-- ============================ -->
-    <!-- 📎 첨부파일 업로드 -->
-    <!-- ============================ -->
-    <section class="panel">
-      <h3>첨부파일 업로드 (여러 개 가능)</h3>
-
-      <input type="file" id="files" name="files" multiple class="input" />
-
-      <div id="filePreview" class="file-list"></div>
-
-      <button type="submit" class="btn btn-primary" style="margin-top:15px;">
-        등록
-      </button>
-    </section>
-
-  </form>
-
-</div>
-
-<!-- 공통 스크립트 -->
-<script src="/kr/admin/js/common_auth.js"></script>
-<script src="/kr/admin/js/sidebar.js"></script>
-
-<!-- Toast Editor -->
-<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
-
-<script>
-  /* ───────────────────────────────
-      🔐 권한 체크 + 로그아웃 설정
-  ─────────────────────────────── */
-  (function () {
+  <script>
+    /* 권한 체크 */
     requireAdminOrEditor();
     document.getElementById("logoutBtn").addEventListener("click", logout);
-  })();
 
+    /* 사이드바 로드 */
+    loadSidebar("notice");
 
-  /* ───────────────────────────────
-      ✏️ Toast UI Editor 초기화
-  ─────────────────────────────── */
-  const editor = new toastui.Editor({
-    el: document.querySelector('#editor'),
-    height: '500px',
-    initialEditType: 'wysiwyg',
-    previewStyle: 'vertical',
-    hideModeSwitch: true,
-    usageStatistics: false,
-    toolbarItems: [
-      ['heading', 'bold', 'italic', 'strike'],
-      ['hr', 'quote'],
-      ['ul', 'ol'],
-      ['table', 'link']
-      /* 이미지 업로드 버튼 제거됨 (뉴스룸만 이미지 사용) */
-    ]
-  });
-
-
-  /* ───────────────────────────────
-      📎 첨부파일 미리보기
-  ─────────────────────────────── */
-  const fileInput = document.getElementById("files");
-  const filePreview = document.getElementById("filePreview");
-
-  fileInput.addEventListener("change", (e) => {
-    const files = [...e.target.files];
-
-    if (!files.length) {
-      filePreview.innerHTML = "";
-      return;
-    }
-
-    filePreview.innerHTML = files
-      .map(f => `<div class="file-item">${f.name}</div>`)
-      .join("");
-  });
-
-
-  /* ───────────────────────────────
-      🚀 공지사항 등록 요청
-  ─────────────────────────────── */
-  document.getElementById("noticeForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const title = document.getElementById("title").value.trim();
-    const lang = document.getElementById("lang").value;
-    const sortOrderRaw = document.getElementById("sort_order").value;
-    const sortOrder = sortOrderRaw === "" ? 9999 : Number(sortOrderRaw);
-    const content = editor.getHTML();
-    const files = document.getElementById("files").files;
-
-    if (!title) return alert("제목을 입력하세요.");
-    if (!content) return alert("내용을 입력하세요.");
-
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("content", content);
-    formData.append("lang", lang);
-    formData.append("sort_order", isNaN(sortOrder) ? 9999 : sortOrder);
-
-    [...files].forEach(f => formData.append("files", f));
-
-    const token = localStorage.getItem("token");
-
-    const res = await fetch("/api/posts/notice/create", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-      body: formData
+    /* Editor 초기화 */
+    const editor = new toastui.Editor({
+      el: document.querySelector('#editor'),
+      height: '500px',
+      initialEditType: 'wysiwyg',
+      previewStyle: 'vertical',
+      hideModeSwitch: true,
+      usageStatistics: false,
+      toolbarItems: [
+        ['heading', 'bold', 'italic', 'strike'],
+        ['hr', 'quote'],
+        ['ul', 'ol'],
+        ['table', 'link']
+      ]
     });
 
-    const result = await res.json();
+    /* 파일 미리보기 */
+    document.getElementById("files").addEventListener("change", (e) => {
+      const list = [...e.target.files]
+        .map(f => `<div class="file-item">${f.name}</div>`)
+        .join("");
+      document.getElementById("filePreview").innerHTML = list;
+    });
 
-    if (res.ok) {
-      alert("공지사항이 등록되었습니다.");
-      location.href = "./notice-list.html";
-    } else {
-      console.error(result);
-      alert("등록 실패: " + (result.message || "알 수 없는 오류"));
-    }
-  });
+    /* 공지 등록 */
+    document.getElementById("noticeForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
 
-</script>
+      const formData = new FormData();
+      formData.append("title", document.getElementById("title").value.trim());
+      formData.append("content", editor.getHTML());
+      formData.append("lang", document.getElementById("lang").value);
+
+      const sort = document.getElementById("sort_order").value || 9999;
+      formData.append("sort_order", Number(sort));
+
+      const files = document.getElementById("files").files;
+      [...files].forEach(f => formData.append("files", f));
+
+      const token = localStorage.getItem("token");
+
+      const res = await fetch("/api/posts/notice/create", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData
+      });
+
+      const out = await res.json();
+
+      if (res.ok) {
+        alert("공지사항이 등록되었습니다.");
+        location.href = "./notice-list.html";
+      } else {
+        alert("등록 실패: " + (out.message || "알 수 없는 오류"));
+      }
+    });
+  </script>
 
 </body>
+
 </html>
