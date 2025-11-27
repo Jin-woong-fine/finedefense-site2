@@ -1,188 +1,124 @@
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>뉴스룸 | 화인디펜스</title>
+  <title>공지사항 | 화인디펜스</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- 공통 CSS -->
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/sub-banner.css">
 
   <style>
-    .news-container {
-      max-width: 1200px;
-      margin: 50px auto 25px;
+    .notice-container {
+      max-width: 1000px;
+      margin: 50px auto 80px;
       padding: 0 20px;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 28px;
     }
 
-    .news-card {
-      background: #fff;
-      border-radius: 14px;
-      overflow: hidden;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.08);
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .news-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 6px 20px rgba(0,0,0,0.12);
-    }
-
-    .news-thumb {
+    table.notice-table {
       width: 100%;
-      height: 180px;
-      object-fit: cover;
-      background: #eee;
+      border-collapse: collapse;
+      margin-top: 20px;
     }
 
-    .news-content {
-      padding: 18px 20px 24px;
+    table.notice-table th,
+    table.notice-table td {
+      padding: 14px 10px;
+      border-bottom: 1px solid #eee;
+      font-size: 0.95rem;
     }
 
-    .news-title {
-      font-size: 1.05rem;
-      font-weight: 700;
-      min-height: 48px;
-      margin-bottom: 12px;
-      line-height: 1.35;
+    table.notice-table th {
+      background: #f5f7fa;
+      font-weight: 600;
+      color: #0f2679;
     }
 
-    .news-date {
-      font-size: 0.85rem;
+    table.notice-table tr:hover td {
+      background: #f7faff;
+      cursor: pointer;
+    }
+
+    .no-data {
+      padding: 50px;
+      text-align: center;
       color: #777;
     }
-
-    /* pagination */
-    .pagination {
-      display: flex;
-      justify-content: center;
-      gap: 6px;
-      margin-bottom: 60px;
-    }
-
-    .pagination button {
-      padding: 7px 12px;
-      background: #fff;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.9rem;
-    }
-
-    .pagination button.active {
-      background: #0f2679;
-      color: #fff;
-      border-color: #0f2679;
-    }
   </style>
+
 </head>
 
 <body>
 
-  <!-- HEADER (nav.js가 자동 로드) -->
-  <div id="header"></div>
+<!-- HEADER -->
+<div id="header"></div>
 
-  <!-- 서브 배너 -->
-  <section class="sub-banner">
-    <img src="/img/sub-banners/pr-2_v2.jpg" alt="뉴스룸 배너" />
-    <div class="banner-text">
-      <h1>뉴스룸</h1>
-      <p>화인디펜스의 최신 소식과 홍보 자료를 확인하세요.</p>
-    </div>
-  </section>
-
-  <!-- breadcrumb -->
-  <div class="breadcrumb">
-    <a href="/kr/index.html">홈</a> &gt;
-    <span class="crumb crumb-level1">홍보센터</span> &gt;
-    <span class="crumb crumb-level2">뉴스룸</span>
-    <div id="side-tabs" class="side-tabs"></div>
+<!-- 배너 -->
+<section class="sub-banner">
+  <img src="/img/sub-banners/pr-1_v2.jpg" alt="공지사항">
+  <div class="banner-text">
+    <h1>공지사항</h1>
+    <p>화인디펜스의 최신 소식 및 공지사항을 안내드립니다.</p>
   </div>
+</section>
 
-  <!-- 뉴스 목록 -->
-  <div class="news-container" id="newsContainer"></div>
+<!-- breadcrumb -->
+<div class="breadcrumb">
+  <a href="/kr/index.html">홈</a> &gt;
+  <span class="crumb-level1">홍보센터</span> &gt;
+  <span class="crumb-level2">공지사항</span>
+</div>
 
-  <!-- 페이지네이션 -->
-  <div class="pagination" id="pagination"></div>
+<div id="side-tabs"></div>
 
-  <!-- FOOTER -->
-  <div id="footer"></div>
+<!-- 공지사항 목록 -->
+<div class="notice-container">
+  <table class="notice-table">
+    <thead>
+      <tr>
+        <th style="width:80px;">번호</th>
+        <th>제목</th>
+        <th style="width:150px;">등록일</th>
+      </tr>
+    </thead>
 
-  <!-- 공통 헤더/푸터 + 탭 스크립트(nav.js) -->
-  <script src="/js/nav.js"></script>
+    <tbody id="noticeList"></tbody>
+  </table>
+</div>
 
-  <script>
-    let currentPage = 1;
-    const pageSize = 9;
 
-    document.addEventListener("DOMContentLoaded", () => loadNews(1));
+<!-- FOOTER -->
+<div id="footer"></div>
 
-    async function loadNews(page) {
-      currentPage = page;
+<script src="/js/nav.js"></script>
 
-      const res = await fetch(
-        `/api/posts/list/news?lang=kr&page=${page}&pageSize=${pageSize}`
-      );
-      const data = await res.json();
+<script>
+  document.addEventListener("DOMContentLoaded", loadNotices);
 
-      const box = document.getElementById("newsContainer");
+  async function loadNotices() {
+    const res = await fetch(`/api/posts/list/notice?lang=kr`);
+    const data = await res.json();
 
-      if (!data.list.length) {
-        box.innerHTML = "<p>등록된 뉴스가 없습니다.</p>";
-        return;
-      }
+    const body = document.getElementById("noticeList");
 
-      // 카드 렌더링
-      box.innerHTML = data.list
-        .map((v) => {
-          const img = v.main_image || "/img/no-image.jpg";
-          const date = v.created_at.substring(0, 10);
-
-          return `
-            <div class="news-card" onclick="openNews(${v.id})">
-              <img src="${img}" class="news-thumb">
-              <div class="news-content">
-                <div class="news-title">${v.title}</div>
-                <div class="news-date">${date}</div>
-              </div>
-            </div>
-          `;
-        })
-        .join("");
-
-      renderPagination(data.pages, data.page);
+    if (!data.length) {
+      body.innerHTML = `<tr><td colspan="3" class="no-data">등록된 공지사항이 없습니다.</td></tr>`;
+      return;
     }
 
-    function openNews(id) {
-      location.href = `/kr/sub/pr/newsroom/news-view.html?id=${id}`;
-    }
+    body.innerHTML = data.map(n => `
+      <tr onclick="openNotice(${n.id})">
+        <td>${n.id}</td>
+        <td>${n.title}</td>
+        <td>${new Date(n.created_at).toLocaleDateString()}</td>
+      </tr>
+    `).join("");
+  }
 
-    function renderPagination(totalPages, current) {
-      const p = document.getElementById("pagination");
-      p.innerHTML = "";
-
-      if (current > 1) {
-        p.innerHTML += `<button onclick="loadNews(${current - 1})">이전</button>`;
-      }
-
-      for (let i = 1; i <= totalPages; i++) {
-        p.innerHTML += `
-          <button class="${i === current ? "active" : ""}"
-                  onclick="loadNews(${i})">${i}</button>
-        `;
-      }
-
-      if (current < totalPages) {
-        p.innerHTML += `<button onclick="loadNews(${current + 1})">다음</button>`;
-      }
-    }
-  </script>
+  function openNotice(id) {
+    location.href = `/kr/sub/pr/notice/notice-view.html?id=${id}`;
+  }
+</script>
 
 </body>
 </html>
