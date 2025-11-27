@@ -1,135 +1,134 @@
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
   <meta charset="UTF-8">
   <title>자료 등록 | 관리자</title>
   <link rel="stylesheet" href="/kr/admin/css/admin.css">
 
-  <!-- Toast UI Editor 2.x -->
-  <link rel="stylesheet" href="https://uicdn.toast.com/tui-editor/latest/tui-editor.min.css">
-  <link rel="stylesheet" href="https://uicdn.toast.com/tui-editor/latest/tui-editor-contents.min.css">
-  <script src="https://uicdn.toast.com/tui-editor/latest/tui-editor-Editor.min.js"></script>
+  <!-- Toast UI Editor 3.x -->
+  <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
+  <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 
-  <!-- Dependencies -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.6/marked.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.24.0/codemirror.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.24.0/codemirror.min.css">
-
-  <!-- Image Resize Plugin -->
-  <script src="https://uicdn.toast.com/editor-plugin-image-resize/v1.0.2/image-resize.min.js"></script>
-
-  <!-- 반응형 이미지 CSS -->
+  <!-- 반응형 이미지 -->
   <style>
-    .tui-editor-contents img {
+    .toastui-editor-contents img {
       max-width: 100%;
       height: auto;
     }
-
     .form-box {
       max-width: 900px;
       margin: 30px auto;
       padding: 30px;
       background: #fff;
       border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+    input, select {
+      padding: 10px;
+      width: 100%;
+      margin-bottom: 15px;
+    }
+    label {
+      font-weight: 600;
+      margin-top: 10px;
+      display: block;
     }
   </style>
 </head>
-
 <body>
-  <div id="sidebar"></div>
 
-  <div class="main">
-    <div class="topbar">
-      <div class="title">자료 등록</div>
-      <button class="home-btn" onclick="location.href='/kr/index.html'">홈으로</button>
-    </div>
+<div id="sidebar"></div>
 
-    <div class="form-box">
-      <label>카테고리</label>
-      <select id="category">
-        <option value="kr_catalog">한국어 종합카탈로그</option>
-        <option value="en_catalog">영어 종합카탈로그</option>
-        <option value="company">회사 소개서</option>
-        <option value="etc">기타</option>
-      </select>
-
-      <label>언어</label>
-      <select id="lang">
-        <option value="kr">한국어</option>
-        <option value="en">영어</option>
-      </select>
-
-      <label>자료 제목</label>
-      <input type="text" id="title">
-
-      <label>본문</label>
-      <div id="editor" style="height:500px;"></div>
-
-      <label>첨부파일</label>
-      <input type="file" id="files" multiple>
-
-      <button class="btn-blue" style="margin-top:20px;" onclick="save()">등록</button>
-    </div>
+<div class="main">
+  <div class="topbar">
+    <div class="title">자료 등록</div>
+    <button class="home-btn" onclick="location.href='/kr/index.html'">홈으로</button>
   </div>
 
-  <script src="/kr/admin/js/sidebar.js"></script>
-  <script src="/kr/admin/js/common_auth.js"></script>
+  <div class="form-box">
+    <label>카테고리</label>
+    <select id="category">
+      <option value="kr_catalog">한국어 종합카탈로그</option>
+      <option value="en_catalog">영어 종합카탈로그</option>
+      <option value="company">회사 소개서</option>
+      <option value="etc">기타</option>
+    </select>
 
-  <script>
-    loadSidebar("downloads");
+    <label>언어</label>
+    <select id="lang">
+      <option value="kr">한국어</option>
+      <option value="en">영어</option>
+    </select>
 
-    const editor = new tui.Editor({
-      el: document.querySelector('#editor'),
-      height: '500px',
-      initialEditType: 'wysiwyg',
-      previewStyle: 'vertical',
-      plugins: [imageResize],
-      hooks: {
-        addImageBlobHook: async (blob, callback) => {
-          const fd = new FormData();
-          fd.append("image", blob);
+    <label>자료 제목</label>
+    <input type="text" id="title">
 
-          const res = await fetch("/api/uploads/editor/image", {
-            method: "POST",
-            body: fd
-          });
-          const out = await res.json();
+    <label>본문</label>
+    <div id="editor" style="height:500px;"></div>
 
-          callback(out.url, blob.name);
-        }
-      }
-    });
+    <label>첨부파일</label>
+    <input type="file" id="files" multiple>
 
-    async function save() {
-      const title = document.getElementById("title").value.trim();
-      if (!title) return alert("제목을 입력하세요.");
+    <button class="btn-blue" style="margin-top:20px;" onclick="save()">등록</button>
+  </div>
+</div>
 
-      const fd = new FormData();
-      fd.append("title", title);
-      fd.append("category", document.getElementById("category").value);
-      fd.append("lang", document.getElementById("lang").value);
-      fd.append("content", editor.getValue());
+<script src="/kr/admin/js/sidebar.js"></script>
+<script src="/kr/admin/js/common_auth.js"></script>
 
-      const files = document.getElementById("files").files;
-      [...files].forEach(f => fd.append("files", f));
+<script>
+  loadSidebar("downloads");
 
-      const res = await fetch("/api/downloads/create", {
-        method: "POST",
-        headers: { Authorization: "Bearer " + localStorage.getItem("token") },
-        body: fd
-      });
-      const out = await res.json();
+  // 🔥 Toast UI Editor 3.x 생성 (플러그인 없이)
+  const editor = new toastui.Editor({
+    el: document.querySelector('#editor'),
+    height: '500px',
+    initialEditType: 'wysiwyg',
+    previewStyle: 'vertical',
+    hooks: {
+      addImageBlobHook: async (blob, callback) => {
+        const fd = new FormData();
+        fd.append("image", blob);
 
-      if (res.ok) {
-        alert("등록 완료");
-        location.href = "/kr/admin/downloads-list.html";
-      } else {
-        alert(out.message);
+        const res = await fetch("/api/uploads/editor/image", {
+          method: "POST",
+          body: fd
+        });
+        const out = await res.json();
+
+        callback(out.url, blob.name);
       }
     }
-  </script>
+  });
+
+  async function save() {
+    const title = document.getElementById("title").value.trim();
+    if (!title) return alert("제목을 입력하세요.");
+
+    const fd = new FormData();
+    fd.append("title", title);
+    fd.append("category", document.getElementById("category").value);
+    fd.append("lang", document.getElementById("lang").value);
+    fd.append("content", editor.getHTML()); // 🔥 3.x에서는 getHTML()
+
+    const files = document.getElementById("files").files;
+    [...files].forEach(f => fd.append("files", f));
+
+    const res = await fetch("/api/downloads/create", {
+      method: "POST",
+      headers: { Authorization: "Bearer " + localStorage.getItem("token") },
+      body: fd
+    });
+    const out = await res.json();
+
+    if (res.ok) {
+      alert("등록 완료");
+      location.href = "/kr/admin/downloads-list.html";
+    } else {
+      alert(out.message || "등록 실패");
+    }
+  }
+</script>
 
 </body>
 </html>
