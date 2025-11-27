@@ -293,7 +293,7 @@ function initBreadcrumbTabs() {
    9) DOM 로드 후 초기화 — ⭐ AdminBar 먼저 실행
 ------------------------------------------------------------ */
 document.addEventListener("DOMContentLoaded", async () => {
-  initAdminBar();  // ⭐ 가장 먼저
+  initAdminBar();   // ⭐ 반드시 먼저 실행
 
   await loadComponent("header", PATH.header);
   await loadComponent("footer", PATH.footer);
@@ -304,3 +304,4 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   setTimeout(() => highlightTopMenu(), 80);
 });
+
