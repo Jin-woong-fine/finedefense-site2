@@ -55,8 +55,7 @@ app.use("/api/auth", authRouter);
 // 인증/특허
 app.use("/api/cert-items", postsCertificationRouter);
 
-// 문의 (고객 → DB 저장 + 메일 발송)
-app.use("/api/inquiry", sendInquiryRouter);
+
 
 // 관리자 대시보드 & 관리자 공통
 app.use("/api/admin", adminDashboardRouter);
@@ -88,6 +87,9 @@ app.use("/api/users", usersRouter);
 
 // 관리자 문의 관리 API
 app.use("/api/inquiry", inquiryRouter);
+
+// 문의 (고객 → DB 저장 + 메일 발송)
+app.use("/api/inquiry", sendInquiryRouter);
 
 
 // ============================
