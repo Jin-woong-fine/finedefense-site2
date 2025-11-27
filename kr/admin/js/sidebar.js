@@ -25,7 +25,7 @@ window.loadSidebar = function(activeKey) {
     { key: "certifications", label: "인증/특허 관리", link: "/kr/admin/certification-list.html", roles: ["superadmin","admin","editor"] },
 
     { key: "inquiry", label: "1:1 문의 관리", link: "/kr/admin/inquiry.html", roles: ["superadmin","admin"] },
-    { key: "loginlogs", label: "로그인 기록", link: "/kr/admin/login-logs.html", roles: ["superadmin"] }
+    { key: "loginlogs", label: "로그인 기록", link: "/kr/admin/login_logs.html", roles: ["superadmin"] }
   ];
 
   /* 메뉴 필터와 렌더링 */
