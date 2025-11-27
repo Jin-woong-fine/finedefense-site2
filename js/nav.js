@@ -122,13 +122,27 @@ function highlightBreadcrumb() {
   const lv2 = document.querySelector(".crumb-level2");
   if (!lv1 || !lv2) return;
 
-  if (path.includes("/company/")) lv1.classList.add("active");
-  if (path.includes("/products/") || path.includes("/product/")) lv1.classList.add("active");
-  if (path.includes("/pr/")) lv1.classList.add("active");
-  if (path.includes("/support/")) lv1.classList.add("active");
+  // 회사소개
+  if (path.includes("/company/") || path.includes("/sub/company/"))
+    lv1.classList.add("active");
 
+  // 제품소개
+  if (path.includes("/products/") || path.includes("/sub/products/") ||
+      path.includes("/product/")  || path.includes("/sub/product/"))
+    lv1.classList.add("active");
+
+  // 홍보센터
+  if (path.includes("/pr/") || path.includes("/sub/pr/"))
+    lv1.classList.add("active");
+
+  // 고객지원
+  if (path.includes("/support/") || path.includes("/sub/support/"))
+    lv1.classList.add("active");
+
+  // Level2는 항상 활성화
   lv2.classList.add("active");
 }
+
 
 /* ------------------------------------------------------------
    7) Side Tabs + 상세페이지 index 활성화
