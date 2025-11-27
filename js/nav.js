@@ -315,9 +315,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   await loadComponent("footer", PATH.footer);
 
   highlightTopMenu();
-  highlightBreadcrumb();
   initBreadcrumbTabs();
+});
 
-  setTimeout(() => highlightTopMenu(), 80);
+window.addEventListener("load", () => {
+  highlightBreadcrumb();  // ⭐ 페이지 전체 렌더링 후 실행
 });
 
