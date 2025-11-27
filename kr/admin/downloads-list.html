@@ -6,14 +6,14 @@
   <link rel="stylesheet" href="/kr/admin/css/admin.css">
 
   <style>
-    .filter-box { display:flex; gap:10px; margin:20px 0; }
-    select, input { padding:8px; border-radius:6px; border:1px solid #ccc; }
-    .btn { padding:8px 14px; border-radius:6px; cursor:pointer; border:none; }
-    .btn-blue { background:#0f2679; color:white; }
-    .btn-del { background:#d9534f; color:white; }
+    .filter-box { display:flex; gap:10px; margin-bottom:20px; }
+    select, input { padding:8px; }
     table { width:100%; border-collapse:collapse; margin-top:20px; }
-    th,td { padding:12px 10px; border-bottom:1px solid #ddd; }
+    th,td { border-bottom:1px solid #ddd; padding:10px; }
     th { background:#f5f7fb; }
+    .thumb { width:80px; height:60px; object-fit:cover; background:#eee; border-radius:6px; }
+    .btn-blue { padding:6px 12px; background:#0f2679;color:#fff; border-radius:6px; }
+    .home-btn { padding:6px 12px; background:#0f2679; color:#fff; border-radius:6px; border:none; cursor:pointer; }
   </style>
 </head>
 
@@ -23,31 +23,44 @@
 
 <div class="main">
 
+  <!-- ⭐ TOPBAR 추가 -->
   <div class="topbar">
     <div class="title">자료실 관리</div>
-    <button class="home-btn" onclick="location.href='/kr/index.html'">홈으로</button>
+    <div>
+      <button class="home-btn" onclick="location.href='/kr/index.html'">홈으로</button>
+    </div>
   </div>
 
-  <button class="btn btn-blue" onclick="location.href='downloads-add.html'">+ 새 자료 등록</button>
+  <button class="btn-blue" onclick="location.href='downloads-add.html'">+ 새 자료 추가</button>
 
   <div class="filter-box">
-    <select id="filterLang">
-      <option value="kr">한국어</option>
-      <option value="en">영어</option>
-      <option value="all">전체 언어</option>
+    <select id="filterCategory">
+      <option value="all">전체 카테고리</option>
+      <option value="kr_catalog">한국어 종합카탈로그</option>
+      <option value="en_catalog">영어 종합카탈로그</option>
+      <option value="company">회사 소개서</option>
+      <option value="etc">기타</option>
     </select>
 
-    <input type="text" id="search" placeholder="검색(제목)">
-    <button class="btn" onclick="loadList()">검색</button>
+    <select id="filterLang">
+      <option value="all">전체 언어</option>
+      <option value="kr">한국어</option>
+      <option value="en">영어</option>
+    </select>
+
+    <input type="text" id="search" placeholder="검색 (제목)">
+    <button onclick="loadList()">검색</button>
   </div>
 
   <table>
     <thead>
       <tr>
+        <th>썸네일</th>
+        <th>카테고리</th>
         <th>제목</th>
         <th>언어</th>
-        <th>파일 크기</th>
-        <th>등록일</th>
+        <th>첨부파일</th>
+        <th>정렬</th>
         <th>수정</th>
         <th>삭제</th>
       </tr>
@@ -59,55 +72,58 @@
 
 <script src="/kr/admin/js/sidebar.js"></script>
 <script src="/kr/admin/js/common_auth.js"></script>
-
 <script>
-loadSidebar("downloads");
+  loadSidebar("downloads");
 
-function formatSize(bytes){
-  if(!bytes) return "-";
-  if(bytes < 1024) return bytes+" B";
-  if(bytes < 1024*1024) return (bytes/1024).toFixed(1)+" KB";
-  return (bytes/1024/1024).toFixed(1)+" MB";
-}
+  async function loadList() {
+    const category = document.getElementById("filterCategory").value;
+    const lang = document.getElementById("filterLang").value;
+    const search = document.getElementById("search").value;
 
-async function loadList(){
-  const lang = document.getElementById("filterLang").value;
-  const search = document.getElementById("search").value;
+    const res = await fetch(`/api/downloads/list?category=${category}&lang=${lang}&search=${search}`);
+    const data = await res.json();
 
-  const res = await fetch(`/api/downloads/list?lang=${lang}&search=${search}`);
-  const data = await res.json();
-
-  document.getElementById("tbody").innerHTML = data.map(i => `
-    <tr>
-      <td>${i.title}</td>
-      <td>${i.lang.toUpperCase()}</td>
-      <td>${formatSize(i.file_size)}</td>
-      <td>${new Date(i.created_at).toLocaleDateString()}</td>
-      <td><button class="btn" onclick="location.href='downloads-edit.html?id=${i.id}'">수정</button></td>
-      <td><button class="btn btn-del" onclick="del(${i.id})">삭제</button></td>
-    </tr>
-  `).join("");
-}
-
-async function del(id){
-  if(!confirm("삭제하시겠습니까?")) return;
-
-  const res = await fetch(`/api/downloads/delete/${id}`, {
-    method:"DELETE",
-    headers:{ Authorization:"Bearer " + localStorage.getItem("token") }
-  });
-
-  const out = await res.json();
-
-  if(res.ok){
-    alert("삭제 완료");
-    loadList();
-  } else {
-    alert(out.message);
+    document.getElementById("tbody").innerHTML = data.map(i => `
+      <tr>
+        <td><img src="${i.thumb_url || '/kr/admin/img/no-thumb.png'}" class="thumb"></td>
+        <td>${printCategory(i.category)}</td>
+        <td>${i.title}</td>
+        <td>${i.lang.toUpperCase()}</td>
+        <td>${i.file_count}개</td>
+        <td>${i.sort_order}</td>
+        <td><button onclick="location.href='downloads-edit.html?id=${i.id}'">수정</button></td>
+        <td><button style="color:red;" onclick="deleteItem(${i.id})">삭제</button></td>
+      </tr>
+    `).join("");
   }
-}
 
-loadList();
+  function printCategory(c) {
+    return {
+      kr_catalog: "한국어 종합카탈로그",
+      en_catalog: "영어 종합카탈로그",
+      company: "회사 소개서",
+      etc: "기타"
+    }[c] || c;
+  }
+
+  async function deleteItem(id) {
+    if (!confirm("정말 삭제하시겠습니까?")) return;
+
+    const res = await fetch(`/api/downloads/delete/${id}`, {
+      method:"DELETE",
+      headers:{ Authorization:"Bearer " + localStorage.getItem("token") }
+    });
+
+    const out = await res.json();
+    if (res.ok) {
+      alert("삭제 완료");
+      loadList();
+    } else {
+      alert(out.message);
+    }
+  }
+
+  loadList();
 </script>
 
 </body>

@@ -3,13 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <title>자료 수정 | 관리자</title>
+
   <link rel="stylesheet" href="/kr/admin/css/admin.css">
+  <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
 
   <style>
-    .form-box { max-width:600px; background:#fff; margin:30px; padding:30px; border-radius:12px; box-shadow:0 4px 14px rgba(0,0,0,0.08); }
-    input, select { width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; margin-bottom:20px; }
-    .btn-blue { background:#0f2679; color:white; padding:10px 16px; border-radius:6px; cursor:pointer; border:none; }
-    .file-info { margin-bottom:10px; font-size:0.9rem; color:#555; }
+    .form-wrap { max-width:900px; margin:20px auto; }
+    .form-item { margin-bottom:20px; }
+    label { font-weight:600; display:block; margin-bottom:6px; }
+    input, select { padding:8px; width:100%; }
+    .file-existing { background:#f7f7f7; padding:10px; border-radius:6px; margin-bottom:10px; }
+    .btn-blue { padding:10px 18px; background:#0f2679;color:white;border-radius:6px;cursor:pointer; }
+    .home-btn { padding:8px 12px; background:#0f2679; color:#fff; border-radius:6px; border:none; cursor:pointer; }
   </style>
 </head>
 
@@ -19,82 +24,147 @@
 
 <div class="main">
 
+  <!-- ⭐ TOPBAR 추가 -->
   <div class="topbar">
     <div class="title">자료 수정</div>
-    <button class="home-btn" onclick="location.href='/kr/index.html'">홈으로</button>
+    <div>
+      <button class="home-btn" onclick="location.href='/kr/index.html'">홈으로</button>
+    </div>
   </div>
 
-  <div class="form-box">
+  <div class="form-wrap">
 
-    <div class="file-info">
-      현재 파일: <a id="currentFile" href="#" target="_blank">보기</a>
+    <div class="form-item">
+      <label>제목</label>
+      <input type="text" id="title">
     </div>
 
-    <label>언어</label>
-    <select id="lang"></select>
+    <div class="form-item">
+      <label>카테고리</label>
+      <select id="category">
+        <option value="kr_catalog">한국어 종합카탈로그</option>
+        <option value="en_catalog">영어 종합카탈로그</option>
+        <option value="company">회사 소개서</option>
+        <option value="etc">기타</option>
+      </select>
+    </div>
 
-    <label>제목</label>
-    <input type="text" id="title">
+    <div class="form-item">
+      <label>언어</label>
+      <select id="lang">
+        <option value="kr">한국어</option>
+        <option value="en">영어</option>
+      </select>
+    </div>
 
-    <label>새 파일 업로드 (선택)</label>
-    <input type="file" id="file">
+    <div class="form-item">
+      <label>정렬순서</label>
+      <input type="number" id="sort_order">
+    </div>
 
-    <label>정렬</label>
-    <input type="number" id="sort_order">
+    <div class="form-item">
+      <label>본문</label>
+      <div id="editor"></div>
+    </div>
 
-    <button class="btn-blue" onclick="save()">수정 완료</button>
+    <div class="form-item">
+      <label>기존 첨부파일</label>
+      <div id="existingFiles"></div>
+    </div>
 
+    <div class="form-item">
+      <label>새 첨부파일 추가</label>
+      <input type="file" id="files" multiple>
+    </div>
+
+    <button class="btn-blue" onclick="save()">수정 저장</button>
   </div>
-
 </div>
 
 <script src="/kr/admin/js/sidebar.js"></script>
 <script src="/kr/admin/js/common_auth.js"></script>
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 
 <script>
-loadSidebar("downloads");
+  loadSidebar("downloads");
 
-const params = new URLSearchParams(location.search);
-const id = params.get("id");
+  const params = new URLSearchParams(location.search);
+  const id = params.get("id");
 
-loadDetail();
-async function loadDetail(){
-  const res = await fetch(`/api/downloads/detail/${id}`);
-  const data = await res.json();
+  let toRemove = [];
 
-  document.getElementById("title").value = data.title;
-  document.getElementById("sort_order").value = data.sort_order;
-  document.getElementById("lang").innerHTML = `
-      <option value="kr" ${data.lang==='kr'?'selected':''}>한국어</option>
-      <option value="en" ${data.lang==='en'?'selected':''}>영어</option>
-  `;
-  document.getElementById("currentFile").href = data.file_url;
-}
-
-async function save(){
-  const fd = new FormData();
-  fd.append("title", document.getElementById("title").value);
-  fd.append("lang", document.getElementById("lang").value);
-  fd.append("sort_order", document.getElementById("sort_order").value);
-
-  if(document.getElementById("file").files[0]){
-    fd.append("file", document.getElementById("file").files[0]);
-  }
-
-  const res = await fetch(`/api/downloads/update/${id}`, {
-    method:"PUT",
-    headers:{ Authorization:"Bearer " + localStorage.getItem("token") },
-    body: fd
+  const editor = new toastui.Editor({
+    el: document.querySelector("#editor"),
+    height: "500px",
+    initialEditType: "wysiwyg",
+    previewStyle: "vertical",
+    hooks: {
+      async addImageBlobHook(blob, callback) {
+        const fd = new FormData();
+        fd.append("image", blob);
+        const res = await fetch("/api/uploads/editor/image", {
+          method:"POST",
+          body: fd
+        });
+        const out = await res.json();
+        callback(out.url, "image");
+      }
+    }
   });
 
-  const out = await res.json();
-  if(res.ok){
-    alert("수정 완료!");
-    location.href="/kr/admin/downloads-list.html";
-  } else {
-    alert(out.message);
+  loadData();
+
+  async function loadData() {
+    const res = await fetch(`/api/downloads/detail/${id}`);
+    const data = await res.json();
+
+    document.getElementById("title").value = data.title;
+    document.getElementById("category").value = data.category;
+    document.getElementById("lang").value = data.lang;
+    document.getElementById("sort_order").value = data.sort_order;
+
+    editor.setHTML(data.content);
+
+    document.getElementById("existingFiles").innerHTML = data.files.map(f => `
+      <div class="file-existing">
+        <label>
+          <input type="checkbox" value="${f.id}" onchange="toggleRemove(this)"> 
+          삭제: ${f.original_name} (${(f.file_size/1024/1024).toFixed(2)} MB)
+        </label>
+      </div>
+    `).join("");
   }
-}
+
+  function toggleRemove(checkbox) {
+    const id = Number(checkbox.value);
+    if (checkbox.checked) toRemove.push(id);
+    else toRemove = toRemove.filter(v => v !== id);
+  }
+
+  async function save() {
+    const fd = new FormData();
+    fd.append("title", document.getElementById("title").value);
+    fd.append("category", document.getElementById("category").value);
+    fd.append("lang", document.getElementById("lang").value);
+    fd.append("sort_order", document.getElementById("sort_order").value);
+    fd.append("content", editor.getHTML());
+    fd.append("removeFileIds", JSON.stringify(toRemove));
+
+    const files = document.getElementById("files").files;
+    for (const f of files) fd.append("files", f);
+
+    const res = await fetch(`/api/downloads/update/${id}`, {
+      method:"PUT",
+      headers:{ Authorization: "Bearer " + localStorage.getItem("token") },
+      body: fd
+    });
+
+    const out = await res.json();
+    if (res.ok) {
+      alert("수정 완료");
+      location.href = "downloads-list.html";
+    } else alert(out.message);
+  }
 </script>
 
 </body>
