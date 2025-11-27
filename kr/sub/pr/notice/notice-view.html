@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/sub-banner.css">
 
-  <!-- ToastUI Viewer -->
+  <!-- Toast UI Viewer -->
   <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor-viewer.min.css">
 
   <style>
@@ -148,7 +148,7 @@
         🔥 파일 크기 표시 포맷터
   ============================================================ */
   function formatSize(bytes) {
-    if (!bytes) return "";
+    if (!bytes) return "0 B";
     if (bytes < 1024) return bytes + " B";
     if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
     return (bytes / 1024 / 1024).toFixed(1) + " MB";
@@ -206,10 +206,10 @@
   ============================================================ */
   function downloadFile(noticeId, path, originalName) {
 
+    // ❗ prefix 반드시 /api/posts/notice 로 맞춰야 함
     const url =
-      `/api/notice/download-file?path=${encodeURIComponent(path)}&name=${encodeURIComponent(originalName)}`;
+      `/api/posts/notice/download-file?path=${encodeURIComponent(path)}&name=${encodeURIComponent(originalName)}`;
 
-    // 자동 다운로드
     const link = document.createElement("a");
     link.href = url;
     link.download = originalName;
@@ -217,8 +217,8 @@
     link.click();
     link.remove();
 
-    // 다운로드 로그 기록
-    fetch("/api/notice/download", {
+    // 다운로드 로그
+    fetch("/api/posts/notice/download", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
