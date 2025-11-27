@@ -123,63 +123,64 @@
 
 </div>
 
-<!-- 공통 스크립트 -->
 <script src="/kr/admin/js/sidebar.js"></script>
 <script src="/kr/admin/js/common_auth.js"></script>
 
 <script>
-  loadSidebar("certifications"); 
+  // 사이드바 로딩
+  loadSidebar("certifications");
+
+  // 목록 불러오기
+  async function loadItems(){
+    const type = document.getElementById("filterType").value;
+    const lang = document.getElementById("filterLang").value;
+    const search = document.getElementById("search").value;
+
+    const res = await fetch(`/api/cert-items/list?type=${type}&lang=${lang}&search=${search}`);
+    const data = await res.json();
+
+    document.getElementById("tbody").innerHTML = data.map(i => `
+      <tr>
+        <td><img src="${i.thumb_url}" class="thumb"></td>
+        <td>${i.type === 'cert' ? '인증' : '특허'}</td>
+        <td>${i.title_kr}</td>
+        <td>${i.title_en}</td>
+        <td>${i.lang.toUpperCase()}</td>
+        <td>${i.sort_order}</td>
+        <td>
+          <button class="btn-small"
+            onclick="location.href='certification-edit.html?id=${i.id}'">
+            수정
+          </button>
+        </td>
+        <td>
+          <button class="btn-delete" onclick="deleteItem(${i.id})">삭제</button>
+        </td>
+      </tr>
+    `).join("");
+  }
+
+  async function deleteItem(id){
+    if(!confirm("삭제하시겠습니까?")) return;
+
+    const res = await fetch(`/api/cert-items/delete/${id}`, {
+      method:"DELETE",
+      headers:{ Authorization:"Bearer " + localStorage.getItem("token") }
+    });
+    const out = await res.json();
+
+    if(res.ok){
+      alert("삭제 완료");
+      loadItems();
+    } else {
+      alert(out.message);
+    }
+  }
+
+  // ⭐ 페이지 로드시 한 번 실행
   loadItems();
 </script>
 
-<script>
-async function loadItems(){
-  const type = document.getElementById("filterType").value;
-  const lang = document.getElementById("filterLang").value;
-  const search = document.getElementById("search").value;
-
-  const res = await fetch(`/api/cert-items/list?type=${type}&lang=${lang}&search=${search}`);
-  const data = await res.json();
-
-  document.getElementById("tbody").innerHTML = data.map(i => `
-    <tr>
-      <td><img src="${i.thumb_url}" class="thumb"></td>
-      <td>${i.type === 'cert' ? '인증' : '특허'}</td>
-      <td>${i.title_kr}</td>
-      <td>${i.title_en}</td>
-      <td>${i.lang.toUpperCase()}</td>
-      <td>${i.sort_order}</td>
-      <td>
-        <button class="btn-small"
-          onclick="location.href='certification-edit.html?id=${i.id}'">
-          수정
-        </button>
-      </td>
-      <td>
-        <button class="btn-delete" onclick="deleteItem(${i.id})">삭제</button>
-      </td>
-    </tr>
-  `).join("");
-}
-
-async function deleteItem(id){
-  if(!confirm("삭제하시겠습니까?")) return;
-
-  const res = await fetch(`/api/cert-items/delete/${id}`, {
-    method:"DELETE",
-    headers:{ Authorization:"Bearer " + localStorage.getItem("token") }
-  });
-  const out = await res.json();
-
-  if(res.ok){
-    alert("삭제 완료");
-    loadItems();
-  } else {
-    alert(out.message);
-  }
-}
-
-</script>
 
 </body>
 </html>
