@@ -122,24 +122,26 @@ function highlightBreadcrumb() {
   const lv2 = document.querySelector(".crumb-level2");
   if (!lv1 || !lv2) return;
 
-  // 회사소개
-  if (path.includes("/company/") || path.includes("/sub/company/"))
-    lv1.classList.add("active");
+  // 경로 매핑 테이블 (언제나 확장 가능)
+  const sectionMap = {
+    company:  ["/company/", "/sub/company/"],
+    products: ["/products/", "/product/", "/sub/products/", "/sub/product/"],
+    pr:       ["/pr/", "/sub/pr/"],
+    support:  ["/support/", "/sub/support/"]
+  };
 
-  // 제품소개
-  if (path.includes("/products/") || path.includes("/sub/products/") ||
-      path.includes("/product/")  || path.includes("/sub/product/"))
-    lv1.classList.add("active");
+  // Level1 활성화
+  for (const key in sectionMap) {
+    const arr = sectionMap[key];
+    for (const k of arr) {
+      if (path.includes(k)) {
+        lv1.classList.add("active");
+        break;
+      }
+    }
+  }
 
-  // 홍보센터
-  if (path.includes("/pr/") || path.includes("/sub/pr/"))
-    lv1.classList.add("active");
-
-  // 고객지원
-  if (path.includes("/support/") || path.includes("/sub/support/"))
-    lv1.classList.add("active");
-
-  // Level2는 항상 활성화
+  // Level2 활성화
   lv2.classList.add("active");
 }
 
