@@ -28,6 +28,7 @@ import postsNoticeRouter from "./routes/posts_notice.js";
 
 
 
+
 // ============================
 // 📌 기본 설정
 // ============================
@@ -64,9 +65,6 @@ app.use("/api/cert-items", postsCertificationRouter);
 app.use("/api/admin", adminDashboardRouter);
 app.use("/api/admin", adminRouter);
 
-// 게시물 공통 조회 (공지/뉴스/갤러리)
-app.use("/api/posts", postsCommonRouter);
-
 // 뉴스 CRUD
 app.use("/api/news", postsNewsRouter);
 
@@ -96,6 +94,9 @@ app.use("/api/inquiry", sendInquiryRouter);
 
 // 공지사항
 app.use("/api/posts/notice", postsNoticeRouter);
+
+// 게시물 공통 조회 (공지/뉴스/갤러리)
+app.use("/api/posts", postsCommonRouter);
 
 
 
