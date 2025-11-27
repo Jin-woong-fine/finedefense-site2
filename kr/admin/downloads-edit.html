@@ -3,18 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <title>자료 수정 | 관리자</title>
-
   <link rel="stylesheet" href="/kr/admin/css/admin.css">
+
+  <!-- Toast UI -->
   <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
 
+  <!-- 이미지 반응형 -->
   <style>
-    .form-wrap { max-width:900px; margin:20px auto; }
-    .form-item { margin-bottom:20px; }
-    label { font-weight:600; display:block; margin-bottom:6px; }
-    input, select { padding:8px; width:100%; }
-    .file-existing { background:#f7f7f7; padding:10px; border-radius:6px; margin-bottom:10px; }
-    .btn-blue { padding:10px 18px; background:#0f2679;color:white;border-radius:6px;cursor:pointer; }
-    .home-btn { padding:8px 12px; background:#0f2679; color:#fff; border-radius:6px; border:none; cursor:pointer; }
+    .toastui-editor-contents img {
+      max-width: 100%;
+      height: auto;
+    }
+    .form-box {
+      max-width: 900px;
+      margin: 30px auto;
+      background:#fff;
+      padding:30px;
+      border-radius:10px;
+      box-shadow:0 4px 10px rgba(0,0,0,0.08);
+    }
+    input, select {
+      padding:10px; 
+      width:100%;
+      margin-bottom:15px;
+    }
+    label { font-weight:600; margin-top:10px; display:block; }
+    .file-item { 
+      display:flex; 
+      justify-content:space-between; 
+      padding:8px; 
+      background:#f6f6f6;
+      margin-bottom:6px;
+      border-radius:6px;
+    }
+    .remove-check { margin-right:10px; }
   </style>
 </head>
 
@@ -23,91 +45,76 @@
 <div id="sidebar"></div>
 
 <div class="main">
-
-  <!-- ⭐ TOPBAR 추가 -->
   <div class="topbar">
     <div class="title">자료 수정</div>
-    <div>
-      <button class="home-btn" onclick="location.href='/kr/index.html'">홈으로</button>
-    </div>
+    <button class="home-btn" onclick="location.href='/kr/index.html'">홈으로</button>
   </div>
 
-  <div class="form-wrap">
+  <div class="form-box">
+    <label>카테고리</label>
+    <select id="category">
+      <option value="kr_catalog">한국어 종합카탈로그</option>
+      <option value="en_catalog">영어 종합카탈로그</option>
+      <option value="company">회사 소개서</option>
+      <option value="etc">기타</option>
+    </select>
 
-    <div class="form-item">
-      <label>제목</label>
-      <input type="text" id="title">
-    </div>
+    <label>언어</label>
+    <select id="lang">
+      <option value="kr">한국어</option>
+      <option value="en">영어</option>
+    </select>
 
-    <div class="form-item">
-      <label>카테고리</label>
-      <select id="category">
-        <option value="kr_catalog">한국어 종합카탈로그</option>
-        <option value="en_catalog">영어 종합카탈로그</option>
-        <option value="company">회사 소개서</option>
-        <option value="etc">기타</option>
-      </select>
-    </div>
+    <label>자료 제목</label>
+    <input type="text" id="title">
 
-    <div class="form-item">
-      <label>언어</label>
-      <select id="lang">
-        <option value="kr">한국어</option>
-        <option value="en">영어</option>
-      </select>
-    </div>
+    <label>본문</label>
+    <div id="editor" style="height:500px;"></div>
 
-    <div class="form-item">
-      <label>정렬순서</label>
-      <input type="number" id="sort_order">
-    </div>
+    <label>기존 첨부파일</label>
+    <div id="oldFiles"></div>
 
-    <div class="form-item">
-      <label>본문</label>
-      <div id="editor"></div>
-    </div>
+    <label>새 첨부파일 추가</label>
+    <input type="file" id="newFiles" multiple>
 
-    <div class="form-item">
-      <label>기존 첨부파일</label>
-      <div id="existingFiles"></div>
-    </div>
-
-    <div class="form-item">
-      <label>새 첨부파일 추가</label>
-      <input type="file" id="files" multiple>
-    </div>
-
-    <button class="btn-blue" onclick="save()">수정 저장</button>
+    <button class="btn-blue" style="margin-top:20px;" onclick="update()">수정 완료</button>
   </div>
 </div>
 
 <script src="/kr/admin/js/sidebar.js"></script>
 <script src="/kr/admin/js/common_auth.js"></script>
+
+<!-- Toast UI Editor + Image Resize Plugin -->
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+<script src="https://uicdn.toast.com/editor-plugin-image-resize/v1.0.2/image-resize.min.js"></script>
 
 <script>
   loadSidebar("downloads");
 
   const params = new URLSearchParams(location.search);
   const id = params.get("id");
+  if (!id) location.href = "/kr/admin/downloads-list.html";
 
-  let toRemove = [];
+  let removeFiles = [];
 
   const editor = new toastui.Editor({
-    el: document.querySelector("#editor"),
-    height: "500px",
-    initialEditType: "wysiwyg",
-    previewStyle: "vertical",
+    el: document.querySelector('#editor'),
+    height: '500px',
+    initialEditType: 'wysiwyg',
+    previewStyle: 'vertical',
+    plugins: [toastui.Editor.plugin.imageResize],
     hooks: {
-      async addImageBlobHook(blob, callback) {
+      addImageBlobHook: async (blob, callback) => {
         const fd = new FormData();
         fd.append("image", blob);
+
         const res = await fetch("/api/uploads/editor/image", {
-          method:"POST",
+          method: "POST",
           body: fd
         });
         const out = await res.json();
-        callback(out.url, "image");
+
+        callback(out.url, blob.name);
       }
     }
   });
@@ -121,49 +128,63 @@
     document.getElementById("title").value = data.title;
     document.getElementById("category").value = data.category;
     document.getElementById("lang").value = data.lang;
-    document.getElementById("sort_order").value = data.sort_order;
+    editor.setHTML(data.content || "");
 
-    editor.setHTML(data.content);
-
-    document.getElementById("existingFiles").innerHTML = data.files.map(f => `
-      <div class="file-existing">
-        <label>
-          <input type="checkbox" value="${f.id}" onchange="toggleRemove(this)"> 
-          삭제: ${f.original_name} (${(f.file_size/1024/1024).toFixed(2)} MB)
-        </label>
+    // 기존 파일 리스트
+    const wrap = document.getElementById("oldFiles");
+    wrap.innerHTML = data.files.map(f => `
+      <div class="file-item">
+        <div>
+          <input type="checkbox" class="remove-check" data-path="${f.file_path}">
+          ${f.original_name} (${formatSize(f.file_size)})
+        </div>
       </div>
     `).join("");
+
+    document.querySelectorAll(".remove-check").forEach(chk => {
+      chk.addEventListener("change", e => {
+        const path = e.target.dataset.path;
+        if (e.target.checked) removeFiles.push(path);
+        else removeFiles = removeFiles.filter(p => p !== path);
+      });
+    });
   }
 
-  function toggleRemove(checkbox) {
-    const id = Number(checkbox.value);
-    if (checkbox.checked) toRemove.push(id);
-    else toRemove = toRemove.filter(v => v !== id);
+  function formatSize(bytes) {
+    if (!bytes) return "";
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1024 * 1024) return (bytes/1024).toFixed(1) + " KB";
+    return (bytes/1024/1024).toFixed(2) + " MB";
   }
 
-  async function save() {
-    const fd = new FormData();
-    fd.append("title", document.getElementById("title").value);
-    fd.append("category", document.getElementById("category").value);
-    fd.append("lang", document.getElementById("lang").value);
-    fd.append("sort_order", document.getElementById("sort_order").value);
-    fd.append("content", editor.getHTML());
-    fd.append("removeFileIds", JSON.stringify(toRemove));
+  async function update() {
+    const title = document.getElementById("title").value.trim();
+    if (!title) return alert("제목을 입력하세요.");
 
-    const files = document.getElementById("files").files;
-    for (const f of files) fd.append("files", f);
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("category", document.getElementById("category").value);
+    formData.append("lang", document.getElementById("lang").value);
+    formData.append("content", editor.getHTML());
+    formData.append("removeFiles", JSON.stringify(removeFiles));
+
+    const newFiles = document.getElementById("newFiles").files;
+    [...newFiles].forEach(f => formData.append("files", f));
 
     const res = await fetch(`/api/downloads/update/${id}`, {
-      method:"PUT",
-      headers:{ Authorization: "Bearer " + localStorage.getItem("token") },
-      body: fd
+      method: "PUT",
+      headers: { Authorization: "Bearer " + localStorage.getItem("token") },
+      body: formData
     });
 
     const out = await res.json();
+
     if (res.ok) {
       alert("수정 완료");
-      location.href = "downloads-list.html";
-    } else alert(out.message);
+      location.href = "/kr/admin/downloads-list.html";
+    } else {
+      alert(out.message);
+    }
   }
 </script>
 

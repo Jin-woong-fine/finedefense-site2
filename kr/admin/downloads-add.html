@@ -4,15 +4,30 @@
   <meta charset="UTF-8">
   <title>자료 등록 | 관리자</title>
   <link rel="stylesheet" href="/kr/admin/css/admin.css">
+
+  <!-- Toast UI Editor -->
   <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
 
+  <!-- 🔥 이미지 반응형 지원 -->
   <style>
-    .form-wrap { max-width:900px; margin:20px auto; }
-    .form-item { margin-bottom:20px; }
-    label { font-weight:600; display:block; margin-bottom:6px; }
-    input, select { padding:8px; width:100%; }
-    .btn-blue { padding:10px 18px; background:#0f2679;color:white;border-radius:6px;cursor:pointer; }
-    .home-btn { padding:8px 12px; background:#0f2679; color:#fff; border:none; border-radius:6px; cursor:pointer; }
+    .toastui-editor-contents img {
+      max-width: 100%;
+      height: auto;
+    }
+    .form-box {
+      max-width: 900px;
+      margin: 30px auto;
+      background:#fff;
+      padding:30px;
+      border-radius:10px;
+      box-shadow:0 4px 10px rgba(0,0,0,0.08);
+    }
+    input, select {
+      padding:10px; 
+      width:100%;
+      margin-bottom:15px;
+    }
+    label { font-weight:600; margin-top:10px; display:block; }
   </style>
 </head>
 
@@ -21,107 +36,98 @@
 <div id="sidebar"></div>
 
 <div class="main">
-
-  <!-- ⭐ TOPBAR 추가 -->
   <div class="topbar">
     <div class="title">자료 등록</div>
-    <div>
-      <button class="home-btn" onclick="location.href='/kr/index.html'">홈으로</button>
-    </div>
+    <button class="home-btn" onclick="location.href='/kr/index.html'">홈으로</button>
   </div>
 
-  <div class="form-wrap">
+  <div class="form-box">
+    <label>카테고리</label>
+    <select id="category">
+      <option value="kr_catalog">한국어 종합카탈로그</option>
+      <option value="en_catalog">영어 종합카탈로그</option>
+      <option value="company">회사 소개서</option>
+      <option value="etc">기타</option>
+    </select>
 
-    <div class="form-item">
-      <label>제목</label>
-      <input type="text" id="title">
-    </div>
+    <label>언어</label>
+    <select id="lang">
+      <option value="kr">한국어</option>
+      <option value="en">영어</option>
+    </select>
 
-    <div class="form-item">
-      <label>카테고리</label>
-      <select id="category">
-        <option value="kr_catalog">한국어 종합카탈로그</option>
-        <option value="en_catalog">영어 종합카탈로그</option>
-        <option value="company">회사 소개서</option>
-        <option value="etc">기타</option>
-      </select>
-    </div>
+    <label>자료 제목</label>
+    <input type="text" id="title" placeholder="제목 입력">
 
-    <div class="form-item">
-      <label>언어</label>
-      <select id="lang">
-        <option value="kr">한국어</option>
-        <option value="en">영어</option>
-      </select>
-    </div>
+    <label>본문</label>
+    <div id="editor" style="height:500px;"></div>
 
-    <div class="form-item">
-      <label>정렬순서</label>
-      <input type="number" id="sort_order" value="9999">
-    </div>
+    <label>첨부파일 (여러 개 가능)</label>
+    <input type="file" id="files" multiple>
 
-    <div class="form-item">
-      <label>본문</label>
-      <div id="editor"></div>
-    </div>
-
-    <div class="form-item">
-      <label>첨부파일</label>
-      <input type="file" id="files" multiple>
-    </div>
-
-    <button class="btn-blue" onclick="save()">등록</button>
+    <button class="btn-blue" style="margin-top:20px;" onclick="save()">등록</button>
   </div>
 </div>
 
 <script src="/kr/admin/js/sidebar.js"></script>
 <script src="/kr/admin/js/common_auth.js"></script>
+
+<!-- Toast UI Editor + Image Resize Plugin -->
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+<script src="https://uicdn.toast.com/editor-plugin-image-resize/v1.0.2/image-resize.min.js"></script>
 
 <script>
   loadSidebar("downloads");
 
   const editor = new toastui.Editor({
-    el: document.querySelector("#editor"),
-    height: "500px",
-    initialEditType: "wysiwyg",
-    previewStyle: "vertical",
+    el: document.querySelector('#editor'),
+    height: '500px',
+    initialEditType: 'wysiwyg',
+    previewStyle: 'vertical',
+    plugins: [toastui.Editor.plugin.imageResize],
     hooks: {
-      async addImageBlobHook(blob, callback) {
+      addImageBlobHook: async (blob, callback) => {
         const fd = new FormData();
         fd.append("image", blob);
+
         const res = await fetch("/api/uploads/editor/image", {
-          method:"POST",
+          method: "POST",
           body: fd
         });
         const out = await res.json();
-        callback(out.url, "image");
+
+        callback(out.url, blob.name);
       }
     }
   });
 
   async function save() {
-    const fd = new FormData();
-    fd.append("title", document.getElementById("title").value);
-    fd.append("category", document.getElementById("category").value);
-    fd.append("lang", document.getElementById("lang").value);
-    fd.append("sort_order", document.getElementById("sort_order").value);
-    fd.append("content", editor.getHTML());
+    const title = document.getElementById("title").value.trim();
+    if (!title) return alert("제목을 입력하세요.");
+
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("category", document.getElementById("category").value);
+    formData.append("lang", document.getElementById("lang").value);
+    formData.append("content", editor.getHTML());
 
     const files = document.getElementById("files").files;
-    for (const f of files) fd.append("files", f);
+    [...files].forEach(f => formData.append("files", f));
 
     const res = await fetch("/api/downloads/create", {
       method: "POST",
       headers: { Authorization: "Bearer " + localStorage.getItem("token") },
-      body: fd
+      body: formData
     });
 
     const out = await res.json();
+
     if (res.ok) {
-      alert("등록되었습니다.");
-      location.href = "downloads-list.html";
-    } else alert(out.message);
+      alert("등록 완료");
+      location.href = "/kr/admin/downloads-list.html";
+    } else {
+      alert(out.message);
+    }
   }
 </script>
 
