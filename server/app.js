@@ -24,6 +24,9 @@ import postsNewsRouter from "./routes/posts_news.js";
 import postsGalleryRouter from "./routes/posts_gallery.js";
 import postsCertificationRouter from "./routes/posts_certification.js";
 
+import postsNoticeRouter from "./routes/posts_notice.js";
+
+
 
 // ============================
 // 📌 기본 설정
@@ -90,6 +93,10 @@ app.use("/api/inquiry", inquiryRouter);
 
 // 문의 (고객 → DB 저장 + 메일 발송)
 app.use("/api/inquiry", sendInquiryRouter);
+
+// 공지사항
+app.use("/api/posts/notice", postsNoticeRouter);
+
 
 
 // ============================
