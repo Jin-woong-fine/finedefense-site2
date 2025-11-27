@@ -116,13 +116,23 @@ function highlightTopMenu() {
    6) Breadcrumb Level1 / Level2 Active (심플 버전)
 ------------------------------------------------------------ */
 function highlightBreadcrumb() {
-  const lv1 = document.querySelector(".crumb-level1");
-  const lv2 = document.querySelector(".crumb-level2");
-  if (!lv1 || !lv2) return;
+  function tryActivateBreadcrumb() {
+    const lv1 = document.querySelector(".crumb-level1");
+    const lv2 = document.querySelector(".crumb-level2");
 
-  lv1.classList.add("active");
-  lv2.classList.add("active");
+    if (lv1 && lv2) {
+      lv1.classList.add("active");
+      lv2.classList.add("active");
+      return; // 성공 → 종료
+    }
+
+    // 아직 못 찾으면 50ms 후 다시 시도
+    setTimeout(tryActivateBreadcrumb, 50);
+  }
+
+  tryActivateBreadcrumb();
 }
+
 
 /* ------------------------------------------------------------
    7) Side Tabs + 상세페이지 index 활성화
