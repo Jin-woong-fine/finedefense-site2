@@ -116,12 +116,17 @@
   </div>
 
   <!-- JS -->
-  <script src="/kr/admin/js/sidebar.js"></script>
   <script src="/kr/admin/js/common_auth.js"></script>
+  <script src="/kr/admin/js/sidebar.js"></script>
   <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 
   <script>
+    // 🔐 권한 체크 (common_auth.js 로드된 뒤)
     requireAdminOrEditor();
+
+    // ⭐ 사이드바 렌더링
+    loadSidebar("inquiry");
+
     document.getElementById("logoutBtn").addEventListener("click", logout);
 
     const params = new URLSearchParams(location.search);
@@ -217,8 +222,8 @@
 
       if (res.ok) alert("메모 저장 완료");
     };
-
   </script>
+
 
 </body>
 
