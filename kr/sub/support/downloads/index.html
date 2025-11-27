@@ -59,6 +59,22 @@
       padding:60px;
       color:#777;
     }
+
+    /* 자동으로 ">" 생성 */
+    .breadcrumb span::before {
+    content: ">";
+    margin: 0 6px;
+    color: #999;
+    }
+
+    .breadcrumb a:first-child::after {
+    content: ">";
+    margin: 0 6px;
+    color: #999;
+    }
+
+
+
   </style>
 </head>
 
@@ -75,10 +91,10 @@
 </section>
 
 <div class="breadcrumb">
-<a href="/kr/index.html">홈</a> &gt;
-<span class="crumb-level1">고객지원</span> &gt;
-<span class="crumb-level2">자료실</span>
-<div id="side-tabs"></div>
+  <a href="/kr/index.html">홈</a>
+  <span class="crumb-level1">고객지원</span>
+  <span class="crumb-level2">자료실</span>
+  <div id="side-tabs"></div>
 </div>
 
 <div class="downloads-container">
