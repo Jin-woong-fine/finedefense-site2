@@ -200,12 +200,12 @@ function initBreadcrumbTabs() {
       if (p.includes("/support/")) {
         tabs = LANG === "kr"
           ? [
-              { name: "1:1 문의", link: `${base}/support/inquiry.html` },
-              { name: "자료실", link: `${base}/support/download.html` },
+              { name: "1:1 문의", link: `${base}/support/inquiry/index.html` },
+              { name: "자료실", link: `${base}/support/download/index.html` },
             ]
           : [
-              { name: "Inquiry", link: `${base}/support/inquiry.html` },
-              { name: "Download", link: `${base}/support/download.html` },
+              { name: "Inquiry", link: `${base}/support/inquiry/index.html` },
+              { name: "Download", link: `${base}/support/download/index.html` },
             ];
       }
 
