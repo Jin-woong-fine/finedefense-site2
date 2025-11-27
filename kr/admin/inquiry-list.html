@@ -2,239 +2,195 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>문의 목록 | Fine Defense 관리자</title>
+  <title>문의 관리 | Fine Defense Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="stylesheet" href="./css/admin.css" />
+  <!-- 공통 관리자 CSS -->
+  <link rel="stylesheet" href="/kr/admin/css/admin.css" />
 
   <style>
-    /* ===== 기본 레이아웃 ===== */
-    body {
-    font-family: 'Noto Sans KR', sans-serif;
-    margin: 0;
-    background: #f5f7fb;
+    .panel {
+      background:#fff;
+      padding:25px;
+      border-radius:10px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.06);
+      margin-bottom:35px;
     }
-
-    /* ===== 사이드바 영역 확보 ===== */
-    .container {
-    margin-left: 240px; /* sidebar width */
-    padding: 40px 50px;
-    }
-
-    /* ===== Topbar ===== */
-    .topbar {
-    margin-left: 240px;        /* sidebar 공간 */
-    height: 60px;
-    background: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0px 30px;
-    border-bottom: 1px solid #ddd;
-    position: sticky;
-    top: 0;
-    z-index: 50;
-    }
-
-    .topbar h2 {
-    font-size: 20px;
-    font-weight: 700;
-    color: #0f2679;
-    margin: 0;
-    }
-
-    .btn {
-    padding: 8px 14px;
-    border-radius: 6px;
-    border: none;
-    cursor: pointer;
-    font-size: 14px;
-    }
-
-    .btn-primary {
-    background: #0f2679;
-    color: #fff;
-    }
-
-    .btn-danger {
-    background: #e60000;
-    color: #fff;
-    }
-
-    /* ===== 테이블 및 목록 ===== */
 
     .status-chip {
-    display: inline-block;
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
+      display:inline-block;
+      padding:4px 10px;
+      border-radius:20px;
+      font-size:12px;
+      font-weight:600;
     }
-    .status-0 { background: #ffe8e8; color: #d10000; }
-    .status-1 { background: #e8f5ff; color: #0058c6; }
+    .status-0 { background:#ffe8e8; color:#d10000; }
+    .status-1 { background:#e8f5ff; color:#0058c6; }
 
     table {
-    width: 100%;
-    border-collapse: collapse;
-    background: white;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      width:100%;
+      border-collapse:collapse;
+    }
+
+    th, td {
+      padding:12px 14px;
+      border-bottom:1px solid #ddd;
+      text-align:left;
+      font-size:14px;
     }
 
     th {
-    background: #eef1f7;
-    padding: 14px 12px;
-    text-align: left;
-    font-size: 14px;
-    font-weight: 600;
-    color: #333;
-    border-bottom: 1px solid #ddd;
+      background:#0f2679;
+      color:white;
+      font-weight:600;
     }
 
-    td {
-    padding: 14px 12px;
-    font-size: 14px;
-    border-bottom: 1px solid #eee;
+    tr:hover td {
+      background:#f3f6ff;
+      cursor:pointer;
     }
 
-    tr:hover {
-    background: #f9fbff;
-    cursor: pointer;
-    }
-
-    /* ===== Filter Buttons ===== */
     .filter-box {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
+      display:flex;
+      gap:10px;
+      align-items:center;
     }
 
     .filter-btn {
-    background: #fff;
-    border: 1px solid #ccc;
-    padding: 7px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 13px;
+      padding:7px 16px;
+      border:1px solid #ccc;
+      background:white;
+      border-radius:6px;
+      cursor:pointer;
+      font-size:13px;
     }
-
     .filter-btn.active {
-    border-color: #0f2679;
-    background: #0f2679;
-    color: white;
+      background:#0f2679;
+      color:white;
+      border-color:#0f2679;
     }
 
   </style>
 </head>
 
 <body>
-  <div id="sidebar"></div>
 
+<!-- ⭐ 사이드바 -->
+<div id="sidebar" data-active="inquiry"></div>
+
+<!-- ⭐ 메인 -->
+<div class="main">
+
+  <!-- ★ TOPBAR -->
   <div class="topbar">
-    <h2>공지사항 관리</h2>
+    <h2>문의 관리</h2>
     <div>
       <button class="btn btn-primary" onclick="location.href='../index.html'">홈으로</button>
       <button id="logoutBtn" class="btn btn-danger">로그아웃</button>
     </div>
   </div>
 
+  <section class="panel">
 
-
-  <div class="container">
-    <h2>문의 목록</h2>
-
-    <div class="filter-box">
+    <!-- 필터 영역 -->
+    <div class="filter-box" style="margin-bottom:15px;">
       <button class="filter-btn active" data-filter="all">전체</button>
       <button class="filter-btn" data-filter="unread">미확인</button>
     </div>
 
+    <!-- 테이블 -->
     <table>
       <thead>
         <tr>
-          <th style="width: 80px;">번호</th>
-          <th style="width: 150px;">이름</th>
+          <th style="width:70px;">번호</th>
+          <th style="width:150px;">이름</th>
           <th>제목</th>
-          <th style="width: 180px;">이메일</th>
-          <th style="width: 140px;">날짜</th>
-          <th style="width: 110px;">상태</th>
+          <th style="width:180px;">이메일</th>
+          <th style="width:150px;">날짜</th>
+          <th style="width:100px;">상태</th>
         </tr>
       </thead>
-      <tbody id="inquiryTable"></tbody>
+      <tbody id="inquiryTable">
+        <tr><td colspan="6" style="text-align:center;">불러오는 중...</td></tr>
+      </tbody>
     </table>
-  </div>
 
-  <!-- 🔥 관리자 로그인 체크 -->
-  <script src="./js/common_auth.js"></script>
+  </section>
 
-  <!-- 🔥 사이드바 로드 -->
-  <script src="./js/sidebar.js"></script>
-  <script>
-    loadSidebar("inquiry");
-  </script>
+</div>
 
-  <!-- 🔥 문의 목록 스크립트 -->
-  <script>
-    let allData = [];
-    let currentFilter = "all";
+<!-- 공통 JS -->
+<script src="/kr/admin/js/common_auth.js"></script>
+<script src="/kr/admin/js/sidebar.js"></script>
 
-    document.addEventListener("DOMContentLoaded", () => {
-      loadInquiryList();
+<script>
+  requireAdminOrEditor();
+  document.getElementById("logoutBtn").addEventListener("click", logout);
 
-      document.querySelectorAll(".filter-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
-          btn.classList.add("active");
-          currentFilter = btn.dataset.filter;
-          renderTable();
-        });
+  let allData = [];
+  let currentFilter = "all";
+
+  document.addEventListener("DOMContentLoaded", () => {
+    loadInquiryList();
+
+    document.querySelectorAll(".filter-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentFilter = btn.dataset.filter;
+        renderTable();
       });
     });
+  });
 
-    async function loadInquiryList() {
-      const res = await fetch("/api/inquiry/list", {
-        headers: { Authorization: "Bearer " + localStorage.getItem("token") }
-      });
+  async function loadInquiryList() {
+    const res = await fetch("/api/inquiry/list", {
+      headers: { Authorization: "Bearer " + localStorage.getItem("token") }
+    });
 
-      const data = await res.json();
-      allData = data;
-      renderTable();
+    const data = await res.json();
+    allData = data;
+    renderTable();
+  }
+
+  function renderTable() {
+    const tbody = document.getElementById("inquiryTable");
+    tbody.innerHTML = "";
+
+    let filtered = allData;
+
+    if (currentFilter === "unread") {
+      filtered = allData.filter(item => item.status === 0);
     }
 
-    function renderTable() {
-      const tbody = document.getElementById("inquiryTable");
-      tbody.innerHTML = "";
-
-      let filtered = allData;
-
-      if (currentFilter === "unread") {
-        filtered = allData.filter(item => item.status === 0);
-      }
-
-      filtered.forEach(row => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${row.id}</td>
-          <td>${row.name}</td>
-          <td>${row.subject || "-"}</td>
-          <td>${row.email}</td>
-          <td>${formatDate(row.created_at)}</td>
-          <td>
-            <span class="status-chip status-${row.status}">
-              ${row.status === 0 ? "미확인" : "확인"}
-            </span>
-          </td>
-        `;
-        tr.onclick = () => {
-          location.href = `/kr/admin/inquiry-view.html?id=${row.id}`;
-        };
-        tbody.appendChild(tr);
-      });
+    if (!filtered.length) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#777;">문의 없음</td></tr>`;
+      return;
     }
 
-    function formatDate(dt) {
-      const d = new Date(dt);
-      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-    }
-  </script>
+    filtered.forEach(row => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${row.id}</td>
+        <td>${row.name}</td>
+        <td>${row.subject || "-"}</td>
+        <td>${row.email}</td>
+        <td>${formatDate(row.created_at)}</td>
+        <td><span class="status-chip status-${row.status}">${row.status === 0 ? "미확인" : "확인"}</span></td>
+      `;
+      tr.onclick = () => location.href = `/kr/admin/inquiry-view.html?id=${row.id}`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function formatDate(dt) {
+    const d = new Date(dt);
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+  }
+
+  // 사이드바 활성화
+  loadSidebar("inquiry");
+</script>
+
 </body>
 </html>
