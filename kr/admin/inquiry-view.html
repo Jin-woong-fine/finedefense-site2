@@ -1,40 +1,24 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8">
-  <title>문의 상세 | Fine Defense 관리자</title>
+  <title>문의 상세 | Fine Defense Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="stylesheet" href="./css/admin.css">
+  <!-- 공통 관리자 CSS -->
+  <link rel="stylesheet" href="/kr/admin/css/admin.css">
 
-  <!-- Quill for read-only display -->
-  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet" />
+  <!-- Quill -->
+  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 
   <style>
-    body {
-      font-family: 'Noto Sans KR', sans-serif;
-      margin: 0;
-      background: #f5f7fb;
-    }
-
-    .container {
-      margin-left: 240px;
-      padding: 40px 50px;
-      max-width: 900px;
-    }
-
-    h2 {
-      font-size: 22px;
-      color: #0f2679;
-      font-weight: 700;
-      margin-bottom: 20px;
-    }
-
-    .field-box {
-      margin-bottom: 25px;
-      padding: 20px;
+    .panel {
       background: #fff;
+      padding: 25px;
       border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+      margin-bottom: 30px;
     }
 
     .field-title {
@@ -44,10 +28,6 @@
       margin-bottom: 6px;
     }
 
-    #contentBox {
-      min-height: 150px;
-    }
-
     .status-chip {
       display: inline-block;
       padding: 6px 12px;
@@ -55,29 +35,15 @@
       font-size: 12px;
       font-weight: 600;
     }
+
     .status-0 {
       background: #ffe8e8;
       color: #d10000;
     }
+
     .status-1 {
       background: #e5f3ff;
       color: #0058c6;
-    }
-
-    .btn {
-      padding: 10px 18px;
-      background: #0f2679;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-      margin-right: 10px;
-    }
-
-    .btn.disabled {
-      background: #999 !important;
-      cursor: not-allowed !important;
     }
 
     textarea {
@@ -89,58 +55,75 @@
       resize: vertical;
       font-size: 14px;
     }
+
+    .btn.disabled {
+      background: #999 !important;
+      cursor: not-allowed !important;
+    }
   </style>
 </head>
 
 <body>
-  <div id="sidebar"></div>
 
-  <div class="container">
-    <h2>문의 상세</h2>
+  <!-- ⭐ 사이드바 -->
+  <div id="sidebar" data-active="inquiry"></div>
 
-    <!-- 이름 -->
-    <div class="field-box">
+  <!-- ⭐ 메인 -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <h2>문의 상세</h2>
+      <div>
+        <button class="btn btn-primary" onclick="location.href='../index.html'">홈으로</button>
+        <button id="logoutBtn" class="btn btn-danger">로그아웃</button>
+      </div>
+    </div>
+
+    <!-- 내용 패널 -->
+    <section class="panel">
+
+      <!-- 이름 -->
       <div class="field-title">이름</div>
-      <div id="nameText"></div>
-    </div>
+      <div id="nameText" style="margin-bottom:20px;"></div>
 
-    <!-- 이메일 -->
-    <div class="field-box">
+      <!-- 이메일 -->
       <div class="field-title">이메일</div>
-      <div id="emailText"></div>
-    </div>
+      <div id="emailText" style="margin-bottom:20px;"></div>
 
-    <!-- 제목 -->
-    <div class="field-box">
+      <!-- 제목 -->
       <div class="field-title">제목</div>
-      <div id="subjectText"></div>
-    </div>
+      <div id="subjectText" style="margin-bottom:20px;"></div>
 
-    <!-- 문의 내용 (Quill read-only) -->
-    <div class="field-box">
+      <!-- 문의 내용 -->
       <div class="field-title">문의 내용</div>
-      <div id="contentBox"></div>
-    </div>
+      <div id="contentBox" style="background:#fff; min-height:150px; margin-bottom:20px;"></div>
 
-    <!-- 상태 -->
-    <div class="field-box">
+      <!-- 상태 -->
       <div class="field-title">상태</div>
       <span id="statusChip"></span>
-      <button id="statusBtn" class="btn">확인 처리</button>
-    </div>
+      <button id="statusBtn" class="btn" style="margin-left:10px;">확인 처리</button>
 
-    <!-- 관리자 메모 -->
-    <div class="field-box">
+      <hr style="margin:25px 0; border:none; border-top:1px solid #eee;">
+
+      <!-- 관리자 메모 -->
       <div class="field-title">관리자 메모</div>
       <textarea id="adminNote"></textarea>
-      <button id="saveNoteBtn" class="btn">메모 저장</button>
-    </div>
+      <button id="saveNoteBtn" class="btn" style="margin-top:10px;">메모 저장</button>
+
+    </section>
+
   </div>
 
-  <script src="./js/sidebar.js"></script>
+  <!-- JS -->
+  <script src="/kr/admin/js/sidebar.js"></script>
+  <script src="/kr/admin/js/common_auth.js"></script>
   <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 
   <script>
+    requireAdminOrEditor();
+    document.getElementById("logoutBtn").addEventListener("click", logout);
+
     const params = new URLSearchParams(location.search);
     const id = params.get("id");
     const role = localStorage.getItem("role");
@@ -151,20 +134,22 @@
     document.addEventListener("DOMContentLoaded", () => {
       loadInquiry();
 
-      // 권한에 따라 기능 숨기기
+      // 권한 별 기능 제한
       if (role === "editor" || role === "viewer") {
         document.getElementById("statusBtn").style.display = "none";
         document.getElementById("adminNote").disabled = true;
-        document.getElementById("saveNoteBtn").disabled = true;
         document.getElementById("saveNoteBtn").classList.add("disabled");
       }
     });
 
-    // ========= 상세 데이터 로드 =========
+    // =========================
+    // 상세 데이터 로드
+    // =========================
     async function loadInquiry() {
       const res = await fetch(`/api/inquiry/view/${id}`, {
         headers: { Authorization: "Bearer " + localStorage.getItem("token") }
       });
+
       inquiryData = await res.json();
 
       document.getElementById("nameText").textContent = inquiryData.name;
@@ -174,18 +159,18 @@
 
       renderStatus();
 
-      // Quill read-only content
+      // Quill read-only
       quill = new Quill("#contentBox", {
         theme: "snow",
-        readOnly: true,
+        readOnly: true
       });
 
       quill.root.innerHTML = inquiryData.message.replace(/\n/g, "<br>");
     }
 
-    // ========= 상태 표시 =========
     function renderStatus() {
       const chip = document.getElementById("statusChip");
+
       if (inquiryData.status === 0) {
         chip.className = "status-chip status-0";
         chip.textContent = "미확인";
@@ -195,28 +180,27 @@
       }
     }
 
-    // ========= 상태 변경 (admin 이상만 가능) =========
+    // 상태 변경
     document.getElementById("statusBtn").onclick = async () => {
       if (role === "editor" || role === "viewer") return;
 
-      const newStatus = 1;
       const res = await fetch(`/api/inquiry/status/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + localStorage.getItem("token")
         },
-        body: JSON.stringify({ status: newStatus })
+        body: JSON.stringify({ status: 1 })
       });
 
       if (res.ok) {
         alert("확인 처리 완료");
-        inquiryData.status = newStatus;
+        inquiryData.status = 1;
         renderStatus();
       }
     };
 
-    // ========= 메모 저장 =========
+    // 메모 저장
     document.getElementById("saveNoteBtn").onclick = async () => {
       if (role === "editor" || role === "viewer") return;
 
@@ -231,10 +215,11 @@
         body: JSON.stringify({ note })
       });
 
-      if (res.ok) {
-        alert("메모 저장 완료");
-      }
+      if (res.ok) alert("메모 저장 완료");
     };
+
   </script>
+
 </body>
+
 </html>
