@@ -24,17 +24,24 @@ const PATH = {
 /* ------------------------------------------------------------
    3) HTML 로더
 ------------------------------------------------------------ */
-async function loadComponent(targetId, url) {
-  try {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(url + " not found");
-    const html = await res.text();
-    const el = document.getElementById(targetId);
-    if (el) el.innerHTML = html;
-  } catch (e) {
-    console.error("Component Load Error:", e);
-  }
+function highlightBreadcrumb() {
+  const path = location.pathname.toLowerCase();
+
+  const lv1 = document.querySelector(".crumb-level1");
+  const lv2 = document.querySelector(".crumb-level2");
+  if (!lv1 || !lv2) return;
+
+  // Level1 (경로 기반)
+  if (path.includes("/company/")) lv1.classList.add("active");
+  if (path.includes("/products/") || path.includes("/product/"))
+    lv1.classList.add("active");
+  if (path.includes("/pr/")) lv1.classList.add("active");
+  if (path.includes("/support/")) lv1.classList.add("active");
+
+  // Level2 (항상 강조)
+  lv2.classList.add("active");
 }
+
 
 /* ------------------------------------------------------------
    4) 상단 메뉴 강조 (메인 메뉴 전용)
@@ -67,27 +74,17 @@ function highlightBreadcrumb() {
   const lv2 = document.querySelector(".crumb-level2");
   if (!lv1 || !lv2) return;
 
-  const t1 = lv1.textContent.trim();
-  const t2 = lv2.textContent.trim();
+  // Level1 (경로 기반)
+  if (path.includes("/company/")) lv1.classList.add("active");
+  if (path.includes("/products/") || path.includes("/product/"))
+    lv1.classList.add("active");
+  if (path.includes("/pr/")) lv1.classList.add("active");
+  if (path.includes("/support/")) lv1.classList.add("active");
 
-  // 레벨1 강조
-  const MAP1 = [
-    { k: "/company/",   t: LANG === "kr" ? "회사소개" : "Company" },
-    { k: "/products/",  t: LANG === "kr" ? "제품소개" : "Products" },
-    { k: "/product/",   t: LANG === "kr" ? "제품소개" : "Products" },
-    { k: "/pr/",        t: LANG === "kr" ? "홍보센터" : "PR Center" },
-    { k: "/support/",   t: LANG === "kr" ? "고객지원" : "Support" },
-  ];
-
-  MAP1.forEach(m => {
-    if (path.includes(m.k) && t1.includes(m.t)) {
-      lv1.classList.add("active");
-    }
-  });
-
-  // 레벨2 강조
+  // Level2 (항상 강조)
   lv2.classList.add("active");
 }
+
 
 /* ------------------------------------------------------------
    6) Side Tabs 표시 + 상세 페이지 Active 처리
@@ -253,15 +250,6 @@ function initAdminBar() {
   const bar = document.createElement("div");
   bar.id = "adminBar";
 
-  bar.innerHTML = `
-    <div class="admin-left"><strong>FINE DEFENSE ADMIN MODE</strong></div>
-    <div class="admin-right">
-      <a href="/${LANG}/index.html" class="admin-btn">홈</a>
-      <a href="/${LANG}/admin/dashboard.html" class="admin-btn">대시보드</a>
-      <a href="#" id="adminLogout" class="admin-btn">로그아웃</a>
-    </div>
-  `;
-
   bar.style.cssText = `
     width:100%;
     height:48px;
@@ -274,15 +262,31 @@ function initAdminBar() {
     position:fixed;
     top:0; left:0;
     z-index:9999;
+    font-size:14px;
   `;
 
   document.body.prepend(bar);
 
-  document.getElementById("adminLogout").addEventListener("click", () => {
-    localStorage.clear();
-    location.href = `/${LANG}/admin/login.html`;
+  // 중요: header 로드가 끝나고 marginTop 적용
+  loadComponent("header", PATH.header, () => {
+    const header = document.querySelector("header.header-inner");
+    if (header) {
+      header.style.marginTop = "48px";
+    }
+  });
+
+  // footer는 기존대로
+  loadComponent("footer", PATH.footer);
+
+  // 로그아웃 버튼 처리
+  bar.addEventListener("click", (e) => {
+    if (e.target.id === "adminLogout") {
+      localStorage.clear();
+      location.href = `/${LANG}/admin/login.html`;
+    }
   });
 }
+
 
 /* ------------------------------------------------------------
    9) DOM 로드 후 초기화
