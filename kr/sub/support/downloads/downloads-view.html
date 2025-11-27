@@ -6,7 +6,11 @@
 
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/sub-banner.css">
-  <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor-viewer.min.css">
+
+  <!-- 🔥 Toast UI Editor 2.x Viewer (안정 버전) -->
+  <link rel="stylesheet" href="https://uicdn.toast.com/tui-editor/latest/tui-editor.min.css">
+  <link rel="stylesheet" href="https://uicdn.toast.com/tui-editor/latest/tui-editor-contents.min.css">
+  <script src="https://uicdn.toast.com/tui-editor/latest/tui-editor-Viewer.min.js"></script>
 
   <style>
     .view-wrap {
@@ -94,7 +98,6 @@
 <div id="footer"></div>
 
 <script src="/js/nav.js"></script>
-<script src="https://uicdn.toast.com/editor/latest/toastui-editor-viewer.min.js"></script>
 
 <script>
   const params = new URLSearchParams(location.search);
@@ -113,14 +116,15 @@
     document.getElementById("info").textContent =
       `${printCategory(data.category)} · ${data.lang.toUpperCase()} · ${new Date(data.created_at).toLocaleDateString()}`;
 
-    // 본문 뷰어
-    new toastui.Editor.factory({
+    /* 🔥 Toast UI Editor 2.x Viewer */
+    new tui.Editor.factory({
       el: document.querySelector('#viewer'),
       viewer: true,
+      height: "auto",
       initialValue: data.content || ""
     });
 
-    // 첨부파일
+    /* 첨부파일 렌더링 */
     if (data.files?.length) {
       document.getElementById("fileWrap").style.display = "block";
 
