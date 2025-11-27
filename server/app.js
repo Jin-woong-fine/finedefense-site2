@@ -26,6 +26,9 @@ import postsNoticeRouter from "./routes/posts_notice.js";
 
 import catalogRouter from "./routes/catalog.js";
 
+import downloadsRouter from "./routes/downloads.js";
+
+
 
 const app = express();
 
@@ -74,6 +77,9 @@ app.use("/api/inquiry", sendInquiryRouter);
 
 
 app.use("/api/catalog", catalogRouter);
+
+app.use("/api/downloads", downloadsRouter);
+
 
 // 🔥 중요! posts_common보다 notice 라우터가 항상 위에 있어야 함
 app.use("/api/posts/notice", postsNoticeRouter);

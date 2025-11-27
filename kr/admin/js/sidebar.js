@@ -29,6 +29,8 @@ window.loadSidebar = function (activeKey) {
     // ⭐ 1:1 문의 관리
     { key: "inquiry", label: "1:1 문의 관리", link: "/kr/admin/inquiry-list.html", roles: ["superadmin", "admin"] },
 
+    { key: "downloads", label: "자료실 관리", link: "/kr/admin/downloads-list.html", roles: ["superadmin", "admin", "editor"] },
+
     { key: "loginlogs", label: "로그인 기록", link: "/kr/admin/login_logs.html", roles: ["superadmin", "admin"] },
   ];
 

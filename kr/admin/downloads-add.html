@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>자료 등록 | 관리자</title>
+  <link rel="stylesheet" href="/kr/admin/css/admin.css">
+
+  <style>
+    .form-box { max-width:600px; background:#fff; margin:30px; padding:30px; border-radius:12px; box-shadow:0 4px 14px rgba(0,0,0,0.08); }
+    input, select { width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; margin-bottom:20px; }
+    .btn-blue { background:#0f2679; color:white; padding:10px 16px; border-radius:6px; cursor:pointer; border:none; }
+  </style>
+</head>
+
+<body>
+
+<div id="sidebar"></div>
+
+<div class="main">
+
+  <div class="topbar">
+    <div class="title">자료 등록</div>
+    <button class="home-btn" onclick="location.href='/kr/admin/index.html'">홈으로</button>
+  </div>
+
+  <div class="form-box">
+
+    <label>언어</label>
+    <select id="lang">
+      <option value="kr">한국어</option>
+      <option value="en">영어</option>
+    </select>
+
+    <label>제목</label>
+    <input type="text" id="title">
+
+    <label>파일 업로드 (PDF, ZIP, 문서 등)</label>
+    <input type="file" id="file">
+
+    <label>정렬 (작을수록 위)</label>
+    <input type="number" id="sort_order" value="9999">
+
+    <button class="btn-blue" onclick="save()">등록</button>
+
+  </div>
+
+</div>
+
+<script src="/kr/admin/js/sidebar.js"></script>
+<script src="/kr/admin/js/common_auth.js"></script>
+
+<script>
+loadSidebar("downloads");
+
+async function save(){
+
+  const file = document.getElementById("file").files[0];
+  if(!file){ alert("파일은 필수입니다."); return; }
+
+  const fd = new FormData();
+  fd.append("title", document.getElementById("title").value);
+  fd.append("lang", document.getElementById("lang").value);
+  fd.append("sort_order", document.getElementById("sort_order").value);
+  fd.append("file", file);
+
+  const res = await fetch("/api/downloads/create", {
+    method:"POST",
+    headers:{ Authorization:"Bearer " + localStorage.getItem("token") },
+    body: fd
+  });
+
+  const out = await res.json();
+
+  if(res.ok){
+    alert("등록 완료!");
+    location.href="/kr/admin/downloads-list.html";
+  } else {
+    alert(out.message);
+  }
+}
+</script>
+
+</body>
+</html>

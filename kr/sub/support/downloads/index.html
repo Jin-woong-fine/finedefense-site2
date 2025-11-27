@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>자료실 | Fine Defense</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/sub-banner.css">
+
+  <style>
+    .downloads-container {
+      max-width: 1000px;
+      margin: 60px auto 100px;
+      padding: 0 20px;
+    }
+    
+    .search-box {
+      display:flex;
+      gap:10px;
+      margin-bottom:20px;
+    }
+    #searchInput {
+      padding:10px;
+      border:1px solid #ccc;
+      border-radius:6px;
+      flex:1;
+    }
+    .search-btn {
+      padding:10px 16px;
+      background:#0f2679;
+      color:white;
+      border:none;
+      border-radius:6px;
+      cursor:pointer;
+    }
+
+    table {
+      width:100%;
+      border-collapse:collapse;
+      margin-top:20px;
+    }
+    th,td {
+      padding:14px 10px;
+      border-bottom:1px solid #ddd;
+      font-size:0.95rem;
+    }
+    th {
+      background:#eef1f7;
+      text-align:left;
+      font-weight:600;
+    }
+    .title-cell {
+      color:#0f2679;
+      cursor:pointer;
+      font-weight:600;
+    }
+    .size {
+      color:#666;
+      font-size:0.85rem;
+    }
+    .date {
+      color:#888;
+      font-size:0.85rem;
+    }
+    .download-btn {
+      padding:6px 12px;
+      background:#0f2679;
+      color:#fff;
+      border-radius:6px;
+      text-decoration:none;
+      font-size:0.9rem;
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="header"></div>
+
+<section class="sub-banner">
+  <img src="/img/sub-banners/pr-5.jpg" alt="자료실">
+  <div class="banner-text">
+    <h1>자료실</h1>
+    <p>각종 문서 및 다운로드 자료를 제공합니다.</p>
+  </div>
+</section>
+
+<div class="breadcrumb">
+  <a href="/kr/index.html">홈</a> &gt;
+  <span class="crumb crumb-level1">홍보센터</span> &gt;
+  <span class="crumb crumb-level2">자료실</span>
+  <div id="side-tabs"></div>
+</div>
+
+<div class="downloads-container">
+
+  <!-- 검색 -->
+  <div class="search-box">
+    <input id="searchInput" placeholder="검색(제목)">
+    <button class="search-btn" onclick="loadList()">검색</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:55%">제목</th>
+        <th style="width:15%">파일 크기</th>
+        <th style="width:15%">등록일</th>
+        <th style="width:15%">다운로드</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+
+</div>
+
+<div id="footer"></div>
+
+<script src="/js/nav.js"></script>
+
+<script>
+loadList();
+
+function formatSize(bytes){
+  if(!bytes) return "-";
+  if(bytes < 1024) return bytes + " B";
+  if(bytes < 1024*1024) return (bytes/1024).toFixed(1)+" KB";
+  return (bytes/1024/1024).toFixed(1)+" MB";
+}
+
+async function loadList(){
+  const q = document.getElementById("searchInput").value;
+
+  const res = await fetch(`/api/downloads/list?search=${encodeURIComponent(q)}`);
+  const data = await res.json();
+
+  document.getElementById("tbody").innerHTML =
+    data.map(i => `
+      <tr>
+        <td class="title-cell" onclick="download('${i.file_url}')">${i.title}</td>
+        <td class="size">${formatSize(i.file_size)}</td>
+        <td class="date">${new Date(i.created_at).toLocaleDateString()}</td>
+        <td>
+          <a class="download-btn" href="${i.file_url}" download>다운로드</a>
+        </td>
+      </tr>
+    `).join("");
+}
+
+function download(url){
+  if(!url) return;
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "";
+  a.click();
+}
+</script>
+
+</body>
+</html>

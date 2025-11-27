@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>자료 수정 | 관리자</title>
+  <link rel="stylesheet" href="/kr/admin/css/admin.css">
+
+  <style>
+    .form-box { max-width:600px; background:#fff; margin:30px; padding:30px; border-radius:12px; box-shadow:0 4px 14px rgba(0,0,0,0.08); }
+    input, select { width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; margin-bottom:20px; }
+    .btn-blue { background:#0f2679; color:white; padding:10px 16px; border-radius:6px; cursor:pointer; border:none; }
+    .file-info { margin-bottom:10px; font-size:0.9rem; color:#555; }
+  </style>
+</head>
+
+<body>
+
+<div id="sidebar"></div>
+
+<div class="main">
+
+  <div class="topbar">
+    <div class="title">자료 수정</div>
+    <button class="home-btn" onclick="location.href='/kr/admin/index.html'">홈으로</button>
+  </div>
+
+  <div class="form-box">
+
+    <div class="file-info">
+      현재 파일: <a id="currentFile" href="#" target="_blank">보기</a>
+    </div>
+
+    <label>언어</label>
+    <select id="lang"></select>
+
+    <label>제목</label>
+    <input type="text" id="title">
+
+    <label>새 파일 업로드 (선택)</label>
+    <input type="file" id="file">
+
+    <label>정렬</label>
+    <input type="number" id="sort_order">
+
+    <button class="btn-blue" onclick="save()">수정 완료</button>
+
+  </div>
+
+</div>
+
+<script src="/kr/admin/js/sidebar.js"></script>
+<script src="/kr/admin/js/common_auth.js"></script>
+
+<script>
+loadSidebar("downloads");
+
+const params = new URLSearchParams(location.search);
+const id = params.get("id");
+
+loadDetail();
+async function loadDetail(){
+  const res = await fetch(`/api/downloads/detail/${id}`);
+  const data = await res.json();
+
+  document.getElementById("title").value = data.title;
+  document.getElementById("sort_order").value = data.sort_order;
+  document.getElementById("lang").innerHTML = `
+      <option value="kr" ${data.lang==='kr'?'selected':''}>한국어</option>
+      <option value="en" ${data.lang==='en'?'selected':''}>영어</option>
+  `;
+  document.getElementById("currentFile").href = data.file_url;
+}
+
+async function save(){
+  const fd = new FormData();
+  fd.append("title", document.getElementById("title").value);
+  fd.append("lang", document.getElementById("lang").value);
+  fd.append("sort_order", document.getElementById("sort_order").value);
+
+  if(document.getElementById("file").files[0]){
+    fd.append("file", document.getElementById("file").files[0]);
+  }
+
+  const res = await fetch(`/api/downloads/update/${id}`, {
+    method:"PUT",
+    headers:{ Authorization:"Bearer " + localStorage.getItem("token") },
+    body: fd
+  });
+
+  const out = await res.json();
+  if(res.ok){
+    alert("수정 완료!");
+    location.href="/kr/admin/downloads-list.html";
+  } else {
+    alert(out.message);
+  }
+}
+</script>
+
+</body>
+</html>
