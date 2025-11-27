@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>1:1 문의 | Fine Defense</title>
+  <link rel="stylesheet" href="/css/style.css">
+
+  <style>
+    body {
+      background: #f4f6fb;
+      font-family: 'Noto Sans KR', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .inquiry-wrapper {
+      max-width: 720px;
+      margin: 80px auto;
+      background: #fff;
+      padding: 50px 60px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+
+    .inquiry-title {
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: #0f2679;
+    }
+
+    .inquiry-desc {
+      font-size: 15px;
+      color: #666;
+      margin-bottom: 40px;
+    }
+
+    .form-group {
+      position: relative;
+      margin-bottom: 32px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 20px 16px 8px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 16px;
+      background: #fafafa;
+      transition: all 0.2s ease;
+      outline: none;
+      resize: none;
+    }
+
+    .form-group textarea {
+      height: 150px;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      background: #fff;
+      border-color: #0f2679;
+      box-shadow: 0 0 0 3px rgba(15,38,121,0.1);
+    }
+
+    .form-group label {
+      position: absolute;
+      left: 16px;
+      top: 16px;
+      font-size: 15px;
+      color: #888;
+      pointer-events: none;
+      transition: all 0.18s ease;
+    }
+
+    /* floating label */
+    .form-group input:focus + label,
+    .form-group input:not(:placeholder-shown) + label,
+    .form-group textarea:focus + label,
+    .form-group textarea:not(:placeholder-shown) + label {
+      top: 6px;
+      font-size: 11px;
+      color: #0f2679;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 16px;
+      background: #0f2679;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 17px;
+      font-weight: 600;
+      transition: background 0.25s;
+    }
+
+    .btn-submit:hover {
+      background: #0c1f63;
+    }
+
+    @media (max-width: 640px) {
+      .inquiry-wrapper {
+        margin: 40px 16px;
+        padding: 40px 30px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="inquiry-wrapper">
+  <div class="inquiry-title">1:1 문의</div>
+  <div class="inquiry-desc">제품 문의, 기술 문의, 협력 문의 등 어떤 내용이든 편하게 작성해주세요.</div>
+
+  <div class="form-group">
+    <input id="name" type="text" placeholder=" " autocomplete="off">
+    <label for="name">이름</label>
+  </div>
+
+  <div class="form-group">
+    <input id="email" type="email" placeholder=" " autocomplete="off">
+    <label for="email">이메일</label>
+  </div>
+
+  <div class="form-group">
+    <input id="subject" type="text" placeholder=" " autocomplete="off">
+    <label for="subject">제목</label>
+  </div>
+
+  <div class="form-group">
+    <textarea id="message" placeholder=" "></textarea>
+    <label for="message">문의 내용</label>
+  </div>
+
+  <button class="btn-submit" onclick="sendInquiry()">문의 보내기</button>
+</div>
+
+<script>
+  async function sendInquiry() {
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const subject = document.getElementById("subject").value.trim();
+    const message = document.getElementById("message").value.trim();
+
+    if (!name || !email || !message) {
+      alert("필수 항목을 입력해주세요.");
+      return;
+    }
+
+    const res = await fetch("/api/inquiry/send", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, subject, message }),
+    });
+
+    const out = await res.json();
+
+    if (res.ok) {
+      alert("문의가 정상적으로 접수되었습니다.\n빠르게 확인 후 답변드리겠습니다.");
+      location.reload();
+    } else {
+      alert("오류 발생: " + out.message);
+    }
+  }
+</script>
+
+</body>
+</html>

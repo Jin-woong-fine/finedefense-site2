@@ -1,100 +1,74 @@
+// server/routes/sendInquiry.js
 import express from "express";
-import multer from "multer";
-import AWS from "aws-sdk";
-import fs from "fs";
-import path from "path";
+import nodemailer from "nodemailer";
 
 const router = express.Router();
 
-// ✅ 저장 경로 + 원본 파일명 유지
-const storage = multer.diskStorage({
-  destination: "uploads/inquiry_attachments/",
-  filename: (req, file, cb) => {
-    const timestamp = Date.now();
-    const safeName = file.originalname.replace(/[^\w.-]/g, "_");
-    cb(null, `${timestamp}_${safeName}`);
+// ============================
+// 📌 하이웍스 SMTP 설정
+// ============================
+const transporter = nodemailer.createTransport({
+  host: "smtp.hiworks.com",
+  port: 465,
+  secure: true,
+  auth: {
+    user: "inquiry@fine-defense.com", // 문의용 메일 계정
+    pass: "YOUR_PASSWORD"             // 하이웍스 SMTP 비밀번호
   }
 });
-const upload = multer({ storage });
 
-// ✅ AWS SES 설정
-AWS.config.update({ region: "ap-northeast-2" });
-const ses = new AWS.SES();
-
-// ✅ 문의 접수 API
-router.post("/sendInquiry", upload.single("file"), async (req, res) => {
+// ============================
+// 📌 POST /api/inquiry/send
+// ============================
+router.post("/send", async (req, res) => {
   try {
-    const { name, email, subject, category, message } = req.body;
-    const file = req.file;
+    const { name, email, subject, message } = req.body;
 
-    // ✅ 첨부파일 MIME 처리
-    let attachmentPart = "";
-    if (file) {
-      const fileData = fs.readFileSync(file.path).toString("base64");
-      const contentType = file.mimetype;
-
-      attachmentPart = `
---NextPart
-Content-Type: ${contentType}; name="${file.originalname}"
-Content-Disposition: attachment; filename="${file.originalname}"
-Content-Transfer-Encoding: base64
-
-${fileData}
-`;
+    if (!name || !email || !message) {
+      return res.status(400).json({ message: "필수 값 누락" });
     }
 
-    // ✅ 메일 본문
-    const emailBody = `
-이름: ${name}<br>
-이메일: ${email}<br>
-문의유형: ${category}<br><br>
-<strong>문의내용:</strong><br>
-${message.replace(/\n/g, "<br>")}
-`;
+    // ===========================================
+    // 🔵 1) 회사 메일로 문의 내용 보내기
+    // ===========================================
+    await transporter.sendMail({
+      from: `"Fine Defense Inquiry" <inquiry@fine-defense.com>`,
+      to: "inquiry@fine-defense.com",
+      subject: subject || "새로운 1:1 문의",
+      html: `
+        <h3>새로운 1:1 문의 접수</h3>
+        <p><b>이름:</b> ${name}</p>
+        <p><b>이메일:</b> ${email}</p>
+        <p><b>제목:</b> ${subject}</p>
+        <p><b>내용:</b><br>${message.replace(/\n/g, "<br>")}</p>
+        <hr>
+        <p style="color:#888;font-size:12px;">Fine Defense 문의 시스템 자동 발송</p>
+      `
+    });
 
-    const rawMail = [
-      "From: 화인디펜스 문의센터 <no-reply@finedefense.co.kr>",
-      "To: inquiry@finedefense.co.kr",
-      `Subject: [문의접수] ${subject}`,
-      "MIME-Version: 1.0",
-      "Content-Type: multipart/mixed; boundary=\"NextPart\"",
-      "",
-      "--NextPart",
-      "Content-Type: text/html; charset=UTF-8",
-      "",
-      emailBody,
-      attachmentPart,
-      "--NextPart--",
-    ].join("\r\n");
+    // ===========================================
+    // 🔵 2) 문의자에게 자동 안내 메일 보내기
+    // ===========================================
+    await transporter.sendMail({
+      from: `"Fine Defense" <inquiry@fine-defense.com>`,
+      to: email,
+      subject: "[Fine Defense] 문의가 접수되었습니다",
+      html: `
+        <p>${name}님,</p>
+        <p>문의해주셔서 감사합니다.</p>
+        <p>담당자가 확인 후 빠르게 회신 드리겠습니다.</p>
+        <br>
+        <p style="color:#888;font-size:12px;">이 메일은 자동 발송되었습니다.</p>
+      `
+    });
 
-    // ✅ AWS SES 발송
-    await ses.sendRawEmail({ RawMessage: { Data: Buffer.from(rawMail) } }).promise();
+    return res.json({ success: true });
 
-    // ✅ 문의 내역 JSON 저장
-    const DATA_FILE = path.join("data", "inquiries.json");
-    const entry = {
-      id: Date.now(),
-      name,
-      email,
-      subject,
-      category,
-      message,
-      file: file ? file.originalname : null,        // 원본명
-      savedName: file ? path.basename(file.path) : null, // 실제 서버 파일명
-      date: new Date().toISOString().slice(0, 10),
-    };
-
-    let data = [];
-    if (fs.existsSync(DATA_FILE)) {
-      data = JSON.parse(fs.readFileSync(DATA_FILE, "utf8"));
-    }
-    data.unshift(entry);
-    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
-
-    res.json({ success: true });
   } catch (err) {
-    console.error("❌ 문의 전송 오류:", err);
-    res.status(500).json({ success: false });
+    console.error("[Inquiry Error] ", err);
+    return res.status(500).json({
+      message: "문의 전송 중 오류가 발생했습니다."
+    });
   }
 });
 

@@ -22,6 +22,8 @@ import postsNewsRouter from "./routes/posts_news.js";
 import postsGalleryRouter from "./routes/posts_gallery.js";  // 갤러리 전용
 import postsCertificationRouter from "./routes/posts_certification.js";
 
+import sendInquiryRouter from "./routes/sendInquiry.js";
+import inquiryRouter from "./routes/inquiry.js";
 
 
 
@@ -97,6 +99,14 @@ app.use("/api/users/me", userProfileRouter);
 
 // 사용자 관리
 app.use("/api/users", usersRouter);
+
+// 사용자 문의 보내기
+app.use("/api/inquiry", sendInquiryRouter);
+
+// 관리자 문의 관리
+app.use("/api/inquiry", inquiryRouter);
+
+
 
 // ============================
 // 📌 프론트엔드 정적 제공 — 마지막
