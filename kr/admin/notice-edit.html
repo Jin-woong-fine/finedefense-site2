@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8" />
   <title>공지사항 수정 | Fine Defense 관리자</title>
@@ -8,8 +9,8 @@
   <!-- Toast UI Editor -->
   <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
 
-  <!-- 공통 관리자 CSS -->
-  <link rel="stylesheet" href="./css/admin.css">
+  <!-- 공통 관리자 CSS (절대 경로 FIX) -->
+  <link rel="stylesheet" href="/kr/admin/css/admin.css">
 
   <style>
     .file-item {
@@ -45,257 +46,194 @@
 
 <body>
 
-<div id="sidebar" data-active="notice"></div>
+  <!-- 사이드바 -->
+  <div id="sidebar" data-active="notice"></div>
 
-<div class="main">
+  <!-- 메인 -->
+  <div class="main">
 
-  <div class="topbar">
-    <h2>공지사항 수정</h2>
-    <div>
-      <button class="btn btn-primary" onclick="location.href='./notice-list.html'">목록으로</button>
-      <button id="logoutBtn" class="btn btn-danger">로그아웃</button>
+    <div class="topbar">
+      <h2>공지사항 수정</h2>
+      <div>
+        <button class="btn btn-primary" onclick="location.href='./notice-list.html'">목록으로</button>
+        <button id="logoutBtn" class="btn btn-danger">로그아웃</button>
+      </div>
     </div>
+
+    <form id="noticeForm" enctype="multipart/form-data">
+
+      <!-- 공지 정보 -->
+      <section class="panel">
+        <h2>공지 정보 수정</h2>
+
+        <input id="title" class="input" placeholder="공지 제목" />
+
+        <select id="lang" class="input">
+          <option value="kr">한국어</option>
+          <option value="en">English</option>
+        </select>
+
+        <input id="sort_order" class="input" type="number" placeholder="정렬 순번" min="1" />
+
+        <div class="help-text">
+          * 상단 고정 = 낮은 숫자 (예: 1,2,3)  
+          * 미입력 시 기본값: 9999
+        </div>
+
+        <h3 style="margin-top:20px;">공지 내용</h3>
+        <div id="editor" style="border:1px solid #ccc;border-radius:6px;"></div>
+      </section>
+
+      <!-- 첨부파일 -->
+      <section class="panel">
+
+        <h3>기존 첨부파일</h3>
+        <div id="oldFiles"></div>
+
+        <h3 style="margin-top:20px;">새 첨부파일 추가</h3>
+        <input type="file" id="newFiles" name="files" multiple class="input">
+        <div id="newFilePreview" class="file-list"></div>
+
+        <button type="submit" class="btn btn-primary" style="margin-top:15px;">
+          수정 완료
+        </button>
+
+      </section>
+
+    </form>
   </div>
 
-  <form id="noticeForm" enctype="multipart/form-data">
+  <!-- JS -->
+  <script src="/kr/admin/js/common_auth.js"></script>
+  <script src="/kr/admin/js/sidebar.js"></script>
+  <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 
-    <!-- 📌 공지 정보 -->
-    <section class="panel">
-      <h2>공지 정보 수정</h2>
+  <script>
+    let editor;
+    let noticeId;
+    let oldFileList = [];
+    let removeOldFiles = [];
 
-      <input id="title" class="input" placeholder="공지 제목" />
+    /* 초기 실행 */
+    document.addEventListener("DOMContentLoaded", () => {
+      requireAdminOrEditor();
+      document.getElementById("logoutBtn").addEventListener("click", logout);
 
-      <select id="lang" class="input">
-        <option value="kr">한국어</option>
-        <option value="en">English</option>
-      </select>
+      loadSidebar("notice");  // ⭐ 사이드바 정상 출력
 
-      <!-- 🔢 정렬 순번 -->
-      <input
-        id="sort_order"
-        class="input"
-        type="number"
-        placeholder="정렬 순번 (숫자가 작을수록 상단에 노출)"
-        min="1"
-      />
-      <div class="help-text">
-        * 메인 공지처럼 위에 고정하고 싶은 글은 작은 숫자(예: 1, 2, 3)를 사용하세요. 미설정 시 기본값 9999.
-      </div>
+      const params = new URLSearchParams(location.search);
+      noticeId = params.get("id");
 
-      <h3 style="margin-top:20px;">공지 내용</h3>
-      <div id="editor" style="border:1px solid #ccc;border-radius:6px;"></div>
-    </section>
+      if (!noticeId) {
+        alert("잘못된 접근입니다.");
+        location.href = "./notice-list.html";
+      }
 
-    <!-- 📁 첨부파일 -->
-    <section class="panel">
-      <h3>기존 첨부파일</h3>
-      <div id="oldFiles"></div>
-      <div class="help-text">
-        * 체크한 파일만 삭제됩니다. 삭제하지 않은 첨부파일은 그대로 유지됩니다.
-      </div>
+      loadNotice();
+    });
 
-      <h3 style="margin-top:20px;">새 첨부파일 추가</h3>
-      <input type="file" id="newFiles" name="files" multiple class="input">
-      <div id="newFilePreview" class="file-list"></div>
-
-      <button type="submit" class="btn btn-primary" style="margin-top:15px;">
-        수정 완료
-      </button>
-    </section>
-
-  </form>
-</div>
-
-<!-- 공통 JS -->
-<script src="/kr/admin/js/common_auth.js"></script>
-<script src="/kr/admin/js/sidebar.js"></script>
-
-<!-- Toast UI -->
-<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
-
-<script>
-  let editor;
-  let noticeId;
-  let oldFileList = [];    // 기존 파일 목록 [{id, file_path, original_name}, ... 예상]
-  let removeOldFiles = []; // 삭제할 파일 경로(or id) 목록
-
-  /* ===========================================================
-      🔐 권한 + 초기 설정
-  ============================================================ */
-  (function () {
-    requireAdminOrEditor();
-    document.getElementById("logoutBtn").addEventListener("click", logout);
-
-    const urlParams = new URLSearchParams(location.search);
-    noticeId = urlParams.get("id");
-    if (!noticeId) {
-      alert("잘못된 접근입니다.");
-      location.href = "./notice-list.html";
-      return;
+    function initEditor(content) {
+      editor = new toastui.Editor({
+        el: document.querySelector('#editor'),
+        height: '500px',
+        initialEditType: 'wysiwyg',
+        previewStyle: 'vertical',
+        initialValue: content,
+        hideModeSwitch: true,
+        toolbarItems: [
+          ['heading', 'bold', 'italic', 'strike'],
+          ['hr', 'quote'],
+          ['ul', 'ol'],
+          ['table', 'link']
+        ]
+      });
     }
 
-    loadNotice();
-  })();
-
-
-  /* ===========================================================
-      ✏️ Toast UI Editor 초기화
-  ============================================================ */
-  function initEditor(content) {
-    editor = new toastui.Editor({
-      el: document.querySelector('#editor'),
-      height: '500px',
-      initialEditType: 'wysiwyg',
-      previewStyle: 'vertical',
-      initialValue: content || "",
-      hideModeSwitch: true,
-      toolbarItems: [
-        ['heading', 'bold', 'italic', 'strike'],
-        ['hr', 'quote'],
-        ['ul', 'ol'],
-        ['table', 'link']
-        // 이미지 업로드는 사용 안 하므로 image 버튼 제거
-      ]
-    });
-  }
-
-
-  /* ===========================================================
-      📌 기존 데이터 로딩
-  ============================================================ */
-  async function loadNotice() {
-    try {
+    /* 공지 불러오기 */
+    async function loadNotice() {
       const res = await fetch(`/api/posts/detail/${noticeId}`);
-      if (!res.ok) throw new Error("공지 상세 불러오기 실패");
-
       const data = await res.json();
 
-      document.getElementById("title").value = data.title || "";
-      document.getElementById("lang").value  = data.lang || "kr";
-      document.getElementById("sort_order").value =
-        (data.sort_order !== null && data.sort_order !== undefined)
-          ? data.sort_order
-          : "";
+      document.getElementById("title").value = data.title;
+      document.getElementById("lang").value = data.lang;
+      document.getElementById("sort_order").value = data.sort_order ?? "";
 
-      initEditor(data.content || "");
+      initEditor(data.content);
 
-      // 기존 첨부파일
       oldFileList = Array.isArray(data.files) ? data.files : [];
       renderOldFiles();
-
-    } catch (e) {
-      console.error(e);
-      alert("공지사항 정보를 불러올 수 없습니다.");
-      location.href = "./notice-list.html";
-    }
-  }
-
-
-  /* ===========================================================
-      📁 기존 첨부파일 UI 렌더링
-  ============================================================ */
-  function renderOldFiles() {
-    const wrap = document.getElementById("oldFiles");
-
-    if (!oldFileList.length) {
-      wrap.innerHTML = "<div style='color:#777;'>첨부파일 없음</div>";
-      return;
     }
 
-    wrap.innerHTML = oldFileList.map((f, i) => `
-      <div class="file-item">
-        <a href="${f.file_path}" target="_blank">${f.original_name}</a>
-        <button type="button" class="remove-old-btn" onclick="markFileForDelete(${i})">삭제</button>
-      </div>
-    `).join("");
-  }
+    function renderOldFiles() {
+      const wrap = document.getElementById("oldFiles");
 
-  // 🔥 삭제할 파일 표시 (화면에서 제거 + 삭제목록에 추가)
-  function markFileForDelete(index) {
-    const file = oldFileList[index];
-    if (!file) return;
+      if (!oldFileList.length) {
+        wrap.innerHTML = "<div style='color:#777;'>첨부파일 없음</div>";
+        return;
+      }
 
-    // 여기서는 file_path 기준으로 삭제 목록을 서버에 전달
-    removeOldFiles.push(file.file_path);
-
-    // 화면에서 제거
-    oldFileList.splice(index, 1);
-    renderOldFiles();
-  }
-
-
-  /* ===========================================================
-      📎 새 파일 미리보기
-  ============================================================ */
-  const newFilesInput = document.getElementById("newFiles");
-  const newPreview = document.getElementById("newFilePreview");
-
-  newFilesInput.addEventListener("change", (e) => {
-    const files = [...e.target.files];
-    if (!files.length) {
-      newPreview.innerHTML = "";
-      return;
+      wrap.innerHTML = oldFileList
+        .map((f, i) => `
+        <div class="file-item">
+          <a href="${f.file_path}" target="_blank">${f.original_name}</a>
+          <button class="remove-old-btn" onclick="markFileForDelete(${i})">삭제</button>
+        </div>
+      `)
+        .join("");
     }
 
-    newPreview.innerHTML = files
-      .map(f => `<div class="file-item">${f.name}</div>`)
-      .join("");
-  });
+    function markFileForDelete(index) {
+      const file = oldFileList[index];
+      removeOldFiles.push(file.file_path);
 
+      oldFileList.splice(index, 1);
+      renderOldFiles();
+    }
 
-  /* ===========================================================
-      🚀 공지 수정 요청
-  ============================================================ */
-  document.getElementById("noticeForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
+    /* 새 파일 미리보기 */
+    document.getElementById("newFiles").addEventListener("change", (e) => {
+      const files = [...e.target.files];
+      const area = document.getElementById("newFilePreview");
 
-    const title = document.getElementById("title").value.trim();
-    const lang = document.getElementById("lang").value;
-    const sortOrderRaw = document.getElementById("sort_order").value;
-    const sortOrder = sortOrderRaw === "" ? 9999 : Number(sortOrderRaw);
-    const content = editor.getHTML();
-    const newFiles = document.getElementById("newFiles").files;
+      area.innerHTML = files.map(f => `<div class="file-item">${f.name}</div>`).join("");
+    });
 
-    if (!title) return alert("제목을 입력하세요.");
-    if (!content) return alert("내용을 입력하세요.");
+    /* 수정 요청 */
+    document.getElementById("noticeForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
 
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("content", content);
-    formData.append("lang", lang);
-    formData.append("sort_order", isNaN(sortOrder) ? 9999 : sortOrder);
+      const formData = new FormData();
+      formData.append("title", document.getElementById("title").value);
+      formData.append("content", editor.getHTML());
+      formData.append("lang", document.getElementById("lang").value);
 
-    // 🗑 삭제할 기존 파일 목록 (JSON 문자열로 전송)
-    formData.append("removeFiles", JSON.stringify(removeOldFiles));
+      const sort = document.getElementById("sort_order").value || 9999;
+      formData.append("sort_order", sort);
 
-    // 🆕 새 파일 추가
-    [...newFiles].forEach(f => formData.append("files", f));
+      formData.append("removeFiles", JSON.stringify(removeOldFiles));
 
-    const token = localStorage.getItem("token");
+      const newFiles = document.getElementById("newFiles").files;
+      [...newFiles].forEach(f => formData.append("files", f));
 
-    try {
+      const token = localStorage.getItem("token");
+
       const res = await fetch(`/api/posts/notice/update/${noticeId}`, {
         method: "PUT",
         headers: { Authorization: `Bearer ${token}` },
         body: formData
       });
 
-      const result = await res.json();
+      const out = await res.json();
 
       if (res.ok) {
         alert("공지사항이 수정되었습니다.");
         location.href = "./notice-list.html";
       } else {
-        console.error(result);
-        alert("수정 실패: " + (result.message || "알 수 없는 오류"));
+        alert("수정 실패: " + (out.message || "알 수 없는 오류"));
       }
-    } catch (err) {
-      console.error(err);
-      alert("수정 중 오류가 발생했습니다.");
-    }
-  });
-
-</script>
+    });
+  </script>
 
 </body>
+
 </html>
