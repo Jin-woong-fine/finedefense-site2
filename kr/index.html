@@ -448,9 +448,9 @@ async function loadLatestPosts() {
 
       let imgURL;
       if (item.category === "notice") {
-        imgURL = "/img/default-notice.png";   // 공지는 무조건 이거!
+        imgURL = "/img/default-notice.jpg";   // 공지는 무조건 이거!
       } else {
-        imgURL = item.main_image || "/img/default-news.png";
+        imgURL = item.main_image || "/img/default-news.jpg";
       }
 
       const dateStr = new Date(item.created_at).toLocaleDateString("ko-KR");
