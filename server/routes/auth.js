@@ -93,6 +93,36 @@ router.post("/login", async (req, res) => {
   }
 });
 
+
+/* ============================================================
+   🔄 세션 연장(refresh)
+============================================================ */
+router.post("/refresh", verifyToken, (req, res) => {
+  const user = req.user; // verifyToken이 넣어줌
+
+  const token = jwt.sign(
+    {
+      id: user.id,
+      role: user.role,
+      name: user.name
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: "2h" }
+  );
+
+  const decoded = jwt.decode(token);
+
+  res.json({
+    message: "session refreshed",
+    token,
+    exp: decoded.exp
+  });
+});
+
+
+
+
+
 /* ============================================================
    👑 사용자 생성 (superadmin 전용)
 ============================================================ */
