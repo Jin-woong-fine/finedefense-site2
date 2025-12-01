@@ -1,6 +1,6 @@
 /****************************************************
- * 🔐 공통 인증 및 권한 관리 — Fine Defense Admin
- * (2025 안정화 버전)
+ * 🔐 Fine Defense Admin — Common Auth
+ * 2025 안정화 버전 (세션관리 + 권한검사 통합)
  ****************************************************/
 console.log("%c[auth] common_auth.js 로드됨", "color:#ff9800;font-weight:bold;");
 
@@ -12,7 +12,8 @@ function getUser() {
     token: localStorage.getItem("token"),
     role: localStorage.getItem("role"),
     name: localStorage.getItem("name"),
-    id: localStorage.getItem("user_id")
+    id: localStorage.getItem("user_id"),
+    exp: localStorage.getItem("exp")
   };
 }
 
@@ -22,10 +23,10 @@ function authHeaders() {
 }
 
 /****************************************************
- * 2) 로그인/권한 체크 함수
+ * 2) 권한 체크 함수
  ****************************************************/
 
-// 🔹 로그인 여부만 검사
+// 로그인 여부만 검사
 function requireLogin() {
   const { token } = getUser();
   console.log("[auth] requireLogin 실행됨:", !!token);
@@ -36,10 +37,10 @@ function requireLogin() {
   }
 }
 
-// 🔹 모든 로그인 사용자 허용 (viewer ~ superadmin)
+// 로그인 사용자(viewer 이상) 모두 허용
 function requireAnyUser() {
   const { role } = getUser();
-  console.log("[auth] requireAnyUser 실행됨, role:", role);
+  console.log("[auth] requireAnyUser 실행됨:", role);
 
   if (!role) {
     alert("로그인이 필요합니다.");
@@ -47,8 +48,7 @@ function requireAnyUser() {
   }
 }
 
-// 🔹 editor 이상(뉴스관리, 제품관리 등)
-// superadmin / admin / editor 허용
+// editor 이상 허용
 function requireAdminOrEditor() {
   const { role } = getUser();
   console.log("[auth] requireAdminOrEditor 실행됨:", role);
@@ -59,20 +59,19 @@ function requireAdminOrEditor() {
   location.href = "/kr/admin/login.html";
 }
 
-// 🔹 admin 이상(사용자 관리, 민감한 시스템)
+// admin 이상 페이지 목록
 const ADMIN_ONLY_PATHS = [
   "/kr/admin/users.html",
   "/kr/admin/login-logs.html",
-  // 향후 관리자 전용 페이지 추가 시 여기에 push
 ];
 
+// admin 이상
 function requireAdminOrSuperadmin() {
   const { role } = getUser();
   const path = location.pathname;
 
   console.log("[auth] requireAdminOrSuperadmin 실행됨:", role, " path:", path);
 
-  // 이 페이지가 admin 검사 대상인지 확인
   if (!ADMIN_ONLY_PATHS.includes(path)) {
     console.log("[auth] → 이 페이지는 관리자 전용 페이지가 아님 (검사 건너뜀)");
     return;
@@ -84,7 +83,7 @@ function requireAdminOrSuperadmin() {
   location.href = "/kr/admin/login.html";
 }
 
-// 🔹 superadmin만 허용
+// superadmin 전용
 function requireSuperadminStrict() {
   const { role } = getUser();
   console.log("[auth] requireSuperadminStrict 실행됨:", role);
@@ -105,7 +104,85 @@ function logout() {
 }
 
 /****************************************************
- * 4) 공통 UI 초기화
+ * 4) 세션 만료 감시 + 세션 연장 + 남은 시간 표시
+ ****************************************************/
+
+// 🔥 세션 연장 요청
+async function extendSession() {
+  const res = await fetch("/api/auth/refresh", {
+    method: "POST",
+    headers: authHeaders()
+  });
+
+  if (!res.ok) {
+    alert("세션 연장 실패. 다시 로그인해주세요.");
+    logout();
+    return;
+  }
+
+  const out = await res.json();
+  localStorage.setItem("token", out.token);
+  localStorage.setItem("exp", out.exp * 1000);
+
+  alert("세션이 연장되었습니다!");
+  window.sessionAlertShown = false;
+}
+
+// ⏰ 세션 만료 감시
+function startSessionWatcher() {
+  const exp = parseInt(localStorage.getItem("exp"), 10);
+  if (!exp) return;
+
+  let warned = false;
+
+  setInterval(() => {
+    const now = Date.now();
+    const remain = exp - now;
+
+    if (remain <= 0) {
+      alert("세션이 만료되었습니다. 다시 로그인해주세요.");
+      logout();
+      return;
+    }
+
+    if (remain <= 300000 && !warned) { // 5분
+      warned = true;
+
+      if (confirm("세션이 곧 만료됩니다. 연장할까요?")) {
+        extendSession();
+      }
+    }
+  }, 10000); // 10초마다 확인
+}
+
+// 🕒 세션 타이머 표시
+function startSessionCountdown() {
+  const exp = parseInt(localStorage.getItem("exp"), 10);
+  if (!exp) return;
+
+  const el = document.getElementById("session-timer");
+  if (!el) return;
+
+  setInterval(() => {
+    const now = Date.now();
+    let remain = exp - now;
+
+    if (remain <= 0) {
+      el.textContent = "세션 만료됨";
+      return;
+    }
+
+    const h = Math.floor(remain / 1000 / 60 / 60);
+    const m = Math.floor((remain / 1000 / 60) % 60);
+    const s = Math.floor((remain / 1000) % 60);
+
+    el.textContent =
+      `세션 ${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')} 남음`;
+  }, 1000);
+}
+
+/****************************************************
+ * 5) UI 초기화
  ****************************************************/
 document.addEventListener("DOMContentLoaded", () => {
   const user = getUser();
@@ -116,10 +193,14 @@ document.addEventListener("DOMContentLoaded", () => {
   if (nameEl && user.name) {
     nameEl.textContent = user.name;
   }
+
+  // 🟦 세션 감시 시작
+  startSessionWatcher();
+  startSessionCountdown();
 });
 
 /****************************************************
- * 5) 전역 바인딩
+ * 6) 전역 바인딩
  ****************************************************/
 window.getUser = getUser;
 window.authHeaders = authHeaders;
@@ -131,3 +212,8 @@ window.requireAdminOrSuperadmin = requireAdminOrSuperadmin;
 window.requireSuperadminStrict = requireSuperadminStrict;
 
 window.logout = logout;
+
+window.startSessionWatcher = startSessionWatcher;
+window.startSessionCountdown = startSessionCountdown;
+window.extendSession = extendSession;
+

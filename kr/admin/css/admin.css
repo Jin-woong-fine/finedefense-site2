@@ -291,3 +291,13 @@ textarea {
 #topPostsList li strong {
   color: #0f2679;
 }
+
+
+.session-timer {
+  padding: 6px 10px;
+  background: #0f2679;
+  color: white;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
