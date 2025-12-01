@@ -24,23 +24,27 @@
   <!-- 🔵 사이드바 -->
   <div id="sidebar"></div>
 
-  <!-- 🔵 메인 -->
-  <div class="topbar">
-    <div class="title">관리자 대시보드</div>
+  <!-- 🔵 메인 시작 -->
+  <div class="main">
 
-    <div style="display:flex; align-items:center; gap:12px;">
 
-      <!-- ⭐ 세션 타이머 추가 -->
-      <span id="session-timer" class="session-timer">세션 계산중...</span>
+    <!-- 🔵 TOPBAR -->
+    <div class="topbar">
+      <div class="title">관리자 대시보드</div>
 
-      <div class="topbar-user" id="topbarUser">
-        <span id="topbarUserName">관리자</span> ▾
-        <div class="user-dropdown" id="userDropdown"></div>
+      <div style="display:flex; align-items:center; gap:12px;">
+
+        <!-- ⭐ 세션 타이머 -->
+        <span id="session-timer" class="session-timer">세션 계산중...</span>
+
+        <div class="topbar-user" id="topbarUser">
+          <span id="topbarUserName">관리자</span> ▾
+          <div class="user-dropdown" id="userDropdown"></div>
+        </div>
+
+        <button onclick="location.href='../index.html'">홈으로</button>
       </div>
-
-      <button onclick="location.href='../index.html'">홈으로</button>
     </div>
-  </div>
 
     <!-- 통계 카드 -->
     <section class="stats-container">
