@@ -426,44 +426,54 @@
     <script src="/js/nav.js"></script>
 
 
-    <script>
-      async function loadNews() {
-        const res = await fetch("/api/posts/list/notice?lang=kr");
-        const data = await res.json();
+<script>
+async function loadNews() {
+  try {
+    const res = await fetch("/api/posts/list/notice?lang=kr");
+    const data = await res.json();
 
-        const grid = document.getElementById("newsGrid");
-        grid.innerHTML = "";
+    // 실제 데이터는 data.list 안에 있음
+    const list = data.list || [];
+    const grid = document.getElementById("newsGrid");
+    grid.innerHTML = "";
 
-        if (!Array.isArray(data) || data.length === 0) {
-          grid.innerHTML = "<p>등록된 뉴스가 없습니다.</p>";
-          return;
-        }
+    if (list.length === 0) {
+      grid.innerHTML = "<p>등록된 뉴스가 없습니다.</p>";
+      return;
+    }
 
-        // 최신 뉴스 3개만 가져오기
-        const latest = data.slice(0, 3);
+    // 최신순 3개만
+    const latest = list.slice(0, 3);
 
-        latest.forEach(item => {
-          const imgURL = item.thumbnail
-            ? `/uploads/${item.thumbnail}` 
-            : "/img/default-news.jpg";
+    latest.forEach(item => {
+      const imgURL = item.main_image
+        ? `/uploads/${item.main_image}`
+        : "/img/default-news.jpg";  // 기본 이미지
 
-          const dateStr = new Date(item.created_at).toLocaleDateString('ko-KR');
+      const dateStr = new Date(item.created_at).toLocaleDateString('ko-KR');
 
-          const card = `
-            <div class="news-card" onclick="location.href='/kr/sub/pr/notice/notice-view.html?id=${item.id}'">
-              <img src="${imgURL}" alt="${item.title}">
-              <h3>${item.title}</h3>
-              <p>${item.summary || ""}</p>
-              <span class="date">${dateStr}</span>
-            </div>
-          `;
+      const card = `
+        <div class="news-card"
+             onclick="location.href='/kr/sub/pr/notice/notice-view.html?id=${item.id}'">
+          <img src="${imgURL}" alt="${item.title}">
+          <h3>${item.title}</h3>
+          <p></p>
+          <span class="date">${dateStr}</span>
+        </div>
+      `;
 
-          grid.innerHTML += card;
-        });
-      }
+      grid.innerHTML += card;
+    });
 
-      document.addEventListener("DOMContentLoaded", loadNews);
-    </script>
+  } catch (error) {
+    console.error("뉴스 로드 오류:", error);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  setTimeout(loadNews, 200); // nav.js 후 실행 안정성
+});
+</script>
 
 
 
