@@ -426,63 +426,50 @@
     <script src="/js/nav.js"></script>
 
 
-<script>
-async function loadNews() {
-  try {
-    const res = await fetch("/api/posts/list/notice?lang=kr");
-    const data = await res.json();
+    <script>
+    async function loadNews() {
+      try {
+        const res = await fetch("/api/posts/list/notice?lang=kr");
+        const data = await res.json();
 
-    const list = data.list || [];
-    const grid = document.getElementById("newsGrid");
-    grid.innerHTML = "";
+        const list = data.list || [];
+        const grid = document.getElementById("newsGrid");
+        grid.innerHTML = "";
 
-    if (list.length === 0) {
-      grid.innerHTML = "<p>등록된 뉴스가 없습니다.</p>";
-      return;
+        const latest = list.slice(0, 3);
+
+        latest.forEach(item => {
+
+          let imgURL = "/public/img/default-news.jpg";  // 기본 이미지 public 기준
+
+          if (item.main_image && item.main_image !== "null") {
+            imgURL = `/public/uploads/${item.main_image}`;  // 🔥 public 거쳐서 접근
+          }
+
+          const dateStr = new Date(item.created_at).toLocaleDateString('ko-KR');
+
+          const card = `
+            <div class="news-card"
+                onclick="location.href='/kr/sub/pr/notice/notice-view.html?id=${item.id}'">
+              <img src="${imgURL}" alt="${item.title}"
+                  onerror="this.onerror=null; this.src='/public/img/default-news.jpg'">
+              <h3>${item.title}</h3>
+              <p></p>
+              <span class="date">${dateStr}</span>
+            </div>
+          `;
+
+          grid.innerHTML += card;
+        });
+
+      } catch (err) {
+        console.error("NEWS LOAD ERROR:", err);
+      }
     }
 
-    const latest = list.slice(0, 3);
+    window.addEventListener("load", loadNews);
+    </script>
 
-    latest.forEach(item => {
-
-      // 이미지 경로 확인 로직
-      let imgURL = "/img/default-news.jpg";   // 기본 이미지
-
-      // 1) DB에 main_image가 있을 때
-      if (item.main_image && item.main_image !== "null" && item.main_image !== "") {
-        imgURL = `/uploads/${item.main_image}`;
-      }
-
-      // 2) 경로가 상대경로로 렌더링되지 않도록 무조건 절대경로로
-      if (!imgURL.startsWith("/")) {
-        imgURL = "/" + imgURL;
-      }
-
-      const dateStr = new Date(item.created_at).toLocaleDateString('ko-KR');
-
-      const card = `
-        <div class="news-card"
-             onclick="location.href='/kr/sub/pr/notice/notice-view.html?id=${item.id}'">
-          <img src="${imgURL}" alt="${item.title}" onerror="this.src='/img/default-news.jpg'">
-          <h3>${item.title}</h3>
-          <p></p>
-          <span class="date">${dateStr}</span>
-        </div>
-      `;
-
-      grid.innerHTML += card;
-    });
-
-  } catch (error) {
-    console.error("뉴스 로딩 오류:", error);
-  }
-}
-
-// nav.js 로딩 이후 실행
-document.addEventListener("DOMContentLoaded", () => {
-  setTimeout(loadNews, 200);
-});
-</script>
 
 
 
