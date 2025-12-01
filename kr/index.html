@@ -397,28 +397,8 @@
       <h2>공지 및 뉴스</h2>
       <p>화인디펜스의 최신 소식, 성과, 인증현황을 전해드립니다.</p>
 
-      <div class="news-grid">
-        <div class="news-card">
-          <img src="img/news_exhibition.jpg" alt="Exhibition Participation">
-          <h3>Participation in Naval Defense Exhibition 2025</h3>
-          <p>FINE DEFENSE showcased its advanced underwater cable and connector solutions at the 2025 Naval Defense Expo.</p>
-          <span class="date">October 15, 2025</span>
-        </div>
+        <div class="news-grid" id="newsGrid"></div>
 
-        <div class="news-card">
-          <img src="img/news_facility.jpg" alt="New Facility">
-          <h3>New Extrusion Line Installed at Okcheon Plant</h3>
-          <p>A new insulation and sheathing extrusion line has been installed to enhance in-house cable production capacity.</p>
-          <span class="date">September 3, 2025</span>
-        </div>
-
-        <div class="news-card">
-          <img src="img/news_certification.jpg" alt="Certification">
-          <h3>ISO 9001 & ISO 14001 Certifications Renewed</h3>
-          <p>FINE DEFENSE continues to maintain international quality and environmental management standards.</p>
-          <span class="date">August 1, 2025</span>
-        </div>
-      </div>
 
       <a href="#" class="news-more">전체 뉴스 보기 →</a>
     </section>
@@ -444,6 +424,49 @@
 
     <!-- ✅ 헤더/푸터 + 관리자바까지 nav.js 하나로 처리 -->
     <script src="/js/nav.js"></script>
+
+
+    <script>
+      async function loadNews() {
+        const res = await fetch("/api/posts/list/notice?lang=kr");
+        const data = await res.json();
+
+        const grid = document.getElementById("newsGrid");
+        grid.innerHTML = "";
+
+        if (!Array.isArray(data) || data.length === 0) {
+          grid.innerHTML = "<p>등록된 뉴스가 없습니다.</p>";
+          return;
+        }
+
+        // 최신 뉴스 3개만 가져오기
+        const latest = data.slice(0, 3);
+
+        latest.forEach(item => {
+          const imgURL = item.thumbnail
+            ? `/uploads/${item.thumbnail}` 
+            : "/img/default-news.jpg";
+
+          const dateStr = new Date(item.created_at).toLocaleDateString('ko-KR');
+
+          const card = `
+            <div class="news-card" onclick="location.href='/kr/sub/pr/notice/notice-view.html?id=${item.id}'">
+              <img src="${imgURL}" alt="${item.title}">
+              <h3>${item.title}</h3>
+              <p>${item.summary || ""}</p>
+              <span class="date">${dateStr}</span>
+            </div>
+          `;
+
+          grid.innerHTML += card;
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", loadNews);
+    </script>
+
+
+
   </body>
 </html>
 
