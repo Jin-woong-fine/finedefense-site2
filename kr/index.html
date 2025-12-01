@@ -427,51 +427,50 @@
 
 
     <script>
-    async function loadNews() {
+    async function loadLatestPosts() {
       try {
-        // 🔥 서버 구조에 맞춘 정답 API
-        const res = await fetch("/api/news/list?lang=kr");
-        const data = await res.json();
+        // 🔥 공지 + 뉴스 최신 3개 API
+        const res = await fetch("/api/posts/latest?lang=kr&limit=3");
+        const list = await res.json();
 
-        // posts_news.js가 { list: [...] } 형식으로 반환함
-        const newsList = Array.isArray(data) ? data : (data.list || []);
         const grid = document.getElementById("newsGrid");
         grid.innerHTML = "";
 
-        if (newsList.length === 0) {
-          grid.innerHTML = "<p>등록된 뉴스가 없습니다.</p>";
+        if (!Array.isArray(list) || list.length === 0) {
+          grid.innerHTML = "<p>등록된 소식이 없습니다.</p>";
           return;
         }
 
-        // 최신 3개
-        const latest = newsList.slice(0, 3);
+        list.forEach(item => {
+          const img = item.main_image || "/img/default-news.jpg";
+          const date = (item.created_at || "").substring(0, 10);
 
-        latest.forEach(item => {
-          // 🔥 posts_news.js는 main_image에 "/uploads/news/파일명" 형태 저장됨
-          let imgURL = item.main_image || "/img/default-news.jpg";
-
-          const dateStr = new Date(item.created_at).toLocaleDateString("ko-KR");
+          // 🔥 category가 'notice'냐 'news'냐에 따라 경로 다르게
+          const link =
+            item.category === "notice"
+              ? `/kr/sub/pr/notice/notice-view.html?id=${item.id}`
+              : `/kr/sub/pr/news/news-view.html?id=${item.id}`;
 
           const card = `
-            <div class="news-card"
-                onclick="location.href='/kr/sub/pr/news/news-view.html?id=${item.id}'">
-              <img src="${imgURL}" alt="${item.title}"
+            <div class="news-card" onclick="location.href='${link}'">
+              <img src="${img}" alt="${item.title}" 
                 onerror="this.src='/img/default-news.jpg'">
               <h3>${item.title}</h3>
-              <p></p>
-              <span class="date">${dateStr}</span>
+              <p>${item.category === "notice" ? "공지사항" : "뉴스"}</p>
+              <span class="date">${date}</span>
             </div>
           `;
+
           grid.innerHTML += card;
         });
-
       } catch (err) {
-        console.error("뉴스 불러오기 오류:", err);
+        console.error("🔥 최신글 로딩 오류:", err);
       }
     }
 
-    window.addEventListener("load", loadNews);
+    window.addEventListener("load", loadLatestPosts);
     </script>
+
 
 
 
