@@ -428,47 +428,51 @@
 
     <script>
     async function loadNews() {
-      try {
-        const res = await fetch("/api/posts/list/notice?lang=kr");
-        const data = await res.json();
+      const res = await fetch("/api/posts/list/notice?lang=kr");
+      const data = await res.json();
 
-        const list = data.list || [];
-        const grid = document.getElementById("newsGrid");
-        grid.innerHTML = "";
+      // 전체 데이터
+      const all = data.list || [];
 
-        const latest = list.slice(0, 3);
+      // 🔥 뉴스만 필터링 (category = 'news')
+      const newsOnly = all.filter(item => item.category === "news");
 
-        latest.forEach(item => {
+      const grid = document.getElementById("newsGrid");
+      grid.innerHTML = "";
 
-          let imgURL = "/public/img/default-news.jpg";  // 기본 이미지 public 기준
-
-          if (item.main_image && item.main_image !== "null") {
-            imgURL = `/public/uploads/${item.main_image}`;  // 🔥 public 거쳐서 접근
-          }
-
-          const dateStr = new Date(item.created_at).toLocaleDateString('ko-KR');
-
-          const card = `
-            <div class="news-card"
-                onclick="location.href='/kr/sub/pr/notice/notice-view.html?id=${item.id}'">
-              <img src="${imgURL}" alt="${item.title}"
-                  onerror="this.onerror=null; this.src='/public/img/default-news.jpg'">
-              <h3>${item.title}</h3>
-              <p></p>
-              <span class="date">${dateStr}</span>
-            </div>
-          `;
-
-          grid.innerHTML += card;
-        });
-
-      } catch (err) {
-        console.error("NEWS LOAD ERROR:", err);
+      if (newsOnly.length === 0) {
+        grid.innerHTML = "<p>등록된 뉴스가 없습니다.</p>";
+        return;
       }
+
+      const latest = newsOnly.slice(0, 3);
+
+      latest.forEach(item => {
+        let imgURL = "/public/img/default-news.jpg";
+
+        if (item.main_image && item.main_image !== "null") {
+          imgURL = `/public/uploads/${item.main_image}`;
+        }
+
+        const dateStr = new Date(item.created_at).toLocaleDateString('ko-KR');
+
+        const card = `
+          <div class="news-card"
+              onclick="location.href='/kr/sub/pr/news/news-view.html?id=${item.id}'">
+            <img src="${imgURL}" alt="${item.title}">
+            <h3>${item.title}</h3>
+            <p></p>
+            <span class="date">${dateStr}</span>
+          </div>
+        `;
+
+        grid.innerHTML += card;
+      });
     }
 
     window.addEventListener("load", loadNews);
     </script>
+
 
 
 
