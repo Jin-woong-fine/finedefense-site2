@@ -185,10 +185,10 @@ router.get("/latest", async (req, res) => {
        WHERE p.category IN ('notice', 'news')
          AND p.lang = ?
        ORDER BY p.created_at DESC
-       LIMIT ?
+       LIMIT ${limit}
     `;
 
-    const [rows] = await db.execute(sql, [lang, limit]);
+    const [rows] = await db.execute(sql, [lang]);
 
     res.json(rows);
 
