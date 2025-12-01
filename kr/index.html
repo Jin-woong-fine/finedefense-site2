@@ -449,7 +449,7 @@ async function loadLatestPosts() {
 
       // 이미지 (뉴스는 main_image, 공지는 없음 → 기본 이미지 적용)
       let imgURL = item.main_image;
-      if (!imgURL) imgURL = "/img/default-news.png";
+      if (!imgURL) imgURL = "/img/default-notice.png";
 
       const dateStr = new Date(item.created_at).toLocaleDateString("ko-KR");
 
