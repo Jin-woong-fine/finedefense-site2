@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>관리자 로그인 | Fine Defense</title>
 
-  <!-- 헤더/푸터/전체 레이아웃 복구 -->
+  <!-- 헤더/푸터/전체 레이아웃 -->
   <link rel="stylesheet" href="/css/style.css">
 
   <style>
@@ -49,7 +49,7 @@
       font-weight: 700;
     }
 
-    /* 입력창 스타일 */
+    /* 입력창 */
     .login-box input {
       width: 100%;
       padding: 13px 14px;
@@ -58,6 +58,7 @@
       border-radius: 8px;
       font-size: 15px;
       transition: 0.2s;
+      box-sizing: border-box;
     }
 
     .login-box input:focus {
@@ -85,12 +86,31 @@
       background: #1b348f;
     }
 
+    /* 에러 메시지 */
     .error {
       color: #c62828;
       text-align: center;
       margin-top: 15px;
       font-size: 14px;
       min-height: 20px;
+    }
+
+    /* 토스트 알림 */
+    .toast-notice {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #0f2679;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      z-index: 9999;
     }
 
     /* 반응형 */
@@ -106,13 +126,15 @@
 
 <body>
 
+  <!-- ⭐ common_auth.js (showToast 포함) -->
+  <script src="/kr/admin/js/common_auth.js"></script>
+
   <div id="header"></div>
 
   <main class="login-area">
     <div class="login-box">
       <h2>관리자 로그인</h2>
 
-      <!-- tabindex 순서 지정 -->
       <input type="text" id="username" placeholder="아이디" tabindex="1">
       <input type="password" id="password" placeholder="비밀번호" tabindex="2">
       <button id="loginBtn" tabindex="3">로그인</button>
@@ -151,16 +173,13 @@
           return;
         }
 
-        // 로컬 저장
+        // 저장
         localStorage.setItem("token", data.token);
         localStorage.setItem("role", data.role);
         localStorage.setItem("name", data.name);
         localStorage.setItem("user_id", data.id);
-        // ⭐ exp 저장
         localStorage.setItem("exp", data.exp * 1000);
 
-
-        // 권한 따라 이동
         if (["superadmin", "admin", "editor"].includes(data.role)) {
           location.href = "/kr/admin/dashboard.html";
         } else {
@@ -176,13 +195,18 @@
     document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("loginBtn").addEventListener("click", tryLogin);
 
-      // 비번 입력 후 엔터키 → 로그인
       document.getElementById("password").addEventListener("keypress", (e) => {
         if (e.key === "Enter") {
           e.preventDefault();
           tryLogin();
         }
       });
+
+      // ⭐ 로그아웃 토스트 표시
+      if (sessionStorage.getItem("logoutNotice")) {
+        showToast("✔ 로그아웃되었습니다.");
+        sessionStorage.removeItem("logoutNotice");
+      }
     });
   </script>
 

@@ -64,8 +64,10 @@ function requireSuperadminStrict() {
  ****************************************************/
 function logout() {
   localStorage.clear();
+  sessionStorage.setItem("logoutNotice", "1");
   location.href = "/kr/admin/login.html";
 }
+
 
 /****************************************************
  * 4) 🔥 세션 연장 (refresh API)
@@ -191,6 +193,30 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /****************************************************
+ * 🔔 Toast 알림 UI
+ ****************************************************/
+function showToast(message, duration = 1500) {
+  let toast = document.createElement("div");
+  toast.className = "toast-notice";
+  toast.textContent = message;
+
+  document.body.appendChild(toast);
+
+  // fade-in
+  setTimeout(() => { toast.style.opacity = 1; }, 50);
+
+  // fade-out 후 제거
+  setTimeout(() => {
+    toast.style.opacity = 0;
+    setTimeout(() => toast.remove(), 500);
+  }, duration);
+}
+
+
+
+
+
+/****************************************************
  * 9) 전역 바인딩
  ****************************************************/
 window.getUser = getUser;
@@ -202,3 +228,4 @@ window.requireAnyUser = requireAnyUser;
 window.requireAdminOrEditor = requireAdminOrEditor;
 window.requireAdminOrSuperadmin = requireAdminOrSuperadmin;
 window.requireSuperadminStrict = requireSuperadminStrict;
+window.showToast = showToast;
