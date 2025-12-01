@@ -426,42 +426,78 @@
     <script src="/js/nav.js"></script>
 
 
-    <script>
-      async function loadLatest() {
+      <script>
+      async function loadLatestNotice() {
         try {
-          const res = await fetch("/api/posts/latest?lang=kr&limit=3");
-          const list = await res.json();
+          const res = await fetch(`/api/posts/list/notice?lang=kr&pageSize=1`);
+          const data = await res.json();
+          const list = data.list || [];
 
-          const grid = document.getElementById("newsGrid");
+          const box = document.getElementById("newsGrid");
 
-          if (!Array.isArray(list) || list.length === 0) {
-            grid.innerHTML = "<p>등록된 소식이 없습니다.</p>";
-            return;
-          }
+          if (list.length === 0) return;
 
-          // ✨ innerHTML 딱 1번만
-          grid.innerHTML = list.map(item => {
-            const img = item.main_image || "/img/default-news.png";
-            const dateStr = new Date(item.created_at).toLocaleDateString("ko-KR");
+          const v = list[0];
 
-            return `
-              <div class="news-card"
-                  onclick="location.href='/kr/sub/pr/${item.category}/${item.category}-view.html?id=${item.id}'">
-                <img src="${img}" alt="${item.title}" onerror="this.src='/img/default-news.jpg'">
-                <h3>${item.title}</h3>
-                <span class="date">${dateStr}</span>
-              </div>
-            `;
-          }).join("");
+          // 이미지 처리
+          const img = v.main_image || "/img/default-news.jpg";
+
+          const dateStr = new Date(v.created_at).toLocaleDateString("ko-KR");
+
+          const html = `
+            <div class="news-card"
+                onclick="location.href='/kr/sub/pr/notice/notice-view.html?id=${v.id}'">
+              <img src="${img}" alt="${v.title}">
+              <h3>[공지] ${v.title}</h3>
+              <p></p>
+              <span class="date">${dateStr}</span>
+            </div>
+          `;
+
+          box.innerHTML += html;
 
         } catch (err) {
-          console.error("🔥 최신 뉴스/공지 불러오기 오류:", err);
+          console.error("공지 로드 오류:", err);
         }
       }
 
-      window.addEventListener("load", loadLatest);
+      async function loadLatestNews() {
+        try {
+          const res = await fetch(`/api/posts/list/news?lang=kr&pageSize=3`);
+          const data = await res.json();
+          const list = data.list || [];
 
-    </script>
+          const box = document.getElementById("newsGrid");
+
+          if (list.length === 0) return;
+
+          list.forEach(v => {
+            const img = v.main_image || "/img/default-news.jpg";
+            const dateStr = new Date(v.created_at).toLocaleDateString("ko-KR");
+
+            const html = `
+              <div class="news-card"
+                  onclick="location.href='/kr/sub/pr/news/news-view.html?id=${v.id}'">
+                <img src="${img}" alt="${v.title}">
+                <h3>${v.title}</h3>
+                <p></p>
+                <span class="date">${dateStr}</span>
+              </div>
+            `;
+            box.innerHTML += html;
+          });
+
+        } catch (err) {
+          console.error("뉴스 로드 오류:", err);
+        }
+      }
+
+      window.addEventListener("load", () => {
+        loadLatestNotice();
+        loadLatestNews();
+      });
+      </script>
+
 
 
 
