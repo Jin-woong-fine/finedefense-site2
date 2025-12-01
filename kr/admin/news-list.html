@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>공지사항 관리 | Fine Defense Admin</title>
+  <title>뉴스 관리 | Fine Defense Admin</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- 공통 관리자 CSS -->
@@ -53,14 +53,14 @@
 <body>
 
 <!-- ⭐ 사이드바 -->
-<div id="sidebar" data-active="notice"></div>
+<div id="sidebar" data-active="news"></div>
 
 <!-- ⭐ 메인 -->
 <div class="main">
 
   <!-- TOPBAR -->
   <div class="topbar">
-    <h2>공지사항 관리</h2>
+    <h2>뉴스 관리</h2>
     <div>
       <button class="btn btn-primary" onclick="location.href='../index.html'">홈으로</button>
       <button id="logoutBtn" class="btn btn-danger">로그아웃</button>
@@ -72,8 +72,8 @@
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
       <input type="text" id="searchInput" class="search-input" placeholder="제목 검색" />
 
-      <button class="btn btn-primary" onclick="location.href='notice-write.html'">
-        공지 작성하기
+      <button class="btn btn-primary" onclick="location.href='news-write.html'">
+        뉴스 작성하기
       </button>
     </div>
 
@@ -83,14 +83,12 @@
           <th style="width:70px;">ID</th>
           <th>제목</th>
           <th style="width:80px;">언어</th>
-          <th style="width:100px;">정렬순서</th>
-          <th style="width:80px;">조회수</th>
-          <th style="width:140px;">작성일</th>
+          <th style="width:120px;">작성일</th>
           <th style="width:120px;">관리</th>
         </tr>
       </thead>
-      <tbody id="noticeTbody">
-        <tr><td colspan="7">불러오는 중...</td></tr>
+      <tbody id="newsTbody">
+        <tr><td colspan="5">불러오는 중...</td></tr>
       </tbody>
     </table>
 
@@ -103,16 +101,14 @@
 <script src="/kr/admin/js/sidebar.js"></script>
 
 <script>
-  /* 🔐 권한 체크 */
+  /* 권한 체크 */
   requireAdminOrEditor();
   document.getElementById("logoutBtn").addEventListener("click", logout);
 
-  const PAGE_SIZE = 20;
-  let allNotices = [];
-  let filteredNotices = [];
-  let currentPage = 1;
+  let allNews = [];
+  let filteredNews = [];
 
-  const tbody = document.getElementById("noticeTbody");
+  const tbody = document.getElementById("newsTbody");
 
   function formatDate(d) {
     const date = new Date(d);
@@ -120,71 +116,59 @@
     return date.toLocaleDateString();
   }
 
-  /* ============================
-      검색 필터
-  ============================ */
+  // 검색 기능
   document.getElementById("searchInput").addEventListener("input", applyFilter);
 
   function applyFilter() {
     const kw = document.getElementById("searchInput").value.trim().toLowerCase();
 
-    filteredNotices = allNotices.filter(n =>
+    filteredNews = allNews.filter(n =>
       (n.title || "").toLowerCase().includes(kw)
     );
 
-    currentPage = 1;
     renderTable();
   }
 
-  /* ============================
-      테이블 렌더링
-  ============================ */
+  // 테이블 렌더링
   function renderTable() {
-    if (!filteredNotices.length) {
-      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#777;">공지 없음</td></tr>`;
+    if (!filteredNews.length) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#777;">뉴스 없음</td></tr>`;
       return;
     }
 
-    const start = (currentPage - 1) * PAGE_SIZE;
-    const items = filteredNotices.slice(start, start + PAGE_SIZE);
-
-    tbody.innerHTML = items.map(n => `
+    tbody.innerHTML = filteredNews.map(n => `
       <tr>
         <td>${n.id}</td>
         <td onclick="openPublicView(${n.id})">${n.title}</td>
         <td><span class="lang-badge">${n.lang}</span></td>
-        <td>${n.sort_order ?? ""}</td>
-        <td>${n.views || 0}</td>
         <td>${formatDate(n.created_at)}</td>
         <td>
           <div class="actions">
-            <button class="btn btn-small btn-gray" onclick="editNotice(event, ${n.id})">수정</button>
-            <button class="btn btn-small btn-danger" onclick="deleteNotice(event, ${n.id})">삭제</button>
+            <button class="btn btn-small btn-gray" onclick="editNews(event, ${n.id})">수정</button>
+            <button class="btn btn-small btn-danger" onclick="deleteNews(event, ${n.id})">삭제</button>
           </div>
         </td>
       </tr>
     `).join("");
   }
 
-  /* ============================
-      CRUD 핸들러
-  ============================ */
+  // 핸들러
   function openPublicView(id) {
-    window.open(`/kr/sub/pr/notice/notice-view.html?id=${id}`, "_blank");
+    window.open(`/kr/sub/pr/news/news-view.html?id=${id}`, "_blank");
   }
 
-  function editNotice(ev, id) {
+  function editNews(ev, id) {
     ev.stopPropagation();
-    location.href = `/kr/admin/notice-edit.html?id=${id}`;
+    location.href = `/kr/admin/news-edit.html?id=${id}`;
   }
 
-  async function deleteNotice(ev, id) {
+  async function deleteNews(ev, id) {
     ev.stopPropagation();
     if (!confirm("삭제하시겠습니까?")) return;
 
     const token = localStorage.getItem("token");
 
-    const res = await fetch(`/api/posts/notice/delete/${id}`, {
+    const res = await fetch(`/api/news/delete/${id}`, {
       method: "DELETE",
       headers: { Authorization: "Bearer " + token }
     });
@@ -193,28 +177,25 @@
 
     if (res.ok) {
       alert("삭제 완료");
-      await loadNotices();
+      await loadNews();
     } else {
       alert("삭제 실패: " + (out.message || "알 수 없는 오류"));
     }
   }
 
-  /* ============================
-      데이터 로드
-  ============================ */
-  async function loadNotices() {
-    const res = await fetch(`/api/posts/list/notice?lang=all`);
+  // 데이터 로드
+  async function loadNews() {
+    const res = await fetch(`/api/news/list?lang=all`);
     const data = await res.json();
 
-    // posts_common 에서 배열 또는 { list: [] } 둘 다 대응
-    allNotices = Array.isArray(data) ? data : (data.list || []);
-    filteredNotices = allNotices.slice();
+    allNews = Array.isArray(data) ? data : (data.list || []);
+    filteredNews = allNews.slice();
+
     renderTable();
   }
 
-  // 초기 실행
-  loadSidebar("notice");
-  loadNotices();
+  loadSidebar("news");
+  loadNews();
 </script>
 
 </body>
