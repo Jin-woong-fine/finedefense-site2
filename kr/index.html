@@ -429,36 +429,24 @@
     <script>
     async function loadNews() {
       try {
-        // 🔥 뉴스(news)만 가져오는 API (정식)
-        const res = await fetch("/api/posts/list?category=news&lang=kr");
+        const res = await fetch("/api/posts/news/list?lang=kr");
         const data = await res.json();
 
-        const list = data.list || [];
-        const newsOnly = list.filter(item => item.category === "news");
-
+        const newsList = Array.isArray(data) ? data : (data.list || []);
         const grid = document.getElementById("newsGrid");
         grid.innerHTML = "";
 
-        if (newsOnly.length === 0) {
+        if (newsList.length === 0) {
           grid.innerHTML = "<p>등록된 뉴스가 없습니다.</p>";
           return;
         }
 
-        // 최신 3개
-        const latest = newsOnly.slice(0, 3);
+        const latest = newsList.slice(0, 3);
 
         latest.forEach(item => {
+          let imgURL = item.main_image || "/img/default-news.jpg";
 
-          // 🔥 기본 이미지
-          let imgURL = "/img/default-news.jpg";
-
-          // 🔥 DB 경로 그대로 사용해야 정상 동작!
-          // DB에는  /uploads/news/파일명   형태로 저장됨
-          if (item.main_image && item.main_image !== "null") {
-            imgURL = item.main_image; // 그대로 사용
-          }
-
-          const dateStr = new Date(item.created_at).toLocaleDateString("ko-KR");
+          const dateStr = new Date(item.created_at).toLocaleDateString('ko-KR');
 
           const card = `
             <div class="news-card"
@@ -470,17 +458,17 @@
               <span class="date">${dateStr}</span>
             </div>
           `;
-
           grid.innerHTML += card;
         });
 
       } catch (err) {
-        console.error("뉴스 로드 오류:", err);
+        console.error("뉴스 불러오기 오류:", err);
       }
     }
 
     window.addEventListener("load", loadNews);
     </script>
+
 
 
 
