@@ -20,9 +20,22 @@
 
 <div class="main">
 
+  <!-- 🔵 TOPBAR -->
   <div class="topbar">
     <div class="title">카탈로그 수정</div>
-    <button class="home-btn" onclick="location.href='/kr/index.html'">홈으로</button>
+
+    <div style="display:flex; align-items:center; gap:12px;">
+
+      <!-- ⭐ 세션 타이머 -->
+      <span id="session-timer" class="session-timer">세션 계산중...</span>
+
+      <div class="topbar-user" id="topbarUser">
+        <span id="topbarUserName">관리자</span> ▾
+        <div class="user-dropdown" id="userDropdown"></div>
+      </div>
+
+      <button onclick="location.href='../index.html'">홈으로</button>
+    </div>
   </div>
 
   <div class="form-box">
