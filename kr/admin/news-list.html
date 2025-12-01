@@ -5,38 +5,149 @@
   <title>뉴스 관리 | Fine Defense</title>
 
   <link rel="stylesheet" href="./css/admin.css" />
+  
   <style>
-    .thumb {
-      width: 80px;
-      height: 50px;
-      object-fit: cover;
-      border-radius: 6px;
-      background: #ddd;
+    /* ==========================
+       뉴스 리스트 테이블 스타일
+       ========================== */
+    table.list-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 25px;
+      background: #fff;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 3px 15px rgba(0,0,0,0.05);
     }
-    table td { vertical-align: middle; }
+
+    .list-table thead {
+      background: #eef1f7;
+    }
+
+    .list-table th {
+      padding: 14px;
+      font-size: 14px;
+      font-weight: 700;
+      border-bottom: 1px solid #e3e6ef;
+      color: #222;
+    }
+
+    .list-table td {
+      padding: 12px;
+      font-size: 14px;
+      border-bottom: 1px solid #f3f4f7;
+      vertical-align: middle;
+      text-align: center;
+      color: #333;
+    }
+
+    .list-table tbody tr:hover {
+      background: #f7faff;
+    }
+
+    /* 썸네일 */
+    .thumb {
+      width: 90px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 8px;
+      background: #ddd;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    }
+
+    /* 제목은 좌측 정렬 */
+    td.title-cell {
+      text-align: left;
+      max-width: 350px;
+      padding-left: 16px;
+      font-weight: 600;
+    }
+
+    /* 관리 버튼 */
+    .list-table button {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: 0.15s;
+      margin: 2px;
+    }
+
+    .btn-edit {
+      background: #0f2679;
+      color: white;
+    }
+    .btn-edit:hover {
+      background: #152f93;
+    }
+
+    .btn-del {
+      background: #d9534f;
+      color: white;
+    }
+    .btn-del:hover {
+      background: #c9302c;
+    }
+
+    /* ==========================
+       언어 필터 버튼
+       ========================== */
+    .lang-filter {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .filter-btn {
+      padding: 7px 16px;
+      border-radius: 18px;
+      border: 1px solid #ccc;
+      cursor: pointer;
+      background: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      transition: 0.2s;
+    }
+
+    .filter-btn:hover {
+      background: #eef2ff;
+    }
+
+    .filter-btn.active {
+      background: #0f2679;
+      border-color: #0f2679;
+      color: #fff;
+    }
   </style>
 </head>
 
 <body>
 
-  <!-- 🔐 로그인 권한 체크 (공통 인증) -->
+  <!-- 🔐 로그인 권한 체크 -->
   <script src="./js/common_auth.js"></script>
   <script>
-    requireAdminOrEditor();  // editor/admin/superadmin 허용
+    requireAdminOrEditor();
   </script>
 
   <!-- 🔵 사이드바 -->
   <div id="sidebar"></div>
   <script src="./js/sidebar.js"></script>
-  <script>
-    loadSidebar("newsroom");   // active 표시
-  </script>
+  <script> loadSidebar("newsroom"); </script>
 
   <!-- 🔵 메인 -->
   <div class="main">
     <div class="topbar">
       <div class="title">뉴스 관리</div>
       <button onclick="location.href='news-edit.html'">새 뉴스 등록</button>
+    </div>
+
+    <!-- 🔥 언어 필터 -->
+    <div class="lang-filter">
+      <button class="filter-btn active" onclick="setFilter('all')">ALL</button>
+      <button class="filter-btn" onclick="setFilter('kr')">KR</button>
+      <button class="filter-btn" onclick="setFilter('en')">EN</button>
     </div>
 
     <table class="list-table">
@@ -56,50 +167,53 @@
   </div>
 
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
+    let currentLang = "all";
+
+    function setFilter(lang) {
+      currentLang = lang;
+
+      document.querySelectorAll(".filter-btn").forEach(btn => 
+        btn.classList.remove("active")
+      );
+
+      const map = { all: 0, kr: 1, en: 2 };
+      document.querySelectorAll(".filter-btn")[map[lang]].classList.add("active");
+
       loadNews();
-    });
+    }
 
     async function loadNews() {
       try {
-        const res = await fetch(`/api/posts/list/news?lang=all`);
-        const data = await res.json();     // 페이지네이션 구조
-        const list = data.list || [];
+        const res = await fetch(`/api/posts/list/news?lang=${currentLang}`);
+        const data = await res.json();
+        const list = data.list || data || [];
+
+        const tbody = document.getElementById("newsList");
 
         if (!Array.isArray(list)) {
-          console.error("뉴스 API 구조 오류:", data);
-          document.getElementById("newsList").innerHTML =
-            "<tr><td colspan='7'>불러오기 오류</td></tr>";
+          tbody.innerHTML = "<tr><td colspan='7'>불러오기 오류</td></tr>";
           return;
         }
 
-        document.getElementById("newsList").innerHTML = list
-          .map((v) => {
-            const img = v.main_image
-              ? v.main_image
-              : "/kr/admin/img/no-thumb.png";
-
-            return `
-              <tr>
-                <td>${v.id}</td>
-                <td><img src="${img}" class="thumb" /></td>
-                <td>${v.title}</td>
-                <td>${v.lang}</td>
-                <td>${v.views || 0}</td>
-                <td>${v.created_at?.replace("T", " ").substring(0, 16)}</td>
-                <td>
-                  <button onclick="edit(${v.id})">수정</button>
-                  <button onclick="del(${v.id})">삭제</button>
-                </td>
-              </tr>
-            `;
-          })
-          .join("");
+        tbody.innerHTML = list.map(v => `
+          <tr>
+            <td>${v.id}</td>
+            <td><img src="${v.main_image || '/kr/admin/img/no-thumb.png'}" class="thumb"></td>
+            <td class="title-cell">${v.title}</td>
+            <td>${v.lang.toUpperCase()}</td>
+            <td>${v.views || 0}</td>
+            <td>${v.created_at?.replace("T", " ").substring(0, 16)}</td>
+            <td>
+              <button class="btn-edit" onclick="edit(${v.id})">수정</button>
+              <button class="btn-del" onclick="del(${v.id})">삭제</button>
+            </td>
+          </tr>
+        `).join("");
 
       } catch (err) {
         console.error("뉴스 불러오기 오류:", err);
         document.getElementById("newsList").innerHTML =
-          "<tr><td colspan='7'>로드 오류</td></tr>";
+          "<tr><td colspan='7'>LOAD ERROR</td></tr>";
       }
     }
 
@@ -123,6 +237,9 @@
         alert("삭제 실패");
       }
     }
+
+    // 최초 불러오기
+    loadNews();
   </script>
 
 </body>
