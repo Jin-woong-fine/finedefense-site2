@@ -79,8 +79,23 @@
 
 <div class="main">
 
+  <!-- 🔵 TOPBAR -->
   <div class="topbar">
-    <h2 class="title">제품 수정</h2>
+    <div class="title">제품 수정</div>
+
+    <div style="display:flex; align-items:center; gap:12px;">
+
+      <!-- ⭐ 세션 타이머 -->
+      <span id="session-timer" class="session-timer">세션 계산중...</span>
+
+      <div class="topbar-user" id="topbarUser">
+        <span id="topbarUserName">관리자</span> ▾
+        <div class="user-dropdown" id="userDropdown"></div>
+      </div>
+
+      <button onclick="location.href='../index.html'">홈으로</button>
+    </div>
+  </div>
 
     <div>
       <button class="btn btn-primary" onclick="location.href='/kr/admin/products.html'">목록으로</button>
