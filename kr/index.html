@@ -449,7 +449,7 @@ async function loadLatestPosts() {
 
       // 이미지 (뉴스는 main_image, 공지는 없음 → 기본 이미지 적용)
       let imgURL = item.main_image;
-      if (!imgURL) imgURL = "/img/default-news.jpg";
+      if (!imgURL) imgURL = "/img/default-news.png";
 
       const dateStr = new Date(item.created_at).toLocaleDateString("ko-KR");
 
@@ -462,7 +462,7 @@ async function loadLatestPosts() {
       const card = `
         <div class="news-card" onclick="location.href='${viewURL}'">
           <img src="${imgURL}" alt="${item.title}" 
-               onerror="this.src='/img/default-news.jpg'">
+               onerror="this.src='/img/default-news.png'">
 
           ${label}
 
