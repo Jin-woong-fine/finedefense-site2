@@ -5,7 +5,6 @@
   <title>뉴스 관리 | Fine Defense Admin</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- 공통 관리자 CSS -->
   <link rel="stylesheet" href="/kr/admin/css/admin.css" />
 
   <style>
@@ -16,7 +15,6 @@
       box-shadow:0 2px 8px rgba(0,0,0,0.06);
       margin-bottom:35px;
     }
-
     .search-input {
       width: 240px;
       padding: 8px 12px;
@@ -24,15 +22,14 @@
       border-radius: 6px;
       font-size: 0.95rem;
     }
-
-    .notice-table { width:100%; border-collapse:collapse; margin-top:10px; }
-    .notice-table th, .notice-table td {
+    table { width:100%; border-collapse:collapse; margin-top:10px; }
+    th, td {
       padding:10px 12px; border-bottom:1px solid #ddd; text-align:left;
       font-size: 0.9rem;
     }
-    .notice-table th { background:#0f2679; color:#fff; }
+    th { background:#0f2679; color:#fff; }
 
-    .notice-table tr:hover td {
+    tr:hover td {
       background:#f3f6ff;
       cursor:pointer;
     }
@@ -52,13 +49,9 @@
 
 <body>
 
-<!-- ⭐ 사이드바 -->
 <div id="sidebar" data-active="news"></div>
 
-<!-- ⭐ 메인 -->
 <div class="main">
-
-  <!-- TOPBAR -->
   <div class="topbar">
     <h2>뉴스 관리</h2>
     <div>
@@ -68,7 +61,6 @@
   </div>
 
   <section class="panel">
-
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
       <input type="text" id="searchInput" class="search-input" placeholder="제목 검색" />
 
@@ -77,13 +69,13 @@
       </button>
     </div>
 
-    <table class="notice-table">
+    <table>
       <thead>
         <tr>
           <th style="width:70px;">ID</th>
           <th>제목</th>
           <th style="width:80px;">언어</th>
-          <th style="width:120px;">작성일</th>
+          <th style="width:100px;">작성일</th>
           <th style="width:120px;">관리</th>
         </tr>
       </thead>
@@ -93,109 +85,111 @@
     </table>
 
   </section>
-
 </div>
 
-<!-- 공통 JS -->
+
 <script src="/kr/admin/js/common_auth.js"></script>
 <script src="/kr/admin/js/sidebar.js"></script>
 
 <script>
-  /* 권한 체크 */
-  requireAdminOrEditor();
-  document.getElementById("logoutBtn").addEventListener("click", logout);
+requireAdminOrEditor();
+document.getElementById("logoutBtn").addEventListener("click", logout);
 
-  let allNews = [];
-  let filteredNews = [];
+let allNews = [];
+let filteredNews = [];
+let PAGE_SIZE = 20;
+let currentPage = 1;
 
-  const tbody = document.getElementById("newsTbody");
+const tbody = document.getElementById("newsTbody");
 
-  function formatDate(d) {
-    const date = new Date(d);
-    if (Number.isNaN(date.getTime())) return "";
-    return date.toLocaleDateString();
+function formatDate(d) {
+  const date = new Date(d);
+  return Number.isNaN(date.getTime()) ? "" : date.toLocaleDateString();
+}
+
+/* 검색 필터 */
+document.getElementById("searchInput").addEventListener("input", applyFilter);
+
+function applyFilter() {
+  const kw = document.getElementById("searchInput").value.trim().toLowerCase();
+
+  filteredNews = allNews.filter(n =>
+    (n.title || "").toLowerCase().includes(kw)
+  );
+
+  currentPage = 1;
+  renderTable();
+}
+
+/* 테이블 렌더 */
+function renderTable() {
+  if (!filteredNews.length) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#777;">뉴스 없음</td></tr>`;
+    return;
   }
 
-  // 검색 기능
-  document.getElementById("searchInput").addEventListener("input", applyFilter);
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const items = filteredNews.slice(start, start + PAGE_SIZE);
 
-  function applyFilter() {
-    const kw = document.getElementById("searchInput").value.trim().toLowerCase();
+  tbody.innerHTML = items.map(n => `
+    <tr>
+      <td>${n.id}</td>
+      <td onclick="openPublicView(${n.id})">${n.title}</td>
+      <td><span class="lang-badge">${n.lang}</span></td>
+      <td>${formatDate(n.created_at)}</td>
+      <td>
+        <div class="actions">
+          <button class="btn btn-small btn-gray" onclick="editNews(event, ${n.id})">수정</button>
+          <button class="btn btn-small btn-danger" onclick="deleteNews(event, ${n.id})">삭제</button>
+        </div>
+      </td>
+    </tr>
+  `).join("");
+}
 
-    filteredNews = allNews.filter(n =>
-      (n.title || "").toLowerCase().includes(kw)
-    );
+/* CRUD 함수 */
+function openPublicView(id) {
+  window.open(`/kr/sub/pr/news/news-view.html?id=${id}`, "_blank");
+}
 
-    renderTable();
+function editNews(ev, id) {
+  ev.stopPropagation();
+  location.href = `/kr/admin/news-edit.html?id=${id}`;
+}
+
+async function deleteNews(ev, id) {
+  ev.stopPropagation();
+  if (!confirm("삭제하시겠습니까?")) return;
+
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`/api/news/delete/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: "Bearer " + token }
+  });
+
+  const out = await res.json().catch(() => ({}));
+
+  if (res.ok) {
+    alert("삭제 완료");
+    await loadNews();
+  } else {
+    alert("삭제 실패: " + (out.message || "알 수 없는 오류"));
   }
+}
 
-  // 테이블 렌더링
-  function renderTable() {
-    if (!filteredNews.length) {
-      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#777;">뉴스 없음</td></tr>`;
-      return;
-    }
+/* 데이터 로드 */
+async function loadNews() {
+  const res = await fetch(`/api/news/list?lang=all`);
+  const data = await res.json();
 
-    tbody.innerHTML = filteredNews.map(n => `
-      <tr>
-        <td>${n.id}</td>
-        <td onclick="openPublicView(${n.id})">${n.title}</td>
-        <td><span class="lang-badge">${n.lang}</span></td>
-        <td>${formatDate(n.created_at)}</td>
-        <td>
-          <div class="actions">
-            <button class="btn btn-small btn-gray" onclick="editNews(event, ${n.id})">수정</button>
-            <button class="btn btn-small btn-danger" onclick="deleteNews(event, ${n.id})">삭제</button>
-          </div>
-        </td>
-      </tr>
-    `).join("");
-  }
+  allNews = Array.isArray(data) ? data : (data.list || []);
+  filteredNews = allNews.slice();
+  renderTable();
+}
 
-  // 핸들러
-  function openPublicView(id) {
-    window.open(`/kr/sub/pr/news/news-view.html?id=${id}`, "_blank");
-  }
-
-  function editNews(ev, id) {
-    ev.stopPropagation();
-    location.href = `/kr/admin/news-edit.html?id=${id}`;
-  }
-
-  async function deleteNews(ev, id) {
-    ev.stopPropagation();
-    if (!confirm("삭제하시겠습니까?")) return;
-
-    const token = localStorage.getItem("token");
-
-    const res = await fetch(`/api/news/delete/${id}`, {
-      method: "DELETE",
-      headers: { Authorization: "Bearer " + token }
-    });
-
-    const out = await res.json().catch(() => ({}));
-
-    if (res.ok) {
-      alert("삭제 완료");
-      await loadNews();
-    } else {
-      alert("삭제 실패: " + (out.message || "알 수 없는 오류"));
-    }
-  }
-
-  // 데이터 로드
-  async function loadNews() {
-    const res = await fetch(`/api/news/list?lang=all`);
-    const data = await res.json();
-
-    allNews = Array.isArray(data) ? data : (data.list || []);
-    filteredNews = allNews.slice();
-
-    renderTable();
-  }
-
-  loadSidebar("news");
-  loadNews();
+loadSidebar("news");
+loadNews();
 </script>
 
 </body>
