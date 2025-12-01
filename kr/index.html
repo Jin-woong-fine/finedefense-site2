@@ -441,28 +441,50 @@ async function loadLatestPosts() {
     }
 
     list.forEach(item => {
-      // 공지와 뉴스 구분 라벨
+      /* -------------------------------
+         🔥 카테고리별 라벨
+      --------------------------------*/
       const label =
         item.category === "notice"
           ? `<span class="badge notice">공지</span>`
           : `<span class="badge news">뉴스</span>`;
 
-      // 이미지 (뉴스는 main_image, 공지는 없음 → 기본 이미지 적용)
+      /* -------------------------------
+         🔥 이미지 기본값 (카테고리별 분기)
+      --------------------------------*/
       let imgURL = item.main_image;
-      if (!imgURL) imgURL = "/img/default-notice.png";
 
-      const dateStr = new Date(item.created_at).toLocaleDateString("ko-KR");
+      if (!imgURL) {
+        imgURL = item.category === "notice"
+          ? "/img/default-notice.png"
+          : "/img/default-news.png";
+      }
 
-      // 페이지 이동 경로
+      // onerror도 동일하게 처리해야 덮어쓰기 없음
+      const defaultImg = item.category === "notice"
+        ? "/img/default-notice.png"
+        : "/img/default-news.png";
+
+      /* -------------------------------
+         🔥 상세 페이지 URL
+      --------------------------------*/
       const viewURL =
         item.category === "notice"
           ? `/kr/sub/pr/notice/notice-view.html?id=${item.id}`
           : `/kr/sub/pr/news/news-view.html?id=${item.id}`;
 
+      /* -------------------------------
+         🔥 날짜 표시
+      --------------------------------*/
+      const dateStr = new Date(item.created_at).toLocaleDateString("ko-KR");
+
+      /* -------------------------------
+         🔥 카드 HTML
+      --------------------------------*/
       const card = `
         <div class="news-card" onclick="location.href='${viewURL}'">
-          <img src="${imgURL}" alt="${item.title}" 
-               onerror="this.src='/img/default-news.png'">
+          <img src="${imgURL}" alt="${item.title}"
+               onerror="this.src='${defaultImg}'">
 
           ${label}
 
@@ -483,7 +505,7 @@ window.addEventListener("load", loadLatestPosts);
 </script>
 
 <style>
-  /* 공지/뉴스 라벨 */
+  /* 공지/뉴스 라벨 스타일 */
   .badge {
     display: inline-block;
     margin: 10px 20px 0;
@@ -493,8 +515,8 @@ window.addEventListener("load", loadLatestPosts);
     border-radius: 4px;
     color: #fff;
   }
-  .badge.notice { background: #0f2679; }
-  .badge.news { background: #198754; }
+  .badge.notice { background: #0f2679; } /* 군청색 */
+  .badge.news { background: #198754; }   /* 녹색 */
 </style>
 
 
