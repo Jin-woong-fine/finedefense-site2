@@ -427,48 +427,40 @@
 
 
     <script>
-    async function loadLatestPosts() {
-      try {
-        // 🔥 공지 + 뉴스 최신 3개 API
-        const res = await fetch("/api/posts/latest?lang=kr&limit=3");
-        const list = await res.json();
+      async function loadLatest() {
+        try {
+          const res = await fetch("/api/posts/latest?lang=kr&limit=3");
+          const list = await res.json();
 
-        const grid = document.getElementById("newsGrid");
-        grid.innerHTML = "";
+          const grid = document.getElementById("newsGrid");
 
-        if (!Array.isArray(list) || list.length === 0) {
-          grid.innerHTML = "<p>등록된 소식이 없습니다.</p>";
-          return;
+          if (!Array.isArray(list) || list.length === 0) {
+            grid.innerHTML = "<p>등록된 소식이 없습니다.</p>";
+            return;
+          }
+
+          // ✨ innerHTML 딱 1번만
+          grid.innerHTML = list.map(item => {
+            const img = item.main_image || "/img/default-news.jpg";
+            const dateStr = new Date(item.created_at).toLocaleDateString("ko-KR");
+
+            return `
+              <div class="news-card"
+                  onclick="location.href='/kr/sub/pr/${item.category}/${item.category}-view.html?id=${item.id}'">
+                <img src="${img}" alt="${item.title}" onerror="this.src='/img/default-news.jpg'">
+                <h3>${item.title}</h3>
+                <span class="date">${dateStr}</span>
+              </div>
+            `;
+          }).join("");
+
+        } catch (err) {
+          console.error("🔥 최신 뉴스/공지 불러오기 오류:", err);
         }
-
-        list.forEach(item => {
-          const img = item.main_image || "/img/default-news.jpg";
-          const date = (item.created_at || "").substring(0, 10);
-
-          // 🔥 category가 'notice'냐 'news'냐에 따라 경로 다르게
-          const link =
-            item.category === "notice"
-              ? `/kr/sub/pr/notice/notice-view.html?id=${item.id}`
-              : `/kr/sub/pr/news/news-view.html?id=${item.id}`;
-
-          const card = `
-            <div class="news-card" onclick="location.href='${link}'">
-              <img src="${img}" alt="${item.title}" 
-                onerror="this.src='/img/default-news.jpg'">
-              <h3>${item.title}</h3>
-              <p>${item.category === "notice" ? "공지사항" : "뉴스"}</p>
-              <span class="date">${date}</span>
-            </div>
-          `;
-
-          grid.innerHTML += card;
-        });
-      } catch (err) {
-        console.error("🔥 최신글 로딩 오류:", err);
       }
-    }
 
-    window.addEventListener("load", loadLatestPosts);
+      window.addEventListener("load", loadLatest);
+
     </script>
 
 
