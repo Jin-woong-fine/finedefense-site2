@@ -156,6 +156,9 @@
         localStorage.setItem("role", data.role);
         localStorage.setItem("name", data.name);
         localStorage.setItem("user_id", data.id);
+        // ⭐ exp 저장
+        localStorage.setItem("exp", data.exp * 1000);
+
 
         // 권한 따라 이동
         if (["superadmin", "admin", "editor"].includes(data.role)) {

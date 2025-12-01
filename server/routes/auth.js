@@ -72,15 +72,20 @@ router.post("/login", async (req, res) => {
       { expiresIn: "2h" }
     );
 
-    await logLogin(user, "success", req); // 🔥 성공 기록
+    // ⭐ 토큰 decode해서 exp 추출
+    const decoded = jwt.decode(token);
+
+    await logLogin(user, "success", req);
 
     res.json({
       message: "login success",
       token,
+      exp: decoded.exp,   // ⭐ 꼭 넣어야 함
       id: user.id,
       name: user.name,
       role: user.role,
     });
+
 
   } catch (err) {
     console.error("❌ Login Error:", err);
