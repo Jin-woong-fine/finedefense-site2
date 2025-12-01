@@ -168,4 +168,37 @@ router.get("/list/:category", async (req, res) => {
 });
 
 
+/* =====================================================
+   📌 최신 포스트(공지 + 뉴스) N개 가져오기
+===================================================== */
+router.get("/latest", async (req, res) => {
+  try {
+    const lang = req.query.lang || "kr";
+    const limit = Number(req.query.limit) || 3;
+
+    const sql = `
+      SELECT p.*,
+             u.name AS author_name,
+             (SELECT COUNT(*) FROM post_view_logs v WHERE v.post_id = p.id) AS views
+        FROM posts p
+        LEFT JOIN users u ON p.author_id = u.id
+       WHERE p.category IN ('notice', 'news')
+         AND p.lang = ?
+       ORDER BY p.created_at DESC
+       LIMIT ?
+    `;
+
+    const [rows] = await db.execute(sql, [lang, limit]);
+
+    res.json(rows);
+
+  } catch (err) {
+    console.error("🔥 최신 글 조회 오류:", err);
+    res.status(500).json({ message: "latest error" });
+  }
+});
+
+
+
+
 export default router;
