@@ -441,50 +441,34 @@ async function loadLatestPosts() {
     }
 
     list.forEach(item => {
-      /* -------------------------------
-         🔥 카테고리별 라벨
-      --------------------------------*/
-      const label =
-        item.category === "notice"
-          ? `<span class="badge notice">공지</span>`
-          : `<span class="badge news">뉴스</span>`;
 
-      /* -------------------------------
-         🔥 이미지 기본값 (카테고리별 분기)
-      --------------------------------*/
-      let imgURL = item.main_image;
-
-      if (!imgURL) {
-        imgURL = item.category === "notice"
-          ? "/img/default-notice.png"
-          : "/img/default-news.png";
-      }
-
-      // onerror도 동일하게 처리해야 덮어쓰기 없음
-      const defaultImg = item.category === "notice"
+      // ✔ 카테고리별 fallback 이미지
+      const fallback = item.category === "notice"
         ? "/img/default-notice.png"
         : "/img/default-news.png";
 
-      /* -------------------------------
-         🔥 상세 페이지 URL
-      --------------------------------*/
+      // ✔ news는 main_image 있고 notice는 없음 → 자동 적용
+      let imgURL = item.main_image || fallback;
+
+      // ✔ 상세페이지 URL
       const viewURL =
         item.category === "notice"
           ? `/kr/sub/pr/notice/notice-view.html?id=${item.id}`
           : `/kr/sub/pr/news/news-view.html?id=${item.id}`;
 
-      /* -------------------------------
-         🔥 날짜 표시
-      --------------------------------*/
       const dateStr = new Date(item.created_at).toLocaleDateString("ko-KR");
 
-      /* -------------------------------
-         🔥 카드 HTML
-      --------------------------------*/
+      const label =
+        item.category === "notice"
+          ? `<span class="badge notice">공지</span>`
+          : `<span class="badge news">뉴스</span>`;
+
       const card = `
         <div class="news-card" onclick="location.href='${viewURL}'">
-          <img src="${imgURL}" alt="${item.title}"
-               onerror="this.src='${defaultImg}'">
+
+          <img src="${imgURL}"
+               alt="${item.title}"
+               onerror="this.onerror=null; this.src='${fallback}';">
 
           ${label}
 
@@ -503,6 +487,7 @@ async function loadLatestPosts() {
 
 window.addEventListener("load", loadLatestPosts);
 </script>
+
 
 <style>
   /* 공지/뉴스 라벨 스타일 */
