@@ -441,7 +441,7 @@
 
           // ✨ innerHTML 딱 1번만
           grid.innerHTML = list.map(item => {
-            const img = item.main_image || "/img/default-news.jpg";
+            const img = item.main_image || "/img/default-news.png";
             const dateStr = new Date(item.created_at).toLocaleDateString("ko-KR");
 
             return `
