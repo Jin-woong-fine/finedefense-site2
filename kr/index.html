@@ -255,24 +255,24 @@
         }
       }
 
-/* ================================
-   메인페이지: Apple-style Blur Header
-   ================================ */
+/* ==========================================
+   메인페이지: Deep Blur + Dark Overlay Header
+   ========================================== */
 
-/* 초기: 완전 투명 + 블러 */
+/* 초기: 배너 위에서 어둡게 + 선명한 blur */
 body#index-page .header-inner {
   position: fixed;
-  top: 0;          /* admin bar 있을 시 JS가 밀어줌 */
+  top: 0; 
   left: 0;
   width: 100%;
   padding: 22px 4vw;
 
-  background: rgba(255,255,255,0.05);     /* 거의 투명 */
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  /* 🔥 어둡게 (배너 위에서도 완전 선명) */
+  background: rgba(15, 15, 15, 0.35); 
+  backdrop-filter: blur(20px) brightness(1.2);
+  -webkit-backdrop-filter: blur(20px) brightness(1.2);
 
-  border-bottom: 1px solid rgba(255,255,255,0.15);
-  box-shadow: none;
+  border-bottom: 1px solid rgba(255,255,255,0.18);
 
   z-index: 6000;
   transition:
@@ -282,33 +282,55 @@ body#index-page .header-inner {
     box-shadow 0.35s ease;
 }
 
-/* 글자 흰색 + 은은한 그림자 */
+/* 기본 글씨 = 흰색 + 대비 증가 */
 body#index-page .header-inner * {
-  color: #fff !important;
-  text-shadow: 0 0 12px rgba(0,0,0,0.25);
+  color: #f4f4f4 !important;
+  text-shadow: 0px 0px 6px rgba(0,0,0,0.4);
 }
 
-/* 스크롤 후: 완전한 흰색 헤더로 변환 */
+/* 메뉴 hover도 밝게 */
+body#index-page .header-inner .main-menu li a:hover {
+  color: #ffffff !important;
+  opacity: 1;
+}
+
+/* 스크롤 후: 완전한 흰색 헤더 */
 body#index-page.scrolled .header-inner {
-  background: rgba(255,255,255,0.95);
+  background: rgba(255,255,255,0.96);
   border-bottom: 1px solid rgba(0,0,0,0.06);
-  padding: 16px 4vw;
 
   backdrop-filter: blur(0px);
   -webkit-backdrop-filter: blur(0px);
-  box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+
+  padding: 16px 4vw;
+  box-shadow: 0px 3px 10px rgba(0,0,0,0.08);
 }
 
-/* 스크롤 시 글자 검정 */
+/* 스크롤 시 글씨 → 검정 */
 body#index-page.scrolled .header-inner * {
   color: #111 !important;
   text-shadow: none !important;
 }
 
-/* 관리자바 있을 때 헤더 자동 아래로 */
+/* 관리자바 있을 때 헤더 이동 */
 body#index-page.has-admin-bar .header-inner {
   top: 38px !important;
 }
+
+/* 언어 토글 버튼은 항상 검정 텍스트 */
+body#index-page .lang-toggle,
+body#index-page .lang-toggle * {
+  color: #111 !important;
+  text-shadow: none !important;
+}
+
+/* 드롭다운은 기본 스타일 유지 */
+body#index-page .language-dropdown.open .lang-list {
+  background: #fff !important;
+}
+
+
+
 
 
 
