@@ -423,11 +423,11 @@ footer {
   color: #fff;
   padding: 6px 16px;
   box-sizing: border-box;
-  display: none;                /* 기본은 숨김 */
+  display: none;                
   justify-content: space-between;
   align-items: center;
   font-size: 13px;
-  z-index: 9999;               /* 최상단 */
+  z-index: 9999;
 }
 
 /* 내부 레이아웃 */
@@ -454,55 +454,37 @@ footer {
   color: #ffd966;
 }
 
-/* 버튼 */
-#adminSessionBar .admin-extend-btn {
+/* ============================================== */
+/* 🔵 공통 버튼 스타일 (대시보드 버튼 + 연장버튼)  */
+/* ============================================== */
+.admin-btn {
   background: #fff;
   color: #0f2679;
   border: none;
-  padding: 4px 10px;
+  padding: 4px 12px;
   border-radius: 4px;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
+  transition: background 0.2s ease;
 }
 
-#adminSessionBar .admin-extend-btn:hover {
+.admin-btn:hover {
   background: #eef1ff;
 }
 
 /* ============================================== */
-/*       🔵 admin bar 존재 시 body 전체 이동       */
+/* 🔵 admin bar 존재 시 body 전체 이동            */
 /* ============================================== */
 
 body.has-admin-bar {
-  padding-top: 50px !important;   /* 🔥 유일한 조정값 — margin-top 대신 padding-top */
+  padding-top: 50px !important;
 }
 
-/* ============================================== */
-/* 🔵 header는 위치 조정 금지 (include 때문에 충돌) */
-/* ============================================== */
-
+/* header는 절대 건드리지 않기 */
 header.header-inner {
   position: relative;
   z-index: 9000;
   margin-top: 0 !important;
   padding-top: 0 !important;
-}
-
-
-
-/* 대시보드용 — admin extend 버튼과 동일한 스타일 */
-.dashboard-btn {
-  background: #fff;
-  color: #0f2679;
-  border: none;
-  padding: 4px 10px;
-  border-radius: 4px;
-  font-size: 12px;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.dashboard-btn:hover {
-  background: #eef1ff;
 }

@@ -4,12 +4,18 @@
     <span class="admin-badge">ADMIN</span>
     <span id="adminUser" class="admin-user"></span>
   </div>
+
   <div class="admin-center">
     <span class="admin-label">세션 남은 시간</span>
     <span id="adminTimer" class="admin-timer">--:--:--</span>
   </div>
+
   <div class="admin-right">
-    <a href="/kr/admin/dashboard.html" class="admin-link">관리자 대시보드</a>
-    <button id="adminExtendBtn" class="admin-extend-btn">연장</button>
+    <button class="admin-btn" onclick="location.href='/kr/admin/dashboard.html'">
+      관리자 대시보드
+    </button>
+    <button id="adminExtendBtn" class="admin-btn admin-extend-btn">
+      연장
+    </button>
   </div>
 </div>
