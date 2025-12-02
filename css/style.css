@@ -1,33 +1,27 @@
-/* 전체 body */
+/* ============================================== */
+/*                   기본 설정                    */
+/* ============================================== */
+
 body {
   margin: 0;
   font-family: Arial, sans-serif;
 }
 
-/* 헤더 전체 */
+/* ============================================== */
+/*                   HEADER                       */
+/* ============================================== */
+
 .header-inner {
   display: flex;
-  justify-content: space-between; /* 좌: 로고, 우: 언어 */
+  justify-content: space-between;
   align-items: center;
   width: 100%;
-  height: auto;
   padding: clamp(0.5rem, 1.5vw, 1.5rem) 2vw;
-  box-sizing: border-box;
-  margin: 0 auto;
-  position: relative;
-  z-index: 10;
   background-color: #fff;
   border-bottom: 1px solid #e0e0e0;
-}
-
-/* 헤더 내부 구조 */
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: clamp(1rem, 3vw, 3rem);
-}
-.header-right {
-  flex: 0 0 auto;
+  position: relative;
+  z-index: 1 !important;      /* admin bar 아래 */
+  box-sizing: border-box;
 }
 
 /* 로고 */
@@ -36,24 +30,27 @@ body {
   height: auto;
 }
 
-/* 메뉴 중앙 정렬 */
+/* 메뉴 영역 (중앙 배치) */
 .main-menu-container {
   flex: 1;
   display: flex;
   justify-content: center;
 }
 
-/* 메인 메뉴 */
 .main-menu {
   position: absolute;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
   display: flex;
   gap: clamp(40px, 5vw, 150px);
   list-style: none;
-  margin: 0;
   padding: 0;
-  white-space: nowrap;
+  margin: 0;
+}
+
+.main-menu li {
+  position: relative;
 }
 
 .main-menu li a {
@@ -69,65 +66,41 @@ body {
   color: #0f2679;
 }
 
-/* 하위 메뉴 */
-.main-menu li {
-  position: relative;
-}
-
-.main-menu li::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 100%;
-  width: 100%;
-  height: 50px;
-  pointer-events: auto;
-}
-
-/* 하위 메뉴 숨김 */
+/* 하위메뉴 */
 .submenu {
   list-style: none;
   opacity: 0;
   visibility: hidden;
-  transform: translateY(10px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
   position: absolute;
   top: 210%;
   left: 50%;
   transform: translate(-50%, 10px);
-  background-color: #fff;
   border: 1px solid #5353536e;
+  background: #fff;
   padding: 0;
   margin: 0;
   min-width: 150px;
+  transition: 0.3s ease;
   z-index: 100;
-  text-align: center;
 }
 
 .submenu li a {
   display: block;
   padding: 8px 15px;
   color: #000;
-  text-decoration: none;
   font-size: clamp(12px, 1vw, 17px);
-  font-weight: 500;
-  transition: color 0.3s ease;
 }
 
-.submenu li a:hover {
-  color: #0f2679;
-}
-
-/* 호버 시 하위 메뉴 표시 */
 .main-menu li:hover > .submenu {
   opacity: 1;
   visibility: visible;
   transform: translate(-50%, 0);
-  display: block;
-  transition: 0.3s ease;
 }
 
-/* 🌐 언어 선택 */
+/* ============================================== */
+/*                 LANG DROPDOWN                  */
+/* ============================================== */
+
 .language-dropdown {
   position: relative;
 }
@@ -136,16 +109,14 @@ body {
   background: #fff;
   border: 1px solid #d0d0d0;
   border-radius: 20px;
-  padding: clamp(4px, 0.6vw, 6px) clamp(10px, 1vw, 16px);
+  padding: 6px 16px;
   font-size: clamp(0.9rem, 1.2vw, 1.2rem);
   font-weight: 700;
-  color: #222;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: clamp(4px, 0.6vw, 8px);
+  gap: 6px;
   transition: all 0.25s ease;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .lang-toggle:hover {
@@ -154,171 +125,72 @@ body {
   color: #0f2679;
 }
 
-.lang-toggle .arrow {
-  font-size: 0.8rem;
-  transition: transform 0.2s ease;
-  margin-left: 4px;
-}
-
-.language-dropdown.open .arrow {
-  transform: rotate(180deg);
-}
-
 .lang-list {
   display: none;
   position: absolute;
   top: 120%;
   right: 0;
-  background: #fff;
   border: 1px solid #ccc;
   border-radius: 10px;
-  box-shadow: 0 6px 12px rgba(0,0,0,0.08);
-  list-style: none;
-  margin: 0;
+  background: #fff;
   padding: 6px 0;
-  width: auto;
   min-width: 80px;
-  white-space: nowrap;
-  z-index: 100;
-  animation: fadeIn 0.2s ease;
+  z-index: 200;
 }
 
 .language-dropdown.open .lang-list {
   display: block;
 }
 
-.lang-list li a {
-  display: block;
-  text-align: center;
-  padding: clamp(6px, 1vw, 8px) clamp(6px, 1vw, 10px);
-  text-decoration: none;
-  color: #333;
-  font-weight: 600;
-  font-size: clamp(0.8rem, 1.1vw, 1.2rem);
-  transition: background 0.2s ease, color 0.2s ease;
-}
+/* ============================================== */
+/*                햄버거 메뉴 (모바일)             */
+/* ============================================== */
 
-.lang-list li a:hover {
-  background-color: #f2f4ff;
-  color: #0f2679;
-}
-
-/* 등장 애니메이션 */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-3px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* 🔽 반응형 햄버거 */
 .hamburger {
   display: none;
   flex-direction: column;
-  justify-content: center;
   gap: 5px;
-  width: 28px;
-  height: 24px;
   cursor: pointer;
 }
 
 .hamburger span {
   background: #333;
   height: 3px;
-  width: 100%;
+  width: 28px;
   border-radius: 2px;
-  transition: all 0.3s ease;
 }
 
-.hamburger.active span:nth-child(1) {
-  transform: rotate(45deg) translate(5px, 5px);
-}
-.hamburger.active span:nth-child(2) {
-  opacity: 0;
-}
-.hamburger.active span:nth-child(3) {
-  transform: rotate(-45deg) translate(6px, -6px);
-}
-
-/* 📱 1024px 이하 자동 전환 */
+/* 모바일 레이아웃 */
 @media (max-width: 1024px) {
-  .header-inner {
-    flex-wrap: wrap;
-    padding: 12px 20px;
-  }
-
-  .header-left .logo {
-    width: 140px;
-  }
-
-  .hamburger {
-    display: flex;
-  }
-
+  .hamburger { display: flex; }
   .main-menu {
     position: static;
     transform: none;
     flex-direction: column;
-    align-items: flex-start;
-    background: #fff;
     width: 100%;
-    border-top: 1px solid #eee;
     display: none;
+    border-top: 1px solid #eee;
   }
-
-  .main-menu.show {
-    display: flex;
-  }
-
-  .main-menu li a {
-    width: 100%;
-    padding: 14px 20px;
-    border-bottom: 1px solid #f0f0f0;
-  }
+  .main-menu.show { display: flex; }
 
   .submenu {
     position: static;
     opacity: 1;
     visibility: visible;
     transform: none;
-    border: none;
-    box-shadow: none;
-    padding-left: 15px;
     background: #f8f8f8;
     display: none;
   }
-
-  .main-menu li.open > .submenu {
-    display: block;
-  }
-
-  .header-right {
-    position: static;
-    top: auto;
-    right: auto;
-    width: 100%;
-    margin-top: 12px;
-    display: flex;
-    justify-content: flex-end;
-  }
+  .main-menu li.open > .submenu { display: block; }
 }
 
-/* 더 작은 화면 */
-@media (max-width: 480px) {
-  .header-left .logo {
-    width: 110px;
-  }
-  .lang-toggle {
-    font-size: 0.8rem;
-    padding: 4px 10px;
-  }
-  .main-menu li a {
-    font-size: 0.95rem;
-  }
-}
+/* ============================================== */
+/*                      FOOTER                    */
+/* ============================================== */
 
-/* 🔽 footer 이하 원본 그대로 유지 🔽 */
 footer {
   width: 100%;
-  background-color: #333;
+  background: #333;
   color: #f0f0f0;
   padding: 40px 0;
   box-sizing: border-box;
@@ -331,63 +203,6 @@ footer {
   gap: 40px;
   width: 60%;
   margin: 0 auto;
-  padding: 0 50px;
-  box-sizing: border-box;
-  text-align: left;
-}
-
-.footer-left, .footer-info, .footer-right {
-  padding: 0 20px;
-}
-
-.footer-left {
-  flex: 1;
-  min-width: 100px;
-  margin-bottom: 20px;
-}
-
-.footer-left .footer-links a {
-  color: #ccc;
-  text-decoration: none;
-  display: block;
-  margin: 5px 0;
-  transition: color 0.2s;
-}
-
-.footer-left .footer-links a:hover {
-  color: #fff;
-}
-
-.footer-info {
-  flex: 2;
-  min-width: 300px;
-  margin-bottom: 0px;
-  color: #d0d0d0;
-}
-
-.footer-info p {
-  margin: 4px 0;
-}
-
-.footer-right {
-  position: relative;
-}
-
-.footer-right .family-links {
-  position: absolute;
-  top: 20%;
-  right: 10%;
-  display: none;
-  list-style: none;
-  padding: 10px;
-  background-color: #7c7c7c;
-  border-radius: 5px;
-  z-index: 10;
-  width: 150px;
-}
-
-.footer-right:hover .family-links {
-  display: block;
 }
 
 .footer-copy {
@@ -398,19 +213,10 @@ footer {
   margin-top: 20px;
   border-top: 1px solid #444;
   padding: 15px 0;
-  box-sizing: border-box;
-}
-
-@media (max-width: 1300px) {
-  .footer-container {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
 }
 
 /* ============================================== */
-/*               🔵 ADMIN SESSION BAR             */
+/*               ADMIN SESSION BAR                */
 /* ============================================== */
 
 #adminSessionBar {
@@ -423,14 +229,12 @@ footer {
   color: #fff;
   padding: 6px 16px;
   box-sizing: border-box;
-  display: none;                
+  display: none;                   /* 기본 숨김 */
   justify-content: space-between;
   align-items: center;
-  font-size: 13px;
-  z-index: 9999;
+  z-index: 9999 !important;        /* 최상단 */
 }
 
-/* 내부 레이아웃 */
 #adminSessionBar .admin-left,
 #adminSessionBar .admin-center,
 #adminSessionBar .admin-right {
@@ -439,24 +243,11 @@ footer {
   gap: 10px;
 }
 
-/* 뱃지 */
-.admin-badge {
-  font-weight: 700;
-  font-size: 11px;
-  padding: 2px 6px;
-  border-radius: 4px;
-  background: rgba(255,255,255,0.18);
-}
-
-/* 타이머 */
 .admin-timer {
   font-weight: 700;
   color: #ffd966;
 }
 
-/* ============================================== */
-/* 🔵 공통 버튼 스타일 (대시보드 버튼 + 연장버튼)  */
-/* ============================================== */
 .admin-btn {
   background: #fff;
   color: #0f2679;
@@ -466,25 +257,12 @@ footer {
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s ease;
 }
-
 .admin-btn:hover {
   background: #eef1ff;
 }
 
-/* ============================================== */
-/* 🔵 admin bar 존재 시 body 전체 이동            */
-/* ============================================== */
-
+/* admin bar가 있을 때 페이지 전체 내려감 */
 body.has-admin-bar {
   padding-top: 50px !important;
-}
-
-/* header는 절대 건드리지 않기 */
-header.header-inner {
-  position: relative;
-  z-index: 9000;
-  margin-top: 0 !important;
-  padding-top: 0 !important;
 }
