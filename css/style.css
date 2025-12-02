@@ -414,13 +414,17 @@ footer {
   margin-top: 40px; /* admin 세션바 높이와 맞춤 */
 }
 
-/* ============================= */
-/*       ADMIN SESSION BAR       */
-/* ============================= */
+/* ============================================== */
+/*        ADMIN SESSION BAR (Fixed Top Bar)       */
+/* ============================================== */
 
 .admin-session-bar,
 #adminSessionBar {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
+  height: 38px;                 /* 🔥 일정한 높이로 통일 */
   background: #0f2679;
   color: #fff;
   padding: 6px 16px;
@@ -429,12 +433,10 @@ footer {
   justify-content: space-between;
   align-items: center;
   font-size: 13px;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 9999;
+  z-index: 9999;               /* 최상단 */
 }
 
+/* 바 내부 공통 레이아웃 */
 .admin-session-bar .admin-left,
 .admin-session-bar .admin-center,
 .admin-session-bar .admin-right {
@@ -443,36 +445,45 @@ footer {
   gap: 10px;
 }
 
+/* ADMIN 뱃지 */
 .admin-badge {
   font-weight: 700;
-  font-size: 12px;
+  font-size: 11px;
   padding: 2px 6px;
   border-radius: 4px;
-  background: rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.18);
 }
 
+/* 관리자명 */
 .admin-user {
   font-weight: 600;
 }
 
+/* "세션 남은 시간" 글자 */
 .admin-label {
-  opacity: 0.9;
+  opacity: 0.85;
+  font-size: 12px;
 }
 
+/* 남은 시간 숫자 */
 .admin-timer {
   font-weight: 700;
-  color: #ffd966;
+  color: #ffd966; /* 옅은 골드 */
+  font-size: 13px;
 }
 
+/* 관리자 대시보드 링크 */
 .admin-link {
   color: #fff;
   text-decoration: none;
-  font-size: 13px;
+  font-size: 12px;
+  font-weight: 500;
 }
 .admin-link:hover {
   text-decoration: underline;
 }
 
+/* 연장 버튼 */
 .admin-extend-btn {
   background: #fff;
   color: #0f2679;
@@ -484,10 +495,25 @@ footer {
   font-weight: 600;
 }
 .admin-extend-btn:hover {
-  background: #f2f4ff;
+  background: #eef1ff;
 }
 
-/* 만료 상태 시 */
+/* 만료 시 색상 변화 */
 .admin-session-expired {
-  background: #7a1b1b;
+  background: #7a1b1b !important;
 }
+
+/* ============================================== */
+/*  ADMIN BAR가 보일 때, 헤더/페이지 자동 내려가기    */
+/* ============================================== */
+
+body.has-admin-bar {
+  margin-top: 38px !important;  /* 🔥 admin bar 높이만큼 전체 페이지 아래로 */
+}
+
+/* 헤더가 admin bar와 겹치지 않도록 절대 보정 */
+header.header-inner {
+  z-index: 9000;
+  position: relative;
+}
+

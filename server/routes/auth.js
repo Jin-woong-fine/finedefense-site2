@@ -1,7 +1,8 @@
+// /server/routes/auth.js
 import express from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import db from "../config/db.js";   // 반드시 db 로 통일
+import db from "../config/db.js";
 import dotenv from "dotenv";
 import requestIp from "request-ip";
 import { verifyToken, verifyRole } from "../middleware/auth.js";
@@ -50,7 +51,7 @@ router.post("/login", async (req, res) => {
     );
 
     if (rows.length === 0) {
-      await logLogin(null, "fail", req); // 🔥 실패 기록
+      await logLogin(null, "fail", req);
       return res.status(404).json({ message: "User not found" });
     }
 
@@ -58,7 +59,7 @@ router.post("/login", async (req, res) => {
 
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) {
-      await logLogin(null, "fail", req);  // 🔥 실패 기록
+      await logLogin(null, "fail", req);
       return res.status(401).json({ message: "Invalid password" });
     }
 
@@ -72,7 +73,6 @@ router.post("/login", async (req, res) => {
       { expiresIn: "2h" }
     );
 
-    // ⭐ 토큰 decode해서 exp 추출
     const decoded = jwt.decode(token);
 
     await logLogin(user, "success", req);
@@ -80,12 +80,11 @@ router.post("/login", async (req, res) => {
     res.json({
       message: "login success",
       token,
-      exp: decoded.exp,   // ⭐ 꼭 넣어야 함
+      exp: decoded.exp,
       id: user.id,
       name: user.name,
       role: user.role,
     });
-
 
   } catch (err) {
     console.error("❌ Login Error:", err);
@@ -93,19 +92,14 @@ router.post("/login", async (req, res) => {
   }
 });
 
-
 /* ============================================================
-   🔄 세션 연장(refresh)
+   🔄 세션 Refresh (토큰 재발급)
 ============================================================ */
 router.post("/refresh", verifyToken, (req, res) => {
-  const user = req.user; // verifyToken이 넣어줌
+  const user = req.user;
 
   const token = jwt.sign(
-    {
-      id: user.id,
-      role: user.role,
-      name: user.name
-    },
+    { id: user.id, role: user.role, name: user.name },
     process.env.JWT_SECRET,
     { expiresIn: "2h" }
   );
@@ -118,10 +112,6 @@ router.post("/refresh", verifyToken, (req, res) => {
     exp: decoded.exp
   });
 });
-
-
-
-
 
 /* ============================================================
    👑 사용자 생성 (superadmin 전용)
@@ -160,6 +150,38 @@ router.post("/create-user", verifyToken, verifyRole("superadmin"), async (req, r
   } catch (err) {
     console.error("❌ User Create Error:", err);
     res.status(500).json({ message: "Server error", detail: err.message });
+  }
+});
+
+/* ============================================================
+   💥 세션 연장 API (프론트 타이머용)
+============================================================ */
+router.post("/extend", verifyToken, async (req, res) => {
+  try {
+    const user = req.user;
+
+    // 관리자만 연장 가능
+    if (user.role !== "admin" && user.role !== "superadmin") {
+      return res.status(403).json({
+        ok: false,
+        message: "관리자만 세션을 연장할 수 있습니다."
+      });
+    }
+
+    // 1시간 연장
+    const extendMs = 60 * 60 * 1000;
+
+    return res.json({
+      ok: true,
+      extendMs
+    });
+
+  } catch (err) {
+    console.error("❌ Extend Error:", err);
+    return res.status(500).json({
+      ok: false,
+      message: "서버 오류가 발생했습니다."
+    });
   }
 });
 
