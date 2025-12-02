@@ -58,28 +58,32 @@ function formatTime(ms) {
 async function initSessionTimer() {
   try {
     // include 로드 기다림
-    const bar = await waitForElement("#adminSessionBar");
+    const bar    = await waitForElement("#adminSessionBar");
     const header = await waitForElement("header.header-inner");
 
     const role = localStorage.getItem("role");
     const name = localStorage.getItem("name");
 
+    // 헤더 여백 초기화(혹시 남아있을 수도 있으니)
+    header.style.marginTop = "0";
+
+    // ----- 관리자 아닐 때 -----
     if (role !== "admin" && role !== "superadmin") {
       bar.style.display = "none";
       document.body.classList.remove("has-admin-bar");
       return;
     }
 
-    // 관리자일 때만 표시
+    // ----- 관리자일 때 -----
     bar.style.display = "flex";
 
-    // 헤더 자동 밀기
-    header.style.marginTop = "38px";
+    // 🔥 여기서만 body에 패딩 주기 (CSS에서 처리)
+    document.body.classList.add("has-admin-bar");
 
     // DOM 연결
     const timerSpan = document.getElementById("adminTimer");
     const extendBtn = document.getElementById("adminExtendBtn");
-    const userSpan = document.getElementById("adminUser");
+    const userSpan  = document.getElementById("adminUser");
 
     if (userSpan) userSpan.textContent = `${name} 님`;
 
@@ -97,32 +101,36 @@ async function initSessionTimer() {
         return;
       }
 
-      timerSpan.textContent = formatTime(diff);
+      if (timerSpan) {
+        timerSpan.textContent = formatTime(diff);
+      }
     }
 
     tick();
     setInterval(tick, 1000);
 
-    extendBtn.addEventListener("click", async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const res = await fetch("/api/auth/extend", {
-          method: "POST",
-          headers: { Authorization: "Bearer " + token }
-        });
-        const out = await res.json();
+    if (extendBtn) {
+      extendBtn.addEventListener("click", async () => {
+        try {
+          const token = localStorage.getItem("token");
+          const res = await fetch("/api/auth/extend", {
+            method: "POST",
+            headers: { Authorization: "Bearer " + token }
+          });
+          const out = await res.json();
 
-        if (res.ok && out.ok) {
-          localStorage.setItem("token", out.token);
-          localStorage.setItem("token_expire", out.exp * 1000);
-          alert("세션이 연장되었습니다.");
-        } else {
-          alert("연장 실패");
+          if (res.ok && out.ok) {
+            localStorage.setItem("token", out.token);
+            localStorage.setItem("token_expire", out.exp * 1000);
+            alert("세션이 연장되었습니다.");
+          } else {
+            alert("연장 실패");
+          }
+        } catch (err) {
+          alert("연장 중 오류");
         }
-      } catch (err) {
-        alert("연장 중 오류");
-      }
-    });
+      });
+    }
 
   } catch (e) {
     console.warn("[session_timer] admin bar or header load 실패");
