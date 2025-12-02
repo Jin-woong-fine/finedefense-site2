@@ -5,10 +5,10 @@
   <title>제품 수정 | Fine Defense 관리자</title>
 
   <!-- Toast UI Editor CSS -->
-  <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+  <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
 
   <!-- 공통 관리자 CSS -->
-  <link rel="stylesheet" href="./css/admin.css" />
+  <link rel="stylesheet" href="./css/admin.css">
 
   <!-- SortableJS -->
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
@@ -16,8 +16,8 @@
   <style>
     .thumb-preview {
       display: flex;
-      gap: 10px;
       flex-wrap: wrap;
+      gap: 10px;
       margin-top: 10px;
     }
     .thumb-preview .img-item {
@@ -40,10 +40,10 @@
       height: 20px;
       border-radius: 50%;
       background: crimson;
-      color: white;
+      color: #fff;
       border: none;
-      cursor: pointer;
       font-size: 13px;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -52,9 +52,9 @@
 
 <div id="sidebar"></div>
 
-<div class="main">   <!-- ✅ 여기서 main 시작 -->
+<div class="main">
 
-  <!-- 🔵 TOPBAR -->
+  <!-- TOPBAR -->
   <div class="topbar">
     <div class="title">제품 수정</div>
 
@@ -70,14 +70,14 @@
     </div>
   </div>
 
-  <!-- 🔵 버튼 영역 -->
+  <!-- 버튼 -->
   <div style="margin-bottom:20px;">
     <button class="btn btn-primary" onclick="location.href='products-list.html'">목록으로</button>
     <button class="btn btn-primary" onclick="location.href='../index.html'">홈으로</button>
     <button id="logoutBtn" class="btn btn-danger">로그아웃</button>
   </div>
 
-  <!-- 🔵 수정 FORM -->
+  <!-- FORM -->
   <form id="productForm" enctype="multipart/form-data">
 
     <section class="panel">
@@ -114,18 +114,15 @@
 
       <h3>새 이미지 업로드 추가</h3>
       <input type="file" id="images" name="images" multiple accept="image/*" class="input">
-
       <div id="previewNew" class="thumb-preview"></div>
 
-      <button type="submit" class="btn btn-primary" style="margin-top:15px;">
-        수정 완료
-      </button>
+      <button type="submit" class="btn btn-primary" style="margin-top:15px;">수정 완료</button>
 
     </section>
 
   </form>
 
-</div> <!-- ✅ main은 반드시 마지막에서 닫힘 -->
+</div>
 
 <!-- 공통 JS -->
 <script src="/kr/admin/js/common_auth.js"></script>
@@ -135,9 +132,7 @@
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 
 <script>
-/* ============================================================
-   초기 설정
-============================================================ */
+/* 초기 설정 */
 (function () {
   requireAdminOrEditor();
   loadSidebar("products");
@@ -151,9 +146,7 @@ if (!productId) {
   location.href = "products-list.html";
 }
 
-/* ============================================================
-   Toast UI Editor 초기화
-============================================================ */
+/* Editor */
 let editor = new toastui.Editor({
   el: document.querySelector('#editor'),
   height: '500px',
@@ -161,31 +154,38 @@ let editor = new toastui.Editor({
   previewStyle: 'vertical',
 });
 
-/* ============================================================
-   기존 데이터 불러오기
-============================================================ */
+/* 기존 데이터 */
 let oldImages = [];
 let newImages = [];
 
+/* 제품 불러오기 */
 async function loadProduct() {
   try {
-    const res = await fetch(`/api/products/${productId}`, { headers: authHeaders() });
-    const data = await res.json();
+    const res = await fetch(`/api/products/${productId}`, {
+      headers: authHeaders()
+    });
+
+    const out = await res.json();
 
     if (!res.ok) {
       alert("제품 정보를 불러오지 못했습니다.");
       return;
     }
 
-    document.getElementById("title").value = data.title;
-    document.getElementById("summary").value = data.summary;
-    document.getElementById("category").value = data.category;
-    document.getElementById("lang").value = data.lang;
-    document.getElementById("sort_order").value = data.sort_order;
+    const p = out.product;
 
-    editor.setHTML(data.content || "");
+    // 텍스트 정보 넣기
+    document.getElementById("title").value = p.title;
+    document.getElementById("summary").value = p.summary;
+    document.getElementById("category").value = p.category;
+    document.getElementById("lang").value = p.lang;
+    document.getElementById("sort_order").value = p.sort_order;
 
-    oldImages = data.images || [];
+    // 내용 넣기
+    editor.setHTML(p.description_html || "");
+
+    // 이미지(파일명만 추출)
+    oldImages = out.images.map(img => img.url.replace("/uploads/products/", ""));
 
     renderOldImages();
 
@@ -197,33 +197,30 @@ async function loadProduct() {
 
 loadProduct();
 
-/* ============================================================
-   기존 이미지 렌더링 + 삭제
-============================================================ */
+/* 기존 이미지 렌더링 + 삭제 + 드래그 정렬 */
 function renderOldImages() {
   const wrap = document.getElementById("previewOld");
   wrap.innerHTML = "";
 
-  oldImages.forEach((img, index) => {
+  oldImages.forEach((name, index) => {
     const div = document.createElement("div");
     div.className = "img-item";
 
     div.innerHTML = `
-      <img src="/uploads/products/${img}">
+      <img src="/uploads/products/${name}">
       <button class="remove-btn" onclick="removeOldImage(${index})">×</button>
     `;
 
     wrap.appendChild(div);
   });
 
-  // 정렬 가능
   new Sortable(wrap, {
     animation: 150,
     onEnd: () => {
       const newOrder = [];
-      document.querySelectorAll("#previewOld img").forEach(imgEl => {
-        const match = oldImages.find(name => imgEl.src.includes(name));
-        if (match) newOrder.push(match);
+      document.querySelectorAll("#previewOld img").forEach(el => {
+        const filename = el.src.split("/uploads/products/")[1];
+        newOrder.push(filename);
       });
       oldImages = newOrder;
     }
@@ -235,9 +232,7 @@ function removeOldImage(i) {
   renderOldImages();
 }
 
-/* ============================================================
-   신규 이미지 업로드 프리뷰
-============================================================ */
+/* 신규 이미지 프리뷰 */
 document.getElementById("images").addEventListener("change", (e) => {
   const files = [...e.target.files];
   newImages.push(...files);
@@ -250,6 +245,7 @@ function renderNewImages() {
 
   newImages.forEach((file, index) => {
     const url = URL.createObjectURL(file);
+
     const div = document.createElement("div");
     div.className = "img-item";
 
@@ -267,9 +263,7 @@ function removeNewImage(i) {
   renderNewImages();
 }
 
-/* ============================================================
-   수정 요청
-============================================================ */
+/* 수정 API 요청 */
 document.getElementById("productForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -279,16 +273,16 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
   form.append("category", document.getElementById("category").value);
   form.append("lang", document.getElementById("lang").value);
   form.append("sort_order", document.getElementById("sort_order").value);
-  form.append("content", editor.getHTML());
+  form.append("description_html", editor.getHTML());
 
-  // 기존 이미지 순서 보내기
+  // 기존 이미지 순서
   form.append("old_images", JSON.stringify(oldImages));
 
-  // 새 이미지 추가
+  // 신규 이미지
   newImages.forEach(f => form.append("images", f));
 
   try {
-    const res = await fetch(`/api/products/update/${productId}`, {
+    const res = await fetch(`/api/products/${productId}`, {
       method: "PUT",
       headers: authHeaders(),
       body: form
