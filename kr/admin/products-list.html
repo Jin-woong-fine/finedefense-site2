@@ -84,158 +84,187 @@
 
 <body>
 
-<div id="sidebar"></div>
+  <!-- 🔵 사이드바 -->
+  <div id="sidebar"></div>
 
-<div class="main">
+  <!-- 🔵 메인 -->
+  <div class="main">
 
-  <!-- 🔵 TOPBAR -->
-  <div class="topbar">
-    <div class="title">제품 관리</div>
+    <!-- 🔵 TOPBAR (대시보드랑 동일 구조) -->
+    <div class="topbar">
+      <div class="title">제품 관리</div>
 
-    <div style="display:flex; align-items:center; gap:12px;">
+      <div style="display:flex; align-items:center; gap:12px;">
 
-      <!-- ⭐ 세션 타이머 -->
-      <span id="session-timer" class="session-timer">세션 계산중...</span>
+        <!-- ⭐ 세션 타이머 -->
+        <span id="session-timer" class="session-timer">세션 계산중...</span>
 
-      <div class="topbar-user" id="topbarUser">
-        <span id="topbarUserName">관리자</span> ▾
-        <div class="user-dropdown" id="userDropdown"></div>
-      </div>
+        <!-- 유저 드롭다운 -->
+        <div class="topbar-user" id="topbarUser">
+          <span id="topbarUserName">관리자</span> ▾
+          <div class="user-dropdown" id="userDropdown"></div>
+        </div>
 
-      <button onclick="location.href='../index.html'">홈으로</button>
-    </div>
-  </div>
-
-    <div>
-      <button class="btn btn-primary" onclick="location.href='products-add.html'">+ 신규등록</button>
-      <button class="btn btn-primary" onclick="location.href='../index.html'">홈으로</button>
-      <button id="logoutBtn" class="btn btn-danger">로그아웃</button>
-    </div>
-  </div>
-
-  <section class="panel">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;">
-      <h2>등록된 제품</h2>
-
-      <!-- 언어 필터 -->
-      <div class="lang-filter">
-        <button type="button" class="lang-btn active" data-lang="kr">KR</button>
-        <button type="button" class="lang-btn" data-lang="en">EN</button>
-        <button type="button" class="lang-btn" data-lang="all">ALL</button>
+        <button onclick="location.href='../index.html'">홈으로</button>
       </div>
     </div>
 
-    <div id="productList" class="product-grid"></div>
-  </section>
+    <!-- 🔵 목록 패널 -->
+    <section class="panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;">
+        <h2>등록된 제품</h2>
 
-</div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <!-- 언어 필터 -->
+          <div class="lang-filter">
+            <button type="button" class="lang-btn active" data-lang="kr">KR</button>
+            <button type="button" class="lang-btn" data-lang="en">EN</button>
+            <button type="button" class="lang-btn" data-lang="all">ALL</button>
+          </div>
 
-<!-- 공통 JS -->
-<script src="/kr/admin/js/common_auth.js"></script>
-<script src="/kr/admin/js/sidebar.js"></script>
-
-<!-- 페이지 전용 JS -->
-<script>
-(function () {
-  requireAdminOrEditor();
-  loadSidebar("products");
-  document.getElementById("logoutBtn").addEventListener("click", logout);
-})();
-
-/* =================================================================
-   🔥 목록만 따로 분리한 전용 스크립트
-   기존 DB/API 구조 완전 동일
-================================================================= */
-
-let allProducts = [];
-let currentLang = "kr";
-
-/* 언어 필터 이벤트 */
-document.querySelectorAll(".lang-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".lang-btn").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    currentLang = btn.dataset.lang;
-    renderList();
-  });
-});
-
-/* 데이터 불러오기 */
-async function loadProducts() {
-  try {
-    const res = await fetch(`/api/products/list`);
-    const data = await res.json();
-
-    allProducts = data.sort((a, b) => a.sort_order - b.sort_order);
-    renderList();
-  } catch (err) {
-    console.error("제품 로드 실패:", err);
-  }
-}
-
-/* 목록 출력 */
-function renderList() {
-  const list = document.getElementById("productList");
-  list.innerHTML = "";
-
-  let filtered = allProducts;
-
-  if (currentLang !== "all") {
-    filtered = filtered.filter(p => p.lang === currentLang);
-  }
-
-  if (filtered.length === 0) {
-    list.innerHTML = "<p>등록된 제품이 없습니다.</p>";
-    return;
-  }
-
-  filtered.forEach(item => {
-    const thumb = item.thumbnail
-      ? `/uploads/products/${item.thumbnail}`
-      : "/kr/admin/img/noimage.png";
-
-    const card = document.createElement("div");
-    card.className = "product-card";
-
-    card.innerHTML = `
-      <img src="${thumb}" alt="">
-      <div class="card-body">
-        <div class="title">${item.title}</div>
-        <div class="category">${item.category.toUpperCase()} | ${item.lang.toUpperCase()}</div>
-
-        <div class="card-buttons">
-          <button class="btn btn-primary" onclick="location.href='products-edit.html?id=${item.id}'">수정</button>
-          <button class="btn btn-danger" onclick="deleteProduct(${item.id})">삭제</button>
+          <!-- 신규 등록 버튼 -->
+          <button class="btn btn-primary" onclick="location.href='products-add.html'">+ 신규등록</button>
         </div>
       </div>
-    `;
 
-    list.appendChild(card);
-  });
-}
+      <div id="productList" class="product-grid"></div>
+    </section>
 
-/* 삭제 */
-async function deleteProduct(id) {
-  if (!confirm("삭제하시겠습니까?")) return;
+  </div>
 
-  const res = await fetch(`/api/products/delete/${id}`, {
-    method: "DELETE",
-    headers: authHeaders(),
-  });
+  <!-- 공통 JS -->
+  <script src="/kr/admin/js/common_auth.js"></script>
+  <script src="/kr/admin/js/sidebar.js"></script>
 
-  const out = await res.json();
+  <script>
+    (function () {
+      requireAdminOrEditor();
+      loadSidebar("products");
 
-  if (res.ok) {
-    alert("삭제되었습니다.");
+      // 🔹 topbar 유저 드롭다운 초기화 (dashboard와 동일)
+      const name = localStorage.getItem("name") || "사용자";
+      const role = localStorage.getItem("role");
+      const nameSpan = document.getElementById("topbarUserName");
+      const dropdown = document.getElementById("userDropdown");
+      const userBox = document.getElementById("topbarUser");
+
+      if (nameSpan) nameSpan.textContent = name;
+
+      let html = `<a href="/kr/admin/user_profile.html">내 프로필</a>`;
+      if (role === "admin" || role === "superadmin") {
+        html += `<a href="/kr/admin/users.html">사용자 관리</a>`;
+      }
+      html += `<a href="javascript:void(0);" onclick="logout()">로그아웃</a>`;
+      dropdown.innerHTML = html;
+
+      userBox.addEventListener("click", (e) => {
+        e.stopPropagation();
+        dropdown.style.display =
+          dropdown.style.display === "block" ? "none" : "block";
+      });
+
+      document.addEventListener("click", () => {
+        dropdown.style.display = "none";
+      });
+    })();
+
+    /* =================================================================
+       🔥 목록 전용 스크립트 (기존 DB/API 구조 동일)
+    ================================================================== */
+
+    let allProducts = [];
+    let currentLang = "kr";
+
+    // 언어 필터 이벤트
+    document.addEventListener("DOMContentLoaded", () => {
+      document.querySelectorAll(".lang-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".lang-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          currentLang = btn.dataset.lang;
+          renderList();
+        });
+      });
+    });
+
+    // 데이터 불러오기
+    async function loadProducts() {
+      try {
+        const res = await fetch(`/api/products/list`);
+        const data = await res.json();
+
+        allProducts = data.sort((a, b) => a.sort_order - b.sort_order);
+        renderList();
+      } catch (err) {
+        console.error("제품 로드 실패:", err);
+      }
+    }
+
+    // 목록 출력
+    function renderList() {
+      const list = document.getElementById("productList");
+      if (!list) return;
+
+      list.innerHTML = "";
+
+      let filtered = allProducts;
+
+      if (currentLang !== "all") {
+        filtered = filtered.filter(p => p.lang === currentLang);
+      }
+
+      if (filtered.length === 0) {
+        list.innerHTML = "<p>등록된 제품이 없습니다.</p>";
+        return;
+      }
+
+      filtered.forEach(item => {
+        const thumb = item.thumbnail
+          ? `/uploads/products/${item.thumbnail}`
+          : "/kr/admin/img/noimage.png";
+
+        const card = document.createElement("div");
+        card.className = "product-card";
+
+        card.innerHTML = `
+          <img src="${thumb}" alt="">
+          <div class="card-body">
+            <div class="title">${item.title}</div>
+            <div class="category">${item.category.toUpperCase()} | ${item.lang.toUpperCase()}</div>
+
+            <div class="card-buttons">
+              <button class="btn btn-primary" onclick="location.href='products-edit.html?id=${item.id}'">수정</button>
+              <button class="btn btn-danger" onclick="deleteProduct(${item.id})">삭제</button>
+            </div>
+          </div>
+        `;
+
+        list.appendChild(card);
+      });
+    }
+
+    // 삭제
+    async function deleteProduct(id) {
+      if (!confirm("삭제하시겠습니까?")) return;
+
+      const res = await fetch(`/api/products/delete/${id}`, {
+        method: "DELETE",
+        headers: authHeaders(),
+      });
+
+      const out = await res.json();
+
+      if (res.ok) {
+        alert("삭제되었습니다.");
+        loadProducts();
+      } else {
+        alert("삭제 실패: " + out.message);
+      }
+    }
+
+    // 실행
     loadProducts();
-  } else {
-    alert("삭제 실패: " + out.message);
-  }
-}
-
-/* 실행 */
-loadProducts();
-</script>
+  </script>
 
 </body>
 </html>
