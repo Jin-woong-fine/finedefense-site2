@@ -207,6 +207,13 @@
 
         const card = document.createElement("div");
         card.className = "product-card";
+        card.style.cursor = "pointer";
+
+        card.addEventListener("click", e => {
+        if (!e.target.closest(".card-buttons")) {
+            location.href = `products-edit.html?id=${item.id}`;
+        }
+        });
 
         card.innerHTML = `
         <img src="${thumb}" alt="">
