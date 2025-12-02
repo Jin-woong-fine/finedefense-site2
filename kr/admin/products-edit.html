@@ -52,15 +52,13 @@
 
 <div id="sidebar"></div>
 
-<div class="main">
+<div class="main">   <!-- ✅ 여기서 main 시작 -->
 
   <!-- 🔵 TOPBAR -->
   <div class="topbar">
     <div class="title">제품 수정</div>
 
     <div style="display:flex; align-items:center; gap:12px;">
-
-      <!-- ⭐ 세션 타이머 -->
       <span id="session-timer" class="session-timer">세션 계산중...</span>
 
       <div class="topbar-user" id="topbarUser">
@@ -72,21 +70,20 @@
     </div>
   </div>
 
-    <div>
-      <button class="btn btn-primary" onclick="location.href='products-list.html'">목록으로</button>
-      <button class="btn btn-primary" onclick="location.href='../index.html'">홈으로</button>
-      <button id="logoutBtn" class="btn btn-danger">로그아웃</button>
-    </div>
+  <!-- 🔵 버튼 영역 -->
+  <div style="margin-bottom:20px;">
+    <button class="btn btn-primary" onclick="location.href='products-list.html'">목록으로</button>
+    <button class="btn btn-primary" onclick="location.href='../index.html'">홈으로</button>
+    <button id="logoutBtn" class="btn btn-danger">로그아웃</button>
   </div>
 
-  <!-- 수정 FORM -->
+  <!-- 🔵 수정 FORM -->
   <form id="productForm" enctype="multipart/form-data">
 
     <section class="panel">
       <h2>제품 정보 수정</h2>
 
-      <input id="title" class="input" placeholder="제품명 입력" required />
-
+      <input id="title" class="input" placeholder="제품명 입력" required>
       <textarea id="summary" class="input" placeholder="카드 요약 설명" required></textarea>
 
       <select id="category" class="input" required>
@@ -102,7 +99,7 @@
         <option value="en">English</option>
       </select>
 
-      <input id="sort_order" class="input" type="number" placeholder="정렬 순번" required />
+      <input id="sort_order" class="input" type="number" placeholder="정렬 순번" required>
 
       <h3>제품 설명 (Toast UI Editor)</h3>
       <div id="editor" style="border:1px solid #ccc; border-radius:6px;"></div>
@@ -116,17 +113,19 @@
       <hr style="margin:20px 0;">
 
       <h3>새 이미지 업로드 추가</h3>
-      <input type="file" id="images" name="images" multiple accept="image/*" class="input" />
+      <input type="file" id="images" name="images" multiple accept="image/*" class="input">
+
       <div id="previewNew" class="thumb-preview"></div>
 
       <button type="submit" class="btn btn-primary" style="margin-top:15px;">
         수정 완료
       </button>
+
     </section>
 
   </form>
 
-</div>
+</div> <!-- ✅ main은 반드시 마지막에서 닫힘 -->
 
 <!-- 공통 JS -->
 <script src="/kr/admin/js/common_auth.js"></script>
