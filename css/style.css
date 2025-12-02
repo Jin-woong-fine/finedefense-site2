@@ -475,7 +475,7 @@ footer {
 /* ============================================== */
 
 body.has-admin-bar {
-  padding-top: 42px !important;   /* 🔥 유일한 조정값 — margin-top 대신 padding-top */
+  padding-top: 50px !important;   /* 🔥 유일한 조정값 — margin-top 대신 padding-top */
 }
 
 /* ============================================== */
