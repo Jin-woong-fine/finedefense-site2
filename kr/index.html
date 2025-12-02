@@ -259,75 +259,80 @@
         메인페이지: Deep Blur + Dark Overlay Header
         ========================================== */
 
-      /* 초기: 배너 위에서 어둡게 + 선명한 blur */
+      /* 초기: 배너 위에서 어둡게 + 강한 blur */
       body#index-page .header-inner {
         position: fixed;
-        top: 0; 
+        top: 0;
         left: 0;
         width: 100%;
         padding: 22px 4vw;
 
-        /* 🔥 어둡게 (배너 위에서도 완전 선명) */
-        background: rgba(15, 15, 15, 0.35); 
-        backdrop-filter: blur(20px) brightness(1.2);
-        -webkit-backdrop-filter: blur(20px) brightness(1.2);
+        background: rgba(15, 15, 15, 0.35);
+        backdrop-filter: blur(18px) brightness(1.25);
+        -webkit-backdrop-filter: blur(18px) brightness(1.25);
 
-        border-bottom: 1px solid rgba(255,255,255,0.18);
-
+        border-bottom: 1px solid rgba(255,255,255,0.15);
         z-index: 6000;
+
         transition:
           background 0.35s ease,
-          border-color 0.35s ease,
           padding 0.35s ease,
-          box-shadow 0.35s ease;
+          box-shadow 0.35s ease,
+          border-color 0.35s ease;
       }
 
-      /* 기본 글씨 = 흰색 + 대비 증가 */
-      body#index-page .header-inner * {
-        color: #f4f4f4 !important;
-        text-shadow: 0px 0px 6px rgba(0,0,0,0.4);
+      /* 기본 글자 → 흰색 */
+      body#index-page .header-inner .main-menu * {
+        color: #f8f8f8 !important;
+        text-shadow: 0px 0px 5px rgba(0,0,0,0.35);
       }
 
-      /* 메뉴 hover도 밝게 */
+      /* hover */
       body#index-page .header-inner .main-menu li a:hover {
-        color: #ffffff !important;
-        opacity: 1;
+        color: #fff !important;
       }
 
-      /* 스크롤 후: 완전한 흰색 헤더 */
+      /* 스크롤하면 → 완전한 흰색 배경 */
       body#index-page.scrolled .header-inner {
-        background: rgba(255,255,255,0.96);
+        background: rgba(255,255,255,0.97);
         border-bottom: 1px solid rgba(0,0,0,0.06);
 
-        backdrop-filter: blur(0px);
-        -webkit-backdrop-filter: blur(0px);
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
 
         padding: 16px 4vw;
-        box-shadow: 0px 3px 10px rgba(0,0,0,0.08);
+        box-shadow: 0 3px 10px rgba(0,0,0,0.07);
       }
 
-      /* 스크롤 시 글씨 → 검정 */
-      body#index-page.scrolled .header-inner * {
+      /* 스크롤 시 글자색 → 검정 */
+      body#index-page.scrolled .header-inner .main-menu * {
         color: #111 !important;
         text-shadow: none !important;
       }
 
-      /* 관리자바 있을 때 헤더 이동 */
+      /* ─────────────────────────────────────
+        언어 토글 버튼은 예외적으로 ‘항상 검정’
+        (배너 위에서도 / 스크롤 후도 동일)
+        ───────────────────────────────────── */
+
+      body#index-page .header-inner .lang-toggle,
+      body#index-page .header-inner .lang-toggle *,
+      body#index-page .header-inner .language-dropdown .lang-list * {
+        color: #111 !important;
+        text-shadow: none !important;
+      }
+
+      /* 드롭다운은 흰색 */
+      body#index-page .language-dropdown.open .lang-list {
+        background: #fff !important;
+        border: 1px solid #ddd;
+      }
+
+      /* 관리자바 있을 때 헤더 위치 보정 */
       body#index-page.has-admin-bar .header-inner {
         top: 38px !important;
       }
 
-      /* 언어 토글 버튼은 항상 검정 텍스트 */
-      body#index-page .lang-toggle,
-      body#index-page .lang-toggle * {
-        color: #111 !important;
-        text-shadow: none !important;
-      }
-
-      /* 드롭다운은 기본 스타일 유지 */
-      body#index-page .language-dropdown.open .lang-list {
-        background: #fff !important;
-      }
 
       </style>
 
