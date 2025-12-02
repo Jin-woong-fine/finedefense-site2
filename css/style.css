@@ -409,16 +409,10 @@ footer {
   }
 }
 
-/* 관리자 모드일 때, 헤더를 자연스럽게 아래로 내림 */
-.admin-mode header {
-  margin-top: 40px; /* admin 세션바 높이와 맞춤 */
-}
-
 /* ============================================== */
-/*        ADMIN SESSION BAR (Fixed Top Bar)       */
+/*               🔵 ADMIN SESSION BAR             */
 /* ============================================== */
 
-.admin-session-bar,
 #adminSessionBar {
   position: fixed;
   top: 0;
@@ -429,21 +423,23 @@ footer {
   color: #fff;
   padding: 6px 16px;
   box-sizing: border-box;
-  display: flex;
+  display: none;                /* 기본은 숨김 */
   justify-content: space-between;
   align-items: center;
   font-size: 13px;
-  z-index: 9999;
+  z-index: 9999;               /* 최상단 */
 }
 
-.admin-session-bar .admin-left,
-.admin-session-bar .admin-center,
-.admin-session-bar .admin-right {
+/* 내부 레이아웃 */
+#adminSessionBar .admin-left,
+#adminSessionBar .admin-center,
+#adminSessionBar .admin-right {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
+/* 뱃지 */
 .admin-badge {
   font-weight: 700;
   font-size: 11px;
@@ -452,55 +448,43 @@ footer {
   background: rgba(255,255,255,0.18);
 }
 
-.admin-user {
-  font-weight: 600;
-}
-
-.admin-label {
-  opacity: 0.85;
-  font-size: 12px;
-}
-
+/* 타이머 */
 .admin-timer {
   font-weight: 700;
   color: #ffd966;
-  font-size: 13px;
 }
 
-.admin-link {
-  color: #fff;
-  text-decoration: none;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.admin-link:hover {
-  text-decoration: underline;
-}
-
-.admin-extend-btn {
+/* 버튼 */
+#adminSessionBar .admin-extend-btn {
   background: #fff;
   color: #0f2679;
   border: none;
   padding: 4px 10px;
   border-radius: 4px;
   font-size: 12px;
-  cursor: pointer;
   font-weight: 600;
+  cursor: pointer;
 }
 
-.admin-extend-btn:hover {
+#adminSessionBar .admin-extend-btn:hover {
   background: #eef1ff;
 }
 
-.admin-session-expired {
-  background: #7a1b1b !important;
-}
+/* ============================================== */
+/*       🔵 admin bar 존재 시 body 전체 이동       */
+/* ============================================== */
 
-/* ============================================== */
-/*      페이지 전체를 admin bar 아래로 이동         */
-/* ============================================== */
 body.has-admin-bar {
-  margin-top: 38px !important;
+  padding-top: 38px !important;   /* 🔥 유일한 조정값 — margin-top 대신 padding-top */
 }
 
+/* ============================================== */
+/* 🔵 header는 위치 조정 금지 (include 때문에 충돌) */
+/* ============================================== */
+
+header.header-inner {
+  position: relative;
+  z-index: 9000;
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}

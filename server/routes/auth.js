@@ -111,7 +111,7 @@ router.post("/refresh", verifyToken, (req, res) => {
 /* ============================================================
    🔄 세션 연장 (JWT 재발급 — 관리자만)
 ============================================================ */
-router.post("/extend", verifyToken, verifyRole(["admin","superadmin"]), (req, res) => {
+router.post("/extend", verifyToken, verifyRole(["admin", "superadmin"]), (req, res) => {
   try {
     const user = req.user;
 
@@ -136,10 +136,9 @@ router.post("/extend", verifyToken, verifyRole(["admin","superadmin"]), (req, re
 
   } catch (err) {
     console.error("/extend error:", err);
-    res.status(500).json({ ok:false, message:"extend failed" });
+    res.status(500).json({ ok: false, message: "extend failed" });
   }
 });
-
 
 /* ============================================================
    👑 사용자 생성 (superadmin 전용)
@@ -178,6 +177,29 @@ router.post("/create-user", verifyToken, verifyRole("superadmin"), async (req, r
   } catch (err) {
     console.error("❌ User Create Error:", err);
     res.status(500).json({ message: "Server error", detail: err.message });
+  }
+});
+
+/* ============================================================
+   🔎 세션 상태 확인 (홈페이지 + 관리자 공통)
+============================================================ */
+router.get("/check", verifyToken, (req, res) => {
+  try {
+    const user = req.user;
+    const token = req.headers.authorization?.split(" ")[1];
+    const decoded = jwt.decode(token);
+
+    return res.json({
+      ok: true,
+      id: user.id,
+      name: user.name,
+      role: user.role,
+      exp: decoded.exp
+    });
+
+  } catch (err) {
+    console.error("/check error:", err);
+    return res.status(500).json({ ok: false, message: "server error" });
   }
 });
 
