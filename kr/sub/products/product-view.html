@@ -6,18 +6,19 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- 공통 CSS -->
+  <!-- 기본 CSS -->
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/sub-banner.css">
 
-  <!-- Toast UI Viewer CSS -->
+  <!-- Toast UI Editor (Editor + Viewer 포함 Full Version) -->
   <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
-  <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor-viewer.min.css">
+  <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+
+  <!-- Lightbox2 (이미지 확대 + 슬라이드) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
 
   <style>
-    /* --------------------------
-        기본 상세 페이지 스타일
-    ---------------------------*/
     .product-detail {
       max-width: 1200px;
       margin: 60px auto 80px;
@@ -26,26 +27,43 @@
       border-radius: 14px;
       box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
     }
-    .product-title { font-size: 2rem; color: #0f2679; margin-bottom: 10px; }
-    .product-category { color:#666; margin-bottom: 30px; }
-    .product-content { display:flex; flex-wrap:wrap; gap:40px; align-items:flex-start; }
-    .product-gallery { flex:1 1 45%; text-align:center; }
-
+    .product-title {
+      font-size: 2rem;
+      color: #0f2679;
+      margin-bottom: 10px;
+    }
+    .product-category {
+      color:#666;
+      margin-bottom: 30px;
+    }
+    .product-content {
+      display:flex;
+      flex-wrap:wrap;
+      gap:40px;
+      align-items:flex-start;
+    }
+    .product-gallery {
+      flex:1 1 45%;
+      text-align:center;
+    }
     .main-image img {
-      width:100%; max-width:420px;
+      width:100%;
+      max-width:420px;
       border-radius:12px;
       box-shadow:0 2px 8px rgba(0,0,0,0.08);
-      cursor:pointer;
+      object-fit:cover;
+      cursor: zoom-in;
     }
-
     .thumb-list {
       margin-top:15px;
-      display:flex; flex-wrap:wrap;
+      display:flex;
+      flex-wrap:wrap;
       justify-content:center;
       gap:8px;
     }
     .thumb-list img {
-      width:80px; height:80px;
+      width:80px;
+      height:80px;
       object-fit:cover;
       border-radius:8px;
       opacity:0.7;
@@ -60,73 +78,15 @@
       transform:scale(1.03);
     }
 
-    .product-desc { flex:1 1 45%; }
+    .product-desc {
+      flex:1 1 45%;
+    }
 
     @media (max-width: 768px) {
-      .product-content { flex-direction:column; }
+      .product-content {
+        flex-direction:column;
+      }
     }
-
-    /* --------------------------
-        Toast UI 표 스타일 FIX
-    ---------------------------*/
-    .toastui-editor-contents table {
-      border-collapse: collapse !important;
-      width: 100%;
-      margin: 12px 0;
-    }
-    .toastui-editor-contents th,
-    .toastui-editor-contents td {
-      border: 1px solid #ccc !important;
-      padding: 8px 10px;
-    }
-    .toastui-editor-contents th {
-      background:#f5f7fa;
-      font-weight:600;
-    }
-
-    /* --------------------------
-       이미지 확대 모달
-    ---------------------------*/
-    .img-modal {
-      display:none;
-      position:fixed;
-      z-index:9999;
-      left:0; top:0;
-      width:100%; height:100%;
-      background:rgba(0,0,0,0.85);
-      justify-content:center;
-      align-items:center;
-      overflow:hidden;
-    }
-    .img-modal img {
-      max-width:90%;
-      max-height:90%;
-      border-radius:12px;
-      box-shadow:0 0 25px rgba(0,0,0,0.5);
-      transition: transform 0.25s ease;
-    }
-
-    .lightbox-nav {
-    position: fixed;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 48px;
-    color: white;
-    cursor: pointer;
-    user-select: none;
-    z-index: 10001;
-    padding: 20px;
-    opacity: 0.8;
-    transition: 0.25s;
-  }
-  .lightbox-nav:hover {
-    opacity: 1;
-  }
-  .lightbox-prev { left: 20px; }
-  .lightbox-next { right: 20px; }
-
-
-
   </style>
 </head>
 
@@ -155,9 +115,12 @@
 
   <div class="product-content">
     <div class="product-gallery">
-      <div class="main-image">
+
+      <!-- 🔍 확대 가능 대표 이미지 -->
+      <a id="mainImageLink" href="/img/products/Image-placeholder.png" data-lightbox="product-set">
         <img id="mainImage" src="/img/products/Image-placeholder.png" alt="제품 이미지">
-      </div>
+      </a>
+
       <div id="thumbList" class="thumb-list"></div>
     </div>
 
@@ -167,163 +130,8 @@
 
 <div id="footer"></div>
 
-<!-- 모달(확대 이미지) -->
-<div id="imgModal" class="img-modal">
-  <img id="modalImg">
-</div>
-
 <script src="/js/nav.js"></script>
-<script src="https://uicdn.toast.com/editor/latest/toastui-editor-viewer.min.js"></script>
 <script src="/js/product-view.js"></script>
-
-
-
-
-
-
-<script>
-/* =====================================================
-   📌 데이터 로딩
-===================================================== */
-document.addEventListener("DOMContentLoaded", loadProductDetail);
-
-let galleryImages = [];      // 모든 이미지 목록
-let currentIndex = 0;        // 현재 확대중인 이미지 index
-
-async function loadProductDetail() {
-  const id = new URLSearchParams(location.search).get("id");
-  if (!id) return;
-
-  const res = await fetch(`/api/products/${id}`);
-  const data = await res.json();
-  renderProduct(data);
-}
-
-/* =====================================================
-   📌 상세 페이지 렌더링
-===================================================== */
-function renderProduct({ product, images }) {
-  document.getElementById("productTitle").textContent = product.title;
-  const categoryLabel = getCategoryLabel(product.category);
-  document.getElementById("productCategory").textContent = `카테고리: ${categoryLabel}`;
-  document.getElementById("crumbProduct").textContent = categoryLabel;
-
-  /* 메인 이미지 설정 */
-  const mainImg = product.thumbnail || "/img/products/Image-placeholder.png";
-  const mainImageEl = document.getElementById("mainImage");
-  mainImageEl.src = mainImg;
-
-  /* 전체 이미지 목록 구성 */
-  galleryImages = [
-    mainImg,
-    ...images
-      .map(i => i.url)
-      .filter(url => url !== product.thumbnail)
-  ];
-
-  /* 메인 이미지 클릭 → 확대 */
-  mainImageEl.addEventListener("click", () => openModal(0));
-
-  /* 썸네일 렌더링 */
-  const thumbList = document.getElementById("thumbList");
-  thumbList.innerHTML = "";
-
-  galleryImages.forEach((url, idx) => {
-    const t = document.createElement("img");
-    t.src = url;
-    if (idx === 0) t.classList.add("active");
-
-    t.addEventListener("click", () => {
-      currentIndex = idx;
-      document.querySelectorAll(".thumb-list img").forEach(a => a.classList.remove("active"));
-      t.classList.add("active");
-      mainImageEl.src = url;
-    });
-
-    t.addEventListener("click", () => openModal(idx));
-
-    thumbList.appendChild(t);
-  });
-
-  /* Toast UI Viewer */
-  new toastui.Editor.factory({
-    el: document.getElementById("productDesc"),
-    viewer: true,
-    initialValue: product.description_html || "<p>설명이 없습니다.</p>"
-  });
-}
-
-/* =====================================================
-   📌 모달(확대 이미지)
-===================================================== */
-const modal = document.getElementById("imgModal");
-const modalImg = document.getElementById("modalImg");
-
-function openModal(idx) {
-  currentIndex = idx;
-  modalImg.src = galleryImages[currentIndex];
-  modal.style.display = "flex";
-}
-
-modal.addEventListener("click", () => closeModal());
-
-function closeModal() {
-  modal.style.display = "none";
-}
-
-/* =====================================================
-   📌 좌/우 이동 (키보드)
-===================================================== */
-document.addEventListener("keydown", (e) => {
-  if (modal.style.display !== "flex") return;
-
-  if (e.key === "ArrowRight") nextImg();
-  if (e.key === "ArrowLeft") prevImg();
-  if (e.key === "Escape") closeModal();
-});
-
-/* =====================================================
-   📌 좌/우 이동 (터치 스와이프)
-===================================================== */
-let startX = 0;
-
-modal.addEventListener("touchstart", e => {
-  startX = e.changedTouches[0].clientX;
-});
-
-modal.addEventListener("touchend", e => {
-  const endX = e.changedTouches[0].clientX;
-
-  if (endX - startX > 60) prevImg();     // 오른쪽 스와이프 → 이전
-  if (startX - endX > 60) nextImg();     // 왼쪽 스와이프 → 다음
-});
-
-/* =====================================================
-   📌 이미지 이동 함수
-===================================================== */
-function nextImg() {
-  currentIndex = (currentIndex + 1) % galleryImages.length;
-  modalImg.src = galleryImages[currentIndex];
-}
-
-function prevImg() {
-  currentIndex =
-    (currentIndex - 1 + galleryImages.length) % galleryImages.length;
-  modalImg.src = galleryImages[currentIndex];
-}
-
-/* =====================================================
-   📌 카테고리 라벨
-===================================================== */
-function getCategoryLabel(code) {
-  return {
-    towed: "수중이동형 케이블",
-    fixed: "수중고정형 케이블",
-    connector: "수중 커넥터",
-    custom: "커스텀 케이블",
-  }[code] || "기타";
-}
-</script>
 
 </body>
 </html>
