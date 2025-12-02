@@ -488,3 +488,21 @@ header.header-inner {
   margin-top: 0 !important;
   padding-top: 0 !important;
 }
+
+
+
+/* 대시보드용 — admin extend 버튼과 동일한 스타일 */
+.dashboard-btn {
+  background: #fff;
+  color: #0f2679;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.dashboard-btn:hover {
+  background: #eef1ff;
+}
