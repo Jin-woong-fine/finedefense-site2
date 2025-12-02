@@ -53,6 +53,14 @@
   </div>
 
   <div class="header-right">
+
+    <!-- ⭐ 로그인 남은시간/연장 영역 추가 -->
+    <div class="admin-session-box" id="adminSessionBox">
+      <span class="session-user" id="sessionUser"></span>
+      <span class="session-timer" id="sessionTimer"></span>
+      <button class="session-refresh-btn" id="sessionRefreshBtn">연장</button>
+    </div>
+
     <div class="language-dropdown">
       <button class="lang-toggle" type="button">
         KOR <span class="arrow">▼</span>
@@ -64,3 +72,5 @@
     </div>
   </div>
 </header>
+
+<script src="/kr/js/session_timer.js"></script>

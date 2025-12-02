@@ -443,6 +443,43 @@ footer {
 }
 
 
+.admin-session-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #333;
+}
+
+.session-user {
+  font-weight: 600;
+  color: #0f2679;
+}
+
+.session-timer {
+  font-size: 12px;
+  color: #d9534f; /* 빨간 느낌 */
+}
+
+.session-refresh-btn {
+  padding: 3px 8px;
+  font-size: 12px;
+  background: #0f2679;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.session-refresh-btn:hover {
+  background: #0c1c5a;
+}
+
+
+
+
+
+
+
 
 
 /* HEADER FIX — 2025 FINAL */
