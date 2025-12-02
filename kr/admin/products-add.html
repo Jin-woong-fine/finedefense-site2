@@ -52,15 +52,13 @@
 
 <div id="sidebar"></div>
 
-<div class="main">
+<div class="main">   <!-- ✅ main은 여기서 시작 -->
 
   <!-- 🔵 TOPBAR -->
   <div class="topbar">
     <div class="title">신규 제품 등록</div>
 
     <div style="display:flex; align-items:center; gap:12px;">
-
-      <!-- ⭐ 세션 타이머 -->
       <span id="session-timer" class="session-timer">세션 계산중...</span>
 
       <div class="topbar-user" id="topbarUser">
@@ -72,11 +70,11 @@
     </div>
   </div>
 
-    <div>
+  <!-- 🔵 버튼 영역 -->
+  <div style="margin-bottom:20px;">
       <button class="btn btn-primary" onclick="location.href='products-list.html'">목록으로</button>
       <button class="btn btn-primary" onclick="location.href='../index.html'">홈으로</button>
       <button id="logoutBtn" class="btn btn-danger">로그아웃</button>
-    </div>
   </div>
 
   <!-- ==========================
@@ -85,7 +83,6 @@
   <form id="productForm" enctype="multipart/form-data">
 
     <section class="panel">
-
       <h2>제품 기본 정보</h2>
 
       <input id="title" class="input" placeholder="제품명 입력" required />
@@ -109,11 +106,9 @@
 
       <h3>제품 설명 (Toast UI Editor)</h3>
       <div id="editor" style="border:1px solid #ccc; border-radius:6px;"></div>
-
     </section>
 
     <section class="panel">
-
       <h3>제품 이미지 업로드</h3>
 
       <input type="file" id="images" name="images" multiple accept="image/*" class="input" />
@@ -124,7 +119,7 @@
 
   </form>
 
-</div>
+</div> <!-- ✅ main은 여기서 닫아야 함 -->
 
 <!-- 공통 JS -->
 <script src="/kr/admin/js/common_auth.js"></script>
@@ -192,10 +187,13 @@ new Sortable(document.getElementById("preview"), {
   animation: 150,
   onEnd: () => {
     const newOrder = [];
-    document.querySelectorAll(".img-item img").forEach(img => {
+    const previews = document.querySelectorAll(".img-item img");
+
+    previews.forEach(img => {
       const file = imageFiles.find(f => URL.createObjectURL(f) === img.src);
       if (file) newOrder.push(file);
     });
+
     imageFiles = newOrder;
   }
 });
@@ -217,7 +215,7 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
   imageFiles.forEach(file => formData.append("images", file));
 
   try {
-    const res = await fetch("/api/products/create", {
+    const res = await fetch("/api/products", {
       method: "POST",
       headers: authHeaders(),
       body: formData
@@ -241,4 +239,5 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
 </script>
 
 </body>
+
 </html>
