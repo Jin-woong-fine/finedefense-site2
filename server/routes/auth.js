@@ -8,7 +8,6 @@ import requestIp from "request-ip";
 import { verifyToken, verifyRole } from "../middleware/auth.js";
 
 dotenv.config();
-
 const router = express.Router();
 
 /* ============================================================
@@ -63,18 +62,14 @@ router.post("/login", async (req, res) => {
       return res.status(401).json({ message: "Invalid password" });
     }
 
+    // 🔥 JWT 발급 (2시간)
     const token = jwt.sign(
-      {
-        id: user.id,
-        role: user.role,
-        name: user.name,
-      },
+      { id: user.id, role: user.role, name: user.name },
       process.env.JWT_SECRET,
       { expiresIn: "2h" }
     );
 
     const decoded = jwt.decode(token);
-
     await logLogin(user, "success", req);
 
     res.json({
@@ -98,19 +93,52 @@ router.post("/login", async (req, res) => {
 router.post("/refresh", verifyToken, (req, res) => {
   const user = req.user;
 
-  const token = jwt.sign(
+  const newToken = jwt.sign(
     { id: user.id, role: user.role, name: user.name },
     process.env.JWT_SECRET,
     { expiresIn: "2h" }
   );
 
-  const decoded = jwt.decode(token);
+  const decoded = jwt.decode(newToken);
 
   res.json({
     message: "session refreshed",
-    token,
+    token: newToken,
     exp: decoded.exp
   });
+});
+
+/* ============================================================
+   🔄 세션 연장 API (프론트 타이머 + 홈페이지 admin bar용)
+============================================================ */
+router.post("/extend", verifyToken, verifyRole(["admin", "superadmin"]), (req, res) => {
+  try {
+    const user = req.user;
+
+    // 🔥 새로운 2시간짜리 토큰 발급
+    const newToken = jwt.sign(
+      { id: user.id, role: user.role, name: user.name },
+      process.env.JWT_SECRET,
+      { expiresIn: "2h" }
+    );
+
+    const decoded = jwt.decode(newToken);
+
+    return res.json({
+      ok: true,
+      message: "session extended",
+      token: newToken,
+      exp: decoded.exp,                // UNIX timestamp (초)
+      extendMs: 2 * 60 * 60 * 1000     // 2시간 (ms)
+    });
+
+  } catch (err) {
+    console.error("❌ Extend Error:", err);
+    return res.status(500).json({
+      ok: false,
+      message: "서버 오류가 발생했습니다."
+    });
+  }
 });
 
 /* ============================================================
@@ -150,38 +178,6 @@ router.post("/create-user", verifyToken, verifyRole("superadmin"), async (req, r
   } catch (err) {
     console.error("❌ User Create Error:", err);
     res.status(500).json({ message: "Server error", detail: err.message });
-  }
-});
-
-/* ============================================================
-   💥 세션 연장 API (프론트 타이머용)
-============================================================ */
-router.post("/extend", verifyToken, async (req, res) => {
-  try {
-    const user = req.user;
-
-    // 관리자만 연장 가능
-    if (user.role !== "admin" && user.role !== "superadmin") {
-      return res.status(403).json({
-        ok: false,
-        message: "관리자만 세션을 연장할 수 있습니다."
-      });
-    }
-
-    // 1시간 연장
-    const extendMs = 60 * 60 * 1000;
-
-    return res.json({
-      ok: true,
-      extendMs
-    });
-
-  } catch (err) {
-    console.error("❌ Extend Error:", err);
-    return res.status(500).json({
-      ok: false,
-      message: "서버 오류가 발생했습니다."
-    });
   }
 });
 

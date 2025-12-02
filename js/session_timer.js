@@ -127,7 +127,7 @@ function waitForAdminBar(timeoutMs = 5000) {
     setInterval(updateTimer, 1000);
 
     // ============================================================
-    // 연장 버튼
+    // 🔁 연장 버튼
     // ============================================================
     extendBtn.addEventListener("click", async () => {
       try {
@@ -141,17 +141,22 @@ function waitForAdminBar(timeoutMs = 5000) {
         const out = await res.json();
 
         if (res.ok) {
-          const extendMs = out.extendMs || 60 * 60 * 1000; // 기본 1시간
-          expire = Date.now() + extendMs;
-          localStorage.setItem("token_expire", String(expire));
+          // 🔥 새 토큰 갱신
+          localStorage.setItem("token", out.token);
 
-          alert("세션이 1시간 연장되었습니다.");
+          // 🔥 expire 갱신
+          const newExpire = out.exp * 1000;
+          localStorage.setItem("token_expire", newExpire);
+          expire = newExpire;
+
+          alert("세션이 2시간 연장되었습니다.");
         } else {
-          alert("연장 실패: " + (out.message || "오류"));
+          alert("연장 실패: " + (out.message || "알 수 없는 오류"));
         }
-      } catch (err) {
-        console.error("[session_timer] 연장 에러", err);
-        alert("연장 중 오류 발생");
+
+      } catch (e) {
+        console.error("[session_timer] 연장 요청 오류", e);
+        alert("연장 중 오류가 발생했습니다.");
       }
     });
   } catch (err) {
