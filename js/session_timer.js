@@ -72,7 +72,6 @@ async function initSessionTimer() {
 
     // 관리자일 때만 표시
     bar.style.display = "flex";
-    document.body.classList.add("has-admin-bar");
 
     // 헤더 자동 밀기
     header.style.marginTop = "38px";

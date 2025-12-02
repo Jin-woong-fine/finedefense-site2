@@ -30,4 +30,22 @@ document.addEventListener("DOMContentLoaded", () => {
   setTimeout(() => {
     document.dispatchEvent(new Event("includeLoaded"));
   }, 20);
+
+
+  // admin bar 먼저 로드 보장
+  if (url.includes("admin-session-bar.html")) {
+    fetch(url)
+      .then(res => res.text())
+      .then(html => {
+        el.innerHTML = html;
+        document.body.classList.add("has-admin-bar"); // padding-top 적용
+      });
+    return; // 아래 중복 로드 방지
+  }
+
+
+
 });
+
+
+
