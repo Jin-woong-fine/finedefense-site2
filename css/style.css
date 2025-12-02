@@ -16,7 +16,7 @@ body {
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  padding: clamp(0.5rem, 1.5vw, 1.5rem) 2vw;
+  padding: 14px 2vw !important;
   background-color: #fff;
   border-bottom: 1px solid #e0e0e0;
   position: relative;
