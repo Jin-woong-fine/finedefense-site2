@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>신규 제품 등록 | Fine Defense 관리자</title>
+
+  <!-- Toast UI Editor CSS -->
+  <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+
+  <!-- 공통 관리자 CSS -->
+  <link rel="stylesheet" href="./css/admin.css" />
+
+  <!-- SortableJS (이미지 정렬용 — 기존 기능 유지) -->
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
+  <style>
+    .thumb-preview {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .thumb-preview .img-item {
+      width: 80px;
+      height: 80px;
+      position: relative;
+    }
+    .thumb-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+    .thumb-preview .remove-btn {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: crimson;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="sidebar"></div>
+
+<div class="main">
+
+  <!-- 🔵 TOPBAR -->
+  <div class="topbar">
+    <div class="title">신규 제품 등록</div>
+
+    <div style="display:flex; align-items:center; gap:12px;">
+
+      <!-- ⭐ 세션 타이머 -->
+      <span id="session-timer" class="session-timer">세션 계산중...</span>
+
+      <div class="topbar-user" id="topbarUser">
+        <span id="topbarUserName">관리자</span> ▾
+        <div class="user-dropdown" id="userDropdown"></div>
+      </div>
+
+      <button onclick="location.href='../index.html'">홈으로</button>
+    </div>
+  </div>
+
+    <div>
+      <button class="btn btn-primary" onclick="location.href='products-list.html'">목록으로</button>
+      <button class="btn btn-primary" onclick="location.href='../index.html'">홈으로</button>
+      <button id="logoutBtn" class="btn btn-danger">로그아웃</button>
+    </div>
+  </div>
+
+  <!-- ==========================
+       신규 등록 FORM 영역
+  ========================== -->
+  <form id="productForm" enctype="multipart/form-data">
+
+    <section class="panel">
+
+      <h2>제품 기본 정보</h2>
+
+      <input id="title" class="input" placeholder="제품명 입력" required />
+
+      <textarea id="summary" class="input" placeholder="카드 요약 설명 (짧은 설명)" required></textarea>
+
+      <select id="category" class="input" required>
+        <option value="">카테고리 선택</option>
+        <option value="towed">수중이동형 케이블</option>
+        <option value="fixed">수중고정형 케이블</option>
+        <option value="connector">수중 커넥터</option>
+        <option value="custom">커스텀 케이블</option>
+      </select>
+
+      <select id="lang" class="input">
+        <option value="kr">한국어</option>
+        <option value="en">English</option>
+      </select>
+
+      <input id="sort_order" class="input" type="number" placeholder="정렬 순번 (작을수록 먼저)" required />
+
+      <h3>제품 설명 (Toast UI Editor)</h3>
+      <div id="editor" style="border:1px solid #ccc; border-radius:6px;"></div>
+
+    </section>
+
+    <section class="panel">
+
+      <h3>제품 이미지 업로드</h3>
+
+      <input type="file" id="images" name="images" multiple accept="image/*" class="input" />
+      <div id="preview" class="thumb-preview"></div>
+
+      <button type="submit" class="btn btn-primary" style="margin-top:15px;">등록</button>
+    </section>
+
+  </form>
+
+</div>
+
+<!-- 공통 JS -->
+<script src="/kr/admin/js/common_auth.js"></script>
+<script src="/kr/admin/js/sidebar.js"></script>
+
+<!-- Toast Editor -->
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+
+<script>
+/* ============================================================
+   🔥 초기 설정 (권한 + 사이드바 + 로그아웃)
+============================================================ */
+(function () {
+  requireAdminOrEditor();
+  loadSidebar("products");
+  document.getElementById("logoutBtn").addEventListener("click", logout);
+})();
+
+/* ============================================================
+   🔥 Toast UI Editor 초기화
+============================================================ */
+const editor = new toastui.Editor({
+  el: document.querySelector('#editor'),
+  height: '500px',
+  initialEditType: 'wysiwyg',
+  previewStyle: 'vertical',
+});
+
+/* ============================================================
+   🔥 이미지 프리뷰 + 삭제 + 정렬
+============================================================ */
+let imageFiles = [];
+
+document.getElementById("images").addEventListener("change", (e) => {
+  const files = [...e.target.files];
+  imageFiles.push(...files);
+  renderPreviews();
+});
+
+function renderPreviews() {
+  const preview = document.getElementById("preview");
+  preview.innerHTML = "";
+
+  imageFiles.forEach((file, index) => {
+    const url = URL.createObjectURL(file);
+    const div = document.createElement("div");
+    div.className = "img-item";
+
+    div.innerHTML = `
+      <img src="${url}">
+      <button class="remove-btn" onclick="removeImage(${index})">×</button>
+    `;
+
+    preview.appendChild(div);
+  });
+}
+
+function removeImage(index) {
+  imageFiles.splice(index, 1);
+  renderPreviews();
+}
+
+/* 드래그 정렬 */
+new Sortable(document.getElementById("preview"), {
+  animation: 150,
+  onEnd: () => {
+    const newOrder = [];
+    document.querySelectorAll(".img-item img").forEach(img => {
+      const file = imageFiles.find(f => URL.createObjectURL(f) === img.src);
+      if (file) newOrder.push(file);
+    });
+    imageFiles = newOrder;
+  }
+});
+
+/* ============================================================
+   🔥 신규 등록 요청
+============================================================ */
+document.getElementById("productForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const formData = new FormData();
+  formData.append("title", document.getElementById("title").value.trim());
+  formData.append("summary", document.getElementById("summary").value.trim());
+  formData.append("category", document.getElementById("category").value);
+  formData.append("lang", document.getElementById("lang").value);
+  formData.append("sort_order", document.getElementById("sort_order").value);
+  formData.append("content", editor.getHTML());
+
+  imageFiles.forEach(file => formData.append("images", file));
+
+  try {
+    const res = await fetch("/api/products/create", {
+      method: "POST",
+      headers: authHeaders(),
+      body: formData
+    });
+
+    const out = await res.json();
+
+    if (!res.ok) {
+      alert("등록 실패: " + out.message);
+      return;
+    }
+
+    alert("제품이 등록되었습니다!");
+    location.href = "products-list.html";
+
+  } catch (err) {
+    console.error(err);
+    alert("서버 오류 발생");
+  }
+});
+</script>
+
+</body>
+</html>

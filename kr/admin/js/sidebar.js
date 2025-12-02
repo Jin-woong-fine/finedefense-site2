@@ -15,7 +15,7 @@ window.loadSidebar = function (activeKey) {
   const menuItems = [
     { key: "dashboard", label: "대시보드", link: "/kr/admin/dashboard.html", roles: ["superadmin", "admin", "editor", "viewer"] },
     { key: "users", label: "사용자 관리", link: "/kr/admin/users.html", roles: ["superadmin", "admin"] },
-    { key: "products", label: "제품 관리", link: "/kr/admin/products.html", roles: ["superadmin", "admin", "editor"] },
+    { key: "products", label: "제품 관리", link: "/kr/admin/products-list.html", roles: ["superadmin", "admin", "editor"] },
     { key: "newsroom", label: "뉴스룸 관리", link: "/kr/admin/news-list.html", roles: ["superadmin", "admin", "editor"] },
     { key: "notice", label: "공지사항 관리", link: "/kr/admin/notice-list.html", roles: ["superadmin", "admin", "editor"] },
     { key: "gallery", label: "갤러리 관리", link: "/kr/admin/gallery-list.html", roles: ["superadmin", "admin", "editor"] },
