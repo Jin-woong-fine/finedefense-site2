@@ -115,12 +115,29 @@ body {
 /* submenu items */
 .submenu li a {
   display: block;
-  padding: 10px 18px;
-  color: #222;
-  font-size: 15px;
+
+  /* 🔥 폰트 크기 + 선명도 */
+  font-size: 15px;          /* 14px → 15px 업그레이드 */
   font-weight: 500;
+  letter-spacing: -0.15px;
+  color: #222;
+
+  /* 🔥 여백 넓혀서 메뉴가 더 커보이고 고급스럽게 */
+  padding: 13px 22px;
+
+  /* 🔥 한 줄 유지 */
   white-space: nowrap;
+
+  /* 🔥 글씨 선명하게 */
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+
   transition: background .2s ease, color .2s ease;
+}
+
+.submenu li a:hover {
+  background-color: #eef3ff;
+  color: #0f2679;
 }
 
 
