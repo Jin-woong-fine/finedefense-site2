@@ -42,6 +42,7 @@
   justify-content: flex-end;
   padding: 25px;
   transition: all 0.35s ease;
+  text-decoration: none !important;
 }
 
 .feature-card::before {
