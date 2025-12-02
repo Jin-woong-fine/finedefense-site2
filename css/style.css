@@ -19,8 +19,10 @@ body {
   padding: clamp(0.5rem, 1.5vw, 1.5rem) 2vw;
   background-color: #fff;
   border-bottom: 1px solid #e0e0e0;
-  top: 0;             /* 화면 최상단 고정 */
-  z-index: 1000;
+
+  position: relative;       /* sticky 제거 후 relative 유지 */
+  z-index: 2000;            /* 더 높은 우선순위 */
+  isolation: isolate;       /* 🔥 레이어 생성 → 어떤 이미지도 헤더 위로 못 올라옴 */
 
   box-sizing: border-box;
 }
