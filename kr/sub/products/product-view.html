@@ -105,6 +105,28 @@
       box-shadow:0 0 25px rgba(0,0,0,0.5);
       transition: transform 0.25s ease;
     }
+
+    .lightbox-nav {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 48px;
+    color: white;
+    cursor: pointer;
+    user-select: none;
+    z-index: 10001;
+    padding: 20px;
+    opacity: 0.8;
+    transition: 0.25s;
+  }
+  .lightbox-nav:hover {
+    opacity: 1;
+  }
+  .lightbox-prev { left: 20px; }
+  .lightbox-next { right: 20px; }
+
+
+
   </style>
 </head>
 
@@ -152,6 +174,12 @@
 
 <script src="/js/nav.js"></script>
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-viewer.min.js"></script>
+<script src="/js/product-view.js"></script>
+
+
+
+
+
 
 <script>
 /* =====================================================
