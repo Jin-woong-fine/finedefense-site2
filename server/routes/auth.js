@@ -109,18 +109,18 @@ router.post("/refresh", verifyToken, (req, res) => {
 });
 
 /* ============================================================
-   🔄 세션 연장 API (프론트 타이머 + 홈페이지 admin bar용)
+   🔄 세션 연장 (JWT 재발급 — 관리자만)
 ============================================================ */
-router.post("/extend", verifyToken, verifyRole(["admin", "superadmin"]), async (req, res) => {
+router.post("/extend", verifyToken, verifyRole(["admin","superadmin"]), (req, res) => {
   try {
     const user = req.user;
 
-    // 🔥 새 JWT 2시간 발급
+    // 🔥 새 토큰 = 2시간
     const newToken = jwt.sign(
       {
         id: user.id,
         role: user.role,
-        name: user.name
+        name: user.name,
       },
       process.env.JWT_SECRET,
       { expiresIn: "2h" }
@@ -131,14 +131,15 @@ router.post("/extend", verifyToken, verifyRole(["admin", "superadmin"]), async (
     return res.json({
       ok: true,
       token: newToken,
-      exp: decoded.exp   // 프론트는 exp 를 그대로 사용
+      exp: decoded.exp // UNIX Timestamp
     });
 
   } catch (err) {
     console.error("/extend error:", err);
-    return res.status(500).json({ ok: false, message: "extend failed" });
+    res.status(500).json({ ok:false, message:"extend failed" });
   }
 });
+
 
 /* ============================================================
    👑 사용자 생성 (superadmin 전용)
