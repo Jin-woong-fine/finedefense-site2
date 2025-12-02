@@ -159,83 +159,85 @@ body {
 
 
 /* ============================================== */
-/*                 LANG DROPDOWN                  */
+/*      LANG DROPDOWN — FINAL OVERRIDE FIX        */
 /* ============================================== */
 
-/* 언어 드롭다운 컨테이너 */
-.language-dropdown {
+.header-right .language-dropdown {
   position: relative;
   display: inline-block;
   font-family: 'Noto Sans KR', sans-serif;
 }
 
 /* 토글 버튼 */
-.lang-toggle {
-  background: #fff;
-  border: 1px solid #cfcfcf;
-  border-radius: 20px;
-  padding: 6px 16px;
-  font-size: 0.95rem;
+.header-right .lang-toggle {
+  background: #fff !important;
+  border: 1px solid #cfcfcf !important;
+  border-radius: 20px !important;
+  padding: 6px 16px !important;
+  font-size: 0.95rem !important;
   font-weight: 600;
-  color: #333;
+  color: #333 !important;
   cursor: pointer;
-  display: flex;
+  display: flex !important;
   align-items: center;
   gap: 6px;
   transition: all 0.25s ease;
+  outline: none;
 }
 
-.lang-toggle:hover {
-  background: #f3f6ff;
-  border-color: #0f2679;
-  color: #0f2679;
+/* hover */
+.header-right .lang-toggle:hover {
+  background: #f3f6ff !important;
+  border-color: #0f2679 !important;
+  color: #0f2679 !important;
 }
 
 /* ▼ 아이콘 */
-.lang-toggle::after {
+.header-right .lang-toggle::after {
   content: "▼";
   font-size: 0.7rem;
   margin-left: 4px;
-  opacity: 0.7;
+  opacity: 0.75;
 }
 
-/* 언어 리스트 */
-.lang-list {
+/* 드롭다운 박스 */
+.header-right .lang-list {
   list-style: none;
-  padding: 8px 0;
+  padding: 8px 0 !important;
   margin: 0;
   position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  background: #fff;
-  border: 1px solid #d6d6d6;
-  border-radius: 10px;
-  width: 110px;
+  top: calc(100% + 8px) !important;
+  right: 0 !important;
+  background: #fff !important;
+  border: 1px solid #d6d6d6 !important;
+  border-radius: 10px !important;
+  width: 120px !important;
   display: none;
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
   overflow: hidden;
-  z-index: 1000;
+  z-index: 10000 !important;
 }
 
 /* 열렸을 때 */
-.language-dropdown.open .lang-list {
-  display: block;
+.header-right .language-dropdown.open .lang-list {
+  display: block !important;
 }
 
-/* 항목 스타일 */
-.lang-list li a {
+/* 항목 */
+.header-right .lang-list li a {
   display: block;
-  padding: 10px 16px;
+  padding: 10px 16px !important;
   text-decoration: none;
-  font-size: 0.9rem;
+  font-size: 0.9rem !important;
   font-weight: 500;
-  color: #333;
+  color: #333 !important;
   transition: background 0.2s ease, color 0.2s ease;
 }
 
-.lang-list li a:hover {
-  background: #eef3ff;
-  color: #0f2679;
+/* hover */
+.header-right .lang-list li a:hover {
+  background: #eef3ff !important;
+  color: #0f2679 !important;
 }
 
 
