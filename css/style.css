@@ -48,7 +48,7 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);
   display: flex;
-  gap: clamp(35px, 4vw, 110px);
+  gap: clamp(50px, 4vw, 110px);
   list-style: none;
   padding: 0;
   margin: 0;
