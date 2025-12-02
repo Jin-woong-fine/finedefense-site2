@@ -9,11 +9,9 @@
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/sub-banner.css">
 
-  <!-- Toast UI Viewer CSS -->
+  <!-- ✅ Toast UI Viewer CSS -->
   <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
   <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor-viewer.min.css">
-
-
 
   <style>
     .product-detail {
@@ -76,9 +74,6 @@
 
     .product-desc {
       flex:1 1 45%;
-      font-size:1.02rem;
-      line-height:1.8;
-      color:#333;
     }
 
     @media (max-width: 768px) {
@@ -86,7 +81,6 @@
         flex-direction:column;
       }
     }
-
   </style>
 </head>
 
@@ -121,15 +115,18 @@
       <div id="thumbList" class="thumb-list"></div>
     </div>
 
-    <div id="productDesc" class="product-desc">
-      <!-- description_html 가 여기 들어감 -->
-    </div>
+    <!-- ❗ Viewer가 여기 렌더링됨 -->
+    <div id="productDesc" class="product-desc"></div>
   </div>
 </section>
 
 <div id="footer"></div>
 
 <script src="/js/nav.js"></script>
+
+<!-- ✅ Toast UI Viewer JS -->
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-viewer.min.js"></script>
+
 <script src="/js/product-view.js"></script>
 
 </body>
