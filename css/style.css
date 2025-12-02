@@ -117,8 +117,8 @@ body {
   display: block;
 
   /* 🔥 폰트 크기 + 선명도 */
-  font-size: 15px;          /* 14px → 15px 업그레이드 */
-  font-weight: 700;
+  font-size: 16px;          /* 14px → 15px 업그레이드 */
+  font-weight: 550;
   letter-spacing: -0.15px;
   color: #222;
 
