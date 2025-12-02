@@ -259,7 +259,7 @@
         메인페이지: Deep Blur + Dark Overlay Header
         ========================================== */
 
-      /* 초기: 배너 위에서 어둡게 + 강한 blur */
+      /* 초기: 배너 위에서 어둡게 + 강한 Blur */
       body#index-page .header-inner {
         position: fixed;
         top: 0;
@@ -281,18 +281,42 @@
           border-color 0.35s ease;
       }
 
-      /* 기본 글자 → 흰색 */
-      body#index-page .header-inner .main-menu * {
-        color: #f8f8f8 !important;
+      /* -------------------------------
+        로고 색상 전환
+        -------------------------------- */
+
+      /* 기본: 배너 위 → 흰색 로고만 표시 */
+      body#index-page .logo-dark { display: none; }
+      body#index-page .logo-white { display: block; }
+
+      /* 스크롤 후 → 컬러 로고 */
+      body#index-page.scrolled .logo-dark { display: block; }
+      body#index-page.scrolled .logo-white { display: none; }
+
+      /* -------------------------------
+        메뉴 텍스트
+        -------------------------------- */
+
+      /* 초기 → 흰색 */
+      body#index-page .header-inner .main-menu a {
+        color: #f6f6f6 !important;
         text-shadow: 0px 0px 5px rgba(0,0,0,0.35);
       }
 
       /* hover */
-      body#index-page .header-inner .main-menu li a:hover {
+      body#index-page .header-inner .main-menu a:hover {
         color: #fff !important;
       }
 
-      /* 스크롤하면 → 완전한 흰색 배경 */
+      /* 스크롤 후 → 검정 */
+      body#index-page.scrolled .header-inner .main-menu a {
+        color: #111 !important;
+        text-shadow: none !important;
+      }
+
+      /* -------------------------------
+        스크롤 후: 완전한 흰색 헤더
+        -------------------------------- */
       body#index-page.scrolled .header-inner {
         background: rgba(255,255,255,0.97);
         border-bottom: 1px solid rgba(0,0,0,0.06);
@@ -304,20 +328,15 @@
         box-shadow: 0 3px 10px rgba(0,0,0,0.07);
       }
 
-      /* 스크롤 시 글자색 → 검정 */
-      body#index-page.scrolled .header-inner .main-menu * {
-        color: #111 !important;
-        text-shadow: none !important;
-      }
-
-      /* ─────────────────────────────────────
-        언어 토글 버튼은 예외적으로 ‘항상 검정’
-        (배너 위에서도 / 스크롤 후도 동일)
-        ───────────────────────────────────── */
-
+      /* -------------------------------
+        언어 토글 — 항상 검정 유지
+        -------------------------------- */
       body#index-page .header-inner .lang-toggle,
       body#index-page .header-inner .lang-toggle *,
-      body#index-page .header-inner .language-dropdown .lang-list * {
+      body#index-page .header-inner .language-dropdown .lang-list *,
+      body#index-page.scrolled .header-inner .lang-toggle,
+      body#index-page.scrolled .header-inner .lang-toggle *,
+      body#index-page.scrolled .header-inner .language-dropdown .lang-list * {
         color: #111 !important;
         text-shadow: none !important;
       }
@@ -328,10 +347,11 @@
         border: 1px solid #ddd;
       }
 
-      /* 관리자바 있을 때 헤더 위치 보정 */
+      /* 관리자바 있을 때 헤더 자동 이동 */
       body#index-page.has-admin-bar .header-inner {
         top: 38px !important;
       }
+
 
 
       </style>
