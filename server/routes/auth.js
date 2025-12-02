@@ -111,13 +111,17 @@ router.post("/refresh", verifyToken, (req, res) => {
 /* ============================================================
    🔄 세션 연장 API (프론트 타이머 + 홈페이지 admin bar용)
 ============================================================ */
-router.post("/extend", verifyToken, verifyRole(["admin", "superadmin"]), (req, res) => {
+router.post("/extend", verifyToken, verifyRole(["admin", "superadmin"]), async (req, res) => {
   try {
     const user = req.user;
 
-    // 🔥 새로운 2시간짜리 토큰 발급
+    // 🔥 새 JWT 2시간 발급
     const newToken = jwt.sign(
-      { id: user.id, role: user.role, name: user.name },
+      {
+        id: user.id,
+        role: user.role,
+        name: user.name
+      },
       process.env.JWT_SECRET,
       { expiresIn: "2h" }
     );
@@ -126,18 +130,13 @@ router.post("/extend", verifyToken, verifyRole(["admin", "superadmin"]), (req, r
 
     return res.json({
       ok: true,
-      message: "session extended",
       token: newToken,
-      exp: decoded.exp,                // UNIX timestamp (초)
-      extendMs: 2 * 60 * 60 * 1000     // 2시간 (ms)
+      exp: decoded.exp   // 프론트는 exp 를 그대로 사용
     });
 
   } catch (err) {
-    console.error("❌ Extend Error:", err);
-    return res.status(500).json({
-      ok: false,
-      message: "서버 오류가 발생했습니다."
-    });
+    console.error("/extend error:", err);
+    return res.status(500).json({ ok: false, message: "extend failed" });
   }
 });
 

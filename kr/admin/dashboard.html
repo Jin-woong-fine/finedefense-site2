@@ -1,3 +1,4 @@
+<!-- /kr/admin/dashboard.html -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -10,33 +11,40 @@
   <!-- CSS -->
   <link rel="stylesheet" href="./css/admin.css">
 
-  <!-- 공통 인증 스크립트 (로드만 함, 실행 안 함) -->
+  <!-- 인증 스크립트 -->
   <script src="./js/common_auth.js"></script>
+
+  <!-- 세션 매니저 (공통 세션 관리) -->
+  <script type="module" src="/js/session_manager.js"></script>
+
+  <!-- 대시보드 세션 타이머 -->
+  <script type="module" src="./js/dashboard_session_timer.js"></script>
+
 </head>
 
 <body>
 
-  <!-- 🔥 로그인 사용자만 접근 허용 (이 위치가 정답임) -->
+  <!-- 접근 권한 체크 -->
   <script>
-    requireAnyUser();
+    requireAnyUser();  // 로그인 안했으면 로그인창으로 이동하는 함수
   </script>
 
-  <!-- 🔵 사이드바 -->
+  <!-- 사이드바 -->
   <div id="sidebar"></div>
 
-  <!-- 🔵 메인 시작 -->
+  <!-- 메인 -->
   <div class="main">
 
-
-    <!-- 🔵 TOPBAR -->
+    <!-- TOPBAR -->
     <div class="topbar">
       <div class="title">관리자 대시보드</div>
 
       <div style="display:flex; align-items:center; gap:12px;">
 
-        <!-- ⭐ 세션 타이머 -->
+        <!-- ⭐ JWT 기반 세션 타이머 -->
         <span id="session-timer" class="session-timer">세션 계산중...</span>
 
+        <!-- 사용자 UI -->
         <div class="topbar-user" id="topbarUser">
           <span id="topbarUserName">관리자</span> ▾
           <div class="user-dropdown" id="userDropdown"></div>
@@ -66,7 +74,7 @@
       </div>
     </section>
 
-    <!-- 그래프 -->
+    <!-- 월별 그래프 -->
     <section class="panel">
       <h2>월별 조회수 그래프</h2>
       <canvas id="monthlyChart" style="max-height:350px;"></canvas>
@@ -78,7 +86,7 @@
       <ul id="topPostsList"></ul>
     </section>
 
-    <!-- 최근 제품 -->
+    <!-- 최근 등록 제품 -->
     <section class="panel">
       <h2>최근 등록 제품</h2>
       <div id="recentProducts"></div>
@@ -94,7 +102,7 @@
     // 사이드바 로드
     loadSidebar("dashboard");
 
-    // 드롭다운 초기화
+    // 사용자 dropdown 초기화
     (function initTopbarUser() {
       const name = localStorage.getItem("name") || "사용자";
       const role = localStorage.getItem("role");
