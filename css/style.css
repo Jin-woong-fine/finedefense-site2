@@ -264,5 +264,5 @@ footer {
 
 /* admin bar가 있을 때 페이지 전체 내려감 */
 body.has-admin-bar {
-  padding-top: 50px !important;
+  padding-top: 40px !important;
 }
