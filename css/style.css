@@ -72,9 +72,7 @@ body {
 }
 
 
-.main-menu > li {
-  padding-bottom: 22px; /* 20~26px 사이 recommended */
-}
+
 
 /* ============================================== */
 /*            SUBMENU (헤더 아래 여유공간)        */
