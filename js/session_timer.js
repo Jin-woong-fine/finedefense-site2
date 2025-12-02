@@ -1,76 +1,87 @@
 // /js/session_timer.js
-import { getToken, getExpireTime, extendSession, clearSession } from "/js/session_manager.js";
-
 console.log("[session_timer] loaded");
 
-// include.js 로 admin bar가 로드될 때까지 기다리는 유틸리티
-function waitForAdminBar(timeout = 5000) {
-  return new Promise((resolve, reject) => {
-    const start = Date.now();
-
-    function check() {
-      const bar = document.getElementById("adminSessionBar");
-      if (bar) return resolve(bar);
-
-      if (Date.now() - start > timeout) {
-        return reject("adminSessionBar not found");
-      }
-      requestAnimationFrame(check);
-    }
-    check();
-  });
+// localStorage에서 토큰 만료시간 가져오기
+function getExpireTime() {
+  return Number(localStorage.getItem("token_expire") || 0);
 }
 
-function formatTime(ms) {
+// 만료 → 로그아웃 처리
+function clearSession() {
+  localStorage.removeItem("token");
+  localStorage.removeItem("role");
+  localStorage.removeItem("name");
+  localStorage.removeItem("token_expire");
+}
+
+function format(ms) {
   const h = String(Math.floor(ms / 3600000)).padStart(2, "0");
   const m = String(Math.floor((ms % 3600000) / 60000)).padStart(2, "0");
   const s = String(Math.floor((ms % 60000) / 1000)).padStart(2, "0");
   return `${h}:${m}:${s}`;
 }
 
-async function startTimer() {
+async function extendSession() {
+  const token = localStorage.getItem("token");
+  if (!token) return false;
+
   try {
-    const bar = await waitForAdminBar();
-    console.log("[session_timer] admin bar detected");
-
-    const role = localStorage.getItem("role");
-    if (role !== "admin" && role !== "superadmin") {
-      bar.style.display = "none";
-      return;
-    }
-
-    bar.style.display = "flex";
-
-    const timerSpan = document.getElementById("adminTimer");
-    const extendBtn = document.getElementById("adminExtendBtn");
-
-    function tick() {
-      const exp = getExpireTime(); // 초 단위
-      const now = Date.now();
-      const diff = exp * 1000 - now;
-
-      if (diff <= 0) {
-        timerSpan.textContent = "00:00:00";
-        clearSession();
-        alert("세션이 만료되었습니다.");
-        location.href = "/kr/admin/login.html";
-        return;
-      }
-
-      timerSpan.textContent = formatTime(diff);
-    }
-
-    extendBtn.addEventListener("click", async () => {
-      const ok = await extendSession();
-      alert(ok ? "세션이 연장되었습니다." : "연장 실패");
+    const res = await fetch("/api/auth/extend", {
+      method: "POST",
+      headers: { Authorization: "Bearer " + token }
     });
 
-    tick();
-    setInterval(tick, 1000);
+    const out = await res.json();
 
-  } catch (err) {
-    console.warn("[session_timer] admin bar not found:", err);
+    if (res.ok && out.extendMs) {
+      const newExpire = Date.now() + out.extendMs;
+      localStorage.setItem("token_expire", String(newExpire));
+      return true;
+    }
+    return false;
+
+  } catch (e) {
+    console.error("extend error:", e);
+    return false;
   }
 }
 
-document.addEventListener("DOMContentLoaded", startTimer);
+// include.js 완료 후 실행
+window.addEventListener("load", () => {
+  const bar = document.getElementById("adminSessionBar");
+  if (!bar) return;
+
+  const role = localStorage.getItem("role");
+  if (role !== "admin" && role !== "superadmin") {
+    bar.style.display = "none";
+    return;
+  }
+
+  bar.style.display = "flex";
+
+  const span = document.getElementById("adminTimer");
+  const btn  = document.getElementById("adminExtendBtn");
+
+  function tick() {
+    const expire = getExpireTime();
+    const diff = expire - Date.now();
+
+    if (diff <= 0) {
+      span.textContent = "00:00:00";
+      clearSession();
+      alert("세션이 만료되었습니다.");
+      location.href = "/kr/admin/login.html";
+      return;
+    }
+
+    span.textContent = format(diff);
+  }
+
+  btn.addEventListener("click", async () => {
+    if (await extendSession()) alert("세션 연장됨");
+    else alert("연장 실패");
+  });
+
+  tick();
+  setInterval(tick, 1000);
+});
