@@ -27,7 +27,8 @@ export function verifyToken(req, res, next) {
 }
 
 /* ============================================================
-   💡 새 권한 시스템: allowRoles
+   💡 권한 체크 allowRoles()
+      superadmin 은 항상 통과 (global bypass)
 ============================================================ */
 export function allowRoles(...roles) {
   return function (req, res, next) {
@@ -35,9 +36,15 @@ export function allowRoles(...roles) {
       return res.status(401).json({ message: "Not authenticated" });
     }
 
+    // 🔥 superadmin 은 모든 권한 통과
+    if (req.user.role === "superadmin") {
+      return next();
+    }
+
+    // 지정된 역할만 허용
     if (!roles.includes(req.user.role)) {
       return res.status(403).json({
-        message: `Permission denied: required roles = ${roles.join(", ")}`,
+        message: `Permission denied: allowed roles = ${roles.join(", ")}`,
       });
     }
 
@@ -46,55 +53,47 @@ export function allowRoles(...roles) {
 }
 
 /* ============================================================
-   🟦 CRUD 권한
+   🟦 CRUD 권한 (superadmin 자동 포함됨)
 ============================================================ */
 
-// 생성 (superadmin + admin)
-export const canCreate = allowRoles("superadmin", "admin");
+// 생성 → admin, superadmin
+export const canCreate = allowRoles("admin");
 
-// 수정 (superadmin + admin + editor)
-export const canUpdate = allowRoles("superadmin", "admin", "editor");
+// 수정 → editor, admin, superadmin
+export const canUpdate = allowRoles("editor", "admin");
 
-// 삭제 (superadmin만)
-export const canDelete = allowRoles("superadmin");
+// 삭제 → admin, superadmin (superadmin 자동 PASS)
+export const canDelete = allowRoles("admin");
 
-// 관리자 페이지 접근 (superadmin + admin + editor)
-export const canReadManagerPages = allowRoles(
-  "superadmin",
-  "admin",
-  "editor"
-);
+// 관리자 페이지 접근 → editor, admin, superadmin
+export const canReadManagerPages = allowRoles("editor", "admin");
 
-// 대시보드 접근 (viewer 포함)
-export const canAccessDashboard = allowRoles(
-  "superadmin",
-  "admin",
-  "editor",
-  "viewer"
-);
+// 대시보드 → viewer, editor, admin, superadmin
+export const canAccessDashboard = allowRoles("viewer", "editor", "admin");
 
-// 사용자 목록 (admin + superadmin)
-export const canViewUsers = allowRoles("superadmin", "admin");
+// 사용자 목록 보기 → admin, superadmin
+export const canViewUsers = allowRoles("admin");
 
-// 사용자 관리 (admin + superadmin)
-export const canManageUsers = allowRoles("superadmin", "admin");
+// 사용자 관리(권한 변경 등) → admin, superadmin
+export const canManageUsers = allowRoles("admin");
 
 
 /* ============================================================
-   🔙 구버전 라우터 호환용 (삭제하면 서버 다시 죽음)
+   🔙 구버전 호환용 (기존 라우터 때문에 유지)
 ============================================================ */
 
-// 기존 verifyRole 유지
+// old version verifyRole → 그냥 allowRoles 연결
 export function verifyRole(...roles) {
   return allowRoles(...roles);
 }
 
-// 기존 verifyAdmin → admin만 허용
+// 기존 verifyAdmin → admin 전용
 export function verifyAdmin(req, res, next) {
   return allowRoles("admin")(req, res, next);
 }
 
-// 기존 verifyEditor → editor + admin 허용
+// 기존 verifyEditor → editor + admin
+// (superadmin은 allowRoles에서 자동 PASS)
 export function verifyEditor(req, res, next) {
   return allowRoles("editor", "admin")(req, res, next);
 }
