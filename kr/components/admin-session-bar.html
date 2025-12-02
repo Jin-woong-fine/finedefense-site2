@@ -1,0 +1,18 @@
+<!-- /components/admin-session-bar.html -->
+<div id="adminSessionBar" class="admin-session-bar" style="display: none;">
+  <div class="admin-left">
+    <span class="admin-badge">ADMIN</span>
+    <span id="adminUser" class="admin-user"></span>
+  </div>
+  <div class="admin-center">
+    <span class="admin-label">세션 남은 시간</span>
+    <span id="adminTimer" class="admin-timer">--:--:--</span>
+  </div>
+  <div class="admin-right">
+    <a href="/kr/admin/dashboard.html" class="admin-link">관리자 대시보드</a>
+    <button id="adminExtendBtn" class="admin-extend-btn">연장</button>
+  </div>
+</div>
+
+<!-- 세션 타이머 스크립트 -->
+<script src="/kr/js/session_timer.js"></script>

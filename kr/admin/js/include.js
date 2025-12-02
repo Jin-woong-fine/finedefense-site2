@@ -1,37 +1,35 @@
-/**
- * include.js - 공통 Header/Footer 로더
- * 대기업 서비스 방식: HTML 로딩 → DOM 삿입 → 내부 script 재실행
- */
-document.addEventListener("DOMContentLoaded", () => {
-  const targets = document.querySelectorAll("[data-include]");
+// /kr/js/include.js
+// 공통 컴포넌트 로더 (header, footer, admin session bar 등)
 
-  targets.forEach(async (target) => {
-    const url = target.dataset.include;
+document.addEventListener("DOMContentLoaded", () => {
+  const includeTargets = document.querySelectorAll("[data-include]");
+  if (!includeTargets.length) return;
+
+  includeTargets.forEach((target) => {
+    const url = target.getAttribute("data-include");
     if (!url) return;
 
-    try {
-      const res = await fetch(url);
-      const html = await res.text();
+    fetch(url)
+      .then((res) => res.text())
+      .then((html) => {
+        target.innerHTML = html;
 
-      // 1) HTML 삽입
-      target.innerHTML = html;
+        // 방금 삽입된 HTML 내부의 <script> 태그 다시 실행
+        const scripts = target.querySelectorAll("script");
+        scripts.forEach((oldScript) => {
+          const newScript = document.createElement("script");
 
-      // 2) 삽입된 HTML 내부 script 재실행
-      const scripts = target.querySelectorAll("script");
+          if (oldScript.src) {
+            newScript.src = oldScript.src;
+          } else {
+            newScript.textContent = oldScript.textContent;
+          }
 
-      scripts.forEach((oldScript) => {
-        const newScript = document.createElement("script");
-
-        if (oldScript.src) {
-          newScript.src = oldScript.src;
-        } else {
-          newScript.textContent = oldScript.textContent;
-        }
-
-        document.body.appendChild(newScript);
+          document.body.appendChild(newScript);
+        });
+      })
+      .catch((err) => {
+        console.error("include load error:", url, err);
       });
-    } catch (err) {
-      console.error("include load error:", url, err);
-    }
   });
 });

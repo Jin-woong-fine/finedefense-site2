@@ -1,36 +1,59 @@
-/**
- * session_timer.js - 관리자 로그인 세션 타이머
- * 대기업 스타일: DOM 검사 → 세션 검사 → 타이머 → 연장 기능
- */
+// /kr/js/session_timer.js
+// 관리자 세션 타이머 & 연장 기능
 
 (function () {
+  const bar = document.getElementById("adminSessionBar");
+  if (!bar) return;
 
-  // DOM 요소 검사
   const userEl = document.getElementById("adminUser");
   const timerEl = document.getElementById("adminTimer");
-  const btn = document.getElementById("adminRefresh");
+  const extendBtn = document.getElementById("adminExtendBtn");
 
-  if (!userEl || !timerEl || !btn) return;
+  if (!userEl || !timerEl || !extendBtn) return;
 
-  // 세션 데이터
-  const name = localStorage.getItem("name") || "관리자";
-  const role = localStorage.getItem("role") || "-";
-  const exp = Number(localStorage.getItem("token_exp"));
+  const name = localStorage.getItem("name");
+  const role = localStorage.getItem("role");
+  const token = localStorage.getItem("token");
+  let expRaw = localStorage.getItem("token_exp");
 
-  userEl.textContent = `${name} (${role})`;
-
-  if (!exp) {
-    timerEl.textContent = "세션 없음";
+  // 세션 없으면 숨김
+  if (!name || !role || !token || !expRaw) {
+    bar.style.display = "none";
     return;
   }
 
-  // 타이머 업데이트
-  function update() {
+  // 관리자 / 슈퍼관리자만 표시
+  const adminRoles = ["admin", "superadmin", "editor"];
+  if (!adminRoles.includes(role)) {
+    bar.style.display = "none";
+    return;
+  }
+
+  // token_exp 파싱 (ms / ISO 둘 다 수용)
+  let exp;
+  if (/^\d+$/.test(expRaw)) {
+    exp = Number(expRaw);
+  } else {
+    exp = Date.parse(expRaw);
+  }
+  if (!exp || isNaN(exp)) {
+    bar.style.display = "none";
+    return;
+  }
+
+  // 표시 시작
+  bar.style.display = "flex";
+  document.body.classList.add("admin-mode");
+
+  userEl.textContent = `${name} (${role})`;
+
+  function updateTimer() {
     const now = Date.now();
     const remain = exp - now;
 
     if (remain <= 0) {
       timerEl.textContent = "만료됨";
+      bar.classList.add("admin-session-expired");
       return;
     }
 
@@ -38,38 +61,56 @@
     const m = String(Math.floor((remain % 3600000) / 60000)).padStart(2, "0");
     const s = String(Math.floor((remain % 60000) / 1000)).padStart(2, "0");
 
-    timerEl.textContent = `남은시간: ${h}:${m}:${s}`;
+    timerEl.textContent = `${h}:${m}:${s}`;
   }
 
-  setInterval(update, 1000);
-  update();
+  // 1초마다 갱신
+  updateTimer();
+  setInterval(updateTimer, 1000);
 
-  // 연장 기능
-  btn.addEventListener("click", async () => {
+  // 연장 버튼 클릭
+  extendBtn.addEventListener("click", async () => {
     try {
       const res = await fetch("/api/auth/refresh", {
         method: "POST",
         headers: {
-          Authorization: "Bearer " + localStorage.getItem("token")
+          Authorization: "Bearer " + token,
+          "Content-Type": "application/json"
         }
       });
 
       const out = await res.json();
 
       if (!res.ok) {
-        alert("연장 실패: " + out.message);
+        alert("세션 연장 실패: " + (out.message || "알 수 없는 오류"));
         return;
       }
 
-      localStorage.setItem("token", out.token);
-      localStorage.setItem("token_exp", Date.now() + 2 * 60 * 60 * 1000);
+      // 새 토큰 / 만료시간 반영
+      if (out.token) {
+        localStorage.setItem("token", out.token);
+      }
 
-      alert("연장되었습니다.");
-      update();
+      let newExp;
+      if (out.expiresIn) {
+        // 서버가 seconds로 만료시간을 주는 경우
+        newExp = Date.now() + out.expiresIn * 1000;
+      } else if (out.exp) {
+        // 서버가 exp(Unix time, seconds)를 주는 경우
+        newExp = out.exp * 1000;
+      } else {
+        // 서버가 안 주면 기본 2시간 연장
+        newExp = Date.now() + 2 * 60 * 60 * 1000;
+      }
 
+      exp = newExp;
+      localStorage.setItem("token_exp", String(newExp));
+
+      alert("세션이 연장되었습니다.");
+      updateTimer();
     } catch (err) {
-      alert("연장 중 오류");
       console.error(err);
+      alert("세션 연장 중 오류가 발생했습니다.");
     }
   });
 })();

@@ -1,22 +1,15 @@
-<header class="header-inner">
-
-  <!-- 🔵 Admin Session Bar -->
-  <div class="admin-session-bar" id="adminSessionBar">
-    <span class="admin-user" id="adminUser"></span>
-    <span class="admin-timer" id="adminTimer"></span>
-    <button class="admin-refresh" id="adminRefresh">연장</button>
-  </div>
-
-  <!-- 🔵 기존 헤더 레이아웃 -->
+<!-- /components/header.html -->
+<header class="header-inner" style="position:relative; z-index:999;">
   <div class="header-left">
     <a href="/kr/index.html">
-      <img src="/img/logo_transparent_finedefense.png" class="logo">
+      <img src="/img/logo_transparent_finedefense.png" alt="Fine Defense Logo" class="logo">
     </a>
 
     <div class="hamburger" id="hamburger">
       <span></span><span></span><span></span>
     </div>
 
+    <!-- 메인 메뉴 -->
     <ul class="main-menu">
       <li>
         <a href="/kr/sub/company/overview.html">회사소개</a>
@@ -64,7 +57,7 @@
   <div class="header-right">
     <div class="language-dropdown">
       <button class="lang-toggle" type="button">
-        KOR ▼
+        KOR <span class="arrow">▼</span>
       </button>
       <ul class="lang-list">
         <li><a data-lang="kr">KOR</a></li>
@@ -72,7 +65,4 @@
       </ul>
     </div>
   </div>
-
-  <!-- ⭐ session timer script load -->
-  <script src="/kr/js/session_timer.js"></script>
 </header>
