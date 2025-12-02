@@ -255,19 +255,23 @@
         }
       }
 
-      /* 메인페이지 전용 헤더 보정 */
+      /* 메인페이지 헤더 원래 디자인 복원 */
       body#index-page .header-inner {
+        background: #fff !important;
+        border-bottom: 1px solid #e0e0e0 !important;
         position: sticky;
-        top: 38px; /* admin bar 만큼 밀기 */
+        top: 38px;
         z-index: 5000;
         isolation: isolate;
       }
 
-      /* 배너가 헤더를 덮지 못하도록 */
-      body#index-page .banner-slider,
-      body#index-page .banner-slider * {
-        z-index: 0 !important;
+      /* 글자색 복원 */
+      body#index-page .header-inner a,
+      body#index-page .header-inner li,
+      body#index-page .header-inner * {
+        color: #111 !important;
       }
+
 
       </style>
 
