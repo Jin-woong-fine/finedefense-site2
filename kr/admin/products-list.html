@@ -87,50 +87,47 @@
   <!-- 🔵 사이드바 -->
   <div id="sidebar"></div>
 
-  <!-- 🔵 메인 -->
-  <div class="main">
+    <div class="main">   <!-- ✅ main은 여기서 시작 -->
 
-    <!-- 🔵 TOPBAR (대시보드랑 동일 구조) -->
+    <!-- 🔵 TOPBAR -->
     <div class="topbar">
-      <div class="title">제품 관리</div>
+        <div class="title">제품 관리</div>
 
-      <div style="display:flex; align-items:center; gap:12px;">
-
-        <!-- ⭐ 세션 타이머 -->
+        <div style="display:flex; align-items:center; gap:12px;">
         <span id="session-timer" class="session-timer">세션 계산중...</span>
 
-        <!-- 유저 드롭다운 -->
         <div class="topbar-user" id="topbarUser">
-          <span id="topbarUserName">관리자</span> ▾
-          <div class="user-dropdown" id="userDropdown"></div>
+            <span id="topbarUserName">관리자</span> ▾
+            <div class="user-dropdown" id="userDropdown"></div>
         </div>
 
         <button onclick="location.href='../index.html'">홈으로</button>
-      </div>
+        </div>
+    </div>
+
+    <!-- 🔵 버튼 영역 -->
+    <div style="margin-bottom:20px;">
+        <button class="btn btn-primary" onclick="location.href='products-add.html'">+ 신규등록</button>
+        <button class="btn btn-primary" onclick="location.href='../index.html'">홈으로</button>
+        <button id="logoutBtn" class="btn btn-danger">로그아웃</button>
     </div>
 
     <!-- 🔵 목록 패널 -->
     <section class="panel">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
         <h2>등록된 제품</h2>
 
-        <div style="display:flex; align-items:center; gap:10px;">
-          <!-- 언어 필터 -->
-          <div class="lang-filter">
+        <div class="lang-filter">
             <button type="button" class="lang-btn active" data-lang="kr">KR</button>
             <button type="button" class="lang-btn" data-lang="en">EN</button>
             <button type="button" class="lang-btn" data-lang="all">ALL</button>
-          </div>
-
-          <!-- 신규 등록 버튼 -->
-          <button class="btn btn-primary" onclick="location.href='products-add.html'">+ 신규등록</button>
         </div>
-      </div>
+        </div>
 
-      <div id="productList" class="product-grid"></div>
+        <div id="productList" class="product-grid"></div>
     </section>
 
-  </div>
+    </div>  <!-- ✅ main을 여기서 닫아야 함 -->
 
   <!-- 공통 JS -->
   <script src="/kr/admin/js/common_auth.js"></script>
