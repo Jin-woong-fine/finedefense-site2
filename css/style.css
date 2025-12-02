@@ -87,7 +87,7 @@ body {
   position: absolute;
 
   /* 🔥 기존: top: 100%; */
-  top: calc(100% + 20px);    /* ← 헤더에서 적당히 아래로 띄움 */
+  top: calc(100% + 30px);    /* ← 헤더에서 적당히 아래로 띄움 */
 
   left: 50%;
   transform: translateX(-50%) translateY(10px);
@@ -117,7 +117,7 @@ body {
   display: block;
   padding: 10px 18px;
   color: #333;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
   white-space: nowrap;
   transition: background .2s ease, color .2s ease;
