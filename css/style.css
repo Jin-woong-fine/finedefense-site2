@@ -71,6 +71,19 @@ body {
   opacity: 1;
 }
 
+.main-menu > li {
+  position: relative; /* ::after 절대위치 기준 필요 */
+}
+
+.main-menu > li::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 100%;
+  width: 100%;
+  height: 22px; /* 20~26px 추천 */
+  background: transparent;
+}
 
 
 
