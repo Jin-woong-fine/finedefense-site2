@@ -498,21 +498,34 @@ document.addEventListener("click", (e) => {
   const dropdown = document.querySelector(".language-dropdown");
   if (!dropdown) return;
 
-  const isToggle = e.target.closest(".lang-toggle");
-  const clickedInsideDropdown = e.target.closest(".language-dropdown");
+  const toggle = e.target.closest(".lang-toggle");
+  const langItem = e.target.closest(".lang-list li a");
 
-  // 🔹 토글 버튼 클릭 → 열고/닫기
-  if (isToggle) {
+  // 🔹 언어 선택 클릭 시 페이지 이동
+  if (langItem) {
+    const lang = langItem.dataset.lang;
+
+    if (lang === "kr") {
+      window.location.href = "/kr/index.html";
+    } else if (lang === "en") {
+      window.location.href = "/en/index.html";
+    }
+    return;
+  }
+
+  // 🔹 토글 클릭 → 열고 닫기
+  if (toggle) {
     dropdown.classList.toggle("open");
     return;
   }
 
-  // 🔹 드롭다운 바깥 클릭 → 무조건 닫기
-  if (!clickedInsideDropdown) {
+  // 🔹 바깥 클릭 → 닫기
+  if (!dropdown.contains(e.target)) {
     dropdown.classList.remove("open");
   }
 });
 </script>
+
 
 
 
