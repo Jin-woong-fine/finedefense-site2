@@ -72,11 +72,11 @@ body {
 }
 
 /* ============================================== */
-/*             SUBMENU (정확히 메뉴 아래)         */
+/*            SUBMENU (헤더 아래 여유공간)        */
 /* ============================================== */
 
 .main-menu li {
-  position: relative; /* 🔥 부모 기준점 확보 */
+  position: relative;
 }
 
 .submenu {
@@ -85,8 +85,11 @@ body {
   visibility: hidden;
 
   position: absolute;
-  top: 100%;           /* 🔥 li 바로 아래 */
-  left: 50%;           /* 🔥 li의 중앙 기준 */
+
+  /* 🔥 기존: top: 100%; */
+  top: calc(100% + 14px);    /* ← 헤더에서 적당히 아래로 띄움 */
+
+  left: 50%;
   transform: translateX(-50%) translateY(10px);
 
   background: #fff;
@@ -95,38 +98,29 @@ body {
   border-radius: 6px;
   padding: 10px 0;
   margin: 0;
-
-  min-width: 180px;   /* 일정한 너비 */
-  white-space: nowrap; /* 🔥 줄바꿈 방지 */
-
+  min-width: 180px;
+  white-space: nowrap;
   text-align: center;
 
   transition: opacity .25s ease, transform .25s ease;
   z-index: 200;
 }
 
-/* 나타날 때 */
 .main-menu li:hover > .submenu {
   opacity: 1;
   visibility: visible;
   transform: translateX(-50%) translateY(0);
 }
 
-/* 서브메뉴 아이템 */
+/* submenu items */
 .submenu li a {
   display: block;
   padding: 10px 18px;
   color: #333;
-  text-decoration: none;
   font-size: 14px;
   font-weight: 500;
-  white-space: nowrap; /* 한 줄 유지 */
+  white-space: nowrap;
   transition: background .2s ease, color .2s ease;
-}
-
-.submenu li a:hover {
-  background: #f4f7ff;
-  color: #0f2679;
 }
 
 
