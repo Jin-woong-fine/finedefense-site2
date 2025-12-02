@@ -1,103 +1,79 @@
-/* ============================================================================
-   📌 제품 상세 페이지 로직 (product-view.js)
-============================================================================ */
-
 document.addEventListener("DOMContentLoaded", loadProductDetail);
 
 async function loadProductDetail() {
   const params = new URLSearchParams(window.location.search);
-  const productId = params.get("id");
+  const id = params.get("id");
+  if (!id) return;
 
-  if (!productId) return;
+  const res = await fetch(`/api/products/${id}`);
+  const out = await res.json();
 
-  try {
-    const res = await fetch(`/api/products/${productId}`);
-    if (!res.ok) throw new Error("서버 오류");
-
-    const data = await res.json();
-    renderProduct(data);
-
-  } catch (err) {
-    console.error("loadProductDetail Error:", err);
-  }
+  renderProduct(out);
 }
 
-/* ============================================================================
-   📌 페이지 렌더링
-============================================================================ */
+/* 렌더링 */
 function renderProduct({ product, images }) {
-  const titleEl = document.getElementById("productTitle");
-  const categoryEl = document.getElementById("productCategory");
-  const descEl = document.getElementById("productDesc");
-  const mainImageEl = document.getElementById("mainImage");
-  const mainImageLink = document.getElementById("mainImageLink");
-  const thumbListEl = document.getElementById("thumbList");
-  const crumbProduct = document.getElementById("crumbProduct");
+  document.getElementById("productTitle").textContent = product.title;
+  document.getElementById("productCategory").textContent =
+    "카테고리: " + getCategoryLabel(product.category);
 
-  const categoryLabel = getCategoryLabel(product.category);
-
-  titleEl.textContent = product.title;
-  categoryEl.textContent = `카테고리: ${categoryLabel}`;
-  crumbProduct.textContent = categoryLabel;
+  document.getElementById("crumbProduct").textContent =
+    getCategoryLabel(product.category);
 
   /* 대표 이미지 */
   const mainImg = product.thumbnail || "/img/products/Image-placeholder.png";
 
+  const mainImageEl = document.getElementById("mainImage");
+  const mainImageLink = document.getElementById("mainImageLink");
+
   mainImageEl.src = mainImg;
   mainImageLink.href = mainImg;
 
-  /* 상세 이미지 중 대표 이미지 제거 */
-  const thumbFile = product.thumbnail ? product.thumbnail.split("/").pop() : null;
+  /* 썸네일 */
+  const thumbList = document.getElementById("thumbList");
+  thumbList.innerHTML = "";
+
+  const thumbFile = product.thumbnail
+    ? product.thumbnail.split("/").pop()
+    : null;
+
   const detailImgs = images.filter(img => {
-    if (!thumbFile) return true;
-    const f = img.url.split("/").pop();
-    return f !== thumbFile;
+    const file = img.url.split("/").pop();
+    return file !== thumbFile;
   });
 
-  /* 썸네일 렌더링 */
-  thumbListEl.innerHTML = "";
-
-  const allThumbs = [
-    { url: mainImg, isMain: true },
-    ...detailImgs.map(img => ({ url: img.url }))
-  ];
-
-  allThumbs.forEach((img, idx) => {
+  detailImgs.forEach((img, idx) => {
     const t = document.createElement("img");
     t.src = img.url;
 
-    if (idx === 0) t.classList.add("active");
-
     t.addEventListener("click", () => {
-      document.querySelectorAll(".thumb-list img").forEach(el =>
-        el.classList.remove("active")
-      );
-      t.classList.add("active");
+      document
+        .querySelectorAll(".thumb-list img")
+        .forEach(i => i.classList.remove("active"));
 
+      t.classList.add("active");
       mainImageEl.src = img.url;
       mainImageLink.href = img.url;
     });
 
-    thumbListEl.appendChild(t);
+    if (idx === 0) t.classList.add("active");
+
+    thumbList.appendChild(t);
   });
 
   /* Toast UI Viewer */
-  new toastui.Editor({
-    el: descEl,
+  new toastui.Editor.factory({
+    el: document.querySelector("#productDesc"),
     viewer: true,
-    initialValue: product.description_html || "<p>설명이 없습니다.</p>",
-    height: "auto"
+    initialValue: product.description_html || "설명이 없습니다."
   });
 }
 
-/* ============================================================================
-   📌 카테고리 라벨
-============================================================================ */
 function getCategoryLabel(code) {
   return {
-    towed: "수중이동형케이블",
-    fixed: "수중고정형케이블",
+    towed: "수중이동형 케이블",
+    fixed: "수중고정형 케이블",
     connector: "수중 커넥터",
-    custom: "커스텀 케이블",
+    custom: "커스텀 케이블"
   }[code] || "기타";
 }
