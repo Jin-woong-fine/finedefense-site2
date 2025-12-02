@@ -87,7 +87,7 @@ body {
   position: absolute;
 
   /* 🔥 기존: top: 100%; */
-  top: calc(100% + 14px);    /* ← 헤더에서 적당히 아래로 띄움 */
+  top: calc(100% + 20px);    /* ← 헤더에서 적당히 아래로 띄움 */
 
   left: 50%;
   transform: translateX(-50%) translateY(10px);
