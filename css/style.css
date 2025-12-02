@@ -16,18 +16,17 @@ body {
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  padding: 14px 2vw !important;
+  padding: clamp(0.5rem, 1.5vw, 1.5rem) 2vw;
   background-color: #fff;
   border-bottom: 1px solid #e0e0e0;
-  position: relative;
-  z-index: 1000; /* admin bar 아래 */
-  box-sizing: border-box;
 
-  /* 선명도 개선 */
-  -webkit-font-smoothing: antialiased;
-  /* font-weight가 흐려보이는 브라우저 최적화 */
-  text-rendering: optimizeLegibility;
+  position: sticky;   /* 🔥 핵심! */
+  top: 0;             /* 화면 최상단 고정 */
+  z-index: 1000;
+
+  box-sizing: border-box;
 }
+
 
 /* 로고 */
 .header-left .logo {
