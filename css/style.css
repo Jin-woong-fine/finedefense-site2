@@ -20,17 +20,22 @@ body {
   background-color: #fff;
   border-bottom: 1px solid #e0e0e0;
   position: relative;
-  z-index: 1 !important;      /* admin bar 아래 */
+  z-index: 1000; /* admin bar 아래 */
   box-sizing: border-box;
+
+  /* 선명도 개선 */
+  -webkit-font-smoothing: antialiased;
+  /* font-weight가 흐려보이는 브라우저 최적화 */
+  text-rendering: optimizeLegibility;
 }
 
 /* 로고 */
 .header-left .logo {
-  width: clamp(120px, 12vw, 200px);
+  width: clamp(120px, 12vw, 190px);
   height: auto;
 }
 
-/* 메뉴 영역 (중앙 배치) */
+/* 메뉴 중앙 배치 */
 .main-menu-container {
   flex: 1;
   display: flex;
@@ -43,59 +48,87 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);
   display: flex;
-  gap: clamp(40px, 5vw, 150px);
+  gap: clamp(35px, 4vw, 110px);
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.main-menu li {
-  position: relative;
-}
-
+/* 상위 메뉴 글씨 선명하게 */
 .main-menu li a {
   text-decoration: none;
-  color: #000;
+  color: #111;
   font-weight: 600;
-  padding: clamp(4px, 0.5vw, 8px) clamp(8px, 1vw, 12px);
-  font-size: clamp(14px, 1vw, 20px);
-  transition: color 0.3s ease;
+  padding: 6px 4px;
+  font-size: clamp(15px, 1vw, 18px);
+  letter-spacing: -0.2px;
+  opacity: 0.95;
+  transition: color .25s ease, opacity .25s ease;
 }
 
 .main-menu li a:hover {
   color: #0f2679;
+  opacity: 1;
 }
 
-/* 하위메뉴 */
+/* ============================================== */
+/*            서브메뉴 가로 한 줄 정렬            */
+/* ============================================== */
+
 .submenu {
   list-style: none;
+
+  /* 처음엔 숨김 */
   opacity: 0;
   visibility: hidden;
+
+  /* ← 메뉴 아래 정중앙 */
   position: absolute;
-  top: 210%;
+  top: calc(100% + 12px);
   left: 50%;
-  transform: translate(-50%, 10px);
-  border: 1px solid #5353536e;
+  transform: translateX(-50%);
+
+  /* 가로 한 줄 */
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+
   background: #fff;
-  padding: 0;
-  margin: 0;
-  min-width: 150px;
-  transition: 0.3s ease;
-  z-index: 100;
+  border: 1px solid rgba(0,0,0,0.15);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  border-radius: 6px;
+
+  padding: 12px 20px;
+  white-space: nowrap; /* 줄바꿈 방지 */
+
+  transition: opacity .25s ease, transform .25s ease;
+  z-index: 200;
 }
 
-.submenu li a {
-  display: block;
-  padding: 8px 15px;
-  color: #000;
-  font-size: clamp(12px, 1vw, 17px);
-}
-
+/* 호버 시 나타남 */
 .main-menu li:hover > .submenu {
   opacity: 1;
   visibility: visible;
-  transform: translate(-50%, 0);
+  transform: translateX(-50%) translateY(0);
 }
+
+/* 서브메뉴 항목 */
+.submenu li a {
+  display: block;
+  padding: 8px 12px;
+  color: #333;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  transition: color .2s ease, background .2s ease;
+}
+
+.submenu li a:hover {
+  color: #0f2679;
+  background: #f4f7ff;
+  border-radius: 4px;
+}
+
 
 /* ============================================== */
 /*                 LANG DROPDOWN                  */
