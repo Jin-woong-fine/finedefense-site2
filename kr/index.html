@@ -268,13 +268,6 @@
     <!-- 메인 헤더 -->
     <div data-include="/kr/components/header.html"></div>
 
-    <!-- ❗ include.js는 마지막에서 딱 1번 실행 -->
-    <script src="/js/include.js"></script>
-
-
-    <!-- ❗ session 타이머도 여기서 딱 1번 실행 -->
-    <script src="/js/session_timer.js"></script>
-
     <div class="banner-slider">
       <div class="slides">
 
@@ -428,7 +421,14 @@
     </section>
 
 
-    <div id="footer"></div>
+  <!-- 푸터 -->
+  <div data-include="/kr/components/footer.html"></div>
+
+  <!-- include.js (1번만 로드) -->
+  <script src="/kr/admin/js/include.js"></script>
+
+  <!-- 세션타이머 -->
+  <script src="/kr/js/session_timer.js"></script>
 
     <!-- 배너 슬라이더 -->
     <script src="/js/banner.js"></script>
