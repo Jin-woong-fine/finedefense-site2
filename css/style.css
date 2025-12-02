@@ -225,11 +225,12 @@ body {
 
 /* 항목 */
 .header-right .lang-list li a {
+  text-align: center;
   display: block;
   padding: 10px 16px !important;
   text-decoration: none;
   font-size: 0.9rem !important;
-  font-weight: 500;
+  font-weight: 550;
   color: #333 !important;
   transition: background 0.2s ease, color 0.2s ease;
 }
