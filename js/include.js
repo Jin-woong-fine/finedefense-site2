@@ -1,4 +1,4 @@
-// /kr/js/include.js
+// /js/include.js
 
 document.addEventListener("DOMContentLoaded", () => {
   const targets = document.querySelectorAll("[data-include]");
