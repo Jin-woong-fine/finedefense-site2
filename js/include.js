@@ -1,25 +1,33 @@
-// /js/include.js — 완전 정리본 (공백 완벽 제거)
+// /js/include.js
+
 document.addEventListener("DOMContentLoaded", () => {
   const targets = document.querySelectorAll("[data-include]");
 
-  targets.forEach(el => {
+  targets.forEach(async (el) => {
     const url = el.getAttribute("data-include");
     if (!url) return;
 
-    fetch(url)
-      .then(res => res.text())
-      .then(html => {
-        // placeholder를 대체하고 공백 제거
-        const parent = el.parentNode;
-        const temp = document.createElement("div");
-        temp.innerHTML = html;
+    try {
+      const res = await fetch(url);
+      const html = await res.text();
 
-        // include 요소를 실제 콘텐츠로 교체
-        while (temp.firstChild) {
-          parent.insertBefore(temp.firstChild, el);
-        }
-        parent.removeChild(el); // placeholder 제거
-      })
-      .catch(err => console.error("include error:", url, err));
+      const temp = document.createElement("div");
+      temp.innerHTML = html;
+
+      // include된 요소를 현재 위치에 삽입
+      while (temp.firstChild) {
+        el.parentNode.insertBefore(temp.firstChild, el);
+      }
+
+      // ★ placeholder 제거 → 공백 제거 핵심!
+      el.remove();
+    } catch (err) {
+      console.error("include error:", url, err);
+    }
   });
+
+  // include 완료 신호 (옵션)
+  setTimeout(() => {
+    document.dispatchEvent(new Event("includeLoaded"));
+  }, 20);
 });
