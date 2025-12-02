@@ -6,17 +6,14 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- 기본 CSS -->
+  <!-- 사이트 공통 CSS -->
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/sub-banner.css">
 
-  <!-- Toast UI Viewer -->
-  <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor-viewer.min.css">
-
-  <!-- Lightbox2 -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css">
-
   <style>
+    /* -----------------------------
+       레이아웃
+    ------------------------------ */
     .product-detail {
       max-width: 1200px;
       margin: 60px auto 80px;
@@ -25,81 +22,195 @@
       border-radius: 14px;
       box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
     }
-
     .product-title {
       font-size: 2rem;
       color: #0f2679;
       margin-bottom: 10px;
     }
-
     .product-category {
-      color: #666;
+      color:#666;
       margin-bottom: 30px;
+      font-size: 0.95rem;
     }
-
-    /* 메인 구조 */
     .product-content {
-      display: flex;
-      gap: 40px;
-      flex-wrap: nowrap;
-      align-items: start;
+      display:flex;
+      flex-wrap:wrap;
+      gap:40px;
+      align-items:flex-start;
     }
-
     .product-gallery {
-      flex: 1;
-      max-width: 460px;
-      text-align: center;
+      flex:1 1 45%;
+      text-align:center;
     }
-
-    /* 대표 이미지 박스 */
-    .main-image img {
-      width: 100%;
-      max-width: 420px;
-      border-radius: 12px;
-      object-fit: cover;
-      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
-      cursor: pointer;
-    }
-
-    /* 썸네일 */
-    .thumb-list {
-      margin-top: 14px;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 8px;
-    }
-
-    .thumb-list img {
-      width: 78px;
-      height: 78px;
-      object-fit: cover;
-      border-radius: 8px;
-      border: 2px solid transparent;
-      opacity: .7;
-      cursor: pointer;
-      transition: .2s ease;
-    }
-
-    .thumb-list img:hover,
-    .thumb-list img.active {
-      opacity: 1;
-      border-color: #0f2679;
-      transform: scale(1.04);
-    }
-
-    /* 설명 */
     .product-desc {
-      flex: 1.2;
+      flex:1 1 45%;
+      font-size:1rem;
+      line-height:1.7;
+      color:#333;
       min-width: 0;
     }
 
-    @media(max-width: 820px) {
+    /* -----------------------------
+       메인 이미지 + 썸네일
+    ------------------------------ */
+    .main-image img {
+      width:100%;
+      max-width:420px;
+      border-radius:12px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.08);
+      object-fit:cover;
+      cursor: zoom-in;
+      transition: transform 0.2s ease;
+    }
+    .main-image img:hover {
+      transform: scale(1.01);
+    }
+
+    .thumb-list {
+      margin-top:15px;
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      gap:8px;
+    }
+    .thumb-list img {
+      width:80px;
+      height:80px;
+      object-fit:cover;
+      border-radius:8px;
+      opacity:0.7;
+      border:2px solid transparent;
+      cursor:pointer;
+      transition:all 0.2s;
+    }
+    .thumb-list img.active,
+    .thumb-list img:hover {
+      opacity:1;
+      border-color:#0f2679;
+      transform:scale(1.03);
+    }
+
+    /* -----------------------------
+       Toast 에디터에서 만든 내용용 스타일
+    ------------------------------ */
+    .product-desc p {
+      margin: 0 0 0.7em;
+    }
+    .product-desc ul,
+    .product-desc ol {
+      padding-left: 1.4em;
+      margin: 0 0 0.7em;
+    }
+    .product-desc strong {
+      font-weight: 600;
+    }
+
+    /* 표 라인 살리기 */
+    .product-desc table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      table-layout: auto;
+    }
+    .product-desc th,
+    .product-desc td {
+      border: 1px solid #d0d4e4;
+      padding: 8px 10px;
+      font-size: 0.95rem;
+      vertical-align: middle;
+    }
+    .product-desc th {
+      background: #f7f8fc;
+      font-weight: 600;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .product-desc img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 10px 0;
+    }
+
+    /* -----------------------------
+       확대 보기(라이트박스) - 메인 이미지 전용
+    ------------------------------ */
+    .image-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      display: none;         /* JS로 제어 */
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    .image-overlay.show {
+      display: flex;
+    }
+    .overlay-inner {
+      position: relative;
+      max-width: 90vw;
+      max-height: 90vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .overlay-image {
+      max-width: 100%;
+      max-height: 100%;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+    .overlay-close {
+      position: absolute;
+      top: -40px;
+      right: 0;
+      font-size: 28px;
+      border: none;
+      background: transparent;
+      color: #fff;
+      cursor: pointer;
+    }
+    .overlay-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0,0,0,0.4);
+      color: #fff;
+      font-size: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .overlay-arrow:hover {
+      background: rgba(0,0,0,0.6);
+    }
+    .overlay-prev {
+      left: -60px;
+    }
+    .overlay-next {
+      right: -60px;
+    }
+
+    @media (max-width: 768px) {
       .product-content {
-        flex-direction: column;
+        flex-direction:column;
       }
-      .product-gallery {
-        max-width: 100%;
+      .overlay-prev {
+        left: 10px;
+      }
+      .overlay-next {
+        right: 10px;
+      }
+      .overlay-close {
+        top: 10px;
+        right: 10px;
       }
     }
   </style>
@@ -129,32 +240,226 @@
   <div id="productCategory" class="product-category"></div>
 
   <div class="product-content">
-
-    <!-- 제품 갤러리 -->
     <div class="product-gallery">
-      <a id="mainImageLink" href="/img/products/Image-placeholder.png" data-lightbox="product-images">
-        <img id="mainImage" src="/img/products/Image-placeholder.png">
-      </a>
+      <div class="main-image">
+        <img id="mainImage" src="/img/products/Image-placeholder.png" alt="제품 이미지">
+      </div>
       <div id="thumbList" class="thumb-list"></div>
     </div>
 
-    <!-- Toast UI Viewer 들어가는 영역 -->
+    <!-- description_html이 여기 들어감 -->
     <div id="productDesc" class="product-desc"></div>
-
   </div>
 </section>
 
 <div id="footer"></div>
 
+<!-- 🔵 헤더/푸터 네비게이션 공통 스크립트 -->
 <script src="/js/nav.js"></script>
 
-<!-- Toast UI Viewer -->
-<script src="https://uicdn.toast.com/editor/latest/toastui-editor-viewer.min.js"></script>
+<script>
+/* ==========================================================
+   📌 전역 상태
+========================================================== */
+let galleryImages = [];   // [url, url, ...]  (대표 + 상세 이미지)
+let currentIndex = 0;
 
-<!-- Lightbox2 -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
+/* ==========================================================
+   📌 초기 로딩
+========================================================== */
+document.addEventListener("DOMContentLoaded", () => {
+  loadProductDetail();
+  setupOverlay();   // 확대 뷰 DOM 미리 구성
+});
 
-<script src="/js/product-view.js"></script>
+/* ==========================================================
+   📌 제품 상세 데이터 로딩
+========================================================== */
+async function loadProductDetail() {
+  const params = new URLSearchParams(window.location.search);
+  const productId = params.get("id");
+
+  if (!productId) return;
+
+  try {
+    const res = await fetch(`/api/products/${productId}`);
+    if (!res.ok) throw new Error("서버 오류");
+
+    const data = await res.json();   // { product, images }
+    renderProduct(data);
+  } catch (err) {
+    console.error("loadProductDetail Error:", err);
+  }
+}
+
+/* ==========================================================
+   📌 카테고리 표시용 라벨
+========================================================== */
+function getCategoryLabel(code) {
+  return {
+    towed: "수중이동형 케이블",
+    fixed: "수중고정형 케이블",
+    connector: "수중 커넥터",
+    custom: "커스텀 케이블",
+  }[code] || "기타";
+}
+
+/* ==========================================================
+   📌 페이지 렌더링
+========================================================== */
+function renderProduct({ product, images }) {
+  const titleEl      = document.getElementById("productTitle");
+  const categoryEl   = document.getElementById("productCategory");
+  const descEl       = document.getElementById("productDesc");
+  const mainImageEl  = document.getElementById("mainImage");
+  const thumbListEl  = document.getElementById("thumbList");
+  const crumbProduct = document.getElementById("crumbProduct");
+
+  const categoryLabel = getCategoryLabel(product.category || "");
+
+  titleEl.textContent = product.title;
+  categoryEl.textContent = `카테고리: ${categoryLabel}`;
+  // breadcrumb 2단계는 카테고리로 고정
+  crumbProduct.textContent = categoryLabel;
+
+  // 대표 이미지
+  const mainImg = product.thumbnail && product.thumbnail.trim()
+    ? product.thumbnail
+    : "/img/products/Image-placeholder.png";
+
+  mainImageEl.src = mainImg;
+
+  // 상세 이미지에서 대표와 중복 제거
+  const thumbFile = product.thumbnail
+    ? product.thumbnail.split("/").pop()
+    : null;
+
+  const detailImgs = (images || []).filter(img => {
+    if (!thumbFile) return true;
+    const file = (img.url || "").split("/").pop();
+    return file !== thumbFile;
+  });
+
+  // 전체 갤러리 배열 구성 (대표 + 상세)
+  galleryImages = [mainImg, ...detailImgs.map(img => img.url)];
+  currentIndex = 0;   // 대표 이미지를 0번 인덱스로
+
+  /* 썸네일 렌더링 */
+  thumbListEl.innerHTML = "";
+
+  galleryImages.forEach((url, idx) => {
+    const t = document.createElement("img");
+    t.src = url;
+
+    if (idx === 0) t.classList.add("active");
+
+    // 썸네일 클릭 → 메인 이미지만 변경 (확대는 X)
+    t.addEventListener("click", () => {
+      document.querySelectorAll(".thumb-list img").forEach(el =>
+        el.classList.remove("active")
+      );
+      t.classList.add("active");
+      currentIndex = idx;
+      mainImageEl.src = url;
+    });
+
+    thumbListEl.appendChild(t);
+  });
+
+  /* 메인 이미지 클릭 → 라이트박스 오픈 */
+  mainImageEl.addEventListener("click", () => {
+    openOverlay(currentIndex);
+  });
+
+  /* description_html 출력 */
+  descEl.innerHTML = product.description_html || "<p>설명이 없습니다.</p>";
+}
+
+/* ==========================================================
+   📌 라이트박스(확대 뷰) 구성
+   - 메인 이미지 한 번 클릭 → 확대
+   - 확대 상태에서 좌우 화살표로 슬라이드
+========================================================== */
+let overlayEl, overlayImgEl, overlayPrevBtn, overlayNextBtn, overlayCloseBtn;
+
+function setupOverlay() {
+  overlayEl = document.createElement("div");
+  overlayEl.className = "image-overlay";
+
+  overlayEl.innerHTML = `
+    <div class="overlay-inner">
+      <button class="overlay-close" type="button">&times;</button>
+      <button class="overlay-arrow overlay-prev" type="button">&#10094;</button>
+      <img class="overlay-image" src="" alt="확대 이미지">
+      <button class="overlay-arrow overlay-next" type="button">&#10095;</button>
+    </div>
+  `;
+
+  document.body.appendChild(overlayEl);
+
+  overlayImgEl   = overlayEl.querySelector(".overlay-image");
+  overlayPrevBtn = overlayEl.querySelector(".overlay-prev");
+  overlayNextBtn = overlayEl.querySelector(".overlay-next");
+  overlayCloseBtn= overlayEl.querySelector(".overlay-close");
+
+  // 닫기
+  overlayCloseBtn.addEventListener("click", closeOverlay);
+
+  // 바깥 클릭 시 닫기
+  overlayEl.addEventListener("click", (e) => {
+    if (e.target === overlayEl) {
+      closeOverlay();
+    }
+  });
+
+  // 좌우 화살표
+  overlayPrevBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    showPrevImage();
+  });
+  overlayNextBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    showNextImage();
+  });
+
+  // ESC / ← / → 키
+  document.addEventListener("keydown", (e) => {
+    if (!overlayEl.classList.contains("show")) return;
+
+    if (e.key === "Escape") {
+      closeOverlay();
+    } else if (e.key === "ArrowLeft") {
+      showPrevImage();
+    } else if (e.key === "ArrowRight") {
+      showNextImage();
+    }
+  });
+}
+
+function openOverlay(index) {
+  if (!galleryImages.length) return;
+
+  currentIndex = index ?? 0;
+  overlayImgEl.src = galleryImages[currentIndex];
+  overlayEl.classList.add("show");
+}
+
+function closeOverlay() {
+  overlayEl.classList.remove("show");
+}
+
+function showPrevImage() {
+  if (!galleryImages.length) return;
+  currentIndex = (currentIndex - 1 + galleryImages.length) % galleryImages.length;
+  overlayImgEl.src = galleryImages[currentIndex];
+}
+
+function showNextImage() {
+  if (!galleryImages.length) return;
+  currentIndex = (currentIndex + 1) % galleryImages.length;
+  overlayImgEl.src = galleryImages[currentIndex];
+}
+</script>
 
 </body>
 </html>
