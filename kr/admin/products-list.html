@@ -129,131 +129,131 @@
 
     </div>  <!-- ✅ main을 여기서 닫아야 함 -->
 
-  <!-- 공통 JS -->
-  <script src="/kr/admin/js/common_auth.js"></script>
-  <script src="/kr/admin/js/sidebar.js"></script>
+    <!-- 공통 JS -->
+    <script src="/kr/admin/js/common_auth.js"></script>
+    <script src="/kr/admin/js/sidebar.js"></script>
 
     <script>
-    (function () {
-    requireAdminOrEditor();
-    loadSidebar("products");
-    document.getElementById("logoutBtn").addEventListener("click", logout);
-    })();
+        (function () {
+        requireAdminOrEditor();
+        loadSidebar("products");
+        document.getElementById("logoutBtn").addEventListener("click", logout);
+        })();
 
-    /* =================================================================
-    🔥 목록만 따로 분리한 전용 스크립트 (서버 API 완전 일치)
-    ================================================================= */
+        /* =================================================================
+        🔥 목록만 따로 분리한 전용 스크립트 (서버 API 완전 일치)
+        ================================================================= */
 
-    let allProducts = [];
-    let currentLang = "kr";
+        let allProducts = [];
+        let currentLang = "kr";
 
-    /* 언어 필터 이벤트 */
-    document.querySelectorAll(".lang-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-        document.querySelectorAll(".lang-btn").forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        currentLang = btn.dataset.lang;
-        loadProducts(); // ← 필터 바꿀 때 다시 로딩!
-    });
-    });
+        /* 언어 필터 이벤트 */
+        document.querySelectorAll(".lang-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            document.querySelectorAll(".lang-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            currentLang = btn.dataset.lang;
+            loadProducts(); // ← 필터 바꿀 때 다시 로딩!
+        });
+        });
 
-    /* 🚀 데이터 불러오기 (서버 API 정확히 반영) */
-    async function loadProducts() {
-    try {
+        /* 🚀 데이터 불러오기 */
+        async function loadProducts() {
+        try {
 
-        if (currentLang === "all") {
-        // ALL → KR + EN 두 번 요청
-        const [krRes, enRes] = await Promise.all([
-            fetch(`/api/products?lang=kr`),
-            fetch(`/api/products?lang=en`)
-        ]);
+            if (currentLang === "all") {
+            const [krRes, enRes] = await Promise.all([
+                fetch(`/api/products?lang=kr`),
+                fetch(`/api/products?lang=en`)
+            ]);
 
-        const kr = await krRes.json();
-        const en = await enRes.json();
+            const kr = await krRes.json();
+            const en = await enRes.json();
 
-        allProducts = [...kr, ...en].sort((a, b) => a.sort_order - b.sort_order);
+            allProducts = [...kr, ...en].sort((a, b) => a.sort_order - b.sort_order);
 
+            } else {
+            const res = await fetch(`/api/products?lang=${currentLang}`);
+            allProducts = await res.json();
+            }
+
+            renderList();
+
+        } catch (err) {
+            console.error("🔥 제품 로드 실패:", err);
+        }
+        }
+
+        /* 목록 출력 */
+        function renderList() {
+        const list = document.getElementById("productList");
+        list.innerHTML = "";
+
+        if (!Array.isArray(allProducts)) {
+            list.innerHTML = "<p>데이터 오류</p>";
+            return;
+        }
+
+        if (allProducts.length === 0) {
+            list.innerHTML = "<p>등록된 제품이 없습니다.</p>";
+            return;
+        }
+
+        allProducts.forEach(item => {
+            const thumb = item.thumbnail
+            ? item.thumbnail
+            : "/kr/admin/img/noimage.png";
+
+            const card = document.createElement("div");
+            card.className = "product-card";
+            card.style.cursor = "pointer";
+
+            // 클릭 → 실제 제품 페이지로 이동
+            card.addEventListener("click", e => {
+            if (!e.target.closest(".card-buttons")) {
+                location.href = `/kr/sub/products/product-view.html?id=${item.id}`;
+            }
+            });
+
+            card.innerHTML = `
+            <img src="${thumb}" alt="">
+            <div class="card-body">
+                <div class="title">${item.title}</div>
+                <div class="category">${item.category.toUpperCase()} | ${item.lang.toUpperCase()}</div>
+
+                <div class="card-buttons">
+                <button class="btn btn-primary" onclick="location.href='products-edit.html?id=${item.id}'">수정</button>
+                <button class="btn btn-danger" onclick="deleteProduct(${item.id})">삭제</button>
+                </div>
+            </div>
+            `;
+
+            list.appendChild(card);
+        });
+        }
+
+        /* 삭제 */
+        async function deleteProduct(id) {
+        if (!confirm("삭제하시겠습니까?")) return;
+
+        const res = await fetch(`/api/products/${id}`, {
+            method: "DELETE",
+            headers: authHeaders(),
+        });
+
+        const out = await res.json();
+
+        if (res.ok) {
+            alert("삭제되었습니다.");
+            loadProducts();
         } else {
-        // 언어별 단일 호출
-        const res = await fetch(`/api/products?lang=${currentLang}`);
-        allProducts = await res.json();
+            alert("삭제 실패: " + out.message);
+        }
         }
 
-        renderList();
-    } catch (err) {
-        console.error("🔥 제품 로드 실패:", err);
-    }
-    }
-
-    /* 목록 출력 */
-    function renderList() {
-    const list = document.getElementById("productList");
-    list.innerHTML = "";
-
-    if (!Array.isArray(allProducts)) {
-        list.innerHTML = "<p>데이터 오류</p>";
-        return;
-    }
-
-    if (allProducts.length === 0) {
-        list.innerHTML = "<p>등록된 제품이 없습니다.</p>";
-        return;
-    }
-
-    allProducts.forEach(item => {
-    const thumb = item.thumbnail
-        ? item.thumbnail
-        : "/kr/admin/img/noimage.png";
-
-    const card = document.createElement("div");
-    card.className = "product-card";
-    card.style.cursor = "pointer";
-
-    // 📌 클릭 → 실제 제품 상세 페이지로 이동
-    card.addEventListener("click", e => {
-        if (!e.target.closest(".card-buttons")) {
-        location.href = `/kr/sub/products/product-view.html?id=${item.id}`;
-        }
-    });
-
-    card.innerHTML = `
-        <img src="${thumb}" alt="">
-        <div class="card-body">
-        <div class="title">${item.title}</div>
-        <div class="category">${item.category.toUpperCase()} | ${item.lang.toUpperCase()}</div>
-
-        <div class="card-buttons">
-            <button class="btn btn-primary" onclick="location.href='products-edit.html?id=${item.id}'">수정</button>
-            <button class="btn btn-danger" onclick="deleteProduct(${item.id})">삭제</button>
-        </div>
-        </div>
-    `;
-
-    list.appendChild(card);
-    });
-
-
-    /* 삭제 */
-    async function deleteProduct(id) {
-    if (!confirm("삭제하시겠습니까?")) return;
-
-    const res = await fetch(`/api/products/${id}`, {
-        method: "DELETE",
-        headers: authHeaders(),
-    });
-
-    const out = await res.json();
-
-    if (res.ok) {
-        alert("삭제되었습니다.");
+        /* 시작 */
         loadProducts();
-    } else {
-        alert("삭제 실패: " + out.message);
-    }
-    }
 
-    /* 시작 */
-    loadProducts();
     </script>
 
 
