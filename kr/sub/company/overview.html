@@ -177,8 +177,11 @@
   </head>
 
   <body>
-    <!-- ✅ 1. 헤더 (공통) -->
-    <div id="header"></div>
+    <!-- 관리자 세션바 -->
+    <div data-include="/kr/components/admin-session-bar.html"></div>
+
+    <!-- 메인 헤더 -->
+    <div data-include="/kr/components/header.html"></div>
 
     <!-- ✅ 2. 섹션 전용 배너 -->
     <section class="sub-banner">
@@ -249,8 +252,14 @@
     </section>
 
 
-    <!-- ✅ 4. 푸터 -->
-    <div id="footer"></div>
+  <!-- 푸터 -->
+  <div data-include="/kr/components/footer.html"></div>
+
+  <script src="/js/include.js"></script>
+  <script src="/js/session_timer.js"></script>
+
+  <!-- 언어 전환 -->
+  <script src="/js/language.js"></script>
 
     <script>
     document.addEventListener("DOMContentLoaded", () => {
