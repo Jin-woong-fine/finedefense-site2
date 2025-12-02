@@ -255,22 +255,31 @@
         }
       }
 
+      /* 메인페이지 전용 헤더 보정 */
+      body#index-page .header-inner {
+        position: sticky;
+        top: 38px; /* admin bar 만큼 밀기 */
+        z-index: 5000;
+        isolation: isolate;
+      }
+
+      /* 배너가 헤더를 덮지 못하도록 */
+      body#index-page .banner-slider,
+      body#index-page .banner-slider * {
+        z-index: 0 !important;
+      }
+
       </style>
 
   </head>
 
+  <body id="index-page">
 
-
-
-  <body>
     <!-- 관리자 세션바 -->
     <div data-include="/kr/components/admin-session-bar.html"></div>
 
     <!-- 메인 헤더 -->
     <div data-include="/kr/components/header.html"></div>
-
-
-
 
     <div class="banner-slider">
       <div class="slides">
