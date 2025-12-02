@@ -64,9 +64,6 @@ async function initSessionTimer() {
     const role = localStorage.getItem("role");
     const name = localStorage.getItem("name");
 
-    // 헤더 여백 초기화(혹시 남아있을 수도 있으니)
-    header.style.marginTop = "0";
-
     // ----- 관리자 아닐 때 -----
     if (role !== "admin" && role !== "superadmin") {
       bar.style.display = "none";
@@ -139,3 +136,19 @@ async function initSessionTimer() {
 
 // 시작
 document.addEventListener("DOMContentLoaded", initSessionTimer);
+
+
+
+// 메인페이지에서 admin-bar 있는 경우 헤더 자동 내려가게
+document.addEventListener("DOMContentLoaded", () => {
+  const body = document.body;
+  const role = localStorage.getItem("role");
+
+  if (body.id === "index-page") {
+    if (role === "admin" || role === "superadmin") {
+      body.classList.add("has-admin-bar");
+    } else {
+      body.classList.remove("has-admin-bar");
+    }
+  }
+});

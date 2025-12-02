@@ -255,22 +255,51 @@
         }
       }
 
-        /* 메인페이지 헤더 원래 디자인 복원 */
-        body#index-page .header-inner {
-          background: #ffffffbb !important;
-          border-bottom: 1px solid #e0e0e0 !important;
-          position: sticky;
-          top: 38px;
-          z-index: 5000;
-          isolation: isolate;
-        }
+/* ================================
+   메인페이지: 배너 위 투명 헤더
+   ================================ */
 
-        /* 글자색 복원 */
-        body#index-page .header-inner a,
-        body#index-page .header-inner li,
-        body#index-page .header-inner * {
-          color: #111 !important;
-        }
+/* 초기 투명 헤더 */
+body#index-page .header-inner {
+  position: fixed;
+  top: 0; /* admin bar는 JS가 조정 */
+  left: 0;
+  width: 100%;
+  padding: 22px 4vw;
+  background: transparent;
+  border-bottom: none;
+  box-shadow: none;
+  z-index: 6000;
+  transition: background 0.35s ease, padding 0.35s ease, box-shadow 0.35s ease;
+}
+
+/* 메뉴 글씨 흰색 */
+body#index-page .header-inner * {
+  color: #fff !important;
+}
+
+/* 스크롤 후 흰색 헤더로 전환 */
+body#index-page.scrolled .header-inner {
+  background: #ffffffee; /* 살짝 투명한 흰색 */
+  border-bottom: 1px solid #e0e0e0;
+  padding: 16px 4vw;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+}
+
+/* 스크롤 시 글자색 검정 */
+body#index-page.scrolled .header-inner * {
+  color: #111 !important;
+}
+
+/* 배너 위에 정확히 겹치도록 */
+body#index-page .banner-slider {
+  margin-top: 0 !important;
+}
+
+/* 관리자바가 있을 때 헤더가 자동으로 아래로 이동 */
+body#index-page.has-admin-bar .header-inner {
+  top: 38px !important;
+}
 
 
 
@@ -506,6 +535,22 @@ async function loadLatestPosts() {
 
 window.addEventListener("load", loadLatestPosts);
 </script>
+
+<script>
+document.addEventListener("scroll", () => {
+  const body = document.body;
+
+  if (window.scrollY > 40) {
+    body.classList.add("scrolled");
+  } else {
+    body.classList.remove("scrolled");
+  }
+});
+</script>
+
+
+
+
 
 
 
