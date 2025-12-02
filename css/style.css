@@ -9,10 +9,10 @@ body {
   display: flex;
   justify-content: space-between; /* 좌: 로고, 우: 언어 */
   align-items: center;
-  width: 100%;                  
-  height: auto;                 
+  width: 100%;
+  height: auto;
   padding: clamp(0.5rem, 1.5vw, 1.5rem) 2vw;
-  box-sizing: border-box; 
+  box-sizing: border-box;
   margin: 0 auto;
   position: relative;
   z-index: 10;
@@ -154,11 +154,6 @@ body {
   color: #0f2679;
 }
 
-.lang-toggle .divider {
-  color: #aaa;
-  font-weight: 300;
-}
-
 .lang-toggle .arrow {
   font-size: 0.8rem;
   transition: transform 0.2s ease;
@@ -214,7 +209,7 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* 🔽🔽🔽 여기부터 반응형 추가 🔽🔽🔽 */
+/* 🔽 반응형 */
 .hamburger {
   display: none;
   flex-direction: column;
@@ -243,15 +238,11 @@ body {
   transform: rotate(-45deg) translate(6px, -6px);
 }
 
-/* 📱 1024px 이하 자동 전환 */
+/* 📱 1024px 이하 */
 @media (max-width: 1024px) {
   .header-inner {
     flex-wrap: wrap;
     padding: 12px 20px;
-  }
-
-  .header-left .logo {
-    width: 140px;
   }
 
   .hamburger {
@@ -273,12 +264,6 @@ body {
     display: flex;
   }
 
-  .main-menu li a {
-    width: 100%;
-    padding: 14px 20px;
-    border-bottom: 1px solid #f0f0f0;
-  }
-
   .submenu {
     position: static;
     opacity: 1;
@@ -295,14 +280,17 @@ body {
     display: block;
   }
 
+  /* 언어버튼 위치 충돌 방지 */
   .header-right {
-    position: absolute;
-    top: 16px;
-    right: 60px;
+    position: static !important;
+    width: 100%;
+    margin-top: 12px;
+    display: flex;
+    justify-content: flex-end;
   }
 }
 
-/* 더 작은 화면 */
+/* 📱 480px 이하 */
 @media (max-width: 480px) {
   .header-left .logo {
     width: 110px;
@@ -311,12 +299,9 @@ body {
     font-size: 0.8rem;
     padding: 4px 10px;
   }
-  .main-menu li a {
-    font-size: 0.95rem;
-  }
 }
 
-/* 🔽 footer 이하 원본 그대로 유지 🔽 */
+/* Footer */
 footer {
   width: 100%;
   background-color: #333;
@@ -325,7 +310,6 @@ footer {
   box-sizing: border-box;
 }
 
-/* 이하 동일 */
 .footer-container {
   display: flex;
   flex-wrap: wrap;
@@ -411,7 +395,6 @@ footer {
   }
 }
 
-
 /* 관리자 모드일 때, 헤더를 자연스럽게 아래로 내림 */
 .admin-mode header {
   margin-top: 48px; /* 관리자바 높이 */
@@ -427,7 +410,7 @@ footer {
 #adminBar .admin-right {
   display: flex;
   align-items: center;
-  gap: 36px;  /* 대기업 UI 기본 간격 */
+  gap: 36px;
 }
 
 #adminBar .admin-right a {
@@ -442,13 +425,16 @@ footer {
   font-weight: 600;
 }
 
+/* ============================= */
+/*   ADMIN SESSION BAR + FIXES   */
+/* ============================= */
 
 .admin-session-box {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  margin-right: 16px;
   font-size: 13px;
-  color: #333;
 }
 
 .session-user {
@@ -458,29 +444,21 @@ footer {
 
 .session-timer {
   font-size: 12px;
-  color: #d9534f; /* 빨간 느낌 */
+  color: #d9534f;
 }
 
 .session-refresh-btn {
-  padding: 3px 8px;
-  font-size: 12px;
   background: #0f2679;
   color: #fff;
+  padding: 4px 10px;
   border: none;
   border-radius: 4px;
+  font-size: 12px;
   cursor: pointer;
 }
 .session-refresh-btn:hover {
   background: #0c1c5a;
 }
-
-
-
-
-
-
-
-
 
 /* HEADER FIX — 2025 FINAL */
 .header-inner {
@@ -489,7 +467,7 @@ footer {
   z-index: 9000 !important;
 }
 
-/* submenu는 너무 아래로 내려가므로 조정 */
+/* SUBMENU FIX */
 .submenu {
-  top: 150% !important;
+  top: 100% !important;
 }

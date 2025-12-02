@@ -1,46 +1,57 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const userEl = document.getElementById("sessionUser");
-  const timerEl = document.getElementById("sessionTimer");
-  const refreshBtn = document.getElementById("sessionRefreshBtn");
+/**
+ * session_timer.js - 관리자 로그인 세션 타이머
+ * 대기업 스타일: DOM 검사 → 세션 검사 → 타이머 → 연장 기능
+ */
 
-  if (!userEl || !timerEl) return; // header 없는 페이지 예외 처리
+(function () {
 
+  // DOM 요소 검사
+  const userEl = document.getElementById("adminUser");
+  const timerEl = document.getElementById("adminTimer");
+  const btn = document.getElementById("adminRefresh");
+
+  if (!userEl || !timerEl || !btn) return;
+
+  // 세션 데이터
   const name = localStorage.getItem("name") || "관리자";
-  const tokenExp = localStorage.getItem("token_exp"); // 저장해둔 JWT 만료시간(ms)
-  const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role") || "-";
+  const exp = Number(localStorage.getItem("token_exp"));
 
-  userEl.textContent = `${name}`;
+  userEl.textContent = `${name} (${role})`;
 
-  if (!tokenExp) {
+  if (!exp) {
     timerEl.textContent = "세션 없음";
     return;
   }
 
-  function updateTimer() {
+  // 타이머 업데이트
+  function update() {
     const now = Date.now();
-    const gap = tokenExp - now;
+    const remain = exp - now;
 
-    if (gap <= 0) {
+    if (remain <= 0) {
       timerEl.textContent = "만료됨";
       return;
     }
 
-    const h = String(Math.floor(gap / 3600000)).padStart(2, "0");
-    const m = String(Math.floor((gap % 3600000) / 60000)).padStart(2, "0");
-    const s = String(Math.floor((gap % 60000) / 1000)).padStart(2, "0");
+    const h = String(Math.floor(remain / 3600000)).padStart(2, "0");
+    const m = String(Math.floor((remain % 3600000) / 60000)).padStart(2, "0");
+    const s = String(Math.floor((remain % 60000) / 1000)).padStart(2, "0");
 
     timerEl.textContent = `남은시간: ${h}:${m}:${s}`;
   }
 
-  setInterval(updateTimer, 1000);
-  updateTimer();
+  setInterval(update, 1000);
+  update();
 
-  // 🔄 토큰 연장 버튼
-  refreshBtn.addEventListener("click", async () => {
+  // 연장 기능
+  btn.addEventListener("click", async () => {
     try {
       const res = await fetch("/api/auth/refresh", {
         method: "POST",
-        headers: { Authorization: "Bearer " + token }
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token")
+        }
       });
 
       const out = await res.json();
@@ -51,18 +62,14 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       localStorage.setItem("token", out.token);
-      localStorage.setItem("token_exp", Date.now() + 2*60*60*1000); // 2시간 다시 설정
+      localStorage.setItem("token_exp", Date.now() + 2 * 60 * 60 * 1000);
 
-      alert("로그인 시간이 연장되었습니다.");
-      updateTimer();
+      alert("연장되었습니다.");
+      update();
 
-    } catch (e) {
-      console.error(e);
-      alert("연장 오류 발생");
+    } catch (err) {
+      alert("연장 중 오류");
+      console.error(err);
     }
   });
-});
-
-<script src="/kr/js/session_timer.js"></script>
-
-
+})();

@@ -1,7 +1,16 @@
-<header class="header-inner" style="position:relative; z-index:999;">
+<header class="header-inner">
+
+  <!-- 🔵 Admin Session Bar -->
+  <div class="admin-session-bar" id="adminSessionBar">
+    <span class="admin-user" id="adminUser"></span>
+    <span class="admin-timer" id="adminTimer"></span>
+    <button class="admin-refresh" id="adminRefresh">연장</button>
+  </div>
+
+  <!-- 🔵 기존 헤더 레이아웃 -->
   <div class="header-left">
     <a href="/kr/index.html">
-      <img src="/img/logo_transparent_finedefense.png" alt="Fine Defense Logo" class="logo">
+      <img src="/img/logo_transparent_finedefense.png" class="logo">
     </a>
 
     <div class="hamburger" id="hamburger">
@@ -53,17 +62,9 @@
   </div>
 
   <div class="header-right">
-
-    <!-- ⭐ 로그인 남은시간/연장 영역 추가 -->
-    <div class="admin-session-box" id="adminSessionBox">
-      <span class="session-user" id="sessionUser"></span>
-      <span class="session-timer" id="sessionTimer"></span>
-      <button class="session-refresh-btn" id="sessionRefreshBtn">연장</button>
-    </div>
-
     <div class="language-dropdown">
       <button class="lang-toggle" type="button">
-        KOR <span class="arrow">▼</span>
+        KOR ▼
       </button>
       <ul class="lang-list">
         <li><a data-lang="kr">KOR</a></li>
@@ -71,6 +72,7 @@
       </ul>
     </div>
   </div>
-</header>
 
-<script src="/kr/js/session_timer.js"></script>
+  <!-- ⭐ session timer script load -->
+  <script src="/kr/js/session_timer.js"></script>
+</header>
