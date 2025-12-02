@@ -1,38 +1,50 @@
 // /js/session_timer.js
 console.log("[session_timer] loaded");
 
-// ==================================
-//  공통 유틸
-// ==================================
+// ========================================
+// 1) admin bar & header가 로드될 때까지 기다림
+// ========================================
+function waitForElement(selector, timeout = 5000) {
+  return new Promise((resolve, reject) => {
+    const start = Date.now();
 
-// localStorage에 저장된 만료시각 가져오기 (초/밀리초 둘 다 대응)
-function getExpireMs() {
-  const raw = Number(localStorage.getItem("token_expire"));
-  if (!raw || Number.isNaN(raw)) return null;
+    function check() {
+      const el = document.querySelector(selector);
+      if (el) return resolve(el);
+      if (Date.now() - start > timeout) return reject(null);
+      requestAnimationFrame(check);
+    }
+    check();
+  });
+}
 
-  // 예전 코드에서 "초" 단위로만 저장했을 가능성도 있으니 둘 다 처리
-  if (raw < 1e12) {
-    // 10^12 보다 작으면 초(sec)로 판단 → ms로 변환
-    return raw * 1000;
+// ========================================
+// 2) 서버에서 exp를 강제로 받아 통일
+// ========================================
+async function fetchServerExp() {
+  const token = localStorage.getItem("token");
+  if (!token) return null;
+
+  try {
+    const res = await fetch("/api/auth/check", {
+      headers: { Authorization: "Bearer " + token }
+    });
+
+    const out = await res.json();
+    if (res.ok && out.ok && out.exp) {
+      localStorage.setItem("token_expire", out.exp * 1000);
+      return out.exp * 1000;
+    }
+  } catch (err) {
+    console.warn("server exp check error:", err);
   }
-  // 그 이상이면 이미 ms
-  return raw;
+
+  return Number(localStorage.getItem("token_expire"));
 }
 
-// 서버에서 내려준 exp(UNIX 초)를 ms로 저장
-function setExpireUnix(expSec) {
-  localStorage.setItem("token_expire", String(expSec * 1000));
-}
-
-// 세션 정보 전체 삭제
-function clearSession() {
-  localStorage.removeItem("token");
-  localStorage.removeItem("role");
-  localStorage.removeItem("name");
-  localStorage.removeItem("token_expire");
-}
-
-// 남은시간 ms → "HH:MM:SS" 문자열
+// ========================================
+// 3) ms → HH:MM:SS
+// ========================================
 function formatTime(ms) {
   const h = String(Math.floor(ms / 3600000)).padStart(2, "0");
   const m = String(Math.floor((ms % 3600000) / 60000)).padStart(2, "0");
@@ -40,127 +52,83 @@ function formatTime(ms) {
   return `${h}:${m}:${s}`;
 }
 
-// ==================================
-//  메인 타이머 로직
-// ==================================
+// ========================================
+// 4) 메인 init
+// ========================================
 async function initSessionTimer() {
-  const bar = document.getElementById("adminSessionBar");
-  if (!bar) {
-    console.warn("[session_timer] adminSessionBar 없음");
-    return;
-  }
+  try {
+    // include 로드 기다림
+    const bar = await waitForElement("#adminSessionBar");
+    const header = await waitForElement("header.header-inner");
 
-  const role = localStorage.getItem("role");
-  const name = localStorage.getItem("name") || "";
+    const role = localStorage.getItem("role");
+    const name = localStorage.getItem("name");
 
-  // 관리자 아니면 바 숨김
-  if (role !== "admin" && role !== "superadmin") {
-    bar.style.display = "none";
-    document.body.classList.remove("has-admin-bar");
-    return;
-  }
-
-  // 관리자일 때만 표시
-  bar.style.display = "flex";
-  document.body.classList.add("has-admin-bar");
-
-  const timerSpan = document.getElementById("adminTimer");
-  const extendBtn = document.getElementById("adminExtendBtn");
-  const userSpan  = document.getElementById("adminUser");
-  const token     = localStorage.getItem("token");
-
-  if (userSpan && name) {
-    userSpan.textContent = `${name} 님`;
-  }
-
-  // 남은시간 갱신 함수
-  function tick() {
-    const expMs = getExpireMs();
-
-    if (!expMs) {
-      // 만료 정보가 없으면 바로 만료 처리
-      timerSpan.textContent = "00:00:00";
-      clearSession();
+    if (role !== "admin" && role !== "superadmin") {
+      bar.style.display = "none";
+      document.body.classList.remove("has-admin-bar");
       return;
     }
 
-    const diff = expMs - Date.now();
+    // 관리자일 때만 표시
+    bar.style.display = "flex";
+    document.body.classList.add("has-admin-bar");
 
-    if (diff <= 0) {
-      timerSpan.textContent = "00:00:00";
-      clearSession();
-      alert("세션이 만료되었습니다. 다시 로그인해주세요.");
-      location.href = "/kr/admin/login.html";
-      return;
+    // 헤더 자동 밀기
+    header.style.marginTop = "38px";
+
+    // DOM 연결
+    const timerSpan = document.getElementById("adminTimer");
+    const extendBtn = document.getElementById("adminExtendBtn");
+    const userSpan = document.getElementById("adminUser");
+
+    if (userSpan) userSpan.textContent = `${name} 님`;
+
+    // 서버에서 exp 받아 통일
+    let expMs = await fetchServerExp();
+
+    function tick() {
+      expMs = Number(localStorage.getItem("token_expire"));
+      const diff = expMs - Date.now();
+
+      if (diff <= 0) {
+        clearSession();
+        alert("세션이 만료되었습니다.");
+        location.href = "/kr/admin/login.html";
+        return;
+      }
+
+      timerSpan.textContent = formatTime(diff);
     }
 
-    timerSpan.textContent = formatTime(diff);
-  }
+    tick();
+    setInterval(tick, 1000);
 
-  // 연장 버튼
-  if (extendBtn) {
     extendBtn.addEventListener("click", async () => {
       try {
+        const token = localStorage.getItem("token");
         const res = await fetch("/api/auth/extend", {
           method: "POST",
           headers: { Authorization: "Bearer " + token }
         });
-
         const out = await res.json();
 
         if (res.ok && out.ok) {
-          // 새 토큰 & 만료시간 갱신
-          if (out.token) {
-            localStorage.setItem("token", out.token);
-          }
-          if (out.exp) {
-            setExpireUnix(out.exp);
-          } else if (out.extendMs) {
-            // 혹시 exp가 없고 extendMs만 온다면
-            const newMs = Date.now() + out.extendMs;
-            localStorage.setItem("token_expire", String(newMs));
-          }
-
+          localStorage.setItem("token", out.token);
+          localStorage.setItem("token_expire", out.exp * 1000);
           alert("세션이 연장되었습니다.");
-          tick(); // 바로 화면 반영
         } else {
-          alert("연장 실패: " + (out.message || "알 수 없는 오류"));
+          alert("연장 실패");
         }
       } catch (err) {
-        console.error("[session_timer] extend error", err);
-        alert("연장 중 오류가 발생했습니다.");
+        alert("연장 중 오류");
       }
     });
-  }
 
-  // 타이머 시작
-  tick();
-  setInterval(tick, 1000);
+  } catch (e) {
+    console.warn("[session_timer] admin bar or header load 실패");
+  }
 }
 
-// ==================================
-//  adminSessionBar가 로드될 때까지 대기
-// ==================================
-function waitForAdminBar(maxWaitMs = 5000) {
-  const start = Date.now();
-
-  function check() {
-    const bar = document.getElementById("adminSessionBar");
-    if (bar) {
-      initSessionTimer();
-      return;
-    }
-    if (Date.now() - start > maxWaitMs) {
-      console.warn("[session_timer] adminSessionBar를 찾지 못함 (timeout)");
-      return;
-    }
-    setTimeout(check, 100); // 0.1초 간격으로 재시도
-  }
-
-  check();
-}
-
-// DOMContentLoaded 이후에 실행 (include.js보다 나중에 실행되는 경우도 커버)
-document.addEventListener("DOMContentLoaded", () => {
-  waitForAdminBar();
-});
+// 시작
+document.addEventListener("DOMContentLoaded", initSessionTimer);
