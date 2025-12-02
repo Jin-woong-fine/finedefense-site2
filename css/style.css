@@ -72,40 +72,38 @@ body {
 }
 
 /* ============================================== */
-/*            서브메뉴 가로 한 줄 정렬            */
+/*             SUBMENU (세로 + 한 줄 유지)        */
 /* ============================================== */
 
 .submenu {
   list-style: none;
-
-  /* 처음엔 숨김 */
   opacity: 0;
   visibility: hidden;
 
-  /* ← 메뉴 아래 정중앙 */
   position: absolute;
-  top: calc(100% + 12px);
+  top: calc(100% + 15px);
   left: 50%;
-  transform: translateX(-50%);
-
-  /* 가로 한 줄 */
-  display: flex;
-  flex-direction: row;
-  gap: 20px;
+  transform: translateX(-50%) translateY(10px);
 
   background: #fff;
   border: 1px solid rgba(0,0,0,0.15);
   box-shadow: 0 8px 20px rgba(0,0,0,0.08);
   border-radius: 6px;
 
-  padding: 12px 20px;
-  white-space: nowrap; /* 줄바꿈 방지 */
+  padding: 10px 0;
+  margin: 0;
+  min-width: 180px;
+
+  /* 🔥 글자 줄바꿈 방지 */
+  white-space: nowrap;
+
+  text-align: center;
 
   transition: opacity .25s ease, transform .25s ease;
   z-index: 200;
 }
 
-/* 호버 시 나타남 */
+/* 나타나는 효과 */
 .main-menu li:hover > .submenu {
   opacity: 1;
   visibility: visible;
@@ -115,19 +113,23 @@ body {
 /* 서브메뉴 항목 */
 .submenu li a {
   display: block;
-  padding: 8px 12px;
+  padding: 10px 18px;
   color: #333;
   text-decoration: none;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
-  transition: color .2s ease, background .2s ease;
+  transition: background .2s ease, color .2s ease;
+
+  /* 🔥 글씨 한 줄 유지 */
+  white-space: nowrap;
 }
 
 .submenu li a:hover {
-  color: #0f2679;
   background: #f4f7ff;
+  color: #0f2679;
   border-radius: 4px;
 }
+
 
 
 /* ============================================== */
