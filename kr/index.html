@@ -494,25 +494,26 @@ window.addEventListener("load", loadLatestPosts);
 
 
 <script>
-document.addEventListener("includeLoaded", () => {
-  document.addEventListener("click", (e) => {
-    const dropdown = document.querySelector(".language-dropdown");
+document.addEventListener("click", (e) => {
+  const dropdown = document.querySelector(".language-dropdown");
+  if (!dropdown) return;
 
-    if (!dropdown) return;
+  const isToggle = e.target.closest(".lang-toggle");
+  const clickedInsideDropdown = e.target.closest(".language-dropdown");
 
-    // 🔥 lang-toggle 클릭했는지 완벽하게 체크
-    if (e.target.closest(".lang-toggle")) {
-      dropdown.classList.toggle("open");
-      return;
-    }
+  // 🔹 토글 버튼 클릭 → 열고/닫기
+  if (isToggle) {
+    dropdown.classList.toggle("open");
+    return;
+  }
 
-    // 바깥 클릭 → 닫힘
-    if (!dropdown.contains(e.target)) {
-      dropdown.classList.remove("open");
-    }
-  });
+  // 🔹 드롭다운 바깥 클릭 → 무조건 닫기
+  if (!clickedInsideDropdown) {
+    dropdown.classList.remove("open");
+  }
 });
 </script>
+
 
 
 
