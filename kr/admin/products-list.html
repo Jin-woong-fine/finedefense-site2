@@ -201,36 +201,36 @@
     }
 
     allProducts.forEach(item => {
-        const thumb = item.thumbnail
+    const thumb = item.thumbnail
         ? item.thumbnail
         : "/kr/admin/img/noimage.png";
 
-        const card = document.createElement("div");
-        card.className = "product-card";
-        card.style.cursor = "pointer";
+    const card = document.createElement("div");
+    card.className = "product-card";
+    card.style.cursor = "pointer";
 
-        card.addEventListener("click", e => {
+    // 📌 클릭 → 실제 제품 상세 페이지로 이동
+    card.addEventListener("click", e => {
         if (!e.target.closest(".card-buttons")) {
-            location.href = `products-edit.html?id=${item.id}`;
+        location.href = `/kr/sub/products/product-view.html?id=${item.id}`;
         }
-        });
+    });
 
-        card.innerHTML = `
+    card.innerHTML = `
         <img src="${thumb}" alt="">
         <div class="card-body">
-            <div class="title">${item.title}</div>
-            <div class="category">${item.category.toUpperCase()} | ${item.lang.toUpperCase()}</div>
+        <div class="title">${item.title}</div>
+        <div class="category">${item.category.toUpperCase()} | ${item.lang.toUpperCase()}</div>
 
-            <div class="card-buttons">
+        <div class="card-buttons">
             <button class="btn btn-primary" onclick="location.href='products-edit.html?id=${item.id}'">수정</button>
             <button class="btn btn-danger" onclick="deleteProduct(${item.id})">삭제</button>
-            </div>
         </div>
-        `;
+        </div>
+    `;
 
-        list.appendChild(card);
+    list.appendChild(card);
     });
-    }
 
     /* 삭제 */
     async function deleteProduct(id) {
