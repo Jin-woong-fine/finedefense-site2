@@ -490,6 +490,24 @@ async function loadLatestPosts() {
 window.addEventListener("load", loadLatestPosts);
 </script>
 
+<script>
+document.addEventListener("click", (e) => {
+  const dropdown = document.querySelector(".language-dropdown");
+  const toggle = document.querySelector(".lang-toggle");
+
+  if (!dropdown || !toggle) return;
+
+  if (toggle.contains(e.target)) {
+    dropdown.classList.toggle("open");
+  } else {
+    dropdown.classList.remove("open");
+  }
+});
+</script>
+
+
+
+
 
 <style>
   /* 공지/뉴스 라벨 스타일 */
