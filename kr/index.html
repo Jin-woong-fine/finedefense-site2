@@ -493,26 +493,26 @@ window.addEventListener("load", loadLatestPosts);
 
 
 
-  <script>
-  document.addEventListener("includeLoaded", () => {
-    document.addEventListener("click", (e) => {
-      const dropdown = document.querySelector(".language-dropdown");
+<script>
+document.addEventListener("includeLoaded", () => {
+  document.addEventListener("click", (e) => {
+    const dropdown = document.querySelector(".language-dropdown");
 
-      if (!dropdown) return;
+    if (!dropdown) return;
 
-      // 🔥 lang-toggle 클릭했는지 완벽하게 체크
-      if (e.target.closest(".lang-toggle")) {
-        dropdown.classList.toggle("open");
-        return;
-      }
+    // 🔥 lang-toggle 클릭했는지 완벽하게 체크
+    if (e.target.closest(".lang-toggle")) {
+      dropdown.classList.toggle("open");
+      return;
+    }
 
-      // 바깥 클릭 → 닫힘
-      if (!dropdown.contains(e.target)) {
-        dropdown.classList.remove("open");
-      }
-    });
+    // 바깥 클릭 → 닫힘
+    if (!dropdown.contains(e.target)) {
+      dropdown.classList.remove("open");
+    }
   });
-  </script>
+});
+</script>
 
 
 
