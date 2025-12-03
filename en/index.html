@@ -1,4 +1,4 @@
-<!-- /kr/index.html -->
+<!-- /en/index.html -->
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -601,12 +601,16 @@ async function loadLatestPosts() {
         imgURL = item.main_image || "/img/default-news.png";
       }
 
-      const dateStr = new Date(item.created_at).toLocaleDateString("ko-KR");
+      const dateStr = new Date(item.created_at).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric"
+      });
 
       const viewURL =
         item.category === "notice"
-          ? `/kr/sub/pr/notice/notice-view.html?id=${item.id}`
-          : `/kr/sub/pr/newsroom/news-view.html?id=${item.id}`;
+          ? `/en/sub/pr/notice/notice-view.html?id=${item.id}`
+          : `/en/sub/pr/newsroom/news-view.html?id=${item.id}`;
 
       const card = `
         <div class="news-card" onclick="location.href='${viewURL}'">
