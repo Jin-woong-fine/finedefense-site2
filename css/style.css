@@ -7,11 +7,127 @@ body {
   font-family: Arial, sans-serif;
 }
 
-/* ===================================================================
-   서브페이지 헤더 — index.scrolled 상태와 100% 동일
-   =================================================================== */
+/* ============================================== */
+/*                HEADER 기본 구조                */
+/* ============================================== */
 
-/* 1) 서브페이지 헤더 기본 스타일 */
+.header-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: clamp(0.5rem, 1.5vw, 1.5rem) 2vw;
+  position: relative;
+  z-index: 2000;
+  box-sizing: border-box;
+  isolation: isolate;
+}
+
+/* 레이아웃 영역 정의 */
+.header-left { display: flex; align-items: center; }
+.header-right { display: flex; align-items: center; gap: 20px; }
+
+/* 로고 공통 사이즈 */
+.header-left .logo {
+  width: clamp(120px, 12vw, 190px);
+  height: auto;
+}
+
+/* 메뉴 중앙 정렬 컨테이너 */
+.main-menu-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+/* 메뉴 */
+.main-menu {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  gap: clamp(50px, 4vw, 150px);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* 메뉴 항목 */
+.main-menu a {
+  text-decoration: none;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 600;
+  font-size: clamp(15px, 1vw, 18px);
+  letter-spacing: -0.2px;
+  transition: color .25s ease, opacity .25s ease;
+}
+
+/* 서브메뉴 기본 구조 */
+.main-menu > li {
+  position: relative;
+}
+
+.main-menu > li::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  height: 30px;
+}
+
+/* 서브메뉴 */
+.submenu {
+  list-style: none;
+  opacity: 0;
+  visibility: hidden;
+
+  position: absolute;
+  top: calc(100% + 22px);
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.15);
+  border-radius: 6px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+
+  padding: 10px 0;
+  min-width: 180px;
+  margin: 0;
+  text-align: center;
+
+  transition: opacity .25s ease, transform .25s ease;
+  z-index: 200;
+}
+
+.main-menu li:hover > .submenu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* 서브메뉴 글씨 */
+.submenu li a {
+  display: block;
+  padding: 10px 14px;
+  font-size: 16px;
+  font-weight: 400;
+  color: #222;
+  white-space: nowrap;
+  transition: background .2s ease, color .2s ease;
+}
+
+.submenu li a:hover {
+  background: #eef3ff;
+  color: #0f2679;
+}
+
+/* =================================================================== */
+/*     서브페이지 전용 헤더 스타일 — index.scrolled 과 100% 동일     */
+/* =================================================================== */
+
 body:not(#index-page) .header-inner {
   background: rgba(255,255,255,0.97) !important;
   border-bottom: 1px solid rgba(0,0,0,0.06) !important;
@@ -26,10 +142,9 @@ body:not(#index-page) .header-inner {
   width: 100% !important;
   position: relative !important;
   z-index: 2000 !important;
-  isolation: isolate !important;
 }
 
-/* 2) 로고 — dark 로고 고정 + 메인과 동일 크기 */
+/* 로고 = dark 로고 + 동일 크기 */
 body:not(#index-page) .logo-dark {
   display: block !important;
   width: clamp(120px, 12vw, 190px) !important;
@@ -38,18 +153,22 @@ body:not(#index-page) .logo-white {
   display: none !important;
 }
 
-/* 3) 메인 메뉴 글씨 — index.scrolled 동일 */
+/* ============================= */
+/*        메인메뉴 텍스트        */
+/* ============================= */
+
 body:not(#index-page) .main-menu a {
   color: #111 !important;
   text-shadow: none !important;
 
   font-family: 'Noto Sans KR', sans-serif !important;
   font-size: clamp(15px, 1vw, 18px) !important;
-  font-weight: 600 !important; 
+  font-weight: 600 !important;
   letter-spacing: -0.2px !important;
 
   opacity: 0.95 !important;
   text-decoration: none !important;
+
   transition: color .25s ease, opacity .25s ease;
 }
 
@@ -58,13 +177,16 @@ body:not(#index-page) .main-menu a:hover {
   opacity: 1 !important;
 }
 
-/* 4) 서브메뉴 — 메인과 동일 */
+/* ============================= */
+/*        서브메뉴 (설정 동일)   */
+/* ============================= */
+
 body:not(#index-page) .submenu {
   background: #fff !important;
   border: 1px solid rgba(0,0,0,0.15) !important;
   border-radius: 6px !important;
-
   padding: 10px 0 !important;
+
   min-width: 180px !important;
 
   opacity: 0;
@@ -79,26 +201,29 @@ body:not(#index-page) .main-menu > li:hover > .submenu {
   transform: translateX(-50%) translateY(0) !important;
 }
 
-/* 5) 서브메뉴 글씨 — index.scrolled 동일 */
+/* 서브메뉴 텍스트 */
 body:not(#index-page) .submenu li a {
   font-size: 16px !important;
   font-weight: 400 !important;
-  letter-spacing: -0.15px !important;
   color: #222 !important;
 
   padding: 10px 14px !important;
+  letter-spacing: -0.15px !important;
   text-shadow: none !important;
+  white-space: nowrap !important;
 
   transition: background .2s ease, color .2s ease;
 }
 
-/* hover */
 body:not(#index-page) .submenu li a:hover {
   background: #eef3ff !important;
   color: #0f2679 !important;
 }
 
-/* 6) 언어 선택 버튼도 동일 */
+/* ============================= */
+/*      언어 선택(공통 적용)     */
+/* ============================= */
+
 body:not(#index-page) .lang-toggle,
 body:not(#index-page) .lang-toggle *,
 body:not(#index-page) .language-dropdown .lang-list * {
@@ -110,6 +235,9 @@ body:not(#index-page) .language-dropdown.open .lang-list {
   background: #fff !important;
   border: 1px solid #ddd !important;
 }
+
+
+
 
 
 
