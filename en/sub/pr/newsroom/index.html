@@ -139,12 +139,13 @@
       ? data
       : (Array.isArray(data.list) ? data.list : []);
 
-    if (!list.length) {
-      document.getElementById("newsContainer").innerHTML =
-        "<p>등록된 뉴스가 없습니다.</p>";
-      renderPagination(1, 1);
-      return;
-    }
+      if (!list.length) {
+        document.getElementById("newsContainer").innerHTML =
+          "<p>No news articles available.</p>";
+        renderPagination(1, 1);
+        return;
+      }
+
 
     // 페이지 계산
     const totalPages = Math.ceil(list.length / pageSize);
