@@ -4,6 +4,8 @@ import path from "path";
 import { fileURLToPath } from "url";
 import db from "../config/db.js";
 import { verifyToken, verifyEditor, verifyAdmin } from "../middleware/auth.js";
+import fs from "fs";
+
 
 const router = express.Router();
 
@@ -236,9 +238,9 @@ router.put("/:id/reorder-images", verifyToken, verifyEditor, async (req, res) =>
   }
 });
 
-/* ==========================================================
-   ❌ 제품 삭제 (EDITOR 이상)
-========================================================== */
+
+
+// 삭제 기능
 router.delete("/:id", verifyToken, verifyEditor, async (req, res) => {
   try {
     const { id } = req.params;
@@ -263,10 +265,11 @@ router.delete("/:id", verifyToken, verifyEditor, async (req, res) => {
     await db.execute(`DELETE FROM product_images WHERE product_id = ?`, [id]);
     await db.execute(`DELETE FROM products WHERE id = ?`, [id]);
 
-    // 4) 실제 파일 삭제 (옵션)
-    import fs from "fs";
+    // 4) 실제 파일 삭제
     images.forEach(img => {
-      const filePath = path.join(__dirname, "../public", img.url || "");
+      if (!img.url) return;
+
+      const filePath = path.join(__dirname, "../public", img.url);
       if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath);
       }
@@ -279,9 +282,6 @@ router.delete("/:id", verifyToken, verifyEditor, async (req, res) => {
     res.status(500).json({ message: "server error" });
   }
 });
-
-
-
 
 
 
