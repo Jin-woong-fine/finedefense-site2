@@ -210,7 +210,8 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
   formData.append("category", document.getElementById("category").value);
   formData.append("lang", document.getElementById("lang").value);
   formData.append("sort_order", document.getElementById("sort_order").value);
-  formData.append("content", editor.getHTML());
+  formData.append("description_html", editor.getHTML());   // ⭐ 수정된 부분
+
 
   imageFiles.forEach(file => formData.append("images", file));
 
