@@ -1,8 +1,10 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>커스텀 케이블 | Fine Defense</title>
+  <title>Custom Cables | Fine Defense</title>
+</head>
+
 
   <!-- 공통 스타일 -->
   <link rel="stylesheet" href="/css/style.css">
@@ -133,42 +135,43 @@
 
 <body>
 
-<!-- 관리자 세션바 (정확한 ID 부여) -->
-<div id="adminBarContainer" data-include="/kr/components/admin-session-bar.html"></div>
+  <!-- Admin Session Bar -->
+  <div id="adminBarContainer" data-include="/en/components/admin-session-bar.html"></div>
 
-<!-- 공통 헤더 -->
-<div id="headerContainer" data-include="/kr/components/header.html"></div>
+  <!-- Common Header -->
+  <div id="headerContainer" data-include="/en/components/header.html"></div>
 
-<!-- 서브 배너 -->
-<section class="sub-banner">
-  <img src="/img/sub-banners/cable.jpg" alt="">
-  <div class="banner-text">
-    <h1>제품소개</h1>
-    <p>해양 방산 현장을 연결하는 케이블 솔루션</p>
+  <!-- Sub Banner -->
+  <section class="sub-banner">
+    <img src="/img/sub-banners/cable.jpg" alt="">
+    <div class="banner-text">
+      <h1>Products</h1>
+      <p>Cable Solutions Connecting Maritime Defense Operations</p>
+    </div>
+  </section>
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="/en/index.html">Home</a> &gt;
+    <span class="crumb crumb-level1">Products</span> &gt;
+    <span class="crumb crumb-level2">Custom Cables</span>
+    <div id="side-tabs" class="side-tabs"></div>
   </div>
-</section>
 
-<!-- breadcrumb -->
-<div class="breadcrumb">
-  <a href="/kr/index.html">홈</a> &gt;
-  <span class="crumb crumb-level1">제품소개</span> &gt;
-  <span class="crumb crumb-level2">커스텀 케이블</span>
-  <div id="side-tabs" class="side-tabs"></div>
-</div>
+  <!-- Main Content -->
+  <section class="product-section">
+    <h1>Custom Cables</h1>
+    <p class="section-desc">
+      We design and manufacture customized power, signal, and fiber-optic composite cables tailored to your specific requirements.
+    </p>
 
-<!-- 본문 -->
-<section class="product-section">
-  <h1>커스텀 케이블</h1>
-  <p class="section-desc">
-    고객 요구에 맞춘 전력·신호·광 복합 케이블을 설계하여 제작합니다.
-  </p>
+    <!-- Auto-rendered Product Cards -->
+    <div id="productCards" class="product-cards"></div>
+  </section>
 
-  <!-- 제품 카드 자동 렌더링 -->
-  <div id="productCards" class="product-cards"></div>
-</section>
 
     <!-- 공통 푸터 -->
-    <div data-include="/kr/components/footer.html"></div>
+    <div data-include="/en/components/footer.html"></div>
 
 <script>
   // HTML 태그 제거 후 텍스트만 남김

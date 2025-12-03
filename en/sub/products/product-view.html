@@ -263,7 +263,7 @@
 
 
     <!-- 공통 푸터 -->
-    <div data-include="/kr/components/footer.html"></div>
+    <div data-include="/en/components/footer.html"></div>
 
 <script>
 /* ==========================================================
@@ -301,15 +301,15 @@ async function loadProductDetail() {
 }
 
 /* ==========================================================
-   📌 카테고리 표시용 라벨
+   📌 Category Label (English)
 ========================================================== */
 function getCategoryLabel(code) {
   return {
-    towed: "수중이동형 케이블",
-    fixed: "수중고정형 케이블",
-    connector: "수중 커넥터",
-    custom: "커스텀 케이블",
-  }[code] || "기타";
+    towed: "Towed Underwater Cable",
+    fixed: "Fixed Underwater Cable",
+    connector: "Underwater Connector",
+    custom: "Custom Cable",
+  }[code] || "Others";
 }
 
 /* ==========================================================
