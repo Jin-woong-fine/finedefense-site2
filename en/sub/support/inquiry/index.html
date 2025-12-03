@@ -127,10 +127,10 @@
 <body>
 
   <!-- Admin Session Bar -->
-  <div id="adminBarContainer" data-include="/en/components/admin-session-bar.html"></div>
+  <div id="adminBarContainer"></div>
 
   <!-- Common Header -->
-  <div id="headerContainer" data-include="/en/components/header.html"></div>
+  <div id="headerContainer"></div>   <!-- ⭐ data-include 제거됨 -->
 
   <!-- Sub Banner -->
   <section class="sub-banner">
@@ -179,50 +179,44 @@
     <button class="btn-submit" onclick="sendInquiry()">Submit Inquiry</button>
   </div>
 
+  <!-- 공통 푸터 -->
+  <div id="footerContainer"></div>  <!-- ⭐ data-include 제거됨 -->
 
+  <script>
+    async function sendInquiry() {
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const subject = document.getElementById("subject").value.trim();
+      const message = document.getElementById("message").value.trim();
 
-    <!-- 공통 푸터 -->
-    <div data-include="/en/components/footer.html"></div>
-
-
-
-    <script>
-      async function sendInquiry() {
-        const name = document.getElementById("name").value.trim();
-        const email = document.getElementById("email").value.trim();
-        const subject = document.getElementById("subject").value.trim();
-        const message = document.getElementById("message").value.trim();
-
-        if (!name || !email || !message) {
-          alert("Please fill in all required fields.");
-          return;
-        }
-
-        const res = await fetch("/api/inquiry/send", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, email, subject, message, lang: "en" }),
-        });
-
-        const out = await res.json();
-
-        if (res.ok) {
-          alert("Your inquiry has been successfully submitted.\nWe will get back to you shortly.");
-          location.reload();
-        } else {
-          alert("An error occurred: " + out.message);
-        }
+      if (!name || !email || !message) {
+        alert("Please fill in all required fields.");
+        return;
       }
-    </script>
+
+      const res = await fetch("/api/inquiry/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, subject, message, lang: "en" }),
+      });
+
+      const out = await res.json();
+
+      if (res.ok) {
+        alert("Your inquiry has been successfully submitted.\nWe will get back to you shortly.");
+        location.reload();
+      } else {
+        alert("An error occurred: " + out.message);
+      }
+    }
+  </script>
 
 
-
-    <!-- 공통 스크립트 -->
-    <script src="/js/include.js"></script>
-    <script src="/js/session_timer.js"></script>
-    <script src="/js/language.js"></script>
-    <script src="/js/nav.js"></script>
-
+  <!-- 공통 스크립트 -->
+  <script src="/js/include.js"></script>
+  <script src="/js/session_timer.js"></script>
+  <script src="/js/language.js"></script>
+  <script src="/js/nav.js"></script>
 
 </body>
 </html>
