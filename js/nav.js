@@ -279,7 +279,7 @@ function initBreadcrumbTabs() {
             { name: "Notice", link: `${base}/pr/notice/index.html` },
             { name: "Newsroom", link: `${base}/pr/newsroom/index.html` },
             { name: "Gallery", link: `${base}/pr/gallery/index.html` },
-            { name: "Certificates", link: `${base}/pr/cert/index.html` },
+            { name: "Certificates", link: `${base}/pr/certification/index.html` },
             { name: "Catalog", link: `${base}/pr/catalog/index.html` },
           ];
     }
