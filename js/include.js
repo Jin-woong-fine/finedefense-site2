@@ -8,6 +8,18 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!url) return;
 
     try {
+      // ★ admin bar 먼저 처리 (url 기준)
+      if (url.includes("admin-session-bar.html")) {
+        const res = await fetch(url);
+        const html = await res.text();
+        el.innerHTML = html;
+
+        // admin bar가 로드되었음을 body에 표시 → padding-top 등 조정
+        document.body.classList.add("has-admin-bar");
+        return; // 아래 일반 include 로직 실행 안함
+      }
+
+      // ★ 일반 include 처리
       const res = await fetch(url);
       const html = await res.text();
 
@@ -19,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
         el.parentNode.insertBefore(temp.firstChild, el);
       }
 
-      // ★ placeholder 제거 → 공백 제거 핵심!
+      // placeholder 제거
       el.remove();
     } catch (err) {
       console.error("include error:", url, err);
@@ -30,22 +42,4 @@ document.addEventListener("DOMContentLoaded", () => {
   setTimeout(() => {
     document.dispatchEvent(new Event("includeLoaded"));
   }, 20);
-
-
-  // admin bar 먼저 로드 보장
-  if (url.includes("admin-session-bar.html")) {
-    fetch(url)
-      .then(res => res.text())
-      .then(html => {
-        el.innerHTML = html;
-        document.body.classList.add("has-admin-bar"); // padding-top 적용
-      });
-    return; // 아래 중복 로드 방지
-  }
-
-
-
 });
-
-
-
