@@ -191,8 +191,8 @@
     <div class="catalog-container">
 
       <div class="tabs">
-        <div class="tab active" data-cat="kr_catalog">Korean Catalog</div>
-        <div class="tab" data-cat="en_catalog">English Catalog</div>
+        <div class="tab" data-cat="kr_catalog">Korean Catalog</div>
+        <div class="tab active" data-cat="en_catalog">English Catalog</div>
         <div class="tab" data-cat="company_intro">Company Brochure</div>
         <div class="tab" data-cat="etc">Others</div>
       </div>
@@ -208,36 +208,43 @@
 
 <script>
 
-// 현재 카테고리
-let currentCategory = "en_catalog";
+  // 현재 카테고리
+  let currentCategory = "en_catalog";
 
-// 탭 클릭
-document.querySelectorAll(".tab").forEach(tab => {
-  tab.addEventListener("click", () => {
-    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-    tab.classList.add("active");
-
-    currentCategory = tab.dataset.cat;
+  // 🔥 페이지 로드 시 기본 탭(en_catalog) 활성화
+  window.addEventListener("DOMContentLoaded", () => {
+    const defaultTab = document.querySelector(`.tab[data-cat="${currentCategory}"]`);
+    if (defaultTab) {
+      defaultTab.classList.add("active");
+    }
     loadList();
   });
-});
 
-loadList();
+  // 탭 클릭
+  document.querySelectorAll(".tab").forEach(tab => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
 
-// API 호출 후 리스트 생성
-async function loadList() {
-  const res = await fetch(`/api/catalog/list?category=${currentCategory}`);
-  const data = await res.json();
+      currentCategory = tab.dataset.cat;
+      loadList();
+    });
+  });
 
-  document.getElementById("catalogList").innerHTML =
-    data.map(i => `
-      <div class="card" onclick="openPdf('${i.file_url}', '${i.title}')">
-        <img src="${i.thumb_url}" class="thumb">
-        <div class="title">${i.title}</div>
-        ${i.file_url ? `<div class="btn-download">PDF 보기</div>` : '<span style="color:#777;">파일 없음</span>'}
-      </div>
-    `).join("");
-}
+  // API 호출 후 리스트 생성
+  async function loadList() {
+    const res = await fetch(`/api/catalog/list?category=${currentCategory}`);
+    const data = await res.json();
+
+    document.getElementById("catalogList").innerHTML =
+      data.map(i => `
+        <div class="card" onclick="openPdf('${i.file_url}', '${i.title}')">
+          <img src="${i.thumb_url}" class="thumb">
+          <div class="title">${i.title}</div>
+          ${i.file_url ? `<div class="btn-download">PDF 보기</div>` : '<span style="color:#777;">파일 없음</span>'}
+        </div>
+      `).join("");
+  }
 
 </script>
 
