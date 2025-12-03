@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>갤러리 상세 | Fine Defense</title>
+  <title>Gallery Details | Fine Defense</title>
 
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/sub-banner.css">
@@ -84,32 +84,32 @@
 
 <body>
 
-  <!-- 관리자 세션바 (정확한 ID 부여) -->
-  <div id="adminBarContainer" data-include="/kr/components/admin-session-bar.html"></div>
+  <!-- Admin Session Bar -->
+  <div id="adminBarContainer" data-include="/en/components/admin-session-bar.html"></div>
 
-  <!-- 공통 헤더 -->
-  <div id="headerContainer" data-include="/kr/components/header.html"></div>
+  <!-- Common Header -->
+  <div id="headerContainer" data-include="/en/components/header.html"></div>
 
-  <!-- 서브 배너 -->
+  <!-- Sub Banner -->
   <section class="sub-banner">
-    <img src="/img/sub-banners/pr-1_v2.jpg" alt="홍보센터 배너" />
+    <img src="/img/sub-banners/pr-1_v2.jpg" alt="Media Center Banner" />
     <div class="banner-text">
-      <h1>홍보센터</h1>
-      <p>화인디펜스의 최신 소식과 홍보 자료를 확인하세요.</p>
+      <h1>Media Center</h1>
+      <p>Explore the latest updates and promotional materials from Fine Defense.</p>
     </div>
   </section>
 
-  <!-- 브레드크럼 + 사이드탭 -->
+  <!-- Breadcrumb -->
   <div class="breadcrumb">
-    <a href="/kr/index.html">홈</a> &gt;
-    <span class="crumb crumb-level1">홍보센터</span> &gt;
-    <span class="crumb crumb-level2">갤러리</span>
+    <a href="/en/index.html">Home</a> &gt;
+    <span class="crumb crumb-level1">Media Center</span> &gt;
+    <span class="crumb crumb-level2">Gallery</span>
     <div id="side-tabs" class="side-tabs"></div>
   </div>
 
-  <!-- 상세 페이지 -->
+  <!-- Detail Page -->
   <div class="gallery-view-wrap">
-    <div class="gallery-title" id="title">로딩 중...</div>
+    <div class="gallery-title" id="title">Loading...</div>
     <div class="gallery-meta" id="meta"></div>
 
     <img id="mainImage" class="gallery-main-image" src="/img/no-image.jpg">
@@ -117,13 +117,14 @@
 
     <div class="gallery-desc" id="description"></div>
 
-    <button class="back-btn" onclick="location.href='/kr/sub/pr/gallery/index.html'">
-      목록으로 돌아가기
+    <button class="back-btn" onclick="location.href='/en/sub/pr/gallery/index.html'">
+      Return to List
     </button>
   </div>
 
+
     <!-- 공통 푸터 -->
-    <div data-include="/kr/components/footer.html"></div>
+    <div data-include="/en/components/footer.html"></div>
 
 
   <script>
@@ -131,7 +132,7 @@
     const id = params.get("id");
 
     if (!id) {
-      location.href = "/kr/sub/pr/gallery/index.html";
+      location.href = "/en/sub/pr/gallery/index.html";
     }
 
     async function loadGalleryDetail() {

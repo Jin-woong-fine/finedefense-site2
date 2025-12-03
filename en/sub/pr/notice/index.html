@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>공지사항 | Fine Defense</title>
+  <title>Notices | Fine Defense</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- 공통 CSS -->
@@ -102,59 +102,62 @@
 
 <body>
 
-  <!-- 관리자 세션바 (정확한 ID 부여) -->
-  <div id="adminBarContainer" data-include="/kr/components/admin-session-bar.html"></div>
+  <!-- Admin Session Bar -->
+  <div id="adminBarContainer" data-include="/en/components/admin-session-bar.html"></div>
 
-  <!-- 공통 헤더 -->
-  <div id="headerContainer" data-include="/kr/components/header.html"></div>
+  <!-- Common Header -->
+  <div id="headerContainer" data-include="/en/components/header.html"></div>
 
-<section class="sub-banner">
-  <img src="/img/sub-banners/pr-1_v2.jpg" alt="공지사항">
-  <div class="banner-text">
-    <h1>홍보센터</h1>
-    <p>화인디펜스의 최신 소식과 홍보 자료를 확인하세요.</p>
-  </div>
-</section>
+  <!-- Sub Banner -->
+  <section class="sub-banner">
+    <img src="/img/sub-banners/pr-1_v2.jpg" alt="Notices">
+    <div class="banner-text">
+      <h1>Media Center</h1>
+      <p>Explore the latest updates and promotional materials from Fine Defense.</p>
+    </div>
+  </section>
 
-<div class="breadcrumb">
-  <a href="/kr/index.html">홈</a> &gt;
-  <span class="crumb crumb-level1">홍보센터</span> &gt;
-  <span class="crumb crumb-level2">공지사항</span>
-  <div id="side-tabs"></div>
-</div>
-
-<div class="notice-wrap">
-
-  <div class="top-row">
-    <select id="langFilter">
-      <option value="kr">한국어</option>
-      <option value="en">영어</option>
-      <option value="all">전체 언어</option>
-    </select>
-
-    <input type="text" id="search" placeholder="제목 검색">
-    <button class="btn-search" onclick="reloadNotices()">검색</button>
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="/en/index.html">Home</a> &gt;
+    <span class="crumb crumb-level1">Media Center</span> &gt;
+    <span class="crumb crumb-level2">Notices</span>
+    <div id="side-tabs"></div>
   </div>
 
-  <table class="notice-table">
-    <thead>
-      <tr>
-        <th style="width:70px;">번호</th>
-        <th>제목</th>
-        <th style="width:120px;">작성일</th>
-        <th style="width:80px;">조회수</th>
-      </tr>
-    </thead>
-    <tbody id="noticeBody">
-      <tr><td colspan="4" class="no-data">불러오는 중...</td></tr>
-    </tbody>
-  </table>
+  <div class="notice-wrap">
 
-  <div class="pagination" id="pagination"></div>
-</div>
+    <div class="top-row">
+      <select id="langFilter">
+        <option value="kr">Korean</option>
+        <option value="en">English</option>
+        <option value="all">All Languages</option>
+      </select>
+
+      <input type="text" id="search" placeholder="Search by title">
+      <button class="btn-search" onclick="reloadNotices()">Search</button>
+    </div>
+
+    <table class="notice-table">
+      <thead>
+        <tr>
+          <th style="width:70px;">No.</th>
+          <th>Title</th>
+          <th style="width:120px;">Date</th>
+          <th style="width:80px;">Views</th>
+        </tr>
+      </thead>
+      <tbody id="noticeBody">
+        <tr><td colspan="4" class="no-data">Loading...</td></tr>
+      </tbody>
+    </table>
+
+    <div class="pagination" id="pagination"></div>
+  </div>
+
 
     <!-- 공통 푸터 -->
-    <div data-include="/kr/components/footer.html"></div>
+    <div data-include="/en/components/footer.html"></div>
 
 
 <script>
@@ -244,7 +247,7 @@
   }
 
   function openNotice(id) {
-    location.href = `/kr/sub/pr/notice/notice-view.html?id=${id}`;
+    location.href = `/en/sub/pr/notice/notice-view.html?id=${id}`;
   }
 </script>
 

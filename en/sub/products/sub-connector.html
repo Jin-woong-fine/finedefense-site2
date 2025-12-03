@@ -201,7 +201,7 @@
 
       container.innerHTML = products.map(p => {
         const img = p.thumbnail || "/img/products/Image-placeholder.png";
-        const link = `/kr/sub/products/product-view.html?id=${p.id}`;
+        const link = `/en/sub/products/product-view.html?id=${p.id}`;
 
         const text = stripHtml(p.description_html || "");
         const desc = text.length > 120 ? text.slice(0, 120) + "…" : text;

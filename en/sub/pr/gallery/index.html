@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>갤러리 | Fine Defense</title>
+  <title>Gallery | Fine Defense</title>
 
   <!-- 공통 CSS -->
   <link rel="stylesheet" href="/css/style.css" />
@@ -59,47 +59,49 @@
 
 <body>
 
-  <!-- 관리자 세션바 (정확한 ID 부여) -->
-  <div id="adminBarContainer" data-include="/kr/components/admin-session-bar.html"></div>
+  <!-- Admin Session Bar -->
+  <div id="adminBarContainer" data-include="/en/components/admin-session-bar.html"></div>
 
-  <!-- 공통 헤더 -->
-  <div id="headerContainer" data-include="/kr/components/header.html"></div>
+  <!-- Common Header -->
+  <div id="headerContainer" data-include="/en/components/header.html"></div>
 
   <!-- Banner -->
   <section class="sub-banner">
-    <img src="/img/sub-banners/pr-1_v2.jpg" alt="홍보센터 배너" />
+    <img src="/img/sub-banners/pr-1_v2.jpg" alt="Media Center Banner" />
     <div class="banner-text">
-      <h1>홍보센터</h1>
-      <p>화인디펜스의 최신 소식과 홍보 자료를 확인하세요.</p>
+      <h1>Media Center</h1>
+      <p>Explore the latest updates and promotional materials from Fine Defense.</p>
     </div>
   </section>
 
+  <!-- Breadcrumb -->
   <div class="breadcrumb">
-    <a href="/kr/index.html">홈</a> &gt;
-    <span class="crumb crumb-level1">홍보센터</span> &gt;
-    <span class="crumb crumb-level2">갤러리</span>
+    <a href="/en/index.html">Home</a> &gt;
+    <span class="crumb crumb-level1">Media Center</span> &gt;
+    <span class="crumb crumb-level2">Gallery</span>
     <div id="side-tabs" class="side-tabs"></div>
   </div>
+
 
   <div class="gallery-container" id="galleryContainer"></div>
 
     <!-- 공통 푸터 -->
-    <div data-include="/kr/components/footer.html"></div>
+    <div data-include="/en/components/footer.html"></div>
 
   <script>
     async function loadGallery() {
-      const res = await fetch(`/api/gallery/list?lang=kr`);
+      const res = await fetch(`/api/gallery/list?lang=en`);
       const list = await res.json();
 
       const box = document.getElementById("galleryContainer");
 
       if (!Array.isArray(list) || !list.length) {
-        box.innerHTML = "<p>등록된 갤러리가 없습니다.</p>";
+        box.innerHTML = "<p>No galleries available.</p>";
         return;
       }
 
       box.innerHTML = list.map(v => `
-        <div class="gallery-card" onclick="location.href='/kr/sub/pr/gallery/gallery-view.html?id=${v.id}'">
+        <div class="gallery-card" onclick="location.href='/en/sub/pr/gallery/gallery-view.html?id=${v.id}'">
           <img src="${v.main_image}" class="gallery-thumb">
           <div class="gallery-info">
             <div class="gallery-title">${v.title}</div>

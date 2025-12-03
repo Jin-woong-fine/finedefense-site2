@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>카탈로그 | Fine Defense</title>
+  <title>Catalog | Fine Defense</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="/css/style.css">
@@ -162,50 +162,54 @@
   </style>
 </head>
 
-<body>
+  <body>
 
-  <!-- 관리자 세션바 (정확한 ID 부여) -->
-  <div id="adminBarContainer" data-include="/kr/components/admin-session-bar.html"></div>
+    <!-- Admin Session Bar -->
+    <div id="adminBarContainer" data-include="/en/components/admin-session-bar.html"></div>
 
-  <!-- 공통 헤더 -->
-  <div id="headerContainer" data-include="/kr/components/header.html"></div>
+    <!-- Common Header -->
+    <div id="headerContainer" data-include="/en/components/header.html"></div>
 
-<section class="sub-banner">
-  <img src="/img/sub-banners/pr-1_v2.jpg" alt="카탈로그">
-  <div class="banner-text">
-      <h1>홍보센터</h1>
-      <p>화인디펜스의 최신 소식과 홍보 자료를 확인하세요.</p>
-  </div>
-</section>
+    <!-- Sub Banner -->
+    <section class="sub-banner">
+      <img src="/img/sub-banners/pr-1_v2.jpg" alt="Catalog">
+      <div class="banner-text">
+          <h1>Media Center</h1>
+          <p>Explore the latest news and promotional materials from Fine Defense.</p>
+      </div>
+    </section>
 
-<div class="breadcrumb">
-  <a href="/kr/index.html">홈</a> &gt;
-  <span class="crumb crumb-level1">홍보센터</span> &gt;
-  <span class="crumb crumb-level2">카탈로그</span>
-  <div id="side-tabs"></div>
-</div>
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+      <a href="/en/index.html">Home</a> &gt;
+      <span class="crumb crumb-level1">Media Center</span> &gt;
+      <span class="crumb crumb-level2">Catalog</span>
+      <div id="side-tabs"></div>
+    </div>
 
-<div class="catalog-container">
+    <!-- Catalog Section -->
+    <div class="catalog-container">
 
-  <div class="tabs">
-    <div class="tab active" data-cat="kr_catalog">한국어 종합 카탈로그</div>
-    <div class="tab" data-cat="en_catalog">영어 종합 카탈로그</div>
-    <div class="tab" data-cat="company_intro">회사 소개서</div>
-    <div class="tab" data-cat="etc">기타</div>
-  </div>
+      <div class="tabs">
+        <div class="tab active" data-cat="kr_catalog">Korean Catalog</div>
+        <div class="tab" data-cat="en_catalog">English Catalog</div>
+        <div class="tab" data-cat="company_intro">Company Brochure</div>
+        <div class="tab" data-cat="etc">Others</div>
+      </div>
 
-  <div id="catalogList" class="card-grid"></div>
+      <div id="catalogList" class="card-grid"></div>
 
-</div>
+    </div>
+
 
     <!-- 공통 푸터 -->
-    <div data-include="/kr/components/footer.html"></div>
+    <div data-include="/en/components/footer.html"></div>
 
 
 <script>
 
 // 현재 카테고리
-let currentCategory = "kr_catalog";
+let currentCategory = "en_catalog";
 
 // 탭 클릭
 document.querySelectorAll(".tab").forEach(tab => {

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>자료 상세보기 | Fine Defense</title>
+  <title>Resource Details | Fine Defense</title>
 
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/sub-banner.css">
@@ -88,46 +88,48 @@
 
 <body>
 
-<!-- 관리자 세션바 (정확한 ID 부여) -->
-<div id="adminBarContainer" data-include="/kr/components/admin-session-bar.html"></div>
+  <!-- Admin Session Bar -->
+  <div id="adminBarContainer" data-include="/en/components/admin-session-bar.html"></div>
 
-<!-- 공통 헤더 -->
-<div id="headerContainer" data-include="/kr/components/header.html"></div>
+  <!-- Common Header -->
+  <div id="headerContainer" data-include="/en/components/header.html"></div>
 
-<section class="sub-banner">
-  <img src="/img/sub-banners/subbanner_support_V2.png" alt="자료실">
-  <div class="banner-text">
-    <h1>고객지원</h1>
-    <p>전문 기술지원과 최신 자료를 한곳에서 손쉽게 이용하실 수 있습니다.</p>
+  <!-- Sub Banner -->
+  <section class="sub-banner">
+    <img src="/img/sub-banners/subbanner_support_V2.png" alt="Resources">
+    <div class="banner-text">
+      <h1>Support</h1>
+      <p>Access professional technical support and the latest resources in one place.</p>
+    </div>
+  </section>
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="/en/index.html">Home</a> &gt;
+    <span class="crumb crumb-level1 active">Support</span> &gt;
+    <span class="crumb crumb-level2 active">Resources</span>
+    <div id="side-tabs"></div>
   </div>
-</section>
 
-<div class="breadcrumb">
-  <a href="/kr/index.html">홈</a> &gt;
-  <span class="crumb crumb-level1 active">고객지원</span> &gt;
-  <span class="crumb crumb-level2 active">자료실</span>
-  <div id="side-tabs"></div>
-</div>
+  <div class="view-wrap">
 
+    <h1 class="title" id="title"></h1>
+    <div class="info" id="info"></div>
 
-<div class="view-wrap">
+    <!-- 🔥 The uploaded HTML content is rendered here -->
+    <div id="viewer" class="article-body"></div>
 
-  <h1 class="title" id="title"></h1>
-  <div class="info" id="info"></div>
+    <div class="files" id="fileWrap" style="display:none;">
+      <h3>Attachments</h3>
+      <div id="fileList"></div>
+    </div>
 
-  <!-- 🔥 여기 안에 HTML 그대로 뿌림 -->
-  <div id="viewer" class="article-body"></div>
-
-  <div class="files" id="fileWrap" style="display:none;">
-    <h3>첨부파일</h3>
-    <div id="fileList"></div>
-  </div>
 
   <a href="index.html" class="back-btn">목록으로</a>
 </div>
 
     <!-- 공통 푸터 -->
-    <div data-include="/kr/components/footer.html"></div>
+    <div data-include="/en/components/footer.html"></div>
 
 <script>
   const id = new URLSearchParams(location.search).get("id");
@@ -171,10 +173,10 @@
 
   function printCategory(c) {
     return {
-      kr_catalog: "한국어 종합카탈로그",
-      en_catalog: "영어 종합카탈로그",
-      company: "회사 소개서",
-      etc: "기타"
+      kr_catalog: "Korean Catalog",
+      en_catalog: "English Catalog",
+      company: "Company Brochure",
+      etc: "Others"
     }[c] || c;
   }
 </script>
