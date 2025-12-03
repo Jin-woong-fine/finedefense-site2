@@ -256,16 +256,16 @@
       }
 
       /* ============================================================
-          INDEX PAGE — TRANSPARENT → WHITE HEADER + LOGO AUTO SWAP
-        ============================================================ */
+          INDEX PAGE — TRANSPARENT BLUR HEADER + LOGO AUTO SWAP
+          (완전 최적화된 최종본)
+      ============================================================ */
 
-      /* 초기: 배너 위에서 반투명 + 강한 Blur */
+      /* 1) 초기 헤더: 배너 위 투명 + 블러 */
       body#index-page .header-inner {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
-
         padding: 22px 4vw;
 
         background: rgba(15, 15, 15, 0.35);
@@ -273,8 +273,8 @@
         -webkit-backdrop-filter: blur(18px) brightness(1.25);
 
         border-bottom: 1px solid rgba(255,255,255,0.15);
-
         z-index: 6000;
+
         transition:
           background 0.35s ease,
           padding 0.35s ease,
@@ -282,55 +282,44 @@
           border-color 0.35s ease;
       }
 
-      /* ------------------------------------------------------------
-          로고 자동 전환
-        ------------------------------------------------------------ */
-
-      /* 초기: 배너 위 → 흰색 로고 */
+      /* 2) 로고 자동 전환 */
       body#index-page .logo-white { display: block !important; }
       body#index-page .logo-dark  { display: none  !important; }
 
-      /* 스크롤 후 → 일반 컬러 로고 */
       body#index-page.scrolled .logo-white { display: none  !important; }
       body#index-page.scrolled .logo-dark  { display: block !important; }
 
-      /* ------------------------------------------------------------
-          메인 메뉴 텍스트 색상 (index 전용)
-        ------------------------------------------------------------ */
-
-      /* 초기: 흰색 */
-      body#index-page .header-inner .main-menu a {
+      /* 3) 메인메뉴 텍스트 */
+      body#index-page .main-menu a {
         color: #f6f6f6 !important;
         text-shadow: 0px 0px 5px rgba(0,0,0,0.35);
+        text-decoration: none !important;
+        font-family: 'Noto Sans KR', sans-serif !important;
       }
 
-      body#index-page .header-inner .main-menu a:hover {
-        color: #ffffff !important;
+      body#index-page .main-menu a:hover {
+        color: #fff !important;
       }
 
-      /* 스크롤 후: 검정 */
-      body#index-page.scrolled .header-inner .main-menu a {
+      /* 스크롤 후: 검정 글씨 */
+      body#index-page.scrolled .main-menu a {
         color: #111 !important;
         text-shadow: none !important;
       }
 
-      /* ------------------------------------------------------------
-          스크롤 후 헤더 스타일 (화이트)
-        ------------------------------------------------------------ */
+      /* 4) 스크롤 후 헤더 → 화이트 */
       body#index-page.scrolled .header-inner {
         background: rgba(255,255,255,0.97);
         border-bottom: 1px solid rgba(0,0,0,0.06);
 
-        backdrop-filter: none;
-        -webkit-backdrop-filter: none;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
 
         padding: 16px 4vw;
         box-shadow: 0 3px 10px rgba(0,0,0,0.07);
       }
 
-      /* ------------------------------------------------------------
-          언어 선택 토글은 항상 검정 (배너 위에서도)
-        ------------------------------------------------------------ */
+      /* 5) 언어 선택 토글은 항상 검정 */
       body#index-page .lang-toggle,
       body#index-page .lang-toggle *,
       body#index-page .language-dropdown .lang-list *,
@@ -341,85 +330,40 @@
         text-shadow: none !important;
       }
 
-      /* 언어 드롭다운 기본 백그라운드 */
+      /* 언어 목록 배경 */
       body#index-page .language-dropdown.open .lang-list {
         background: #fff !important;
         border: 1px solid #ddd !important;
       }
 
-      /* ------------------------------------------------------------
-          서브메뉴는 ALWAYS 흰색 배경 + 검정 글씨
-          (메인페이지여도 영향 안받음)
-        ------------------------------------------------------------ */
-
-      body#index-page .submenu {
+      /* 6) 서브메뉴 — 항상 흰 배경 + 검정 글씨 */
+      body#index-page .submenu,
+      body#index-page .header-inner .main-menu li .submenu {
         background: #fff !important;
         border: 1px solid rgba(0,0,0,0.15) !important;
       }
 
-      body#index-page .submenu li a {
+      body#index-page .submenu li a,
+      body#index-page .header-inner .main-menu li .submenu li a {
         color: #222 !important;
         text-shadow: none !important;
       }
 
-      body#index-page .submenu li a:hover {
+      body#index-page .submenu li a:hover,
+      body#index-page .header-inner .main-menu li .submenu li a:hover {
         background: #eef3ff !important;
         color: #0f2679 !important;
       }
 
-      /* ------------------------------------------------------------
-          관리자 세션바 있을 때 헤더 보정
-        ------------------------------------------------------------ */
+      /* 7) 관리자 세션바 대응 */
       body#index-page.has-admin-bar .header-inner {
         top: 38px !important;
       }
 
-      /* ------------------------------------------------------------
-          메인 배너가 헤더와 겹치지 않도록 조정 (필요시)
-        ------------------------------------------------------------ */
+      /* 8) 배너와 간격 보정 */
       body#index-page .banner-slider {
         margin-top: 0 !important;
       }
-
-
-      /* =======================================================
-        INDEX PAGE HEADER FIX PATCH — 밑줄 제거 / 폰트 복구 / 
-        서브메뉴 흰색 유지 강제 / 우선순위 완전제압
-        ======================================================= */
-
-      /* 헤더 메뉴 밑줄 제거 */
-      body#index-page .header-inner a {
-        text-decoration: none !important;
-      }
-
-      /* 메인 메뉴 폰트 원래대로 복구 */
-      body#index-page .header-inner .main-menu a {
-        font-family: 'Noto Sans KR', sans-serif !important;
-        font-weight: 600 !important;
-        font-size: clamp(15px, 1vw, 18px) !important;
-        letter-spacing: -0.2px !important;
-      }
-
-      /* 서브메뉴 배경 강제 */
-      body#index-page .submenu {
-        background: #fff !important;
-        border: 1px solid rgba(0,0,0,0.15) !important;
-      }
-
-      /* 서브메뉴 글씨 강제 검정 (최우선 순위) */
-      body#index-page .submenu li a {
-        color: #222 !important;
-        text-shadow: none !important;
-      }
-
-      /* 서브메뉴 hover도 강제 */
-      body#index-page .submenu li a:hover {
-        background: #eef3ff !important;
-        color: #0f2679 !important;
-      }
-
-
-
 
       </style>
 
