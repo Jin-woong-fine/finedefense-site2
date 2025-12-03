@@ -1,291 +1,266 @@
+<!-- /en/sub/company/overview.html -->
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta name="description" content="Company Overview | FINE DEFENSE">
-      <title>Company Overview | FINE DEFENSE</title>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Fine Defense Company Overview">
+  <title>Company Overview | Fine Defense</title>
 
-      <link rel="stylesheet" href="../../style.css">
+</head>
+  <!-- 공통 CSS -->
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/sub-banner.css" />
 
-      <style>
-        .overview-section {
-          max-width: 1100px;
-          margin: 120px auto;
-          padding: 60px 40px;
-          background: #fff;
-          border-radius: 12px;
-          box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-          line-height: 1.7;
-          color: #333;
-          text-align: center;
-        }
+  <style>
+    body {
+      margin: 0;
+      font-family: "Noto Sans KR", sans-serif;
+      background: #ffffff;
+      color: #333;
+    }
 
-        .overview-section h1 {
-          font-size: 2rem;
-          color: #0f2679;
-          margin-bottom: 10px;
-        }
+    .page-header {
+      text-align: center;
+      background: #ffffff;
+      padding: 100px 20px 20px;
+      border-bottom: 1px solid #e4e8f0;
+      margin-top: 10px;
+    }
 
-        .overview-subtitle {
-          font-size: 1.1rem;
-          color: #2976db;
-          margin-bottom: 40px;
-        }
+    .page-header h1 {
+      font-size: 2.0rem;
+      color: #0f2679;
+      margin-bottom: 10px;
+    }
 
-        .overview-text {
-          font-size: 1.05rem;
-          color: #333;
-          text-align: left;
-          line-height: 1.8;
-          margin-bottom: 50px;
-        }
+    .page-header p {
+      font-size: 1.4rem;
+      color: #666;
+      opacity: 0.8;
+      margin: 0;
+    }
 
-        .overview-text p {
-          margin-bottom: 15px;
-        }
+    /* ===== 회사 개요 본문 ===== */
+    .overview-section {
+      max-width: 1100px;
+      margin: 30px auto;
+      padding: 45px 40px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      line-height: 1.7;
+      color: #333;
+      text-align: center;
+    }
 
-        /* ===== 회사 개요 카드 디자인 향상 ===== */
-        .company-grid {
-          display: grid;
-          grid-template-columns: repeat(5, minmax(180px, 1fr)); /* ✅ 카드 폭 줄여서 한 줄 유지 */
-          gap: 20px;
-          justify-items: stretch;
-          margin-top: 40px;
-        }
+    .overview-section h1 {
+      font-size: 2rem;
+      color: #0f2679;
+      margin-bottom: 10px;
+    }
 
-        @media (max-width: 1024px) {
-          .company-grid {
-            grid-template-columns: repeat(2, 1fr); /* 태블릿에서는 2열 */
-            gap: 25px;
-          }
-        }
+    .overview-subtitle {
+      font-size: 1.4rem;
+      font-weight: 500;
+      color: #2976db;
+      margin-bottom: 40px;
+    }
 
-        @media (max-width: 600px) {
-          .company-grid {
-            grid-template-columns: 1fr; /* 모바일에서는 1열 */
-          }
-        }
+    .overview-text {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: #000000;
+      text-align: left;
+      line-height: 1.8;
+      margin-bottom: 50px;
+    }
 
-        .info-card {
-          position: relative;
-          border-radius: 12px;
-          padding: 28px 20px;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-          background: #f5f8ff;
-          overflow: hidden;
-          text-align: left;
-          transition: transform 0.25s ease, box-shadow 0.25s ease;
-        }
+    .overview-text p {
+      margin-bottom: 15px;
+    }
 
-        /* hover 효과 */
-        .info-card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 8px 18px rgba(15, 38, 121, 0.12);
-        }
+    /* ===== 회사 개요 카드 디자인 ===== */
+    .company-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(180px, 1fr));
+      gap: 20px;
+      justify-items: stretch;
+      margin-top: 40px;
+    }
 
-        /* 제목 */
-        .info-card h3 {
-          color: #0f2679;
-          font-size: 1.05rem;
-          font-weight: 700;
-          margin-bottom: 8px;
-        }
+    @media (max-width: 1024px) {
+      .company-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 25px;
+      }
+    }
 
-        /* 내용 */
-        .info-card p {
-          color: #333;
-          font-size: 0.9rem;
-          margin: 0;
-          line-height: 1.5;
-        }
+    @media (max-width: 600px) {
+      .company-grid {
+        grid-template-columns: 1fr;
+      }
+    }
 
-        /* 카드별 색상 테마 */
-        .info-card:nth-child(1) { background: linear-gradient(160deg, #e8f3ff 0%, #f8fbff 100%); }
-        .info-card:nth-child(2) { background: linear-gradient(160deg, #f5f7fa 0%, #fafbfc 100%); }
-        .info-card:nth-child(3) { background: linear-gradient(160deg, #ecf4ff 0%, #f9fbff 100%); }
-        .info-card:nth-child(4) { background: linear-gradient(160deg, #f0f6f6 0%, #f9fcfc 100%); }
-        .info-card:nth-child(5) { background: linear-gradient(160deg, #edf3ff 0%, #f9fbff 100%); }
+    .info-card {
+      position: relative;
+      border-radius: 12px;
+      padding: 28px 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      background: #f5f8ff;
+      overflow: hidden;
+      text-align: left;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
 
-        /* 상단 아이콘 장식 */
-        .info-card::before {
-          content: "";
-          position: absolute;
-          top: 15px;
-          right: 20px;
-          width: 40px;
-          height: 40px;
-          background-size: contain;
-          background-repeat: no-repeat;
-          opacity: 0.15;
-        }
+    .info-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 18px rgba(15, 38, 121, 0.12);
+    }
 
-        /* 개별 아이콘 */
-        .info-card:nth-child(1)::before { background-image: url("/img/icons/calendar.svg"); }
-        .info-card:nth-child(2)::before { background-image: url("/img/icons/location.svg"); }
-        .info-card:nth-child(3)::before { background-image: url("/img/icons/team.svg"); }
-        .info-card:nth-child(4)::before { background-image: url("/img/icons/gear.svg"); }
-        .info-card:nth-child(5)::before { background-image: url("/img/icons/factory.svg"); }
+    .info-card h3 {
+      color: #0f2679;
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
 
-        @media (max-width: 768px) {
-          .info-card {
-            text-align: center;
-            padding: 25px 20px;
-          }
-          .info-card::before {
-            display: none;
-          }
-        }
+    .info-card p {
+      color: #333;
+      font-size: 1.0rem;
+      font-weight: 500;
+      margin: 0;
+      line-height: 1.5;
+    }
 
+    /* 카드별 색상 */
+    .info-card:nth-child(1) { background: linear-gradient(160deg, #e8f3ff, #f8fbff); }
+    .info-card:nth-child(2) { background: linear-gradient(160deg, #f5f7fa, #fafbfc); }
+    .info-card:nth-child(3) { background: linear-gradient(160deg, #ecf4ff, #f9fbff); }
+    .info-card:nth-child(4) { background: linear-gradient(160deg, #f0f6f6, #f9fcfc); }
+    .info-card:nth-child(5) { background: linear-gradient(160deg, #edf3ff, #f9fbff); }
 
-      </style>
-  </head>
+    /* 아이콘 */
+    .info-card::before {
+      content: "";
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      opacity: 0.15;
+    }
 
-  <body>
-    <header class="header-inner">
-      <div class="header-left">
-        <a href="../../index.html"><img src="../../img/logo_transparent_finedefense.png" alt="Logo" class="logo"></a>
+    .info-card:nth-child(1)::before { background-image: url("/img/icons/calendar.svg"); }
+    .info-card:nth-child(2)::before { background-image: url("/img/icons/location.svg"); }
+    .info-card:nth-child(3)::before { background-image: url("/img/icons/team.svg"); }
+    .info-card:nth-child(4)::before { background-image: url("/img/icons/gear.svg"); }
+    .info-card:nth-child(5)::before { background-image: url("/img/icons/factory.svg"); }
 
-        <ul class="main-menu">
-          <li>
-            <a href="#">About Us</a>
-            <ul class="submenu">
-              <li><a href="overview.html">Company Overview</a></li>
-              <li><a href="ceo.html">CEO Message</a></li>
-              <li><a href="history.html">History</a></li>
-              <li><a href="vision.html">Vision & Philosophy</a></li>
-              <li><a href="organization.html">Organization</a></li>
-              <li><a href="location.html">Location</a></li>
-            </ul>
-          </li>
+    @media (max-width: 768px) {
+      .info-card {
+        text-align: center;
+        padding: 25px 20px;
+      }
+      .info-card::before {
+        display: none;
+      }
+    }
+  </style>
+</head>
 
-          <li>
-            <a href="#">Products</a>
-            <ul class="submenu">
-              <li><a href="#">Towed Underwater Cables</a></li>
-              <li><a href="#">Fixed Underwater Cables</a></li>
-              <li><a href="#">Subsea Connectors</a></li>
-              <li><a href="#">EPD Cables</a></li>
-              <li><a href="#">Custom Cables</a></li>
-            </ul>
-          </li>
+<body>
 
-          <li>
-            <a href="#">Media Center</a>
-            <ul class="submenu">
-              <li><a href="#">Newsroom</a></li>
-              <li><a href="#">Gallery</a></li>
-              <li><a href="#">Videos</a></li>
-              <li><a href="#">Catalogs</a></li>
-            </ul>
-          </li>
+  <!-- Admin Session Bar -->
+  <div id="adminBarContainer" data-include="/en/components/admin-session-bar.html"></div>
 
-          <li>
-            <a href="#">Support</a>
-            <ul class="submenu">
-              <li><a href="#">Contact Us</a></li>
-              <li><a href="#">Download Center</a></li>
-            </ul>
-          </li>
-        </ul>
-      </div>
+  <!-- Common Header -->
+  <div id="headerContainer" data-include="/en/components/header.html"></div>
 
-      <!-- Language Switch -->
-      <div class="header-right">
-        <div class="language-dropdown">
-          <button class="lang-toggle">ENG <span class="arrow">▼</span></button>
-          <ul class="lang-list">
-            <li><a href="/kr/sub/company/overview.html" data-lang="kor">KOR</a></li>
-            <li><a href="/en/sub/company/overview.html" data-lang="eng">ENG</a></li>
-          </ul>
-        </div>
-      </div>
-    </header>
-
-    <section class="overview-section">
+  <!-- Sub Banner -->
+  <section class="sub-banner">
+    <img src="/img/sub-banners/occheon-plant2-3.jpg" alt="Company Overview Banner">
+    <div class="banner-text">
       <h1>Company Overview</h1>
-      <p class="overview-subtitle">Connecting the Ocean Through Technology – Together with FINE DEFENSE.</p>
+      <p>Fine Defense connects the oceans through technology.</p>
+    </div>
+  </section>
 
-      <div class="overview-text">
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="/en">Home</a> &gt;
+    <span class="crumb crumb-level1">About Us</span> &gt;
+    <span class="crumb crumb-level2">Company Overview</span>
+
+    <div id="side-tabs" class="side-tabs hidden"></div>
+  </div>
+
+  <!-- Main Content -->
+  <section class="overview-section">
+    <h1>Company Overview</h1>
+    <p class="overview-subtitle">Connecting the ocean through technology — Fine Defense leads the way.</p>
+
+    <div class="overview-text">
+      <p>
+        Fine Defense Co., Ltd. is a specialized manufacturer dedicated to the design, production, and testing of defense-grade underwater cables, including fixed and towed array sonar cables for naval platforms such as submarines and surface vessels.
+      </p>
+      <p>
+        As a technology-driven company composed of experienced engineers, we independently manage the entire process—from design and manufacturing to qualification testing. With accumulated technical expertise and rigorous quality management, Fine Defense delivers highly reliable solutions for both domestic and international maritime defense programs.
+      </p>
+      <p>
+        Based on proven capabilities and a strong commitment to quality, Fine Defense continues to grow as a trusted partner in the global naval defense industry.
+      </p>
+    </div>
+
+    <!-- Company Info Cards -->
+    <div class="company-grid">
+      <div class="info-card">
+        <h3>Founded</h3>
+        <p>May 18, 2005</p>
+      </div>
+
+      <div class="info-card">
+        <h3>Head Office</h3>
         <p>
-        FINE DEFENSE INC. is a specialized company based on core technologies in the underwater defense industry,
-        designing, manufacturing, and testing advanced defense-grade cables such as fixed and towed underwater cables
-        used in sonar systems and submarine applications.
-        </p>
-        <p>
-        As a technology-driven SME composed of highly skilled engineers,
-        we perform the entire process — from design and production to testing and evaluation — in-house,
-        providing reliable and customized solutions for naval and underwater defense projects.
-        </p>
-        <p>
-        FINE DEFENSE continues to grow as a trusted partner in the field of naval and marine defense systems,
-        backed by accumulated technology and uncompromising quality.
+          #902, 250 Hakhye-ro, Dongan-gu, Anyang-si,<br>
+          Gyeonggi-do, Republic of Korea
         </p>
       </div>
 
-      <div class="company-grid">
-        <div class="info-card">
-          <h3>Founded</h3>
-          <p>May 18, 2005</p>
-        </div>
-
-        <div class="info-card">
-          <h3>Head Office</h3>
-          <p>902, 250 Hagui-ro, Dongan-gu, Anyang-si, Gyeonggi-do, Korea</p>
-        </div>
-
-        <div class="info-card">
-          <h3>Employees</h3>
-          <p>Approx. 16</p>
-        </div>
-
-        <div class="info-card">
-          <h3>Main Business</h3>
-          <p>Underwater Cables · Underwater Connectors</p>
-        </div>
-
-        <div class="info-card">
-          <h3>Facilities</h3>
-          <p>Head Office · Okcheon Plant 1 · Okcheon Plant 2</p>
-        </div>
+      <div class="info-card">
+        <h3>Employees</h3>
+        <p>Approx. 16</p>
       </div>
-    </section>
 
-    <footer>
-      <div class="footer-container">
-        <div class="footer-left">
-          <div class="footer-links">
-            <a href="#">About Us</a>
-            <a href="../../privacy.html">Privacy Policy</a>
-            <a href="#">Contact</a>
-            <a href="#">Download Center</a>
-          </div>
-        </div>
-
-        <div class="footer-info">
-          <p><strong>FINE DEFENSE INC.</strong></p>
-          <p>902, 250 Hagui-ro, Dongan-gu, Anyang-si, Gyeonggi-do, Korea</p>
-          <p>Tel: +82-31-8068-6103 | Fax: +82-70-4325-6116</p>
-          <p>Email: finedefense@finedefense.co.kr</p>
-          <p>Okcheon Plant 1: 48 Iwonnonggong-ro, Iwon-myeon, Okcheon-gun, Chungbuk</p>
-          <p>Okcheon Plant 2: 183 Pyeongsan-gil, Dongi-myeon, Okcheon-gun, Chungbuk</p>
-        </div>
-
-        <div class="footer-right">
-          <p class="family-title">FAMILY COMPANY ▼</p>
-          <ul class="family-links">
-            <li><a href="#">Fine</a></li>
-            <li><a href="#">Woobang Cable</a></li>
-          </ul>
-        </div>
-
-        <div class="footer-copy">
-          &copy; 2025 FINE DEFENSE INC. All Rights Reserved.
-        </div>
+      <div class="info-card">
+        <h3>Main Business Areas</h3>
+        <p>
+          Towed array cables · Underwater terminations ·  
+          Underwater harnesses · Custom-designed underwater cables
+        </p>
       </div>
-    </footer>
 
-    <script src="../../js/banner.js"></script>
-    <script src="../../js/language.js"></script>
-  </body>
+      <div class="info-card">
+        <h3>Facilities</h3>
+        <p>
+          Head Office · Okcheon Plant 1 · <br>
+          Okcheon Plant 2
+        </p>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- 공통 푸터 -->
+  <div data-include="/en/components/footer.html"></div>
+
+  <!-- 공통 스크립트 -->
+  <script src="/js/include.js"></script>
+  <script src="/js/session_timer.js"></script>
+  <script src="/js/language.js"></script>
+  <script src="/js/nav.js"></script>
+
+</body>
 </html>

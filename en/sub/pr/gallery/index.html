@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>갤러리 | Fine Defense</title>
+
+  <!-- 공통 CSS -->
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/sub-banner.css" />
+
+  <style>
+    .gallery-container {
+      max-width: 1200px;
+      margin: 50px auto 70px;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 22px;
+    }
+
+    .gallery-card {
+      background: #fff;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .gallery-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 22px rgba(0, 0, 0, 0.12);
+    }
+
+    .gallery-thumb {
+      width: 100%;
+      height: 190px;
+      object-fit: cover;
+      background: #eee;
+    }
+
+    .gallery-info {
+      padding: 16px 18px 20px;
+    }
+
+    .gallery-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #222;
+    }
+
+    .gallery-date {
+      font-size: 0.85rem;
+      color: #777;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- 관리자 세션바 (정확한 ID 부여) -->
+  <div id="adminBarContainer" data-include="/kr/components/admin-session-bar.html"></div>
+
+  <!-- 공통 헤더 -->
+  <div id="headerContainer" data-include="/kr/components/header.html"></div>
+
+  <!-- Banner -->
+  <section class="sub-banner">
+    <img src="/img/sub-banners/pr-1_v2.jpg" alt="홍보센터 배너" />
+    <div class="banner-text">
+      <h1>홍보센터</h1>
+      <p>화인디펜스의 최신 소식과 홍보 자료를 확인하세요.</p>
+    </div>
+  </section>
+
+  <div class="breadcrumb">
+    <a href="/kr/index.html">홈</a> &gt;
+    <span class="crumb crumb-level1">홍보센터</span> &gt;
+    <span class="crumb crumb-level2">갤러리</span>
+    <div id="side-tabs" class="side-tabs"></div>
+  </div>
+
+  <div class="gallery-container" id="galleryContainer"></div>
+
+    <!-- 공통 푸터 -->
+    <div data-include="/kr/components/footer.html"></div>
+
+  <script>
+    async function loadGallery() {
+      const res = await fetch(`/api/gallery/list?lang=kr`);
+      const list = await res.json();
+
+      const box = document.getElementById("galleryContainer");
+
+      if (!Array.isArray(list) || !list.length) {
+        box.innerHTML = "<p>등록된 갤러리가 없습니다.</p>";
+        return;
+      }
+
+      box.innerHTML = list.map(v => `
+        <div class="gallery-card" onclick="location.href='/kr/sub/pr/gallery/gallery-view.html?id=${v.id}'">
+          <img src="${v.main_image}" class="gallery-thumb">
+          <div class="gallery-info">
+            <div class="gallery-title">${v.title}</div>
+            <div class="gallery-date">${v.created_at.substring(0, 10)}</div>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    loadGallery();
+  </script>
+
+    <!-- 공통 스크립트 -->
+    <script src="/js/include.js"></script>
+    <script src="/js/session_timer.js"></script>
+    <script src="/js/language.js"></script>
+    <script src="/js/nav.js"></script>
+
+
+
+</body>
+</html>

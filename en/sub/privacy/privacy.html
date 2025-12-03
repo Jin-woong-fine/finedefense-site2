@@ -1,15 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
   <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta name="description" content="화인디펜스, 임시 홈페이지, 테스트 홈페이지">
+      <meta name="description" content="화인디펜스 개인정보취급방침">
 
-      <title>FINE DEFENSE</title>
+      <title>개인정보취급방침 | 화인디펜스</title>
 
-      <link rel="stylesheet" href="style.css">
-      <link rel="stylesheet" href="features.css">
-      <link rel="stylesheet" href="banner.css">
+      <link rel="stylesheet" href="/css/style.css" />
 
       <style>
         .privacy-section {
@@ -56,157 +54,69 @@
   </head>
 
   <body>
-    <header class="header-inner">
-      <div class="header-left">
-        <a href="#"><img src="img/logo_transparent_finedefense.png" alt="Logo" class="logo"></a>
-        <ul class="main-menu">
-          <li>
-            <a href="#">About Us</a>
-            <ul class="submenu">
-              <li><a href="#">Company Overview</a></li>
-              <li><a href="#">CEO Message</a></li>
-              <li><a href="#">History</a></li>
-              <li><a href="#">Vision & Philosophy</a></li>
-              <li><a href="#">Organization</a></li>
-              <li><a href="#">Location</a></li>
-            </ul>
-          </li>
+  <!-- 관리자 세션바 (정확한 ID 부여) -->
+  <div id="adminBarContainer" data-include="/kr/components/admin-session-bar.html"></div>
 
-          <li>
-            <a href="#">Products</a>
-            <ul class="submenu">
-              <li><a href="#">Towed Underwater Cables</a></li>
-              <li><a href="#">Fixed Underwater Cables</a></li>
-              <li><a href="#">Subsea Connectors</a></li>
-              <li><a href="#">EPD Cables</a></li>
-              <li><a href="#">Custom Cables</a></li>
-            </ul>
-          </li>
+  <!-- 공통 헤더 -->
+  <div id="headerContainer" data-include="/kr/components/header.html"></div>
 
-          <li>
-            <a href="#">Media Center</a>
-            <ul class="submenu">
-              <li><a href="#">Newsroom</a></li>
-              <li><a href="#">Gallery</a></li>
-              <li><a href="#">Promotional Videos</a></li>
-              <li><a href="#">Catalogs</a></li>
-            </ul>
-          </li>
-
-          <li>
-            <a href="#">Support</a>
-            <ul class="submenu">
-              <li><a href="#">Contact Us</a></li>
-              <li><a href="#">Download Center</a></li>
-            </ul>
-          </li>
-        </ul>
-      </div>
-
-
-      <!-- 언어 선택 -->
-      <div class="header-right">
-        <div class="language-dropdown">
-          <button class="lang-toggle">ENG <span class="arrow">▼</span></button>
-          <ul class="lang-list">
-            <li><a href="#" data-lang="kor">KOR</a></li>
-            <li><a href="#" data-lang="eng">ENG</a></li>
-          </ul>
-        </div>
-      </div>
-
-
-
-
-      
-    </header>  <!-- ✅ 여기 추가!! -->
-
-    <!-- ✅ Privacy Policy Section -->
+    <!-- ✅ 개인정보취급방침 본문 -->
     <section class="privacy-section">
-      <h1>Privacy Policy</h1>
+      <h1>개인정보취급방침</h1>
 
-      <h2>1. General Provisions</h2>
-      <p>FINE DEFENSE INC. complies with the relevant laws and guidelines of the Republic of Korea regarding the protection of personal information and is committed to safeguarding users’ personal data.</p>
-      <p>This policy may be amended in accordance with applicable laws or company regulations. Any changes will be announced through the company website.</p>
+      <h2>1. 총 칙</h2>
+      <p>(주)화인디펜스는 「정보통신망이용촉진 및 정보보호 등에 관한 법률」상의 개인정보보호 규정과 관련 지침을 준수하며, 회원의 개인정보 보호를 위해 최선을 다합니다.</p>
+      <p>본 방침은 법령 및 회사 방침에 따라 개정될 수 있으며, 변경 시 홈페이지 공지사항을 통해 안내됩니다.</p>
 
-      <h2>2. Collection and Use of Personal Information</h2>
+      <h2>2. 개인정보 수집 항목 및 이용 목적</h2>
       <ul>
-        <li>Name, ID, password, email address, and phone number</li>
-        <li>Address and payment information (bank or credit card details)</li>
-        <li>Cookies (for customized service and user convenience)</li>
+        <li>성명, 아이디, 비밀번호, 이메일주소, 전화번호</li>
+        <li>주소, 결제정보 (은행/신용카드 정보)</li>
+        <li>쿠키(아이디) – 맞춤형 서비스 제공</li>
       </ul>
-      <p>Users may choose to refuse cookie storage through browser settings. However, certain services may be limited as a result.</p>
+      <p>고객은 쿠키 저장을 거부할 수 있으며, 거부 시 일부 서비스 이용이 제한될 수 있습니다.</p>
 
-      <h2>3. Retention Period of Personal Information</h2>
+      <h2>3. 개인정보 보유기간</h2>
       <ul>
-        <li>Records of contracts or subscription withdrawals: 5 years</li>
-        <li>Records of payment and supply of goods: 5 years</li>
-        <li>Records of customer complaints or dispute resolution: 3 years</li>
-      </ul>
-
-      <h2>4. Provision of Personal Information to Third Parties</h2>
-      <p>The company does not provide personal information to third parties without the user’s consent, except when required by law.</p>
-
-      <h2>5. Access and Correction of Personal Information</h2>
-      <p>Users may access or correct their personal information at any time. The user is responsible for managing their own ID and password.</p>
-
-      <h2>6. Membership Withdrawal</h2>
-      <p>Users may withdraw their membership at any time through the account management section of the website.</p>
-
-      <h2>7. Technical Measures for the Protection of Personal Information</h2>
-      <ul>
-        <li>Passwords and personal data are stored in encrypted form.</li>
-        <li>Antivirus programs and intrusion prevention systems are operated.</li>
-        <li>Regular security inspections and monitoring are conducted.</li>
+        <li>계약 또는 청약철회 등에 관한 기록: 5년</li>
+        <li>대금결제 및 재화 공급에 관한 기록: 5년</li>
+        <li>소비자 불만 또는 분쟁처리에 관한 기록: 3년</li>
       </ul>
 
-      <h2>8. Personal Information Protection Officer</h2>
+      <h2>4. 개인정보의 제3자 제공</h2>
+      <p>원칙적으로 회원 동의 없이 개인정보를 제3자에게 제공하지 않으며, 법령에 따른 요청 시에만 제공합니다.</p>
+
+      <h2>5. 개인정보의 열람 및 정정</h2>
+      <p>회원은 언제든지 개인정보를 열람·정정할 수 있으며, ID/비밀번호 관리에 대한 책임은 본인에게 있습니다.</p>
+
+      <h2>6. 회원 탈퇴</h2>
+      <p>회원은 홈페이지의 회원정보 관리 메뉴를 통해 언제든 탈퇴를 신청할 수 있습니다.</p>
+
+      <h2>7. 개인정보보호를 위한 기술적 대책</h2>
       <ul>
-        <li>Name: </li>
-        <li>Position: </li>
-        <li>Phone: </li>
-        <li>Email: </li>
+        <li>비밀번호 및 개인정보 데이터 암호화 저장</li>
+        <li>백신 프로그램 및 침입차단시스템 운영</li>
+        <li>정기적 보안 점검 및 모니터링</li>
       </ul>
 
-      <p class="updated-date">Last Updated: November 3, 2025</p>
+      <h2>8. 개인정보 관리책임자</h2>
+      <ul>
+        <li>성명: </li>
+        <li>직책: </li>
+        <li>전화번호: </li>
+        <li>E-mail: </li>
+      </ul>
+
+      <p class="updated-date">최종 수정일: 2025년 11월 3일</p>
     </section>
 
-    <footer>
-      <div class="footer-container">
-        <div class="footer-left">
-          <div class="footer-links">
-            <a href="#">About Us</a>
-            <a href="privacy.html">Privacy Policy</a>
-            <a href="#">Contact</a>
-            <a href="#">Download Center</a>
-          </div>
-        </div>
+    <!-- 공통 푸터 -->
+    <div data-include="/kr/components/footer.html"></div>
 
-        <div class="footer-info">
-          <p><strong>FINE DEFENSE INC.</strong></p>
-          <p>Address: 902, 250 Hagui-ro, Dongan-gu, Anyang-si, Gyeonggi-do, Korea</p>
-          <p>Tel: +82-31-8068-6103 | Fax: +82-70-4325-6116</p>
-          <p>Email: finedefense@finedefense.co.kr</p>
-          <p>Okcheon Plant 1: 48 Iwonnonggong-ro, Iwon-myeon, Okcheon-gun, Chungbuk</p>
-          <p>Okcheon Plant 2: 183 Pyeongsan-gil, Dongi-myeon, Okcheon-gun, Chungbuk</p>
-        </div>
-
-        <div class="footer-right">
-          <p class="family-title">FAMILY COMPANY ▼</p>
-          <ul class="family-links">
-            <li><a href="#">Fine</a></li>
-            <li><a href="#">Woobang Cable</a></li>
-          </ul>
-        </div>
-
-        <div class="footer-copy">
-          &copy; 2025 FINE DEFENSE INC. All Rights Reserved.
-        </div>
-      </div>
-    </footer>
-
-    <script src="js/banner.js"></script>
-    <script src="js/language.js"></script>
-
+    <!-- 공통 스크립트 -->
+    <script src="/js/include.js"></script>
+    <script src="/js/session_timer.js"></script>
+    <script src="/js/language.js"></script>
+    <script src="/js/nav.js"></script>
   </body>
 </html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="화인디펜스 조직도 - Fine Defense Organization">
+  <title>조직도 | 화인디펜스</title>
+
+
+      <link rel="stylesheet" href="/css/style.css">
+      <link rel="stylesheet" href="/css/sub-banner.css">
+      <link rel="stylesheet" href="../../nav/company-nav.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+      body {
+        margin: 0;
+        font-family: "Noto Sans KR", sans-serif;
+        background: #ffffff;
+        color: #333;
+      }
+
+      .page-header {
+          text-align: center;
+          background: #ffffff;
+          padding: 20px 20px 20px;
+          border-bottom: 1px solid #e4e8f0;
+          margin-top: 10px;
+      }
+
+      .page-header h1 {
+          font-size: 2.0rem;
+          color: #0f2679;
+          margin-bottom: 10px;
+      }
+
+      .page-header p {
+          font-size: 1.4rem;
+          color: #666;
+          opacity: 0.8;
+          margin: 0;
+      }
+
+      /* ===== 조직도 본문 ===== */
+      .organization {
+        max-width: 1000px;
+        margin: 20px auto;
+        padding: 60px 40px;
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        text-align: center;
+      }
+
+      .org-chart {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 50px;
+      }
+
+      /* 대표이사 */
+      .org-node.ceo {
+        background: linear-gradient(135deg, #2f62d0, #4a80f0);
+        color: #fff;
+        padding: 20px 60px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 1.2rem;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .org-node.ceo i {
+        font-size: 1.8rem;
+        opacity: 0.9;
+      }
+
+      /* 부서 */
+      .org-branch {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 40px;
+      }
+
+      .org-dept {
+        background: #ffffff;
+        border: 2px solid #0f2679;
+        color: #0f2679;
+        padding: 20px 35px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        min-width: 160px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .org-dept:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 8px 18px rgba(15,38,121,0.15);
+      }
+
+      .org-dept i {
+        font-size: 1.8rem;
+        color: #0f2679;
+        margin-bottom: 4px;
+      }
+
+      @media (max-width: 768px) {
+        .org-dept {
+          width: 80%;
+          min-width: auto;
+        }
+        .org-branch {
+          flex-direction: column;
+          align-items: center;
+          gap: 25px;
+        }
+      }
+    </style>
+</head>
+
+<body>
+  <!-- 관리자 세션바 (정확한 ID 부여) -->
+  <div id="adminBarContainer" data-include="/kr/components/admin-session-bar.html"></div>
+
+  <!-- 공통 헤더 -->
+  <div id="headerContainer" data-include="/kr/components/header.html"></div>
+
+    <!-- ✅ 2. 배너 -->
+    <section class="sub-banner">
+      <img src="/img/sub-banners/occheon-plant2-3.jpg" alt="회사소개 배너" />
+      <div class="banner-text">
+        <h1>회사소개</h1>
+        <p>화인디펜스는 기술로 해양을 연결합니다.</p>
+      </div>
+    </section>
+
+    <!-- ✅ 3. breadcrumb -->
+    <div class="breadcrumb">
+      <a href="/">홈</a> &gt;
+      <span class="crumb crumb-level1">회사소개</span> &gt;
+      <span class="crumb crumb-level2">조직도</span>
+
+      <!-- ✅ breadcrumb 내부에 탭 1개만 -->
+      <div id="side-tabs" class="side-tabs"></div>
+    </div>
+
+
+
+    <section class="page-header">
+      <h1>화인디펜스 조직도</h1>
+    </section>
+
+    <section class="organization">
+      <div class="org-chart">
+        <div class="org-node ceo">
+          <i class="fas fa-user-tie"></i>
+          대표이사
+        </div>
+
+        <div class="org-branch">
+          <div class="org-dept"><i class="fas fa-lightbulb"></i> 연구소</div>
+          <div class="org-dept"><i class="fas fa-briefcase"></i> 경영지원팀</div>
+          <div class="org-dept"><i class="fas fa-handshake"></i> 영업팀</div>
+          <div class="org-dept"><i class="fas fa-cart-shopping"></i> 구매팀</div>
+          <div class="org-dept"><i class="fas fa-check-circle"></i> 품질관리팀</div>
+          <div class="org-dept"><i class="fas fa-industry"></i> 생산팀</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 공통 푸터 -->
+    <div data-include="/kr/components/footer.html"></div>
+
+    <!-- 공통 스크립트 -->
+    <script src="/js/include.js"></script>
+    <script src="/js/session_timer.js"></script>
+    <script src="/js/language.js"></script>
+    <script src="/js/nav.js"></script>
+</body>
+</html>

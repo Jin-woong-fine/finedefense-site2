@@ -1,219 +1,133 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
   <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta name="description" content="FINE DEFENSE CEO Message">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="화인디펜스 CEO 인사말" />
 
-      <title>CEO Message | FINE DEFENSE</title>
+    <title>CEO 인사말 | 화인디펜스</title>
 
-      <!-- ✅ 상대경로로 수정 -->
-      <link rel="stylesheet" href="../../style.css">
-      <link rel="stylesheet" href="../../features.css">
-      <link rel="stylesheet" href="../../banner.css">
+    <!-- ✅ 공통 CSS -->
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/sub-banner.css" />
 
-      <style>
-        .ceo-section {
-          max-width: 1000px;
-          margin: 120px auto 80px;
-          padding: 60px 40px;
-          background: #fff;
-          border-radius: 12px;
-          box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-          line-height: 1.8;
-          color: #333;
-        }
+    <style>
+      .ceo-section {
+        max-width: 1000px;
+        margin: 70px auto 80px;
+        padding: 40px 40px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        line-height: 1.8;
+        color: #333;
+      }
 
-        .ceo-section h1 {
-          text-align: center;
-          font-size: 2rem;
-          color: #0f2679;
-          margin-bottom: 40px;
-        }
+      .ceo-section h1 {
+        text-align: center;
+        font-size: 2rem;
+        color: #0f2679;
+        margin-bottom: 40px;
+      }
 
-        .ceo-photo {
-          text-align: center;
-          margin-bottom: 40px;
-        }
+      .ceo-message {
+        font-size: 1.1rem;
+        font-weight: 500;
+        margin-bottom: 40px;
+      }
 
-        .ceo-photo img {
-          max-width: 300px;
-          border-radius: 10px;
-          box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-
-        .ceo-message {
-          font-size: 1.05rem;
-          margin-bottom: 40px;
-        }
-
-        .ceo-signature {
-          text-align: right;
-          font-weight: bold;
-          color: #222;
-          font-size: 1.1rem;
-        }
-
-        .ceo-symbol {
+      .ceo-signature {
         text-align: right;
-        margin-top: 20px;
-        }
+        font-weight: bold;
+        color: #222;
+        font-size: 1.3rem;
+      }
 
-        .ceo-symbol img {
-        width: 100px;            /* 🔹 심볼 크기 조정 */
-        opacity: 0.7;            /* 🔹 은은하게 표시 */
-        transition: opacity 0.3s ease;
-        }
+      body {
+        background-image: url("/img/finedefense_symbol.png");
+        background-repeat: no-repeat;
+        background-position: center 550px;
+        background-size: 600px auto;
+        opacity: 1;
+        background-attachment: scroll;
+      }
 
-        .ceo-symbol img:hover {
-        opacity: 1;              /* 🔹 마우스 올리면 선명하게 */
-        }
-
-
-      </style>
+      .ceo-section {
+        position: relative;
+        z-index: 1;
+        background: rgba(255, 255, 255, 0.808);
+        border-radius: 12px;
+      }
+    </style>
   </head>
 
   <body>
-    <header class="header-inner">
-      <div class="header-left">
-        <!-- ✅ 로고 경로 수정 -->
-        <a href="../../index.html"><img src="../../img/logo_transparent_finedefense.png" alt="Logo" class="logo"></a>
-        <ul class="main-menu">
-          <li>
-            <a href="#">About Us</a>
-            <ul class="submenu">
-              <li><a href="overview.html">Company Overview</a></li>
-              <li><a href="ceo.html">CEO Message</a></li>
-              <li><a href="history.html">History</a></li>
-              <li><a href="vision.html">Vision & Philosophy</a></li>
-              <li><a href="organization.html">Organization</a></li>
-              <li><a href="location.html">Location</a></li>
-            </ul>
-          </li>
+    <!-- 관리자 세션바 (정확한 ID 부여) -->
+    <div id="adminBarContainer" data-include="/kr/components/admin-session-bar.html"></div>
 
-          <li>
-            <a href="#">Products</a>
-            <ul class="submenu">
-              <li><a href="#">Towed Underwater Cables</a></li>
-              <li><a href="#">Fixed Underwater Cables</a></li>
-              <li><a href="#">Subsea Connectors</a></li>
-              <li><a href="#">EPD Cables</a></li>
-              <li><a href="#">Custom Cables</a></li>
-            </ul>
-          </li>
+    <!-- 공통 헤더 -->
+    <div id="headerContainer" data-include="/kr/components/header.html"></div>
 
-          <li>
-            <a href="#">Media Center</a>
-            <ul class="submenu">
-              <li><a href="#">Newsroom</a></li>
-              <li><a href="#">Gallery</a></li>
-              <li><a href="#">Videos</a></li>
-              <li><a href="#">Catalogs</a></li>
-            </ul>
-          </li>
-
-          <li>
-            <a href="#">Support</a>
-            <ul class="submenu">
-              <li><a href="#">Contact Us</a></li>
-              <li><a href="#">Download Center</a></li>
-            </ul>
-          </li>
-        </ul>
+    <!-- ✅ 2. 배너 -->
+    <section class="sub-banner">
+      <img src="/img/sub-banners/occheon-plant2-3.jpg" alt="회사소개 배너" />
+      <div class="banner-text">
+        <h1>회사소개</h1>
+        <p>화인디펜스는 기술로 해양을 연결합니다.</p>
       </div>
+    </section>
 
-      <!-- ✅ Language Switch -->
-      <div class="header-right">
-        <div class="language-dropdown">
-          <button class="lang-toggle">ENG <span class="arrow">▼</span></button>
-          <ul class="lang-list">
-            <li><a href="/kr/sub/company/ceo.html" data-lang="kor">KOR</a></li>
-            <li><a href="/en/sub/company/ceo.html" data-lang="eng">ENG</a></li>
-          </ul>
-        </div>
-      </div>
-    </header>
+    <!-- ✅ 3. breadcrumb -->
+    <div class="breadcrumb">
+      <a href="/">홈</a> &gt;
+      <span class="crumb crumb-level1">회사소개</span> &gt;
+      <span class="crumb crumb-level2">CEO 인사말</span>
 
-    <!-- ✅ CEO MESSAGE CONTENT -->
-    <section class="ceo-section">
-      <h1>CEO Message</h1>
-
-    <div class="ceo-message">
-      <p>Hello,<br>
-      We sincerely appreciate your visit to the official website of FINE DEFENSE INC.</p>
-
-      <p>
-      FINE DEFENSE is a specialized engineering company that designs and manufactures 
-      fixed and towed underwater cables, as well as marine exploration cables 
-      for sonar, magnetic, and electric field systems — each optimized through 
-      purpose-specific engineering to meet diverse customer needs.
-      </p>
-
-      <p>
-      Recognized for our core design, material, manufacturing, and evaluation technologies 
-      suitable for subsea environments, we have successfully completed national R&D projects 
-      and localized imported products to enter the defense market.  
-      In the commercial sector, we continue to expand our presence with high-quality products 
-      and strong customer satisfaction.  
-      Based on our accumulated and proven expertise, we will strive to provide customized 
-      solutions and pursue mutual growth with our clients.
-      </p>
-
-      <p>
-      We sincerely ask for your continued interest and support.
-      </p>
-
-      <p>Thank you.</p>
+      <!-- ✅ breadcrumb 내부에 탭 1개만 -->
+      <div id="side-tabs" class="side-tabs"></div>
     </div>
 
 
-      <div class="ceo-signature">
-        All employees of FINE DEFENSE INC.
+
+    <!-- ✅ 본문 -->
+    <section class="ceo-section">
+      <h1>CEO 인사말</h1>
+
+      <div class="ceo-message">
+        <p>
+          안녕하십니까?<br />
+          (주)화인디펜스 홈페이지를 방문해주신 여러분께 진심으로 감사드립니다.
+        </p>
+        <p>
+          ㈜화인디펜스는 고객의 다양한 요구에 대응하여 소나시스템, 자기장시스템,
+          전기장시스템의 고정형, 이동형 해저케이블 및 해양 탐사 케이블을 용도별
+          최적의 엔지니어링으로 설계·제조하는 강소 전문기업입니다.
+        </p>
+        <p>
+          해저환경에 적합한 핵심 설계기술과 재료기술, 양산제조기술 및 평가기술
+          등을 인정받아 수행한 국가 R&D 사업을 성공적으로 완료하였고, 수입제품을
+          국산화하여 군수시장에 진입하였습니다. 민수시장에서도 높은 품질과
+          고객만족으로 시장을 확대해 나가고 있습니다.
+        </p>
+        <p>
+          그동안 축적되고 검증된 기술로 고객 맞춤형 솔루션을 제공하는
+          동반성장을 추구하겠습니다.
+        </p>
+        <p>여러분의 지속적인 관심과 성원을 부탁드립니다.</p>
+        <p>감사합니다.</p>
       </div>
 
-      <!-- 심볼 이미지 추가 -->
-      <div class="ceo-symbol">
-          <img src="../../../img/finedefense_symbol.png" alt="Fine Defense Symbol">
-      </div>
-
+      <div class="ceo-signature">(주)화인디펜스 직원 일동</div>
     </section>
 
-    <footer>
-      <div class="footer-container">
-        <div class="footer-left">
-          <div class="footer-links">
-            <a href="#">About Us</a>
-            <a href="../../privacy.html">Privacy Policy</a>
-            <a href="#">Contact</a>
-            <a href="#">Download Center</a>
-          </div>
-        </div>
+    <!-- 공통 푸터 -->
+    <div data-include="/kr/components/footer.html"></div>
 
-        <div class="footer-info">
-          <p><strong>FINE DEFENSE INC.</strong></p>
-          <p>Address: 902, 250 Hagui-ro, Dongan-gu, Anyang-si, Gyeonggi-do, Korea</p>
-          <p>Tel: +82-31-8068-6103 | Fax: +82-70-4325-6116</p>
-          <p>Email: finedefense@finedefense.co.kr</p>
-          <p>Okcheon Plant 1: 48 Iwonnonggong-ro, Iwon-myeon, Okcheon-gun, Chungbuk</p>
-          <p>Okcheon Plant 2: 183 Pyeongsan-gil, Dongi-myeon, Okcheon-gun, Chungbuk</p>
-        </div>
+    <!-- 공통 스크립트 -->
+    <script src="/js/include.js"></script>
+    <script src="/js/session_timer.js"></script>
+    <script src="/js/language.js"></script>
+    <script src="/js/nav.js"></script>
 
-        <div class="footer-right">
-          <p class="family-title">FAMILY COMPANY ▼</p>
-          <ul class="family-links">
-            <li><a href="#">Fine</a></li>
-            <li><a href="#">Woobang Cable</a></li>
-          </ul>
-        </div>
-
-        <div class="footer-copy">
-          &copy; 2025 FINE DEFENSE INC. All Rights Reserved.
-        </div>
-      </div>
-    </footer>
-
-    <!-- ✅ js 경로 수정 -->
-    <script src="../../js/banner.js"></script>
-    <script src="../../js/language.js"></script>
   </body>
 </html>

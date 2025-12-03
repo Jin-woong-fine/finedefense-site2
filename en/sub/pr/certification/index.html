@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>인증 및 특허 | Fine Defense</title>
+
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/sub-banner.css">
+
+  <style>
+    .page-wrap {
+      max-width: 1200px;
+      margin: 50px auto 80px;
+      padding: 0 20px;
+    }
+
+    h2.section-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: #0f2679;
+    }
+
+    /* 카드(인증/특허 공용) */
+    .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 180px)); /* 180px 강제 */
+    justify-content: center; /* 가운데 정렬 */
+    gap: 18px;
+    margin-bottom: 60px;
+    }
+
+    .card-item {
+    background: #fff;
+    border-radius: 12px;
+    padding: 8px; /* small padding */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    cursor: pointer;
+    transition: 0.25s ease;
+    }
+
+    .card-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+    }
+
+    .card-item img {
+    width: 100%;
+    aspect-ratio: 1 / 1.414; /* A4 비율 */
+    object-fit: contain;
+    border-radius: 6px;
+    background: #f4f4f4;
+    }
+
+    .card-title {
+    margin-top: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #0f2679;
+    text-align: center;
+    }
+
+
+
+    /* 모달 */
+    .modal-bg {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.65);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-box {
+      background: #fff;
+      padding: 20px;
+      border-radius: 14px;
+      max-width: 900px;
+      width: 90%;
+      position: relative;
+    }
+
+    .modal-box img {
+    max-height: 80vh;        /* 화면 세로의 80%까지만 */
+    max-width: 90vw;         /* 가로도 화면 넘지 않게 */
+    width: auto;             /* A4 비율 유지 */
+    height: auto;            /* A4 비율 유지 */
+    aspect-ratio: 1 / 1.414; /* A4 비율 강제 */
+    object-fit: contain;
+    background: #fff;
+    border-radius: 12px;
+    display: block;
+    margin: 0 auto;
+    }
+
+
+    .modal-box iframe {
+      width: 100%;
+      height: 80vh;
+      border-radius: 12px;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      font-size: 22px;
+      cursor: pointer;
+      color: #333;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- 관리자 세션바 (정확한 ID 부여) -->
+  <div id="adminBarContainer" data-include="/kr/components/admin-session-bar.html"></div>
+
+  <!-- 공통 헤더 -->
+  <div id="headerContainer" data-include="/kr/components/header.html"></div>
+
+<!-- PR 공통 배너 -->
+<section class="sub-banner">
+  <img src="/img/sub-banners/pr-1_v2.jpg" alt="홍보센터 배너" />
+  <div class="banner-text">
+      <h1>홍보센터</h1>
+      <p>화인디펜스의 최신 소식과 홍보 자료를 확인하세요.</p>
+  </div>
+</section>
+
+<!-- breadcrumb + side-tabs -->
+<div class="breadcrumb">
+  <a href="/kr/index.html">홈</a> &gt;
+  <span class="crumb crumb-level1">홍보센터</span> &gt;
+  <span class="crumb crumb-level2">인증 및 특허</span>
+  <div id="side-tabs" class="side-tabs"></div>
+</div>
+
+<div class="page-wrap">
+
+  <!-- 인증 -->
+  <h2 class="section-title">📄 기업 인증</h2>
+  <div class="card-grid" id="certGrid"></div>
+
+  <!-- 특허 -->
+  <h2 class="section-title">🔬 기술 특허</h2>
+  <div class="card-grid" id="patentGrid"></div>
+
+</div>
+
+<!-- 모달 -->
+<div id="modalBg" class="modal-bg">
+  <div class="modal-box">
+    <div class="modal-close" onclick="closeModal()">✕</div>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+    <!-- 공통 푸터 -->
+    <div data-include="/kr/components/footer.html"></div>
+
+<script>
+
+/* --------------------------------------
+   데이터 로딩 (KR 페이지 → lang=kr or all)
+-----------------------------------------*/
+async function loadCertItems() {
+  try {
+    const certRes = await fetch('/api/cert-items/list?type=cert&lang=kr');
+    const certList = await certRes.json();
+
+    const patentRes = await fetch('/api/cert-items/list?type=patent&lang=kr');
+    const patentList = await patentRes.json();
+
+    renderCards(certList, "certGrid");
+    renderCards(patentList, "patentGrid");
+
+  } catch (err) {
+    console.error("로딩 오류:", err);
+  }
+}
+
+
+/* --------------------------------------
+   카드 렌더링
+-----------------------------------------*/
+function renderCards(list, containerId) {
+  const wrap = document.getElementById(containerId);
+
+  if (!list.length) {
+    wrap.innerHTML = `<div style="color:#777;font-size:0.9rem;">등록된 데이터가 없습니다.</div>`;
+    return;
+  }
+
+  wrap.innerHTML = list.map(item => `
+    <div class="card-item" onclick="openModal('${item.file_url}')">
+      <img src="${item.thumb_url}" alt="">
+      <div class="card-title">${item.title_kr}</div>
+    </div>
+  `).join("");
+}
+
+
+/* --------------------------------------
+   모달 제어
+-----------------------------------------*/
+function openModal(fileUrl) {
+  const modalBg = document.getElementById("modalBg");
+  const modalContent = document.getElementById("modalContent");
+
+  modalBg.style.display = "flex";
+
+  if (fileUrl.endsWith(".pdf")) {
+    modalContent.innerHTML = `<iframe src="${fileUrl}"></iframe>`;
+  } else {
+    modalContent.innerHTML = `<img src="${fileUrl}">`;
+  }
+}
+
+function closeModal() {
+  document.getElementById("modalBg").style.display = "none";
+}
+
+
+/* 시작 */
+loadCertItems();
+
+</script>
+
+    <!-- 공통 스크립트 -->
+    <script src="/js/include.js"></script>
+    <script src="/js/session_timer.js"></script>
+    <script src="/js/language.js"></script>
+    <script src="/js/nav.js"></script>
+
+
+
+
+</body>
+</html>

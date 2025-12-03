@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>자료실 | Fine Defense</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/sub-banner.css">
+
+  <style>
+    .downloads-container {
+      max-width: 1200px;
+      margin: 50px auto 100px;
+    }
+
+    .filters {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    select, input {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    .list-item {
+      display: flex;
+      gap: 20px;
+      padding: 20px 0;
+      border-bottom: 1px solid #eee;
+      align-items: center;
+    }
+
+    .thumb {
+      width: 120px;
+      height: 80px;
+      object-fit: cover;
+      background: #ddd;
+      border-radius: 6px;
+    }
+
+    .item-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #0f2679;
+    }
+
+    .item-info {
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .no-data {
+      text-align:center;
+      padding:60px;
+      color:#777;
+    }
+
+
+
+
+
+  </style>
+</head>
+
+<body>
+<!-- 관리자 세션바 (정확한 ID 부여) -->
+<div id="adminBarContainer" data-include="/kr/components/admin-session-bar.html"></div>
+
+<!-- 공통 헤더 -->
+<div id="headerContainer" data-include="/kr/components/header.html"></div>
+
+<section class="sub-banner">
+  <img src="/img/sub-banners/subbanner_support_V2.png" alt="자료실">
+  <div class="banner-text">
+    <h1>고객지원</h1>
+    <p>전문 기술지원과 최신 자료를 한곳에서 손쉽게 이용하실 수 있습니다.</p>
+  </div>
+</section>
+
+<div class="breadcrumb">
+  <a href="/kr/index.html">홈</a> &gt;
+  <span class="crumb crumb-level1 active">고객지원</span> &gt;
+  <span class="crumb crumb-level2 active">자료실</span>
+  <div id="side-tabs"></div>
+</div>
+
+
+<div class="downloads-container">
+
+  <div class="filters">
+    <select id="filterCategory">
+      <option value="all">전체 카테고리</option>
+      <option value="kr_catalog">한국어 종합카탈로그</option>
+      <option value="en_catalog">영어 종합카탈로그</option>
+      <option value="company">회사 소개서</option>
+      <option value="etc">기타</option>
+    </select>
+
+    <select id="filterLang">
+      <option value="all">전체 언어</option>
+      <option value="kr">한국어</option>
+      <option value="en">영어</option>
+    </select>
+
+    <input type="text" id="search" placeholder="검색 (제목)">
+    <button onclick="loadList()">검색</button>
+  </div>
+
+  <div id="listArea"></div>
+</div>
+
+    <!-- 공통 푸터 -->
+    <div data-include="/kr/components/footer.html"></div>
+
+
+<script>
+  loadList();
+
+  async function loadList() {
+    const category = document.getElementById("filterCategory").value;
+    const lang = document.getElementById("filterLang").value;
+    const search = document.getElementById("search").value;
+
+    const res = await fetch(`/api/downloads/list?category=${category}&lang=${lang}&search=${search}`);
+    const data = await res.json();
+
+    const area = document.getElementById("listArea");
+
+    if (!data.length) {
+      area.innerHTML = `<div class="no-data">등록된 자료가 없습니다.</div>`;
+      return;
+    }
+
+    area.innerHTML = data.map(i => `
+      <div class="list-item" onclick="openView(${i.id})" style="cursor:pointer;">
+        <img src="${i.thumb_url || '/img/icons/file.png'}" class="thumb">
+
+        <div>
+          <div class="item-title">${i.title}</div>
+          <div class="item-info">
+            ${printCategory(i.category)} · ${i.lang.toUpperCase()} · 첨부파일 ${i.file_count}개 · 
+            ${new Date(i.created_at).toLocaleDateString()}
+          </div>
+        </div>
+      </div>
+    `).join("");
+  }
+
+    function openView(id) {
+    location.href = `/kr/sub/support/downloads/downloads-view.html?id=${id}`;
+    }
+
+  function printCategory(c) {
+    return {
+      kr_catalog: "한국어 종합카탈로그",
+      en_catalog: "영어 종합카탈로그",
+      company: "회사 소개서",
+      etc: "기타"
+    }[c] || c;
+  }
+</script>
+
+
+    <!-- 공통 스크립트 -->
+    <script src="/js/include.js"></script>
+    <script src="/js/session_timer.js"></script>
+    <script src="/js/language.js"></script>
+    <script src="/js/nav.js"></script>
+
+
+
+
+</body>
+</html>

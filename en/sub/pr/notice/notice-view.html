@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>공지사항 | Fine Defense</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- 공통 CSS -->
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/sub-banner.css">
+
+  <!-- Toast UI Viewer -->
+  <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor-viewer.min.css">
+
+  <style>
+    .notice-container {
+      max-width: 900px;
+      margin: 50px auto 100px;
+      background: #fff;
+      padding: 40px 50px;
+      border-radius: 14px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+    }
+
+    .notice-title {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #0f2679;
+      margin-bottom: 10px;
+    }
+
+    .notice-info {
+      color: #555;
+      font-size: 0.9rem;
+      margin-bottom: 25px;
+    }
+
+    .attachment-section {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid #ddd;
+    }
+
+    .file-item {
+      padding: 10px;
+      background: #f7f7f7;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .file-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .file-icon {
+      width: 22px;
+      opacity: .8;
+    }
+
+    .file-size {
+      font-size: 0.85rem;
+      color: #777;
+    }
+
+    .download-btn {
+      background: #0f2679;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .back-btn {
+      margin-top: 40px;
+      display: inline-block;
+      background: #0f2679;
+      color: white;
+      padding: 10px 18px;
+      border-radius: 6px;
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- 관리자 세션바 (정확한 ID 부여) -->
+  <div id="adminBarContainer" data-include="/kr/components/admin-session-bar.html"></div>
+
+  <!-- 공통 헤더 -->
+  <div id="headerContainer" data-include="/kr/components/header.html"></div>
+
+<section class="sub-banner">
+  <img src="/img/sub-banners/pr-1_v2.jpg" alt="공지사항">
+  <div class="banner-text">
+    <h1>홍보센터</h1>
+    <p>화인디펜스의 최신 소식과 홍보 자료를 확인하세요.</p>
+  </div>
+</section>
+
+<div class="breadcrumb">
+  <a href="/kr/index.html">홈</a> &gt;
+  <span class="crumb crumb-level1">홍보센터</span> &gt;
+  <span class="crumb crumb-level2">공지사항</span>
+  <div id="side-tabs"></div>
+</div>
+
+<div class="notice-container">
+
+  <h1 class="notice-title" id="title"></h1>
+  <div class="notice-info">
+    <span id="date"></span> | 조회수 <span id="views"></span>
+  </div>
+
+  <div id="viewer"></div>
+
+  <!-- 첨부파일 -->
+  <div class="attachment-section" id="attachmentWrap" style="display:none;">
+    <h3>📎 첨부파일</h3>
+    <div id="attachmentList"></div>
+  </div>
+
+  <a class="back-btn" href="/kr/sub/pr/notice/notice.html">목록으로</a>
+</div>
+
+    <!-- 공통 푸터 -->
+    <div data-include="/kr/components/footer.html"></div>
+
+<!-- Toast UI Viewer JS -->
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+
+<script>
+  const params = new URLSearchParams(location.search);
+  const noticeId = params.get("id");
+
+  if (!noticeId) {
+    alert("잘못된 접근입니다.");
+    location.href = "/kr/sub/pr/notice/notice.html";
+  }
+
+  loadNotice();
+  increaseViews();
+
+  /* ===========================================================
+        🔥 파일 크기 표시 포맷터
+  ============================================================ */
+  function formatSize(bytes) {
+    if (!bytes) return "0 B";
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+    return (bytes / 1024 / 1024).toFixed(1) + " MB";
+  }
+
+  /* ===========================================================
+        🔥 공지 상세 데이터 불러오기
+  ============================================================ */
+  async function loadNotice() {
+    const res = await fetch(`/api/posts/detail/${noticeId}`);
+    const data = await res.json();
+
+    document.getElementById("title").textContent = data.title;
+    document.getElementById("date").textContent =
+      new Date(data.created_at).toLocaleDateString();
+    document.getElementById("views").textContent = data.views || 0;
+
+    toastui.Editor.factory({
+      el: document.querySelector('#viewer'),
+      viewer: true,
+      initialValue: data.content || ""
+    });
+
+    // 첨부파일 렌더링
+    if (data.files?.length) {
+      document.getElementById("attachmentWrap").style.display = "block";
+
+      document.getElementById("attachmentList").innerHTML =
+        data.files.map(f => `
+          <div class="file-item">
+            <div class="file-left">
+              <img class="file-icon" src="${getFileIcon(f.original_name)}">
+              <span>${f.original_name}</span>
+              <span class="file-size">(${formatSize(f.file_size)})</span>
+            </div>
+
+            <button class="download-btn"
+              onclick="downloadFile(${noticeId}, '${f.file_path}', '${f.original_name}')">
+              다운로드
+            </button>
+          </div>
+        `).join("");
+    }
+  }
+
+  /* ===========================================================
+        🔥 조회수 증가
+  ============================================================ */
+  function increaseViews() {
+    fetch(`/api/posts/view/${noticeId}`, { method: "POST" });
+  }
+
+  /* ===========================================================
+        🔥 다운로드 (자동 다운로드)
+  ============================================================ */
+  function downloadFile(noticeId, path, originalName) {
+
+    // ❗ prefix 반드시 /api/posts/notice 로 맞춰야 함
+    const url =
+      `/api/posts/notice/download-file?path=${encodeURIComponent(path)}&name=${encodeURIComponent(originalName)}`;
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = originalName;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    // 다운로드 로그
+    fetch("/api/posts/notice/download", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        notice_id: noticeId,
+        file_path: path,
+        original_name: originalName
+      })
+    });
+  }
+
+  /* ===========================================================
+        📌 파일 아이콘 자동 선택
+  ============================================================ */
+  function getFileIcon(name) {
+    const ext = name.split(".").pop().toLowerCase();
+
+    if (ext === "pdf") return "/img/icons/pdf.png";
+    if (["xls", "xlsx"].includes(ext)) return "/img/icons/excel.png";
+    if (["jpg", "jpeg", "png"].includes(ext)) return "/img/icons/image.png";
+
+    return "/img/icons/file.png";
+  }
+</script>
+
+
+    <!-- 공통 스크립트 -->
+    <script src="/js/include.js"></script>
+    <script src="/js/session_timer.js"></script>
+    <script src="/js/language.js"></script>
+    <script src="/js/nav.js"></script>
+
+
+</body>
+</html>

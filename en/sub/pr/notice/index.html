@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>공지사항 | Fine Defense</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- 공통 CSS -->
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/sub-banner.css">
+
+  <style>
+    .notice-wrap {
+      max-width: 1000px;
+      margin: 50px auto 100px;
+    }
+
+    .top-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 15px;
+      gap: 10px;
+    }
+
+    select, input {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+
+    .btn-search {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: none;
+      background: #0f2679;
+      color: #fff;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    table.notice-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+    }
+
+    table.notice-table th,
+    table.notice-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #eee;
+      font-size: 0.95rem;
+    }
+
+    table.notice-table th {
+      background: #f5f7fb;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    table.notice-table td.title {
+      text-align: left;
+    }
+
+    table.notice-table tr:hover td {
+      background: #fafbff;
+      cursor: pointer;
+    }
+
+    .no-data {
+      text-align: center;
+      padding: 40px;
+      color: #777;
+    }
+
+    .pagination {
+      margin-top: 24px;
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .pagination button {
+      border: 1px solid #ccc;
+      background: #fff;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .pagination button.active {
+      background: #0f2679;
+      color: #fff;
+      border-color: #0f2679;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- 관리자 세션바 (정확한 ID 부여) -->
+  <div id="adminBarContainer" data-include="/kr/components/admin-session-bar.html"></div>
+
+  <!-- 공통 헤더 -->
+  <div id="headerContainer" data-include="/kr/components/header.html"></div>
+
+<section class="sub-banner">
+  <img src="/img/sub-banners/pr-1_v2.jpg" alt="공지사항">
+  <div class="banner-text">
+    <h1>홍보센터</h1>
+    <p>화인디펜스의 최신 소식과 홍보 자료를 확인하세요.</p>
+  </div>
+</section>
+
+<div class="breadcrumb">
+  <a href="/kr/index.html">홈</a> &gt;
+  <span class="crumb crumb-level1">홍보센터</span> &gt;
+  <span class="crumb crumb-level2">공지사항</span>
+  <div id="side-tabs"></div>
+</div>
+
+<div class="notice-wrap">
+
+  <div class="top-row">
+    <select id="langFilter">
+      <option value="kr">한국어</option>
+      <option value="en">영어</option>
+      <option value="all">전체 언어</option>
+    </select>
+
+    <input type="text" id="search" placeholder="제목 검색">
+    <button class="btn-search" onclick="reloadNotices()">검색</button>
+  </div>
+
+  <table class="notice-table">
+    <thead>
+      <tr>
+        <th style="width:70px;">번호</th>
+        <th>제목</th>
+        <th style="width:120px;">작성일</th>
+        <th style="width:80px;">조회수</th>
+      </tr>
+    </thead>
+    <tbody id="noticeBody">
+      <tr><td colspan="4" class="no-data">불러오는 중...</td></tr>
+    </tbody>
+  </table>
+
+  <div class="pagination" id="pagination"></div>
+</div>
+
+    <!-- 공통 푸터 -->
+    <div data-include="/kr/components/footer.html"></div>
+
+
+<script>
+  let currentPage = 1;
+  const pageSize = 10;  // 한 페이지 10개
+
+  document.addEventListener("DOMContentLoaded", () => {
+    loadNotices(1);
+  });
+
+  function reloadNotices() {
+    loadNotices(1);
+  }
+
+  async function loadNotices(page) {
+    currentPage = page;
+
+    const lang = document.getElementById("langFilter").value;
+    const search = document.getElementById("search").value.trim();
+
+    // 🔥 posts_common.js 규격에 맞는 엔드포인트
+    let url = `/api/posts/list/notice?lang=${lang}&page=${page}&pageSize=${pageSize}`;
+
+    // (선택) 검색 기능을 posts_common에 붙였다면 아래처럼 쿼리 추가
+    if (search) {
+      url += `&search=${encodeURIComponent(search)}`;
+    }
+
+    const res = await fetch(url);
+    const data = await res.json();
+
+    const tbody = document.getElementById("noticeBody");
+    const pagination = document.getElementById("pagination");
+
+    if (!data.list || !data.list.length) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="4" class="no-data">등록된 공지사항이 없습니다.</td>
+        </tr>
+      `;
+      pagination.innerHTML = "";
+      return;
+    }
+
+    // 번호 계산 (전체 기준 역순)
+    const startIndex = data.total - (data.page - 1) * data.pageSize;
+
+    tbody.innerHTML = data.list.map((item, idx) => {
+      const no = startIndex - idx;
+      const dateStr = item.created_at ? item.created_at.substring(0, 10) : "";
+      const views = item.views ?? 0;
+
+      return `
+        <tr onclick="openNotice(${item.id})">
+          <td style="text-align:center;">${no}</td>
+          <td class="title">${item.title}</td>
+          <td style="text-align:center;">${dateStr}</td>
+          <td style="text-align:center;">${views}</td>
+        </tr>
+      `;
+    }).join("");
+
+    // 페이지네이션 렌더링
+    renderPagination(data.pages, data.page);
+  }
+
+  function renderPagination(totalPages, current) {
+    const p = document.getElementById("pagination");
+    p.innerHTML = "";
+
+    if (totalPages <= 1) return;
+
+    if (current > 1) {
+      p.innerHTML += `<button onclick="loadNotices(${current - 1})">이전</button>`;
+    }
+
+    for (let i = 1; i <= totalPages; i++) {
+      p.innerHTML += `
+        <button class="${i === current ? "active" : ""}"
+                onclick="loadNotices(${i})">${i}</button>
+      `;
+    }
+
+    if (current < totalPages) {
+      p.innerHTML += `<button onclick="loadNotices(${current + 1})">다음</button>`;
+    }
+  }
+
+  function openNotice(id) {
+    location.href = `/kr/sub/pr/notice/notice-view.html?id=${id}`;
+  }
+</script>
+
+
+    <!-- 공통 스크립트 -->
+    <script src="/js/include.js"></script>
+    <script src="/js/session_timer.js"></script>
+    <script src="/js/language.js"></script>
+    <script src="/js/nav.js"></script>
+
+
+</body>
+</html>
