@@ -236,5 +236,53 @@ router.put("/:id/reorder-images", verifyToken, verifyEditor, async (req, res) =>
   }
 });
 
+/* ==========================================================
+   ❌ 제품 삭제 (EDITOR 이상)
+========================================================== */
+router.delete("/:id", verifyToken, verifyEditor, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // 1) 제품 존재 확인
+    const [[product]] = await db.execute(
+      `SELECT * FROM products WHERE id = ?`,
+      [id]
+    );
+
+    if (!product) {
+      return res.status(404).json({ message: "not found" });
+    }
+
+    // 2) 이미지 목록 조회
+    const [images] = await db.execute(
+      `SELECT url FROM product_images WHERE product_id = ?`,
+      [id]
+    );
+
+    // 3) DB 삭제
+    await db.execute(`DELETE FROM product_images WHERE product_id = ?`, [id]);
+    await db.execute(`DELETE FROM products WHERE id = ?`, [id]);
+
+    // 4) 실제 파일 삭제 (옵션)
+    import fs from "fs";
+    images.forEach(img => {
+      const filePath = path.join(__dirname, "../public", img.url || "");
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    });
+
+    res.json({ message: "deleted" });
+
+  } catch (err) {
+    console.error("DELETE product error:", err);
+    res.status(500).json({ message: "server error" });
+  }
+});
+
+
+
+
+
 
 export default router;
