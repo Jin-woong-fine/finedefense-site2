@@ -16,36 +16,34 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-
   width: 100%;
   padding: clamp(0.5rem, 1.5vw, 1.5rem) 2vw;
-
-  background-color: rgba(20, 20, 20, 0.95);   /* ← 흰색 → 다크 */
-  border-bottom: 1px solid rgba(255,255,255,0.12);
+  background-color: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
 
   position: relative;
-  z-index: 3000;
+  z-index: 2000;
   isolation: isolate;
-
   box-sizing: border-box;
 }
 
-/* 로고 */
+/* 로고 공통 사이즈 */
 .header-left .logo {
   width: clamp(120px, 12vw, 190px);
   height: auto;
 }
 
-/* 기본 로고 = WHITE 버전 */
-.logo-white { display: block; }
-.logo-dark { display: none; }
+/* ✅ 기본은 컬러/다크 로고만 보이게 */
+.logo-dark { display: block; }
+.logo-white { display: none; }
 
-/* 메뉴 중앙 배치 */
+/* 메뉴 중앙 배치 등 나머지는 기존 그대로 */
 .main-menu-container {
   flex: 1;
   display: flex;
   justify-content: center;
 }
+
 
 .main-menu {
   position: absolute;

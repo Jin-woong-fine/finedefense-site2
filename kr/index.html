@@ -256,7 +256,7 @@
       }
 
       /* ================================================
-          INDEX PAGE — Deep Blur Header + Auto Logo Swap
+        INDEX PAGE — Deep Blur Header + Auto Logo Swap
         ================================================ */
 
       /* 초기: 배너 위에서 어둡고 Blur 강하게 */
@@ -285,37 +285,36 @@
         로고 자동 전환
         ============================== */
 
-      /* 초기: 배너 위 → 흰색 로고 */
+      /* 초기: 배너 위 → 흰색 로고만 보이게 (기본값 뒤집기) */
       body#index-page .logo-white { display: block !important; }
-      body#index-page .logo-dark  { display: none !important; }
+      body#index-page .logo-dark  { display: none  !important; }
 
       /* 스크롤 후 → 컬러 로고 */
-      body#index-page.scrolled .logo-white { display: none !important; }
+      body#index-page.scrolled .logo-white { display: none  !important; }
       body#index-page.scrolled .logo-dark  { display: block !important; }
 
       /* ==============================
-        메뉴 글씨
+        메뉴 글씨 (메인 메뉴만)
         ============================== */
 
-      /* 초기: 흰색 + 글로우 */
+      /* 초기: 흰색 */
       body#index-page .header-inner .main-menu a {
         color: #f6f6f6 !important;
         text-shadow: 0px 0px 5px rgba(0,0,0,0.35);
       }
 
-      /* hover */
       body#index-page .header-inner .main-menu a:hover {
         color: #ffffff !important;
       }
 
-      /* 스크롤 후: 검정 + 그림자 제거 */
+      /* 스크롤 후: 검정 */
       body#index-page.scrolled .header-inner .main-menu a {
         color: #111 !important;
         text-shadow: none !important;
       }
 
       /* ==============================
-        스크롤 후: 완전한 흰색 헤더
+        스크롤 후: 헤더 배경 전환
         ============================== */
 
       body#index-page.scrolled .header-inner {
@@ -325,12 +324,12 @@
         backdrop-filter: none;
         -webkit-backdrop-filter: none;
 
-        padding: 16px 4vw; /* ↓ 정리됨 */
+        padding: 16px 4vw;
         box-shadow: 0 3px 10px rgba(0,0,0,0.07);
       }
 
       /* ==============================
-        언어 토글 버튼 — 항상 검정
+        언어 토글 — 항상 검정
         ============================== */
 
       body#index-page .lang-toggle,
@@ -343,26 +342,24 @@
         text-shadow: none !important;
       }
 
-      /* 드롭다운은 기본 white */
+      /* 드롭다운은 흰색 */
       body#index-page .language-dropdown.open .lang-list {
         background: #fff !important;
         border: 1px solid #ddd !important;
       }
 
       /* ==============================
-        관리자 세션바 있을 때 헤더 자동 이동
+        관리자 세션바 있을 때 헤더 위치 조정
         ============================== */
 
       body#index-page.has-admin-bar .header-inner {
         top: 38px !important;
       }
 
-
       /* ==============================================
-        메인페이지 헤더에서도 서브메뉴는 항상 검정 글씨 고정
+        메인페이지에서도 서브메뉴는 항상 검정 글씨 고정
         ============================================== */
 
-      /* 서브메뉴 자체 배경/테두리 강제 유지 */
       body#index-page .submenu {
         background: #fff !important;
         border: 1px solid rgba(0,0,0,0.15) !important;
@@ -371,14 +368,15 @@
       /* 서브메뉴 글씨 기본 검정 */
       body#index-page .submenu li a {
         color: #222 !important;
-        text-shadow: none !important;   /* 메인 헤더의 흰 글씨 shadow 영향 제거 */
+        text-shadow: none !important;
       }
 
-      /* hover 시 색상은 기존대로 */
+      /* 서브메뉴 hover */
       body#index-page .submenu li a:hover {
         color: #0f2679 !important;
         background: #eef3ff !important;
       }
+
 
 
       </style>
@@ -625,10 +623,6 @@ document.addEventListener("scroll", () => {
   }
 });
 </script>
-
-
-
-
 
 
 
