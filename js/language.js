@@ -1,50 +1,39 @@
 // --------------------------------------------
-// 🌐 Fine Defense Language Switch (Perfect Final)
+// 🌐 Fine Defense Language Switch — Perfect Stable Version
 // --------------------------------------------
 
 function changeLanguage(lang) {
-  const path = window.location.pathname;
+  let url = window.location.pathname;
 
-  // 🚫 이미 그 언어이면 중복 변환 금지 → 무한 kr/kr/kr 방지 핵심!!
-  if (path.startsWith("/" + lang + "/")) return;
+  // 1) 현재 언어 제거
+  url = url.replace(/^\/(kr|en)\//, "/");
 
-  const segments = path.split("/").filter(seg => seg.length > 0);
+  // 2) 새 언어 붙이기
+  const newUrl = `/${lang}${url}`;
 
-  // 첫 번째가 언어 폴더면 교체
-  if (segments[0] === "kr" || segments[0] === "en") {
-    segments[0] = lang;
-  } else {
-    // 아니라면 앞에 lang 붙임
-    segments.unshift(lang);
-  }
-
-  const newUrl = "/" + segments.join("/");
   window.location.href = newUrl;
 }
 
 // --------------------------------------------
-// 🌐 Language Dropdown Init
+// 🌐 Dropdown Init
 // --------------------------------------------
-
 function initLanguageDropdown() {
-  const dropdown = document.querySelector('.language-dropdown');
-  const toggle = document.querySelector('.lang-toggle');
-  const links = document.querySelectorAll('.lang-list a');
+  const dropdown = document.querySelector(".language-dropdown");
+  const toggle = document.querySelector(".lang-toggle");
+  const links = document.querySelectorAll(".lang-list a");
 
   if (!dropdown || !toggle || !links.length) return false;
 
-  toggle.addEventListener('click', (e) => {
+  toggle.addEventListener("click", (e) => {
     e.preventDefault();
-    dropdown.classList.toggle('open');
+    dropdown.classList.toggle("open");
   });
 
-  // 외부 클릭 시 닫기
-  document.addEventListener('click', (e) => {
-    if (!dropdown.contains(e.target)) dropdown.classList.remove('open');
+  document.addEventListener("click", (e) => {
+    if (!dropdown.contains(e.target)) dropdown.classList.remove("open");
   });
 
-  // 언어 선택
-  links.forEach(a => {
+  links.forEach((a) => {
     a.addEventListener("click", (e) => {
       e.preventDefault();
       changeLanguage(a.dataset.lang);
@@ -55,10 +44,11 @@ function initLanguageDropdown() {
 }
 
 // --------------------------------------------
-// 📌 헤더 include 완료 대기 후 자동 실행
+// 🔍 MutationObserver — header include 끝날 때까지 대기
 // --------------------------------------------
 function waitForHeader() {
-  if (initLanguageDropdown()) return;
+  const ok = initLanguageDropdown();
+  if (ok) return;
 
   const obs = new MutationObserver(() => {
     if (initLanguageDropdown()) obs.disconnect();
