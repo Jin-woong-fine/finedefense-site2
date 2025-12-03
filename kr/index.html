@@ -382,6 +382,45 @@
       }
 
 
+      /* =======================================================
+        INDEX PAGE HEADER FIX PATCH — 밑줄 제거 / 폰트 복구 / 
+        서브메뉴 흰색 유지 강제 / 우선순위 완전제압
+        ======================================================= */
+
+      /* 헤더 메뉴 밑줄 제거 */
+      body#index-page .header-inner a {
+        text-decoration: none !important;
+      }
+
+      /* 메인 메뉴 폰트 원래대로 복구 */
+      body#index-page .header-inner .main-menu a {
+        font-family: 'Noto Sans KR', sans-serif !important;
+        font-weight: 600 !important;
+        font-size: clamp(15px, 1vw, 18px) !important;
+        letter-spacing: -0.2px !important;
+      }
+
+      /* 서브메뉴 배경 강제 */
+      body#index-page .submenu {
+        background: #fff !important;
+        border: 1px solid rgba(0,0,0,0.15) !important;
+      }
+
+      /* 서브메뉴 글씨 강제 검정 (최우선 순위) */
+      body#index-page .submenu li a {
+        color: #222 !important;
+        text-shadow: none !important;
+      }
+
+      /* 서브메뉴 hover도 강제 */
+      body#index-page .submenu li a:hover {
+        background: #eef3ff !important;
+        color: #0f2679 !important;
+      }
+
+
+
+
       </style>
 
   </head>
