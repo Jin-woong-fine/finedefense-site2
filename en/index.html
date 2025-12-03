@@ -1,11 +1,13 @@
+<!-- /kr/index.html -->
 <!DOCTYPE html>
 <html lang="en">
   <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta name="description" content="화인디펜스, 임시 홈페이지, 테스트 홈페이지">
+      <meta name="description" content="Fine Defense specializes in marine defense cables, submarine sonar cable assemblies, towed array sonar cables, and integrated termination systems for harsh deep-sea environments.">
 
-      <title>FINE DEFENSE</title>
+      <title>Fine Defense | Marine Defense Cable & Sonar System Manufacturer</title>
+
 
       <link rel="stylesheet" href="/css/style.css">
       <link rel="stylesheet" href="/css/banner.css">
@@ -67,13 +69,13 @@
       /* 카드 제목 */
       .facility-card h3 {
         margin: 20px 0 20px; /* 🔽 위아래 여백 축소 */
-        font-size: 1.4rem;
+        font-size: 1.3rem;
         color: #222;
       }
 
       /* 카드 설명 */
       .facility-card p {
-        font-size: 1.2rem;  /* 🔽 조금 작게 */
+        font-size: 1.0rem;  /* 🔽 조금 작게 */
         color: #555;
         padding: 0 15px 15px; /* 🔽 패딩 축소 */
         line-height: 1.4;
@@ -254,118 +256,186 @@
         }
       }
 
+      /* ============================================================
+          INDEX PAGE — TRANSPARENT BLUR HEADER + LOGO AUTO SWAP
+          (완전 최적화된 최종본)
+      ============================================================ */
+
+      /* 1) 초기 헤더: 배너 위 투명 + 블러 */
+      body#index-page .header-inner {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        padding: 22px 4vw;
+
+        background: rgba(15, 15, 15, 0.35);
+        backdrop-filter: blur(18px) brightness(1.25);
+        -webkit-backdrop-filter: blur(18px) brightness(1.25);
+
+        border-bottom: 1px solid rgba(255,255,255,0.15);
+        z-index: 6000;
+
+        transition:
+          background 0.35s ease,
+          padding 0.35s ease,
+          box-shadow 0.35s ease,
+          border-color 0.35s ease;
+      }
+
+      /* 2) 로고 자동 전환 */
+      body#index-page .logo-white { display: block !important; }
+      body#index-page .logo-dark  { display: none  !important; }
+
+      body#index-page.scrolled .logo-white { display: none  !important; }
+      body#index-page.scrolled .logo-dark  { display: block !important; }
+
+      /* 3) 메인메뉴 텍스트 */
+      body#index-page .main-menu a {
+        color: #f6f6f6 !important;
+        text-shadow: 0px 0px 5px rgba(0,0,0,0.35);
+        text-decoration: none !important;
+        font-family: 'Noto Sans KR', sans-serif !important;
+      }
+
+      body#index-page .main-menu a:hover {
+        color: #fff !important;
+      }
+
+      /* 스크롤 후: 검정 글씨 */
+      body#index-page.scrolled .main-menu a {
+        color: #111 !important;
+        text-shadow: none !important;
+        font-weight: 600 !important;   /* ← 추가 */
+      }
+
+      /* 4) 스크롤 후 헤더 → 화이트 */
+      body#index-page.scrolled .header-inner {
+        background: rgba(255,255,255,0.97);
+        border-bottom: 1px solid rgba(0,0,0,0.06);
+
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+
+        padding: 22px 4vw;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.07);
+      }
+
+      /* 5) 언어 선택 토글은 항상 검정 */
+      body#index-page .lang-toggle,
+      body#index-page .lang-toggle *,
+      body#index-page .language-dropdown .lang-list *,
+      body#index-page.scrolled .lang-toggle,
+      body#index-page.scrolled .lang-toggle *,
+      body#index-page.scrolled .language-dropdown .lang-list * {
+        color: #111 !important;
+        text-shadow: none !important;
+      }
+
+      /* 언어 목록 배경 */
+      body#index-page .language-dropdown.open .lang-list {
+        background: #fff !important;
+        border: 1px solid #ddd !important;
+      }
+
+      /* 6) 서브메뉴 — 항상 흰 배경 + 검정 글씨 */
+      body#index-page .submenu,
+      body#index-page .header-inner .main-menu li .submenu {
+        background: #fff !important;
+        border: 1px solid rgba(0,0,0,0.15) !important;
+      }
+
+      body#index-page .submenu li a,
+      body#index-page .header-inner .main-menu li .submenu li a {
+        color: #222 !important;
+        text-shadow: none !important;
+      }
+
+      body#index-page .submenu li a:hover,
+      body#index-page .header-inner .main-menu li .submenu li a:hover {
+        background: #eef3ff !important;
+        color: #0f2679 !important;
+      }
+
+      /* 7) 관리자 세션바 대응 */
+      body#index-page.has-admin-bar .header-inner {
+        top: 38px !important;
+      }
+
+      /* 8) 배너와 간격 보정 */
+      body#index-page .banner-slider {
+        margin-top: 0 !important;
+      }
+
+      /* 스크롤 전·후 공통: 서브메뉴 글씨 굵기 항상 동일하게 */
+      .header-inner .submenu li a,
+      body#index-page .header-inner .submenu li a {
+        font-weight: 500 !important;  /* 원하는 굵기로 조절 */
+      }
+
+      /* 메인페이지 기본 로고 크기 */
+      body#index-page .header-left .logo {
+        width: clamp(120px, 12vw, 190px) !important;
+      }
+
+
+
+
       </style>
+
   </head>
 
+  <body id="index-page">
 
+    <!-- Admin Session Bar -->
+    <div data-include="/kr/components/admin-session-bar.html"></div>
 
-
-  <body>
-    <header class="header-inner">
-      <div class="header-left">
-
-        <a href="/en/index.html"><img src="/img/logo_transparent_finedefense.png" alt="Logo" class="logo"></a>
-
-        <ul class="main-menu">
-          <li>
-            <a href="#">About Us</a>
-            <ul class="submenu">
-              <li><a href="/en/sub/company/overview.html">Company Overview</a></li>
-              <li><a href="/en/sub/company/ceo.html">CEO Message</a></li>
-              <li><a href="/en/sub/company/history.html">History</a></li>
-              <li><a href="/en/sub/company/vision.html">Vision & Philosophy</a></li>
-              <li><a href="/en/sub/company/organization.html">Organization</a></li>
-              <li><a href="/en/sub/company/location.html">Location</a></li>
-            </ul>
-          </li>
-
-          <li>
-            <a href="#">Products</a>
-            <ul class="submenu">
-              <li><a href="#">Towed Underwater Cables</a></li>
-              <li><a href="#">Fixed Underwater Cables</a></li>
-              <li><a href="#">Subsea Connectors</a></li>
-              <li><a href="#">EPD Cables</a></li>
-              <li><a href="#">Custom Cables</a></li>
-            </ul>
-          </li>
-
-          <li>
-            <a href="#">Media Center</a>
-            <ul class="submenu">
-              <li><a href="#">Newsroom</a></li>
-              <li><a href="#">Gallery</a></li>
-              <li><a href="#">Promotional Videos</a></li>
-              <li><a href="#">Catalogs</a></li>
-            </ul>
-          </li>
-
-          <li>
-            <a href="#">Support</a>
-            <ul class="submenu">
-              <li><a href="#">Contact Us</a></li>
-              <li><a href="#">Download Center</a></li>
-            </ul>
-          </li>
-        </ul>
-      </div>
-
-
-      <!-- 언어 선택 -->
-      <div class="header-right">
-        <div class="language-dropdown">
-          <button class="lang-toggle">ENG <span class="arrow">▼</span></button>
-          <ul class="lang-list">
-            <li><a href="#" data-lang="kr">KOR</a></li>
-            <li><a href="#" data-lang="en">ENG</a></li>
-          </ul>
-        </div>
-      </div>
-
-
-
-
-      
-    </header>  <!-- ✅ 여기 추가!! -->
-
+    <!-- Main Header -->
+    <div data-include="/kr/components/header.html"></div>
 
     <div class="banner-slider">
       <div class="slides">
 
+        <!-- Banner 1 -->
         <div class="slide">
-          <img src="../img/banners/banner_warship4.jpg" alt="배너 1">
+          <img src="/img/banners/banner_warship4.jpg" alt="Banner 1">
           <div class="banner-text">
-            Complete Sonar Cable Assembly Solutions for Naval Defense
+            Precision Cable & Termination Manufacturing for Advanced Underwater Sensor Systems
             <div class="banner-subtext">
-              Delivering fully integrated cable, connector, and termination systems for reliable performance in advanced naval sonar applications.
+              One-stop production of high-reliability sonar cables, connectors, and termination assemblies
             </div>
           </div>
         </div>
 
+        <!-- Banner 2 -->
         <div class="slide">
-          <img src="/img/banners/banner_submarine4.jpg" alt="배너 2">
+          <img src="../img/banners/banner_submarine4.jpg" alt="Banner 2">
           <div class="banner-text">
-            High-Pressure Submarine Sonar Assemblies – Designed to Endure the Depths
+            Integrated Submarine Sonar Cable Manufacturing for Extreme Deep-Sea Pressure
             <div class="banner-subtext">
-              Providing integrated cable and harness systems for submarine sonar applications, tested for durability and pressure integrity in extreme ocean depths.
+              Engineered cable, connector, and wiring systems designed for high-pressure and harsh marine environments
             </div>
           </div>
         </div>
 
+        <!-- Banner 3 -->
         <div class="slide">
-          <img src="/img/banners/banner_manufacturing4.jpg" alt="배너 3">
-          <div class="banner-text">engineering Strength Beneath the Surface
+          <img src="../img/banners/banner_manufacturing4.jpg" alt="Banner 3">
+          <div class="banner-text">
+            Integrated Manufacturing Infrastructure for Underwater Cable Production
             <div class="banner-subtext">
-              Refined armoring technology ensures strength and reliability in every underwater cable we manufacture.
+              In-house stranding, braiding, armoring, and extrusion processes for high-reliability cable manufacturing
             </div>
           </div>
         </div>
 
+        <!-- Banner 4 -->
         <div class="slide">
-          <img src="/img/banners/banner_waterpressuretester4.jpg" alt="배너 4">
-          <div class="banner-text">Testing the Depths of Reliability
+          <img src="../img/banners/banner_waterpressuretester4.jpg" alt="Banner 4">
+          <div class="banner-text">
+            Comprehensive Reliability Testing Infrastructure for Underwater Cables
             <div class="banner-subtext">
-              Equipped with 60-bar hydrostatic chambers, we ensure every underwater cable performs flawlessly under ocean pressure.
+              Equipped with 60-bar hydrostatic chambers, tensile, bending, electrical, and optical test systems
             </div>
           </div>
         </div>
@@ -375,176 +445,223 @@
       <button class="prev">&#10094;</button>
       <button class="next">&#10095;</button>
 
-      <!-- 페이지네이션 -->
+      <!-- Pagination -->
       <div class="pagination"></div>
 
     </div>
 
 
-
+    <!-- Business Areas -->
     <section class="business-area">
       <h2>Business Areas</h2>
       <p>
-        FINE DEFENSE provides total solutions in subsea communication and power transmission —  
-        from cable design and manufacturing to termination, testing, and customized engineering.  
-        Our integrated production system ensures reliability, performance, and innovation across every product line.
+        Fine Defense provides integrated solutions across design, manufacturing, and testing 
+        for underwater communication and power-transmission cable systems.
+        <br>Our end-to-end production capabilities ensure reliability, performance, and innovation in every product we deliver.
       </p>
+
       <div class="features">
-        <div class="feature-card" style="background-image: url('/img/card_businessareas/underwater-cable2.jpg');">
-          <h3>Underwater Cable</h3>
-        </div>
-        <div class="feature-card" style="background-image: url('/img/card_businessareas/ai_termination2.jpg');">
-          <h3>Connector&Termination</h3>
-        </div>
-        <div class="feature-card" style="background-image: url('/img/card_businessareas/custom_cable2.jpg');">
-          <h3>Customized Cable</h3>
-        </div>
+
+        <a href="/en/sub/products/sub-towed.html" class="feature-card"
+          style="background-image: url('/img/card_businessareas/underwater-cable2.jpg');">
+          <h3>Underwater Cables</h3>
+        </a>
+
+        <a href="/en/sub/products/sub-connector.html" class="feature-card"
+          style="background-image: url('/img/card_businessareas/ai_termination2.jpg');">
+          <h3>Underwater Connectors & Terminations</h3>
+        </a>
+
+        <a href="/en/sub/products/sub-custom.html" class="feature-card"
+          style="background-image: url('/img/card_businessareas/custom_cable2.jpg');">
+          <h3>Custom Cable Solutions</h3>
+        </a>
+
       </div>
     </section>
 
+
+    <!-- Manufacturing & Testing Facilities -->
     <section class="facilities">
-      <h2>Manufacturing & Testing Capabilities</h2>
+      <h2>Manufacturing & Reliability Testing Infrastructure</h2>
       <p>
-        From stranding and armoring to extrusion and reliability testing, 
-        FINE DEFENSE operates complete in-house facilities to ensure 
-        the reliability and quality of every subsea cable we manufacture.
+        From stranding, armoring, and extrusion to reliability evaluation — 
+        Fine Defense operates all processes in-house, ensuring the quality and durability of every underwater cable.
       </p>
 
       <div class="facility-grid">
 
-        <!-- 1. 연선기 -->
+        <!-- Stranding Line -->
         <div class="facility-card">
-          <img src="/img/card_manufature&test/card_stranding4.jpg" alt="Stranding Machine">
-          <h3>Stranding Machine</h3>
-          <p>Core wire stranding system ensuring uniform tension and precision alignment for multi-conductor underwater cables.</p>
+          <img src="/img/card_manufature&test/card_stranding4.jpg" alt="Stranding Line">
+          <h3>Stranding Line</h3>
+          <p>
+            Planetary stranding lines for precise tension control and optimized arrangement of multi-core underwater cables
+          </p>
         </div>
 
-        <!-- 2. 강선 외장기 -->
+        <!-- Armoring Line -->
         <div class="facility-card">
-          <img src="/img/card_manufature&test/card_armoringline4.jpg" alt="Steel Wire Armoring Line">
-          <h3>Steel Wire Armoring Line</h3>
-          <p>Reinforcing cable structure with precision steel wire armoring for superior mechanical strength and durability.</p>
+          <img src="/img/card_manufature&test/card_armoringline4.jpg" alt="Armoring Line">
+          <h3>Armoring Line</h3>
+          <p>
+            Planetary steel wire armoring lines engineered for durable and uniform mechanical protection
+          </p>
         </div>
 
-        <!-- 3. 압출기 -->
+        <!-- Extrusion Line -->
         <div class="facility-card">
           <img src="/img/card_manufature&test/card_extrusion4.jpg" alt="Extrusion Line">
           <h3>Extrusion Line</h3>
-          <p>Advanced extrusion equipment for consistent insulation and sheathing across all cable types.</p>
+          <p>
+            High-precision insulation and sheathing extrusion capabilities ensuring consistent material performance
+          </p>
         </div>
 
-        <!-- 4. 기계·환경시험설비 -->
+        <!-- Mechanical & Environmental Testing -->
         <div class="facility-card">
-          <img src="/img/card_manufature&test/card_mechanicaltest4.jpg" alt="Mechanical & Environmental Test Facility">
-          <h3>Mechanical & Environmental Test Facility</h3>
-          <p>Integrated systems for hydrostatic, tensile, bending, and temperature testing to ensure reliability under real-world conditions.</p>
+          <img src="/img/card_manufature&test/card_mechanicaltest4.jpg" alt="Mechanical & Environmental Testing">
+          <h3>Environmental Test Facilities</h3>
+          <p>
+            Integrated hydrostatic, tensile, bending, and thermal testing systems to validate real-world reliability
+          </p>
         </div>
 
-        <!-- 5. 전기·광학 시험장비 -->
+        <!-- Electrical & Optical Testing -->
         <div class="facility-card">
-          <img src="/img/card_manufature&test/card_electricaltest4.jpg" alt="Electrical & Optical Test Equipment">
-          <h3>Electrical & Optical Test Equipment</h3>
-          <p>Instruments for continuity, insulation resistance, communication, and optical loss verification in underwater cable systems.</p>
+          <img src="/img/card_manufature&test/card_electricaltest4.jpg" alt="Electrical & Optical Testing">
+          <h3>Electrical, Optical & Communication Test Equipment</h3>
+          <p>
+            Advanced instruments for measuring optical, electrical, and communication characteristics of underwater cables
+          </p>
         </div>
 
       </div>
     </section>
 
 
-
+    <!-- News -->
     <section class="news">
       <h2>News & Updates</h2>
-      <p>Latest activities, certifications, and project achievements from FINE DEFENSE.</p>
+      <p>Stay informed with the latest announcements, achievements, and certifications from Fine Defense.</p>
 
-      <div class="news-grid">
-        <div class="news-card">
-          <img src="img/news_exhibition.jpg" alt="Exhibition Participation">
-          <h3>Participation in Naval Defense Exhibition 2025</h3>
-          <p>FINE DEFENSE showcased its advanced subsea cable and connector solutions at the 2025 Naval Defense Expo.</p>
-          <span class="date">October 15, 2025</span>
-        </div>
+      <div class="news-grid" id="newsGrid"></div>
 
-        <div class="news-card">
-          <img src="img/news_facility.jpg" alt="New Facility">
-          <h3>New Extrusion Line Installed at Okcheon Plant</h3>
-          <p>A new insulation and sheathing extrusion line has been installed to enhance in-house cable production capacity.</p>
-          <span class="date">September 3, 2025</span>
-        </div>
-
-        <div class="news-card">
-          <img src="img/news_certification.jpg" alt="Certification">
-          <h3>ISO 9001 & ISO 14001 Certifications Renewed</h3>
-          <p>FINE DEFENSE continues to maintain international quality and environmental management standards.</p>
-          <span class="date">August 1, 2025</span>
-        </div>
-      </div>
-
-      <a href="#" class="news-more">View All News →</a>
+      <a href="/en/sub/pr/newsroom/index.html" class="news-more">View All News →</a>
     </section>
 
 
-
+    <!-- Contact CTA -->
     <section class="contact-cta">
       <div class="contact-inner">
         <h2>Contact & Inquiry</h2>
         <p>
-          Need technical consultation or a quotation for subsea cable solutions?  
-          Reach out to our engineering and sales team directly.
+          Need technical consultation or a quotation for underwater cable solutions?<br>
+          Contact our engineering and sales team at Fine Defense.
         </p>
-        <a href="contact.html" class="contact-btn">Go to Inquiry Page →</a>
+        <a href="/en/sub/support/inquiry/index.html" class="contact-btn">Go to Inquiry Page →</a>
       </div>
     </section>
 
 
+  <!-- 푸터 -->
+  <div data-include="/kr/components/footer.html"></div>
+
+  <!-- 배너 슬라이더 -->
+  <script src="/js/banner.js"></script>
+
+  <script src="/js/include.js"></script>
+  <script src="/js/session_timer.js"></script>
+  <script src="/js/language.js"></script>
 
 
 
 
+<script>
+async function loadLatestPosts() {
+  try {
+    const res = await fetch(`/api/posts/latest?lang=kr&limit=4`);
+    const list = await res.json();
 
+    const grid = document.getElementById("newsGrid");
+    grid.innerHTML = "";
 
-   <footer>
-      <div class="footer-container">
-        <div class="footer-left">
-          <div class="footer-links">
-            <a href="#">About Us</a>
-            <a href="/en/sub/privacy/privacy.html">Privacy Policy</a>
-            <a href="#">Contact</a>
-            <a href="#">Download Center</a>
-          </div>
+    if (!Array.isArray(list) || list.length === 0) {
+      grid.innerHTML = "<p>등록된 소식이 없습니다.</p>";
+      return;
+    }
+
+    list.forEach(item => {
+      const label =
+        item.category === "notice"
+          ? `<span class="badge notice">공지</span>`
+          : `<span class="badge news">뉴스</span>`;
+
+      let imgURL;
+      if (item.category === "notice") {
+        imgURL = "/img/default-notice.png";   // 공지는 무조건 이거!
+      } else {
+        imgURL = item.main_image || "/img/default-news.png";
+      }
+
+      const dateStr = new Date(item.created_at).toLocaleDateString("ko-KR");
+
+      const viewURL =
+        item.category === "notice"
+          ? `/kr/sub/pr/notice/notice-view.html?id=${item.id}`
+          : `/kr/sub/pr/newsroom/news-view.html?id=${item.id}`;
+
+      const card = `
+        <div class="news-card" onclick="location.href='${viewURL}'">
+          <img src="${imgURL}" alt="${item.title}">
+          ${label}
+          <h3>${item.title}</h3>
+          <span class="date">${dateStr}</span>
         </div>
+      `;
 
-        <div class="footer-info">
-          <p><strong>FINE DEFENSE INC.</strong></p>
-          <p>Address: 902, 250 Hagui-ro, Dongan-gu, Anyang-si, Gyeonggi-do, Korea</p>
-          <p>Tel: +82-31-8068-6103 | Fax: +82-70-4325-6116</p>
-          <p>Email: finedefense@finedefense.co.kr</p>
-          <p>Okcheon Plant 1: 48 Iwonnonggong-ro, Iwon-myeon, Okcheon-gun, Chungbuk</p>
-          <p>Okcheon Plant 2: 183 Pyeongsan-gil, Dongi-myeon, Okcheon-gun, Chungbuk</p>
-        </div>
-
-        <div class="footer-right">
-          <p class="family-title">FAMILY COMPANY ▼</p>
-          <ul class="family-links">
-            <li><a href="#">Fine</a></li>
-            <li><a href="#">Woobang Cable</a></li>
-          </ul>
-        </div>
-
-        <div class="footer-copy">
-          &copy; 2025 FINE DEFENSE INC. All Rights Reserved.
-        </div>
-      </div>
-    </footer>
+      grid.innerHTML += card;
+    });
 
 
+  } catch (err) {
+    console.error("최신글 불러오기 오류:", err);
+  }
+}
+
+window.addEventListener("load", loadLatestPosts);
+</script>
+
+<script>
+document.addEventListener("scroll", () => {
+  const body = document.body;
+
+  if (window.scrollY > 40) {
+    body.classList.add("scrolled");
+  } else {
+    body.classList.remove("scrolled");
+  }
+});
+</script>
 
 
-    <script src="/js/banner.js"></script>
-    <script src="/js/language.js"></script>
 
+<style>
+  /* 공지/뉴스 라벨 스타일 */
+  .badge {
+    display: inline-block;
+    margin: 10px 20px 0;
+    padding: 3px 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: 4px;
+    color: #fff;
+  }
+  .badge.notice { background: #0f2679; } /* 군청색 */
+  .badge.news { background: #198754; }   /* 녹색 */
+</style>
 
 
   </body>
-
-
 </html>
+
