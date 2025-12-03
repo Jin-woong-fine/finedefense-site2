@@ -310,8 +310,8 @@ function initBreadcrumbTabs() {
 ------------------------------------------------------------ */
 document.addEventListener("DOMContentLoaded", async () => {
   initAdminBar();
-  await loadComponent("header", PATH.header);
-  await loadComponent("footer", PATH.footer);
+    await loadComponent("headerContainer", PATH.header);
+    await loadComponent("footerContainer", PATH.footer);
 
   highlightTopMenu();
   initBreadcrumbTabs();
