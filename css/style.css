@@ -204,7 +204,7 @@ body:not(#index-page) .main-menu > li:hover > .submenu {
 /* 서브메뉴 텍스트 */
 body:not(#index-page) .submenu li a {
   font-size: 16px !important;
-  font-weight: 400 !important;
+  font-weight: 500 !important;
   color: #222 !important;
 
   padding: 10px 14px !important;
