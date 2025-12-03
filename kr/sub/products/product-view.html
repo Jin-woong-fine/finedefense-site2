@@ -218,7 +218,11 @@
 
 <body>
 
-<div id="header"></div>
+  <!-- 관리자 세션바 (정확한 ID 부여) -->
+  <div id="adminBarContainer" data-include="/kr/components/admin-session-bar.html"></div>
+
+  <!-- 공통 헤더 -->
+  <div id="headerContainer" data-include="/kr/components/header.html"></div>
 
 <section class="sub-banner">
   <img src="/img/sub-banners/cable.jpg" alt="제품소개 배너">
@@ -252,10 +256,8 @@
   </div>
 </section>
 
-<div id="footer"></div>
-
-<!-- 🔵 헤더/푸터 네비게이션 공통 스크립트 -->
-<script src="/js/nav.js"></script>
+    <!-- 공통 푸터 -->
+    <div data-include="/kr/components/footer.html"></div>
 
 <script>
 /* ==========================================================
@@ -460,6 +462,14 @@ function showNextImage() {
   overlayImgEl.src = galleryImages[currentIndex];
 }
 </script>
+
+    <!-- 공통 스크립트 -->
+    <script src="/js/include.js"></script>
+    <script src="/js/session_timer.js"></script>
+    <script src="/js/language.js"></script>
+    <script src="/js/nav.js"></script>
+
+
 
 </body>
 </html>
