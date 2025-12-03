@@ -8,35 +8,38 @@ body {
 }
 
 /* ============================================== */
-/*                DEFAULT DARK HEADER             */
-/*      (모든 서브페이지 기본: 다크헤더)          */
+/*                DEFAULT LIGHT HEADER            */
+/*     (서브페이지 = index.scrolled 상태 동일)     */
 /* ============================================== */
 
 .header-inner {
   display: flex;
   justify-content: space-between;
   align-items: center;
+
   width: 100%;
-  padding: clamp(0.5rem, 1.5vw, 1.5rem) 2vw;
-  background: #ffffff; /* 밝은 버전 */
-  border-bottom: 1px solid #e0e0e0; /* 밝은 헤더용 기본 테두리 */
+  padding: 22px 4vw; /* index.scrolled 와 동일 */
+
+  background: rgba(255,255,255,0.97);  /* index.scrolled */
+  border-bottom: 1px solid rgba(0,0,0,0.06); /* index.scrolled */
+
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
+  box-shadow: 0 3px 10px rgba(0,0,0,0.07); /* index.scrolled 와 동일 */
+
   position: relative;
   z-index: 2000;
   isolation: isolate;
   box-sizing: border-box;
 }
 
-/* 로고 공통 사이즈 */
-.header-left .logo {
-  width: clamp(120px, 12vw, 190px);
-  height: auto;
-}
-
-/* 기본은 컬러/다크 로고 */
+/* 로고 — 서브페이지는 무조건 컬러 로고 */
 .logo-dark { display: block; }
 .logo-white { display: none; }
 
-/* 메뉴 중앙 배치 */
+
+/* 메뉴 영역 */
 .main-menu-container {
   flex: 1;
   display: flex;
@@ -55,10 +58,10 @@ body {
   margin: 0;
 }
 
-/* 🔥 서브페이지만 흰 글씨 */
+/* 🔥 서브페이지 메뉴 글씨 = index.scrolled 동일: 검정 */
 body:not(#index-page) .main-menu li a {
   text-decoration: none;
-  color: #f5f5f5;
+  color: #111 !important;  /* index.scrolled */
   font-weight: 600;
   padding: 6px 8px;
   font-size: clamp(15px, 1vw, 18px);
@@ -68,11 +71,14 @@ body:not(#index-page) .main-menu li a {
 }
 
 body:not(#index-page) .main-menu li a:hover {
-  color: #ffffff;
+  color: #000 !important;
   opacity: 1;
 }
 
-/* 서브메뉴 공통 */
+/* ====================================================== */
+/*                     SUBMENU (공통)                     */
+/* ====================================================== */
+
 .main-menu > li {
   position: relative;
 }
@@ -84,27 +90,30 @@ body:not(#index-page) .main-menu li a:hover {
   left: 0;
   width: 100%;
   height: 30px;
-  background: transparent;
 }
 
-/* Submenu */
+/* Submenu — index.scrolled 와 완전 동일 */
 .submenu {
   list-style: none;
   opacity: 0;
   visibility: hidden;
+
   position: absolute;
-  top: calc(100% + 28px);
+  top: calc(100% + 22px); /* 서브메뉴 약간 더 위로 자연스럽게 */
   left: 50%;
   transform: translateX(-50%) translateY(10px);
-  background: #fff;
-  border: 1px solid rgba(0,0,0,0.15);
+
+  background: #fff !important;
+  border: 1px solid rgba(0,0,0,0.15) !important;
   box-shadow: 0 8px 20px rgba(0,0,0,0.08);
   border-radius: 6px;
+
   padding: 10px 0;
-  margin: 0;
   min-width: 180px;
+  margin: 0;
   white-space: nowrap;
   text-align: center;
+
   transition: opacity .25s ease, transform .25s ease;
   z-index: 200;
 }
@@ -115,20 +124,21 @@ body:not(#index-page) .main-menu li a:hover {
   transform: translateX(-50%) translateY(0);
 }
 
+/* Submenu 글씨 — index.scrolled 동일 */
 .submenu li a {
   display: block;
   padding: 10px 14px;
-  font-size: 16px;
-  font-weight: 550;
-  color: #111;
-  white-space: nowrap;
+  font-size: 15px;        /* 스크롤 후와 동일 굵기 */
+  font-weight: 400 !important;
+  color: #222 !important;
   transition: background .2s ease, color .2s ease;
 }
 
 .submenu li a:hover {
-  background: #eef3ff;
-  color: #0f2679;
+  background: #eef3ff !important;
+  color: #0f2679 !important;
 }
+
 
 
 
