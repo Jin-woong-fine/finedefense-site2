@@ -160,6 +160,9 @@ function showSideTabs(list, trigger) {
 
     if (current === href) a.classList.add("active");
 
+    // 🔥 Inquiry 페이지는 상세페이지 없음 → DETAIL 처리 비활성화 (버그 방지)
+    if (current.includes("/support/inquiry/")) return;
+
     const DETAIL = [
       { d: "/pr/notice/notice-view",         i: "/pr/notice/index.html" },
       { d: "/pr/newsroom/news-view",         i: "/pr/newsroom/index.html" },
