@@ -183,7 +183,7 @@
     const container = document.getElementById("productCards");
 
     try {
-      const res = await fetch("/api/products");
+      const res = await fetch("/api/products?lang=kr");
       if (!res.ok) throw new Error("서버 응답 오류");
 
       const all = await res.json();
