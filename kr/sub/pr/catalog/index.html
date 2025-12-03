@@ -125,10 +125,10 @@
       overflow:hidden;
     }
     .pdf-frame {
-      width:100%;
-      height:100%;
-      border: none;
+      width: 100%;
+      height: calc(100% - 50px); /* 헤더 높이 제외 */
     }
+
     .modal-footer {
       padding:10px;
       text-align:right;
@@ -146,6 +146,17 @@
     .viewer-btn:hover {
       background: rgba(255,255,255,0.2);
     }
+
+    /* === 모달 창 크기 조절 가능하도록 설정 === */
+    .modal-content {
+      resize: both;        /* 가로나 세로 둘 다 조절 가능 */
+      overflow: auto;      /* 내부 컨텐츠가 넘칠 때 스크롤 */
+      max-width: 95vw;     /* 창이 너무 커지는 것 방지 */
+      max-height: 95vh;
+      min-width: 400px;    /* 최소 크기 */
+      min-height: 300px;
+    }
+
 
 
   </style>
