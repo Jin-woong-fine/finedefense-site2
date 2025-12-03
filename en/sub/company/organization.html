@@ -1,15 +1,14 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="화인디펜스 조직도 - Fine Defense Organization">
-  <title>조직도 | 화인디펜스</title>
+  <meta name="description" content="Fine Defense Organization" />
+  <title>Organization | Fine Defense</title>
 
 
       <link rel="stylesheet" href="/css/style.css">
       <link rel="stylesheet" href="/css/sub-banner.css">
-      <link rel="stylesheet" href="../../nav/company-nav.css">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
@@ -130,57 +129,74 @@
 </head>
 
 <body>
-  <!-- 관리자 세션바 (정확한 ID 부여) -->
-  <div id="adminBarContainer" data-include="/kr/components/admin-session-bar.html"></div>
+  <!-- Admin Session Bar -->
+  <div id="adminBarContainer" data-include="/en/components/admin-session-bar.html"></div>
 
-  <!-- 공통 헤더 -->
-  <div id="headerContainer" data-include="/kr/components/header.html"></div>
+  <!-- Common Header -->
+  <div id="headerContainer" data-include="/en/components/header.html"></div>
 
-    <!-- ✅ 2. 배너 -->
-    <section class="sub-banner">
-      <img src="/img/sub-banners/occheon-plant2-3.jpg" alt="회사소개 배너" />
-      <div class="banner-text">
-        <h1>회사소개</h1>
-        <p>화인디펜스는 기술로 해양을 연결합니다.</p>
-      </div>
-    </section>
-
-    <!-- ✅ 3. breadcrumb -->
-    <div class="breadcrumb">
-      <a href="/">홈</a> &gt;
-      <span class="crumb crumb-level1">회사소개</span> &gt;
-      <span class="crumb crumb-level2">조직도</span>
-
-      <!-- ✅ breadcrumb 내부에 탭 1개만 -->
-      <div id="side-tabs" class="side-tabs"></div>
+  <!-- Banner -->
+  <section class="sub-banner">
+    <img src="/img/sub-banners/occheon-plant2-3.jpg" alt="Company Introduction Banner" />
+    <div class="banner-text">
+      <h1>About Us</h1>
+      <p>Fine Defense connects the oceans through technology.</p>
     </div>
+  </section>
 
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="/en">Home</a> &gt;
+    <span class="crumb crumb-level1">About Us</span> &gt;
+    <span class="crumb crumb-level2">Organization</span>
 
+    <div id="side-tabs" class="side-tabs"></div>
+  </div>
 
-    <section class="page-header">
-      <h1>화인디펜스 조직도</h1>
-    </section>
+  <section class="page-header">
+    <h1>Fine Defense Organization</h1>
+  </section>
 
-    <section class="organization">
-      <div class="org-chart">
-        <div class="org-node ceo">
-          <i class="fas fa-user-tie"></i>
-          대표이사
+  <section class="organization">
+    <div class="org-chart">
+      
+      <div class="org-node ceo">
+        <i class="fas fa-user-tie"></i>
+        Chief Executive Officer
+      </div>
+
+      <div class="org-branch">
+        <div class="org-dept">
+          <i class="fas fa-lightbulb"></i> R&D Center
         </div>
 
-        <div class="org-branch">
-          <div class="org-dept"><i class="fas fa-lightbulb"></i> 연구소</div>
-          <div class="org-dept"><i class="fas fa-briefcase"></i> 경영지원팀</div>
-          <div class="org-dept"><i class="fas fa-handshake"></i> 영업팀</div>
-          <div class="org-dept"><i class="fas fa-cart-shopping"></i> 구매팀</div>
-          <div class="org-dept"><i class="fas fa-check-circle"></i> 품질관리팀</div>
-          <div class="org-dept"><i class="fas fa-industry"></i> 생산팀</div>
+        <div class="org-dept">
+          <i class="fas fa-briefcase"></i> Management Support Team
+        </div>
+
+        <div class="org-dept">
+          <i class="fas fa-handshake"></i> Sales Team
+        </div>
+
+        <div class="org-dept">
+          <i class="fas fa-cart-shopping"></i> Procurement Team
+        </div>
+
+        <div class="org-dept">
+          <i class="fas fa-check-circle"></i> Quality Assurance Team
+        </div>
+
+        <div class="org-dept">
+          <i class="fas fa-industry"></i> Production Team
         </div>
       </div>
-    </section>
+
+    </div>
+  </section>
+
 
     <!-- 공통 푸터 -->
-    <div data-include="/kr/components/footer.html"></div>
+    <div data-include="/en/components/footer.html"></div>
 
     <!-- 공통 스크립트 -->
     <script src="/js/include.js"></script>

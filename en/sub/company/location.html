@@ -1,14 +1,13 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>찾아오시는 길 | 화인디펜스</title>
+  <title>Location & Directions | Fine Defense</title>
 
 
       <link rel="stylesheet" href="/css/style.css">
       <link rel="stylesheet" href="/css/sub-banner.css">
-      <link rel="stylesheet" href="../../nav/company-nav.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
   <style>
@@ -95,67 +94,81 @@
 </head>
 
 <body>
-  <!-- 관리자 세션바 (정확한 ID 부여) -->
-  <div id="adminBarContainer" data-include="/kr/components/admin-session-bar.html"></div>
+  <!-- Admin Session Bar -->
+  <div id="adminBarContainer" data-include="/en/components/admin-session-bar.html"></div>
 
-  <!-- 공통 헤더 -->
-  <div id="headerContainer" data-include="/kr/components/header.html"></div>
+  <!-- Common Header -->
+  <div id="headerContainer" data-include="/en/components/header.html"></div>
 
-    <!-- ✅ 2. 배너 -->
-    <section class="sub-banner">
-      <img src="/img/sub-banners/occheon-plant2-3.jpg" alt="회사소개 배너" />
-      <div class="banner-text">
-        <h1>회사소개</h1>
-        <p>화인디펜스는 기술로 해양을 연결합니다.</p>
-      </div>
-    </section>
-
-    <!-- ✅ 3. breadcrumb -->
-    <div class="breadcrumb">
-      <a href="/">홈</a> &gt;
-      <span class="crumb crumb-level1">회사소개</span> &gt;
-      <span class="crumb crumb-level2">찾아오시는 길</span>
-
-      <!-- ✅ breadcrumb 내부에 탭 1개만 -->
-      <div id="side-tabs" class="side-tabs"></div>
+  <!-- Banner -->
+  <section class="sub-banner">
+    <img src="/img/sub-banners/occheon-plant2-3.jpg" alt="Company Introduction Banner" />
+    <div class="banner-text">
+      <h1>About Us</h1>
+      <p>Fine Defense connects the oceans through technology.</p>
     </div>
+  </section>
 
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="/en">Home</a> &gt;
+    <span class="crumb crumb-level1">About Us</span> &gt;
+    <span class="crumb crumb-level2">Location & Directions</span>
+
+    <div id="side-tabs" class="side-tabs"></div>
+  </div>
 
   <section class="page-header">
-    <h1>찾아오시는 길</h1>
+    <h1>Location & Directions</h1>
   </section>
 
   <section class="location-section">
-    <h2><i class="fas fa-building"></i> 본사</h2>
-    <p>경기도 안양시 동안구 학의로 250, 902호 (관양동, 관양두산벤처다임)</p>
+
+    <!-- HQ -->
+    <h2><i class="fas fa-building"></i> Head Office</h2>
+    <p>
+      #902, 250 Hakhye-ro, Dongan-gu,  
+      Anyang-si, Gyeonggi-do, Republic of Korea  
+      (Gwanyang Doosan Venture Daim)
+    </p>
     <div class="map-container">
       <iframe 
-        src="https://www.google.com/maps?q=경기도%20안양시%20동안구%20학의로%20250&output=embed"
+        src="https://www.google.com/maps?q=250%20Hakhye-ro%2C%20Dongan-gu%2C%20Anyang-si&output=embed"
         allowfullscreen=""
         loading="lazy">
       </iframe>
     </div>
 
-    <h2><i class="fas fa-industry"></i> 옥천 제1공장</h2>
-    <p>충청북도 옥천군 이원면 이원농공로 48</p>
+    <!-- Okcheon Plant 1 -->
+    <h2><i class="fas fa-industry"></i> Okcheon Plant 1</h2>
+    <p>
+      48 Iwon Nonggong-ro, Iwon-myeon,  
+      Okcheon-gun, Chungcheongbuk-do, Republic of Korea
+    </p>
     <div class="map-container">
       <iframe 
-        src="https://www.google.com/maps?q=충청북도%20옥천군%20이원면%20이원농공로%2048&output=embed"
+        src="https://www.google.com/maps?q=48%20Iwon%20Nonggong-ro%2C%20Iwon-myeon%2C%20Okcheon-gun&output=embed"
         allowfullscreen=""
         loading="lazy">
       </iframe>
     </div>
 
-    <h2><i class="fas fa-industry"></i> 옥천 제2공장</h2>
-    <p>충청북도 옥천군 동이면 평산길 183</p>
+    <!-- Okcheon Plant 2 -->
+    <h2><i class="fas fa-industry"></i> Okcheon Plant 2</h2>
+    <p>
+      183 Pyeongsan-gil, Dongi-myeon,  
+      Okcheon-gun, Chungcheongbuk-do, Republic of Korea
+    </p>
     <div class="map-container">
       <iframe 
-        src="https://www.google.com/maps?q=충청북도%20옥천군%20동이면%20평산길%20183&output=embed"
+        src="https://www.google.com/maps?q=183%20Pyeongsan-gil%2C%20Dongi-myeon%2C%20Okcheon-gun&output=embed"
         allowfullscreen=""
         loading="lazy">
       </iframe>
     </div>
+
   </section>
+
 
     <!-- 공통 푸터 -->
     <div data-include="/kr/components/footer.html"></div>
