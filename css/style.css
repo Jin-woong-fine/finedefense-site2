@@ -93,7 +93,7 @@ body:not(#index-page) .main-menu li a:hover {
   opacity: 0;
   visibility: hidden;
   position: absolute;
-  top: calc(100% + 25px);
+  top: calc(100% + 30px);
   left: 50%;
   transform: translateX(-50%) translateY(10px);
   background: #fff;
