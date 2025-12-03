@@ -140,6 +140,17 @@ body:not(#index-page) .main-menu li a:hover {
 }
 
 
+/* 서브페이지 전용: 헤더 높이 & 로고 크기 고정 */
+body:not(#index-page) .header-inner {
+  padding: 14px 2vw !important;
+}
+
+body:not(#index-page) .header-left .logo {
+  width: 140px !important;
+}
+
+
+
 
 
 
