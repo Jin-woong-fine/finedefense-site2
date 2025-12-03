@@ -59,7 +59,11 @@
 
 <body>
 
-  <div id="header"></div>
+  <!-- 관리자 세션바 (정확한 ID 부여) -->
+  <div id="adminBarContainer" data-include="/kr/components/admin-session-bar.html"></div>
+
+  <!-- 공통 헤더 -->
+  <div id="headerContainer" data-include="/kr/components/header.html"></div>
 
   <!-- Banner -->
   <section class="sub-banner">
@@ -79,8 +83,8 @@
 
   <div class="gallery-container" id="galleryContainer"></div>
 
-  <div id="footer"></div>
-  <script src="/js/nav.js"></script>
+    <!-- 공통 푸터 -->
+    <div data-include="/kr/components/footer.html"></div>
 
   <script>
     async function loadGallery() {
@@ -107,6 +111,14 @@
 
     loadGallery();
   </script>
+
+    <!-- 공통 스크립트 -->
+    <script src="/js/include.js"></script>
+    <script src="/js/session_timer.js"></script>
+    <script src="/js/language.js"></script>
+    <script src="/js/nav.js"></script>
+
+
 
 </body>
 </html>
