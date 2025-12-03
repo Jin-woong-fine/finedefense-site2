@@ -130,8 +130,11 @@
   </head>
 
   <body>
-    <!-- ✅ 1. 헤더 (공통) -->
-    <div id="header"></div>
+    <!-- 관리자 세션바 (정확한 ID 부여) -->
+    <div id="adminBarContainer" data-include="/kr/components/admin-session-bar.html"></div>
+
+    <!-- 공통 헤더 -->
+    <div id="headerContainer" data-include="/kr/components/header.html"></div>
 
     <!-- ✅ 2. 섹션 전용 배너 -->
     <section class="sub-banner">
@@ -358,41 +361,13 @@
     </div>
     </section>
 
-    <div id="footer"></div>
+    <!-- 공통 푸터 -->
+    <div data-include="/kr/components/footer.html"></div>
 
-    <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      // ✅ header 불러오기
-      fetch("../../components/header.html")
-        .then(res => res.text())
-        .then(html => {
-          document.getElementById("header").innerHTML = html;
-
-          // ✅ header 삽입 후 language.js 재로드 (언어 버튼 클릭 정상 작동)
-          const langScript = document.createElement("script");
-          langScript.src = "/js/language.js";
-          document.body.appendChild(langScript);
-        });
-
-      // ✅ company-nav 불러오기
-      fetch("../../nav/company-nav.html")
-        .then(res => res.text())
-        .then(html => {
-          document.getElementById("company-nav").innerHTML = html;
-          const current = window.location.pathname.split("/").pop();
-          document.querySelectorAll(".company-nav a").forEach(a => {
-            if (a.href.includes(current)) a.classList.add("active");
-          });
-        });
-
-      // ✅ footer 불러오기
-      fetch("../../components/footer.html")
-        .then(res => res.text())
-        .then(html => document.getElementById("footer").innerHTML = html);
-    });
-    </script>
-
-    <!-- ✅ 공통 네비 관련 스크립트 -->
+    <!-- 공통 스크립트 -->
+    <script src="/js/include.js"></script>
+    <script src="/js/session_timer.js"></script>
+    <script src="/js/language.js"></script>
     <script src="/js/nav.js"></script>
 
   </body>
