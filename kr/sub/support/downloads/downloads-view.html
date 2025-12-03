@@ -88,7 +88,11 @@
 
 <body>
 
-<div id="header"></div>
+<!-- 관리자 세션바 (정확한 ID 부여) -->
+<div id="adminBarContainer" data-include="/kr/components/admin-session-bar.html"></div>
+
+<!-- 공통 헤더 -->
+<div id="headerContainer" data-include="/kr/components/header.html"></div>
 
 <section class="sub-banner">
   <img src="/img/sub-banners/subbanner_support_V2.png" alt="자료실">
@@ -122,9 +126,8 @@
   <a href="index.html" class="back-btn">목록으로</a>
 </div>
 
-<div id="footer"></div>
-
-<script src="/js/nav.js"></script>
+    <!-- 공통 푸터 -->
+    <div data-include="/kr/components/footer.html"></div>
 
 <script>
   const id = new URLSearchParams(location.search).get("id");
@@ -175,6 +178,15 @@
     }[c] || c;
   }
 </script>
+
+    <!-- 공통 스크립트 -->
+    <script src="/js/include.js"></script>
+    <script src="/js/session_timer.js"></script>
+    <script src="/js/language.js"></script>
+    <script src="/js/nav.js"></script>
+
+
+
 
 </body>
 </html>
