@@ -155,11 +155,23 @@ router.put("/:id", verifyToken, verifyEditor, (req, res) => {
       if (!title || !category)
         return res.status(400).json({ message: "Missing required fields" });
 
-      const removedImages = JSON.parse(req.body.removedImages || "[]");
+      // 🔥 프론트에서 보낸 old_images 읽기
+      const oldImages = JSON.parse(req.body.old_images || "[]");
 
-      /* ---------------------------------------------
-         1) 기본 정보 수정
-      --------------------------------------------- */
+      // 🔥 현재 DB 이미지 목록
+      const [dbImages] = await db.execute(
+        `SELECT url FROM product_images WHERE product_id = ?`,
+        [id]
+      );
+
+      const currentList = dbImages.map(img =>
+        img.url.replace("/uploads/products/", "")
+      );
+
+      // 🔥 삭제해야 할 이미지 = DB - oldImages
+      const removedImages = currentList.filter(img => !oldImages.includes(img));
+
+      /* 기본 정보 업데이트 */
       await db.execute(
         `UPDATE products
          SET title = ?, category = ?, description_html = ?
@@ -167,20 +179,24 @@ router.put("/:id", verifyToken, verifyEditor, (req, res) => {
         [title, category, description_html || "", id]
       );
 
-      /* ---------------------------------------------
-         2) 삭제된 이미지 제거
-      --------------------------------------------- */
+      /* DB에서 삭제 */
       if (removedImages.length > 0) {
         await db.query(
           `DELETE FROM product_images 
            WHERE product_id = ? AND url IN (?)`,
-          [id, removedImages]
+          [id, removedImages.map(f => "/uploads/products/" + f)]
         );
+
+        // 🔥 실제 파일 삭제
+        removedImages.forEach(file => {
+          const filePath = path.join(__dirname, "../public/uploads/products", file);
+          if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+          }
+        });
       }
 
-      /* ---------------------------------------------
-         3) 새 이미지 저장
-      --------------------------------------------- */
+      /* 새 이미지 저장 */
       if (req.files?.length > 0) {
         const values = req.files.map((f, idx) => [
           id,
