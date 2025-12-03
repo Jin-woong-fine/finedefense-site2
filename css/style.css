@@ -18,9 +18,8 @@ body {
   align-items: center;
   width: 100%;
   padding: clamp(0.5rem, 1.5vw, 1.5rem) 2vw;
-  background-color: #ffffff;
-  border-bottom: 1px solid #e0e0e0;
-
+  background: #0f0f0f;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
   position: relative;
   z-index: 2000;
   isolation: isolate;
@@ -33,17 +32,16 @@ body {
   height: auto;
 }
 
-/* ✅ 기본은 컬러/다크 로고만 보이게 */
+/* 기본은 컬러/다크 로고 */
 .logo-dark { display: block; }
 .logo-white { display: none; }
 
-/* 메뉴 중앙 배치 등 나머지는 기존 그대로 */
+/* 메뉴 중앙 배치 */
 .main-menu-container {
   flex: 1;
   display: flex;
   justify-content: center;
 }
-
 
 .main-menu {
   position: absolute;
@@ -57,10 +55,10 @@ body {
   margin: 0;
 }
 
-/* 상위 메뉴 글씨 → 흰색 */
-.main-menu li a {
+/* 🔥 서브페이지만 흰 글씨 */
+body:not(#index-page) .main-menu li a {
   text-decoration: none;
-  color: #f5f5f5;        /* 🔥 흰색 */
+  color: #f5f5f5;
   font-weight: 600;
   padding: 6px 8px;
   font-size: clamp(15px, 1vw, 18px);
@@ -69,7 +67,7 @@ body {
   transition: color .25s ease, opacity .25s ease;
 }
 
-.main-menu li a:hover {
+body:not(#index-page) .main-menu li a:hover {
   color: #ffffff;
   opacity: 1;
 }
@@ -89,28 +87,24 @@ body {
   background: transparent;
 }
 
-/* Submenu (white) */
+/* Submenu */
 .submenu {
   list-style: none;
   opacity: 0;
   visibility: hidden;
-
   position: absolute;
   top: calc(100% + 30px);
   left: 50%;
   transform: translateX(-50%) translateY(10px);
-
   background: #fff;
   border: 1px solid rgba(0,0,0,0.15);
   box-shadow: 0 8px 20px rgba(0,0,0,0.08);
   border-radius: 6px;
-
   padding: 10px 0;
   margin: 0;
   min-width: 180px;
   white-space: nowrap;
   text-align: center;
-
   transition: opacity .25s ease, transform .25s ease;
   z-index: 200;
 }

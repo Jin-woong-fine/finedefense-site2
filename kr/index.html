@@ -255,16 +255,17 @@
         }
       }
 
-      /* ================================================
-        INDEX PAGE — Deep Blur Header + Auto Logo Swap
-        ================================================ */
+      /* ============================================================
+          INDEX PAGE — TRANSPARENT → WHITE HEADER + LOGO AUTO SWAP
+        ============================================================ */
 
-      /* 초기: 배너 위에서 어둡고 Blur 강하게 */
+      /* 초기: 배너 위에서 반투명 + 강한 Blur */
       body#index-page .header-inner {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
+
         padding: 22px 4vw;
 
         background: rgba(15, 15, 15, 0.35);
@@ -281,21 +282,21 @@
           border-color 0.35s ease;
       }
 
-      /* ==============================
-        로고 자동 전환
-        ============================== */
+      /* ------------------------------------------------------------
+          로고 자동 전환
+        ------------------------------------------------------------ */
 
-      /* 초기: 배너 위 → 흰색 로고만 보이게 (기본값 뒤집기) */
+      /* 초기: 배너 위 → 흰색 로고 */
       body#index-page .logo-white { display: block !important; }
       body#index-page .logo-dark  { display: none  !important; }
 
-      /* 스크롤 후 → 컬러 로고 */
+      /* 스크롤 후 → 일반 컬러 로고 */
       body#index-page.scrolled .logo-white { display: none  !important; }
       body#index-page.scrolled .logo-dark  { display: block !important; }
 
-      /* ==============================
-        메뉴 글씨 (메인 메뉴만)
-        ============================== */
+      /* ------------------------------------------------------------
+          메인 메뉴 텍스트 색상 (index 전용)
+        ------------------------------------------------------------ */
 
       /* 초기: 흰색 */
       body#index-page .header-inner .main-menu a {
@@ -313,10 +314,9 @@
         text-shadow: none !important;
       }
 
-      /* ==============================
-        스크롤 후: 헤더 배경 전환
-        ============================== */
-
+      /* ------------------------------------------------------------
+          스크롤 후 헤더 스타일 (화이트)
+        ------------------------------------------------------------ */
       body#index-page.scrolled .header-inner {
         background: rgba(255,255,255,0.97);
         border-bottom: 1px solid rgba(0,0,0,0.06);
@@ -328,10 +328,9 @@
         box-shadow: 0 3px 10px rgba(0,0,0,0.07);
       }
 
-      /* ==============================
-        언어 토글 — 항상 검정
-        ============================== */
-
+      /* ------------------------------------------------------------
+          언어 선택 토글은 항상 검정 (배너 위에서도)
+        ------------------------------------------------------------ */
       body#index-page .lang-toggle,
       body#index-page .lang-toggle *,
       body#index-page .language-dropdown .lang-list *,
@@ -342,41 +341,45 @@
         text-shadow: none !important;
       }
 
-      /* 드롭다운은 흰색 */
+      /* 언어 드롭다운 기본 백그라운드 */
       body#index-page .language-dropdown.open .lang-list {
         background: #fff !important;
         border: 1px solid #ddd !important;
       }
 
-      /* ==============================
-        관리자 세션바 있을 때 헤더 위치 조정
-        ============================== */
-
-      body#index-page.has-admin-bar .header-inner {
-        top: 38px !important;
-      }
-
-      /* ==============================================
-        메인페이지에서도 서브메뉴는 항상 검정 글씨 고정
-        ============================================== */
+      /* ------------------------------------------------------------
+          서브메뉴는 ALWAYS 흰색 배경 + 검정 글씨
+          (메인페이지여도 영향 안받음)
+        ------------------------------------------------------------ */
 
       body#index-page .submenu {
         background: #fff !important;
         border: 1px solid rgba(0,0,0,0.15) !important;
       }
 
-      /* 서브메뉴 글씨 기본 검정 */
       body#index-page .submenu li a {
         color: #222 !important;
         text-shadow: none !important;
       }
 
-      /* 서브메뉴 hover */
       body#index-page .submenu li a:hover {
-        color: #0f2679 !important;
         background: #eef3ff !important;
+        color: #0f2679 !important;
       }
 
+      /* ------------------------------------------------------------
+          관리자 세션바 있을 때 헤더 보정
+        ------------------------------------------------------------ */
+      body#index-page.has-admin-bar .header-inner {
+        top: 38px !important;
+      }
+
+      /* ------------------------------------------------------------
+          메인 배너가 헤더와 겹치지 않도록 조정 (필요시)
+        ------------------------------------------------------------ */
+      body#index-page .banner-slider {
+        margin-top: 0 !important;
+      }
 
 
       </style>
