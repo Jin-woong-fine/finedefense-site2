@@ -141,7 +141,7 @@ router.get("/:id", async (req, res) => {
 
 
 /* ==========================================================
-   ✏ 제품 수정 (EDITOR 이상)
+   ✏ 제품 수정 (모든 필드 + 이미지 완전 지원)
 ========================================================== */
 router.put("/:id", verifyToken, verifyEditor, (req, res) => {
   upload.array("images")(req, res, async (err) => {
@@ -150,58 +150,84 @@ router.put("/:id", verifyToken, verifyEditor, (req, res) => {
 
     try {
       const { id } = req.params;
-      const { title, category, description_html } = req.body;
 
-      if (!title || !category)
+      // 프론트에서 보낸 값
+      const {
+        title,
+        summary,
+        category,
+        lang,
+        sort_order,
+        description_html,
+        old_images
+      } = req.body;
+
+      if (!title || !category || !lang)
         return res.status(400).json({ message: "Missing required fields" });
 
-      // 🔥 프론트에서 보낸 old_images 읽기
-      const oldImages = JSON.parse(req.body.old_images || "[]");
+      // 🔥 old_images 파싱
+      const oldList = JSON.parse(old_images || "[]");
 
-      // 🔥 현재 DB 이미지 목록
+      // 🔥 DB에 저장된 이미지 목록 조회
       const [dbImages] = await db.execute(
-        `SELECT url FROM product_images WHERE product_id = ?`,
+        `SELECT url FROM product_images WHERE product_id = ? ORDER BY sort_order ASC`,
         [id]
       );
 
-      const currentList = dbImages.map(img =>
+      const dbList = dbImages.map(img =>
         img.url.replace("/uploads/products/", "")
       );
 
-      // 🔥 삭제해야 할 이미지 = DB - oldImages
-      const removedImages = currentList.filter(img => !oldImages.includes(img));
+      // 🔥 삭제할 이미지 (DB - oldList)
+      const removed = dbList.filter(name => !oldList.includes(name));
 
-      /* 기본 정보 업데이트 */
+      /* ==================================================
+         1) 텍스트 정보 업데이트 (🔥 완전체)
+      ================================================== */
       await db.execute(
         `UPDATE products
-         SET title = ?, category = ?, description_html = ?
+           SET title = ?,
+               summary = ?,
+               category = ?,
+               lang = ?,
+               sort_order = ?,
+               description_html = ?
          WHERE id = ?`,
-        [title, category, description_html || "", id]
+        [
+          title,
+          summary || "",
+          category,
+          lang,
+          sort_order || 999,
+          description_html || "",
+          id
+        ]
       );
 
-      /* DB에서 삭제 */
-      if (removedImages.length > 0) {
+      /* ==================================================
+         2) 삭제된 이미지 DB 제거 + 서버 파일 삭제
+      ================================================== */
+      if (removed.length > 0) {
         await db.query(
           `DELETE FROM product_images 
            WHERE product_id = ? AND url IN (?)`,
-          [id, removedImages.map(f => "/uploads/products/" + f)]
+          [id, removed.map(f => "/uploads/products/" + f)]
         );
 
-        // 🔥 실제 파일 삭제
-        removedImages.forEach(file => {
-          const filePath = path.join(__dirname, "../public/uploads/products", file);
-          if (fs.existsSync(filePath)) {
-            fs.unlinkSync(filePath);
-          }
+        removed.forEach(name => {
+          const filePath = path.join(uploadDir, name);
+          if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
         });
       }
 
-      /* 새 이미지 저장 */
+      /* ==================================================
+         3) 신규 업로드 이미지 기록
+      ================================================== */
       if (req.files?.length > 0) {
         const values = req.files.map((f, idx) => [
           id,
           "/uploads/products/" + f.filename,
-          idx
+          oldList.length + idx   // 기존 이미지 뒤에 이어 붙음
         ]);
 
         await db.query(
@@ -211,14 +237,30 @@ router.put("/:id", verifyToken, verifyEditor, (req, res) => {
         );
       }
 
+      /* ==================================================
+         4) 기존 이미지 순서 재정렬 (oldList 기준)
+      ================================================== */
+      await Promise.all(
+        oldList.map((filename, index) =>
+          db.query(
+            `UPDATE product_images
+             SET sort_order = ?
+             WHERE product_id = ? AND url = ?`,
+            [index, id, "/uploads/products/" + filename]
+          )
+        )
+      );
+
       res.json({ message: "updated" });
 
     } catch (e) {
       console.error("PUT error:", e);
-      res.status(500).json({ message: "server error" });
+      res.status(500).json({ message: "server error", error: e.message });
     }
   });
 });
+
+
 
 
 /* ==========================================================
