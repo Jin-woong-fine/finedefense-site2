@@ -54,6 +54,18 @@
     .btn-primary { background:#0f2679; color:#fff; }
     .btn-danger { background:#d62828; color:#fff; }
 
+    .sort-order {
+      font-size: 0.85rem;
+      color: #777;
+      margin-top: 4px;
+      margin-bottom: 10px;
+    }
+    .sort-order strong {
+      color: #0f2679;
+    }
+
+
+
     /* 언어 필터 */
     .lang-filter {
       display:inline-flex;
@@ -216,16 +228,23 @@
             });
 
             card.innerHTML = `
-            <img src="${thumb}" alt="">
-            <div class="card-body">
-                <div class="title">${item.title}</div>
-                <div class="category">${item.category.toUpperCase()} | ${item.lang.toUpperCase()}</div>
+              <img src="${thumb}" alt="">
+              <div class="card-body">
+                  <div class="title">${item.title}</div>
 
-                <div class="card-buttons">
-                <button class="btn btn-primary" onclick="location.href='products-edit.html?id=${item.id}'">수정</button>
-                <button class="btn btn-danger" onclick="deleteProduct(${item.id})">삭제</button>
-                </div>
-            </div>
+                  <div class="category">
+                    ${item.category.toUpperCase()} | ${item.lang.toUpperCase()}
+                  </div>
+
+                  <div class="sort-order">
+                    순번: <strong>${item.sort_order}</strong>
+                  </div>
+
+                  <div class="card-buttons">
+                    <button class="btn btn-primary" onclick="location.href='products-edit.html?id=${item.id}'">수정</button>
+                    <button class="btn btn-danger" onclick="deleteProduct(${item.id})">삭제</button>
+                  </div>
+              </div>
             `;
 
             list.appendChild(card);
