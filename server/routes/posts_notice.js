@@ -206,9 +206,16 @@ router.get("/download-file", async (req, res) => {
     [fileId]
   );
 
-  if (!file) return res.status(404).json({ message: "file not found" });
+  if (!file) {
+    return res.status(404).json({ message: "file not found" });
+  }
 
-  const absPath = path.join(__dirname, "..", file.file_path.replace(/^\//, ""));
+  // public 경로 추가됨
+  const absPath = path.join(__dirname, "../public", file.file_path.replace(/^\//, ""));
+
+  if (!fs.existsSync(absPath)) {
+    return res.status(404).json({ message: "file not found" });
+  }
 
   res.setHeader(
     "Content-Disposition",
