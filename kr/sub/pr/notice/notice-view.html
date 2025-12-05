@@ -188,11 +188,10 @@
               <span class="file-size">(${formatSize(f.file_size)})</span>
             </div>
 
-          <button class="download-btn"
-            onclick="downloadFile(${noticeId}, ${f.id})"
-            다운로드
-          </button>
-
+            <button class="download-btn"
+              onclick="downloadFile(${noticeId}, ${f.id})">
+              다운로드
+            </button>
           </div>
         `).join("");
     }
@@ -209,13 +208,18 @@
         🔥 다운로드 (자동 다운로드)
   ============================================================ */
   function downloadFile(noticeId, fileId) {
+    // 파일 다운로드
     const url = `/api/posts/notice/download-file?id=${fileId}`;
     window.location.href = url;
 
+    // 다운로드 로그 기록
     fetch("/api/posts/notice/download", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ notice_id: noticeId, file_id: fileId })
+      body: JSON.stringify({
+        notice_id: noticeId,
+        file_id: fileId
+      })
     });
   }
 
