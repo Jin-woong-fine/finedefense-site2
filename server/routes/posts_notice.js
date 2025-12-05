@@ -221,20 +221,24 @@ router.get("/download-file", async (req, res) => {
 });
 
 /* ============================================================
-   📥 다운로드 로그
+   📥 다운로드 로그 (DB 스키마에 맞게 수정)
 ============================================================ */
 router.post("/download", async (req, res) => {
   try {
-    const { notice_id, file_path, original_name } = req.body;
+    const { notice_id, file_id } = req.body;
+
+    if (!notice_id || !file_id) {
+      return res.status(400).json({ message: "missing file_id or notice_id" });
+    }
 
     const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.ip || "";
-    const ua = req.headers["user-agent"] || "unknown";
+    const ua = req.headers["user-agent"] || "";
 
     await db.execute(
       `INSERT INTO notice_download_logs
-         (notice_id, file_path, original_name, ip, user_agent)
-       VALUES (?, ?, ?, ?, ?)`,
-      [notice_id, file_path, original_name, ip, ua]
+         (notice_id, file_id, ip, user_agent)
+       VALUES (?, ?, ?, ?)`,
+      [notice_id, file_id, ip, ua]
     );
 
     res.json({ message: "download logged" });
@@ -245,4 +249,3 @@ router.post("/download", async (req, res) => {
   }
 });
 
-export default router;

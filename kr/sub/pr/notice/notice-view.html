@@ -188,10 +188,11 @@
               <span class="file-size">(${formatSize(f.file_size)})</span>
             </div>
 
-            <button class="download-btn"
-              onclick="downloadFile(${noticeId}, '${f.file_path}', '${f.original_name}')">
-              다운로드
-            </button>
+          <button class="download-btn"
+            onclick="downloadFile(${noticeId}, ${f.id}, '${f.file_path}', '${f.original_name}')"
+            다운로드
+          </button>
+
           </div>
         `).join("");
     }
@@ -207,9 +208,9 @@
   /* ===========================================================
         🔥 다운로드 (자동 다운로드)
   ============================================================ */
-  function downloadFile(noticeId, path, originalName) {
+  function downloadFile(noticeId, fileId, path, originalName) {
 
-    // ❗ prefix 반드시 /api/posts/notice 로 맞춰야 함
+    // 실제 파일 다운로드
     const url =
       `/api/posts/notice/download-file?path=${encodeURIComponent(path)}&name=${encodeURIComponent(originalName)}`;
 
@@ -220,14 +221,13 @@
     link.click();
     link.remove();
 
-    // 다운로드 로그
+    // 다운로드 로그 (DB 스키마에 맞게 변경)
     fetch("/api/posts/notice/download", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         notice_id: noticeId,
-        file_path: path,
-        original_name: originalName
+        file_id: fileId
       })
     });
   }
