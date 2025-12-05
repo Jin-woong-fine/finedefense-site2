@@ -80,12 +80,13 @@ router.get("/detail/:id", async (req, res) => {
 
     // 🔥 여기! file_size 포함해야 프론트에서 읽을 수 있다.
     const [files] = await db.execute(
-      `SELECT file_path, original_name, file_size
-         FROM post_files
+      `SELECT id, file_path, original_name, file_size
+        FROM post_files
         WHERE post_id=?`,
       [postId]
     );
     post.files = files;
+
 
     res.json(post);
 
