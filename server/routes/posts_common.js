@@ -72,21 +72,22 @@ router.get("/detail/:id", async (req, res) => {
     if (!rows.length) return res.json({});
     const post = rows[0];
 
+    // 이미지
     const [images] = await db.execute(
       `SELECT image_path FROM post_images WHERE post_id=?`,
       [postId]
     );
     post.images = images.map(i => i.image_path);
 
-    // 🔥 여기! file_size 포함해야 프론트에서 읽을 수 있다.
+    // 파일 (🔥 반드시 id 포함)
     const [files] = await db.execute(
       `SELECT id, file_path, original_name, file_size
-        FROM post_files
+         FROM post_files
         WHERE post_id=?`,
       [postId]
     );
-    post.files = files;
 
+    post.files = files;
 
     res.json(post);
 
@@ -98,7 +99,7 @@ router.get("/detail/:id", async (req, res) => {
 
 
 /* =====================================================
-   📤 목록 조회 + Pagination (안정 버전)
+   📤 목록 조회
 ===================================================== */
 router.get("/list/:category", async (req, res) => {
   try {
@@ -110,9 +111,6 @@ router.get("/list/:category", async (req, res) => {
 
     const offset = (page - 1) * pageSize;
 
-    /* ---------------------------
-       전체 개수
-    ---------------------------- */
     let countSQL = `SELECT COUNT(*) AS cnt FROM posts WHERE category=?`;
     const countParams = [category];
 
@@ -125,10 +123,6 @@ router.get("/list/:category", async (req, res) => {
     const total = countRows[0].cnt;
     const pages = Math.ceil(total / pageSize);
 
-    /* ---------------------------
-       실제 데이터 조회
-       LIMIT/OFFSET → 문자열 삽입
-    ---------------------------- */
     let listSQL = `
       SELECT p.*,
              u.name AS author_name,
@@ -151,9 +145,6 @@ router.get("/list/:category", async (req, res) => {
 
     const [rows] = await db.execute(listSQL, listParams);
 
-    /* ---------------------------
-       응답
-    ---------------------------- */
     res.json({
       list: rows,
       total,
@@ -170,7 +161,7 @@ router.get("/list/:category", async (req, res) => {
 
 
 /* =====================================================
-   📌 최신 포스트(공지 + 뉴스) N개 가져오기
+   📌 최신 글 가져오기
 ===================================================== */
 router.get("/latest", async (req, res) => {
   try {
@@ -198,8 +189,6 @@ router.get("/latest", async (req, res) => {
     res.status(500).json({ message: "latest error" });
   }
 });
-
-
 
 
 export default router;

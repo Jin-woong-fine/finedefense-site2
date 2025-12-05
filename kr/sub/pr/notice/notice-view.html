@@ -164,6 +164,11 @@
     const res = await fetch(`/api/posts/detail/${noticeId}`);
     const data = await res.json();
 
+    if (!data || !data.title) {
+      alert("게시물을 찾을 수 없습니다.");
+      return;
+    }
+
     document.getElementById("title").textContent = data.title;
     document.getElementById("date").textContent =
       new Date(data.created_at).toLocaleDateString();
@@ -175,7 +180,7 @@
       initialValue: data.content || ""
     });
 
-    // 첨부파일 렌더링
+    // 첨부파일 렌더링 (위에서 만든 버전)
     if (data.files?.length) {
       document.getElementById("attachmentWrap").style.display = "block";
 
@@ -208,7 +213,13 @@
         🔥 다운로드 (자동 다운로드)
   ============================================================ */
   function downloadFile(noticeId, fileId) {
-    // 파일 다운로드
+
+    if (!fileId || isNaN(fileId)) {
+      alert("잘못된 파일입니다.");
+      return;
+    }
+
+    // 실제 파일 다운로드
     const url = `/api/posts/notice/download-file?id=${fileId}`;
     window.location.href = url;
 
@@ -222,6 +233,7 @@
       })
     });
   }
+
 
 
   /* ===========================================================

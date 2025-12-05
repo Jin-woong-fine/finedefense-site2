@@ -29,7 +29,9 @@ if (!fs.existsSync(NOTICE_DIR)) {
 function toDiskPath(publicPath) {
   if (!publicPath) return null;
 
-  const clean = publicPath.replace(/^\/+/, ""); // 앞 슬래시 제거
+  // "/uploads/notice_files/xxx" → "notice_files/xxx"
+  const clean = publicPath.replace(/^\/?uploads\//, "");
+
   return path.join(UPLOAD_ROOT, clean);
 }
 
