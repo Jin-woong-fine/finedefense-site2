@@ -199,26 +199,25 @@ router.delete("/delete/:id", verifyToken, async (req, res) => {
    📥 파일 다운로드
 ============================================================ */
 router.get("/download-file", async (req, res) => {
-  const filePath = req.query.path;
-  const originalName = req.query.name;
+  const fileId = req.query.id;
 
-  if (!filePath || !originalName) {
-    return res.status(400).json({ message: "file info missing" });
-  }
+  const [[file]] = await db.execute(
+    `SELECT file_path, original_name FROM post_files WHERE id=?`,
+    [fileId]
+  );
 
-  const absPath = path.join(__dirname, "..", filePath.replace(/^\//, ""));
+  if (!file) return res.status(404).json({ message: "file not found" });
 
-  if (!fs.existsSync(absPath)) {
-    return res.status(404).json({ message: "file not found" });
-  }
+  const absPath = path.join(__dirname, "..", file.file_path.replace(/^\//, ""));
 
   res.setHeader(
     "Content-Disposition",
-    `attachment; filename*=UTF-8''${encodeURIComponent(originalName)}`
+    `attachment; filename*=UTF-8''${encodeURIComponent(file.original_name)}`
   );
 
   res.download(absPath);
 });
+
 
 /* ============================================================
    📥 다운로드 로그 (DB 스키마에 맞게 수정)
