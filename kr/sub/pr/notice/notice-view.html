@@ -188,10 +188,10 @@
               <span class="file-size">(${formatSize(f.file_size)})</span>
             </div>
 
-          <button class="download-btn"
-            onclick="downloadFile(${noticeId}, ${f.id}, '${f.file_path}', '${f.original_name}')"
-            다운로드
-          </button>
+            <button class="download-btn"
+              onclick="downloadFile(${noticeId}, ${f.id}, '${f.file_path}', '${f.original_name}')">
+              다운로드
+            </button>
 
           </div>
         `).join("");
@@ -210,9 +210,7 @@
   ============================================================ */
   function downloadFile(noticeId, fileId, path, originalName) {
 
-    // 실제 파일 다운로드
-    const url =
-      `/api/posts/notice/download-file?path=${encodeURIComponent(path)}&name=${encodeURIComponent(originalName)}`;
+    const url = `/api/posts/notice/download-file?path=${encodeURIComponent(path)}&name=${encodeURIComponent(originalName)}`;
 
     const link = document.createElement("a");
     link.href = url;
@@ -221,7 +219,7 @@
     link.click();
     link.remove();
 
-    // 다운로드 로그 (DB 스키마에 맞게 변경)
+    // 다운로드 로그 기록 (file_id 사용!)
     fetch("/api/posts/notice/download", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
