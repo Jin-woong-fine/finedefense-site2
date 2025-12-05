@@ -201,19 +201,28 @@ router.delete("/delete/:id", verifyToken, async (req, res) => {
 router.get("/download-file", async (req, res) => {
   const fileId = req.query.id;
 
+  console.log("➡️ download-file called with id:", fileId);
+
   const [[file]] = await db.execute(
     `SELECT file_path, original_name FROM post_files WHERE id=?`,
     [fileId]
   );
 
+  console.log("📁 DB file info:", file);
+
   if (!file) {
-    return res.status(404).json({ message: "file not found" });
+    console.log("❌ DB에서 파일 정보 없음");
+    return res.status(404).json({ message: "file not found DB" });
   }
 
-  // public 경로 추가됨
+  // 우리가 예상하는 코드
   const absPath = path.join(__dirname, "../public", file.file_path.replace(/^\//, ""));
 
+  console.log("🔍 서버가 찾는 실제 경로:", absPath);
+  console.log("🔍 파일 존재 여부:", fs.existsSync(absPath));
+
   if (!fs.existsSync(absPath)) {
+    console.log("❌ 파일이 서버 경로에 없음!");
     return res.status(404).json({ message: "file not found" });
   }
 
@@ -224,6 +233,7 @@ router.get("/download-file", async (req, res) => {
 
   res.download(absPath);
 });
+
 
 
 /* ============================================================
