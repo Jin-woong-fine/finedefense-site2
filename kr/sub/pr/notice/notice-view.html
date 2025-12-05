@@ -189,7 +189,7 @@
             </div>
 
           <button class="download-btn"
-            onclick="downloadFile(${noticeId}, ${f.id})">
+            onclick="downloadFile(${noticeId}, ${f.id})"
             다운로드
           </button>
 
@@ -209,23 +209,16 @@
         🔥 다운로드 (자동 다운로드)
   ============================================================ */
   function downloadFile(noticeId, fileId) {
-    // 실제 파일 다운로드
     const url = `/api/posts/notice/download-file?id=${fileId}`;
-    
-    const link = document.createElement("a");
-    link.href = url;
-    link.click();
+    window.location.href = url;
 
-    // 다운로드 로그
     fetch("/api/posts/notice/download", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        notice_id: noticeId,
-        file_id: fileId
-      })
+      body: JSON.stringify({ notice_id: noticeId, file_id: fileId })
     });
   }
+
 
   /* ===========================================================
         📌 파일 아이콘 자동 선택
