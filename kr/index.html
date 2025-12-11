@@ -360,12 +360,67 @@
 
       
 
-      @media (max-width: 1024px) {
-        .submenu { display: none; }
-        .main-menu li.open .submenu { display: block; }
+    @media (max-width: 1024px) {
+
+      /* 시설 카드 */
+      .facility-card {
+        max-width: 260px !important;
+      }
+      .facility-card img {
+        height: 160px !important;
+      }
+      .facility-card h3 {
+        font-size: 1.1rem !important;
+      }
+      .facility-card p {
+        font-size: 0.9rem !important;
       }
 
-      </style>
+      /* 뉴스 카드 */
+      .news-card {
+        width: 260px !important;
+      }
+      .news-card img {
+        height: 150px !important;
+      }
+      .news-card h3 {
+        font-size: 1.1rem !important;
+      }
+    }
+
+    @media (max-width: 600px) {
+
+      /* 시설 카드 */
+      .facility-card {
+        max-width: 220px !important;
+      }
+      .facility-card img {
+        height: 130px !important;
+      }
+      .facility-card h3 {
+        font-size: 1rem !important;
+        margin: 12px 0 !important;
+      }
+      .facility-card p {
+        font-size: 0.85rem !important;
+      }
+
+      /* 뉴스 카드 */
+      .news-card {
+        width: 220px !important;
+      }
+      .news-card img {
+        height: 120px !important;
+      }
+      .news-card h3 {
+        font-size: 1rem !important;
+      }
+      .news-card p {
+        font-size: 0.85rem !important;
+      }
+    }
+
+  </style>
 
   </head>
 
