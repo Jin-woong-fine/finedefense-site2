@@ -1,15 +1,461 @@
-/* ============================================== */
-/*                   기본 설정                    */
-/* ============================================== */
+/* ============================================================
+   GLOBAL BASE
+============================================================ */
+
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
 
 body {
-  margin: 0;
   font-family: Arial, sans-serif;
 }
 
-/* ============================================== */
-/*                      FOOTER                    */
-/* ============================================== */
+/* data-include 영역이 div를 안 깨먹게 */
+[data-include] {
+  display: contents !important;
+}
+
+/* ============================================================
+   HEADER LAYOUT (PC 공통)
+============================================================ */
+
+.header-inner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+
+  height: 64px;
+  padding: 0 4vw;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  background: rgba(255, 255, 255, 0.97);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+
+  box-sizing: border-box;
+  z-index: 6000;
+
+  transition:
+    background 0.3s ease,
+    box-shadow 0.3s ease,
+    border-color 0.3s ease,
+    padding 0.3s ease;
+}
+
+/* 관리자 세션바가 있을 때 헤더 살짝 내려주기 */
+body.has-admin-bar .header-inner {
+  top: 38px;
+}
+
+/* 헤더 안쪽 기본 정렬 */
+.header-left,
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+/* ============================================================
+   LOGO
+============================================================ */
+
+.logo-wrap {
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+  line-height: 0;
+  text-decoration: none;
+  border: none;
+  outline: none;
+}
+
+.logo-wrap img {
+  display: block;
+  vertical-align: top;
+}
+
+/* 기본: 서브페이지/일반페이지 → 다크 로고 우선 */
+.logo {
+  width: clamp(120px, 11vw, 180px);
+}
+
+.logo-dark { display: block; }
+.logo-white { display: none; }
+
+/* 포커스 아웃라인 제거 */
+.logo-wrap:focus,
+.logo-wrap:active {
+  outline: none;
+}
+
+/* ============================================================
+   PC NAVIGATION
+============================================================ */
+
+.pc-nav {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pc-menu {
+  display: flex;
+  align-items: center;
+  gap: 40px;          /* 메인 메뉴 간격 */
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.pc-menu > li {
+  position: relative;
+}
+
+.pc-menu > li > a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 8px 0;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 600;
+
+  color: #111;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+}
+
+.pc-menu > li > a:hover {
+  color: #0f2679;
+}
+
+/* ============================================================
+   PC SUBMENU (드롭다운)
+============================================================ */
+
+.submenu {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 14px);
+  transform: translateX(-50%);
+  min-width: 180px;
+
+  margin: 0;
+  padding: 6px 0;
+
+  list-style: none;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.10);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.12);
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.22s ease,
+    transform 0.22s ease;
+  z-index: 6100;
+}
+
+/* hover 시 표시 (마우스가 li 안에 있는 동안 유지) */
+.pc-menu > li:hover > .submenu {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+.submenu li a {
+  display: block;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  color: #222;
+  white-space: nowrap;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.submenu li a:hover {
+  background: #eef3ff;
+  color: #0f2679;
+}
+
+/* ============================================================
+   LANGUAGE DROPDOWN (PC)
+============================================================ */
+
+.language-dropdown {
+  position: relative;
+  font-size: 13px;
+}
+
+.lang-toggle {
+  min-width: 56px;
+  padding: 6px 14px;
+  border-radius: 999px;
+
+  background: #ffffff;
+  border: 1px solid #d0d4dd;
+  color: #333;
+
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.lang-toggle:hover {
+  background: #f3f5fb;
+  border-color: #b8bfd3;
+  box-shadow: 0 0 0 1px rgba(15,38,121,0.08);
+}
+
+.lang-list {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 80px;
+
+  margin: 0;
+  padding: 6px 0;
+  list-style: none;
+
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid #d0d4dd;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+
+  display: none;
+  z-index: 6200;
+}
+
+/* language.js 에서 .open 토글한다고 가정 */
+.language-dropdown.open .lang-list {
+  display: block;
+}
+
+.lang-list li a {
+  display: block;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #222;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.lang-list li a:hover {
+  background: #eef3ff;
+  color: #0f2679;
+}
+
+/* ============================================================
+   MOBILE TOGGLE 기본값
+============================================================ */
+
+.mobile-menu-btn {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  width: 32px;
+  height: 32px;
+
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.mobile-menu-btn span {
+  width: 22px;
+  height: 2px;
+  border-radius: 999px;
+  background: #111;
+  margin: 3px 0;
+}
+
+/* ============================================================
+   MOBILE OVERLAY (FULLSCREEN MENU)
+============================================================ */
+
+.mobile-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255,255,255,0.97);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+  z-index: 7000;
+}
+
+.mobile-overlay.open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.mobile-overlay-inner {
+  position: relative;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 80px 24px 40px;
+}
+
+/* 모바일 닫기 버튼 (X) */
+.mobile-close-btn {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  background: none;
+  border: none;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+/* 모바일 메뉴 구조 */
+.mobile-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.mobile-menu > li {
+  border-bottom: 1px solid #e2e4ec;
+  padding: 4px 0 8px;
+}
+
+/* 1차 버튼 */
+.m-item {
+  width: 100%;
+  padding: 10px 0;
+  background: none;
+  border: none;
+  text-align: left;
+
+  font-size: 15px;
+  font-weight: 700;
+  color: #111;
+  cursor: pointer;
+}
+
+/* 2차 목록 */
+.m-sub {
+  list-style: none;
+  margin: 0;
+  padding-left: 4px;
+
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.25s ease;
+}
+
+.m-sub.open {
+  max-height: 300px;  /* 아코디언 열릴 때 최대 높이 */
+}
+
+.m-sub li a {
+  display: block;
+  padding: 6px 0 6px 10px;
+  font-size: 13px;
+  color: #444;
+  text-decoration: none;
+}
+
+.m-sub li a:hover {
+  color: #0f2679;
+}
+
+/* ============================================================
+   RESPONSIVE BREAKPOINTS (HEADER)
+============================================================ */
+
+/* 1024px 이하 → PC 메뉴 숨기고 모바일 메뉴 버튼 표시 */
+@media (max-width: 1024px) {
+
+  .pc-nav {
+    display: none;
+  }
+
+  .mobile-menu-btn {
+    display: flex;
+  }
+
+  .header-inner {
+    height: 60px;
+    padding: 0 16px;
+  }
+
+  .logo {
+    width: 130px;
+  }
+
+  .language-dropdown {
+    display: none; /* 필요하면 모바일 메뉴 안으로 이전해도 됨 */
+  }
+}
+
+/* 600px 이하 → 모바일 최적화 */
+@media (max-width: 600px) {
+  .mobile-overlay-inner {
+    width: 100%;
+    max-width: none;
+    padding: 76px 20px 32px;
+  }
+
+  .m-item {
+    font-size: 15px;
+  }
+
+  .m-sub li a {
+    font-size: 12px;
+  }
+}
+
+/* ============================================================
+   SUBPAGE HEADER (공통) 
+   - 메인(index-page)에서만 body#index-page에서 오버라이드
+============================================================ */
+
+body:not(#index-page) .header-inner {
+  background: rgba(255,255,255,0.97);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+
+body:not(#index-page) .pc-menu > li > a {
+  color: #111;
+}
+
+body:not(#index-page) .logo-dark { display: block; }
+body:not(#index-page) .logo-white { display: none; }
+
+/* ============================================================
+   FOOTER  (기존 코드 유지)
+============================================================ */
 
 footer {
   width: 100%;
@@ -104,7 +550,7 @@ footer {
   border-top: 1px solid #444;
 }
 
-/* 반응형 */
+/* 반응형 footer */
 @media (max-width: 1300px) {
   .footer-container {
     flex-direction: column;
@@ -128,9 +574,9 @@ footer {
   }
 }
 
-/* ============================================== */
-/*               ADMIN SESSION BAR                */
-/* ============================================== */
+/* ============================================================
+   ADMIN SESSION BAR (기존 유지)
+============================================================ */
 
 #adminSessionBar {
   position: fixed;
@@ -177,12 +623,4 @@ footer {
 
 body.has-admin-bar {
   padding-top: 38px !important;
-}
-
-/* ============================================== */
-/*                INCLUDE SUPPORT                 */
-/* ============================================== */
-
-[data-include] {
-  display: contents !important;
 }
