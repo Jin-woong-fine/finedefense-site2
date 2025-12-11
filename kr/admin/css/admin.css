@@ -412,6 +412,18 @@ textarea {
   border-left: 4px solid #ffffff !important;
 }
 
+#sidebar .menu-item.dashboard-root {
+  font-weight: 700 !important;
+  font-size: 15px !important;
+  color: #ffffff !important;
+  background: rgba(255,255,255,0.12);
+  border-left: 4px solid rgba(255,255,255,0.6);
+  margin-top: 6px;
+}
+
+
+
+
 #sidebar .submenu .menu-item {
   padding-left: 28px !important;
   font-size: 14px !important;

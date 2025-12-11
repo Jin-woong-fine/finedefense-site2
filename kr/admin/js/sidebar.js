@@ -40,7 +40,7 @@ async function loadSidebar(activePage = "") {
     avatarUrl || "/img/admin/avatar-placeholder.png"; // 기본 이미지도 제공
 
   const menu = [
-    { title: "대시보드", link: "/kr/admin/dashboard.html", key: "dashboard" },
+    { title: "대시보드", link: "/kr/admin/dashboard.html", key: "dashboard", special: "dashboard-root" },
 
     {
       title: "트래픽 분석",
