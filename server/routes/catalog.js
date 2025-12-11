@@ -261,4 +261,47 @@ router.get("/detail/:id", async (req, res) => {
   }
 });
 
-export default router;
+/* ======================================================
+   📌 6) 조회수 증가 (카탈로그 PDF 열람)
+====================================================== */
+router.post("/view/:id", async (req, res) => {
+  try {
+    await db.execute(
+      `UPDATE catalog_items
+       SET views = views + 1
+       WHERE id = ?`,
+      [req.params.id]
+    );
+
+    res.json({ success: true });
+
+  } catch (err) {
+    console.error("[catalog view] 오류:", err);
+    res.status(500).json({ success: false });
+  }
+});
+
+
+/* ======================================================
+   📌 7) 다운로드 수 증가
+====================================================== */
+router.post("/download/:id", async (req, res) => {
+  try {
+    await db.execute(
+      `UPDATE catalog_items
+       SET downloads = downloads + 1
+       WHERE id = ?`,
+      [req.params.id]
+    );
+
+    res.json({ success: true });
+
+  } catch (err) {
+    console.error("[catalog download] 오류:", err);
+    res.status(500).json({ success: false });
+  }
+});
+
+
+
+export default router; 

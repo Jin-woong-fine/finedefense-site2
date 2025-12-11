@@ -251,6 +251,60 @@ async function loadContentStats() {
 }
 
 /* -----------------------------------------------------
+   8) 카탈로그 조회수 TOP 5
+----------------------------------------------------- */
+async function loadCatalogViewTop() {
+  try {
+    const res = await apiGet("/api/catalog/top-views");
+    const data = await res.json();
+
+    const ul = document.getElementById("catalogViewTopList");
+    if (!ul) return;
+
+    ul.innerHTML =
+      data.length === 0
+        ? `<li style="color:#777;">데이터 없음</li>`
+        : data
+            .map(
+              (c) =>
+                `<li>${c.title} — <strong>${c.views}</strong>회</li>`
+            )
+            .join("");
+
+  } catch (err) {
+    console.error("loadCatalogViewTop Error:", err);
+  }
+}
+
+/* -----------------------------------------------------
+   9) 카탈로그 다운로드 TOP 5
+----------------------------------------------------- */
+async function loadCatalogDownloadTop() {
+  try {
+    const res = await apiGet("/api/catalog/top-downloads");
+    const data = await res.json();
+
+    const ul = document.getElementById("catalogDownloadTopList");
+    if (!ul) return;
+
+    ul.innerHTML =
+      data.length === 0
+        ? `<li style="color:#777;">데이터 없음</li>`
+        : data
+            .map(
+              (c) =>
+                `<li>${c.title} — <strong>${c.downloads}</strong>회</li>`
+            )
+            .join("");
+
+  } catch (err) {
+    console.error("loadCatalogDownloadTop Error:", err);
+  }
+}
+
+
+
+/* -----------------------------------------------------
    초기 실행
 ----------------------------------------------------- */
 document.addEventListener("DOMContentLoaded", () => {
@@ -261,4 +315,6 @@ document.addEventListener("DOMContentLoaded", () => {
   loadReferrerList();
   loadPageViewList();
   loadContentStats();
+  loadCatalogViewTop();
+  loadCatalogDownloadTop();
 });
