@@ -7,7 +7,9 @@ function waitForHeader(callback) {
   const timer = setInterval(() => {
     const btn = document.querySelector(".mobile-menu-btn");
     const overlay = document.querySelector(".mobile-overlay");
-    if (btn && overlay) {
+    const langToggle = document.querySelector(".lang-toggle");
+
+    if (btn && overlay && langToggle) {
       clearInterval(timer);
       callback();
     }
@@ -19,6 +21,7 @@ function initHeaderScript() {
   const overlay = document.querySelector(".mobile-overlay");
   const submenuButtons = document.querySelectorAll(".m-item");
   const body = document.body;
+  const langDropdown = document.querySelector(".language-dropdown");
 
   if (!btn || !overlay) return;
 
@@ -26,9 +29,13 @@ function initHeaderScript() {
   //  오버레이 열기 (모바일 전용)
   // -----------------------------
   const openOverlay = () => {
-    if (window.innerWidth > 1024) return; // 🔥 PC에서는 절대 안 열림
+    if (window.innerWidth > 1024) return;
+
     overlay.classList.add("open");
     body.style.overflow = "hidden";
+
+    // 언어 드롭다운 강제 닫기
+    if (langDropdown) langDropdown.classList.remove("open");
   };
 
   // -----------------------------
@@ -37,10 +44,7 @@ function initHeaderScript() {
   const closeOverlay = () => {
     overlay.classList.remove("open");
     body.style.overflow = "";
-
-    document.querySelectorAll(".m-sub.open").forEach(sub => {
-      sub.classList.remove("open");
-    });
+    submenuButtons.forEach(btn => btn.nextElementSibling.classList.remove("open"));
   };
 
   // 햄버거 → 오버레이 열기
@@ -48,16 +52,19 @@ function initHeaderScript() {
 
   // 배경 클릭 → 닫기
   overlay.addEventListener("click", (e) => {
-    if (e.target === overlay) {
+    if (e.target.classList.contains("mobile-overlay")) {
       closeOverlay();
     }
   });
 
-  // 아코디언
+  // -----------------------------
+  // 모바일 아코디언 메뉴
+  // -----------------------------
   submenuButtons.forEach(button => {
     button.addEventListener("click", () => {
       const sub = button.nextElementSibling;
 
+      // 다른 열린 서브메뉴 모두 닫기
       document.querySelectorAll(".m-sub.open").forEach(opened => {
         if (opened !== sub) opened.classList.remove("open");
       });
@@ -66,17 +73,39 @@ function initHeaderScript() {
     });
   });
 
-  // 모바일 서브메뉴 링크 클릭 → 닫기
+  // 모바일 링크 클릭 시 메뉴 닫기
   document.querySelectorAll(".mobile-menu a").forEach(link => {
     link.addEventListener("click", closeOverlay);
   });
 
+  // -----------------------------
   // PC 전환 시 자동 초기화
-  window.addEventListener("resize", () => {
+  // -----------------------------
+  const resetOnResize = () => {
     if (window.innerWidth > 1024) {
       closeOverlay();
     }
-  });
+  };
+
+  window.addEventListener("resize", resetOnResize);
+
+  // -----------------------------
+  // 언어 드롭다운 (PC/모바일 통합 안정화)
+  // -----------------------------
+  const langToggle = document.querySelector(".lang-toggle");
+  const langList = document.querySelector(".lang-list");
+
+  if (langToggle && langList) {
+    langToggle.addEventListener("click", (e) => {
+      e.stopPropagation();
+      langDropdown.classList.toggle("open");
+    });
+
+    // 외부 클릭 시 닫기
+    document.addEventListener("click", () => {
+      langDropdown.classList.remove("open");
+    });
+  }
 }
 
 waitForHeader(initHeaderScript);

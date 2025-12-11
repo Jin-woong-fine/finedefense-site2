@@ -1,7 +1,6 @@
 /* ============================================================
-   GLOBAL RESET
+   GLOBAL RESET — (대기업 공통 스타일)
 ============================================================ */
-
 html, body {
   margin: 0;
   padding: 0;
@@ -12,32 +11,38 @@ html, body {
   box-sizing: border-box;
 }
 
+
 /* ============================================================
-   HEADER BASE (PC + Mobile 공통)
+   HEADER 기본 구조
 ============================================================ */
 
 .header-inner {
   position: fixed;
-  top: 0; 
+  top: 0;
   left: 0;
   width: 100%;
-  height: 66px;
+  height: 64px;   /* 대기업 평균 헤더 높이 */
   padding: 0 3vw;
+
   display: flex;
   justify-content: space-between;
   align-items: center;
+
   background: transparent;
-  transition: 0.3s ease;
+  transition: background 0.3s ease, border-color 0.3s ease;
+
   z-index: 5000;
 }
 
+
 /* ============================================================
-   LOGO — 보라색 줄 문제 완전 제거
+   로고 영역 — 보라색 줄 100% 제거
 ============================================================ */
 
 .logo-wrap {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   height: 100%;
   line-height: 0;
   border: none;
@@ -49,32 +54,32 @@ html, body {
   outline: none !important;
 }
 
-.logo {
+.header-left .logo {
   display: block;
-  vertical-align: top; 
-  width: clamp(100px, 8vw, 145px);
+  vertical-align: top; /* 로고 아래 생기던 줄 제거 */
+  width: clamp(105px, 8vw, 150px);
+  pointer-events: none;
 }
 
-/* PC 전용 로고 */
-.logo-white { display: none; }
-.logo-dark  { display: block; }
 
 /* ============================================================
-   PC MENU
+   PC NAVIGATION
 ============================================================ */
 
 .pc-nav {
   flex: 1;
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 
 .pc-menu {
   display: flex;
-  gap: clamp(16px, 1.5vw, 32px);
+  align-items: center;
+  gap: clamp(22px, 1.7vw, 34px);
   list-style: none;
-  padding: 0;
   margin: 0;
+  padding: 0;
 }
 
 .pc-menu > li {
@@ -82,193 +87,223 @@ html, body {
 }
 
 .pc-menu > li > a {
+  text-decoration: none;
   font-weight: 600;
   font-size: 16px;
-  padding: 14px 0;
-  text-decoration: none;
+  padding: 12px 0;
+  line-height: 1;
+  transition: color 0.2s ease;
   color: inherit;
-  transition: color .2s ease;
 }
 
+
 /* ============================================================
-   SUBMENU (PC dropdown)
+   PC SUBMENU (드롭다운)
 ============================================================ */
 
-.submenu {
+.pc-menu .submenu {
   position: absolute;
   top: calc(100% + 18px);
   left: 50%;
   transform: translateX(-50%) translateY(12px);
+
   opacity: 0;
   visibility: hidden;
 
-  min-width: 180px;
-  padding: 6px 0;
   list-style: none;
-
+  min-width: 170px;
   background: #fff;
-  border-radius: 8px;
-  border: 1px solid rgba(0,0,0,0.12);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  padding: 8px 0;
 
-  transition: opacity .25s ease, transform .25s ease;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.10);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.10);
+
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  z-index: 200;
 }
 
-/* hover 유지 + 단일 submenu만 표시 */
+/* Hover 유지 + 자연스러운 열림 */
 .pc-menu > li:hover > .submenu {
   opacity: 1;
   visibility: visible;
   transform: translateX(-50%) translateY(0);
 }
 
-.submenu a {
+.pc-menu .submenu li a {
   display: block;
-  padding: 8px 14px;  /* 🔥 위아래 간격 줄여 더 세련되게 */
-  font-size: 14.5px;
+  padding: 9px 18px;
+  font-size: 14px;
   color: #222;
+  text-align: left;
   text-decoration: none;
-  transition: 0.2s;
+  white-space: nowrap;
 }
 
-.submenu a:hover {
+.pc-menu .submenu li a:hover {
   background: #eef2ff;
   color: #0f2679;
 }
 
+
 /* ============================================================
-   INDEX PAGE HEADER STYLE
+   INDEX PAGE HEADER (투명 → 스크롤 시 흰색)
 ============================================================ */
 
 body#index-page .header-inner {
-  background: rgba(20,20,20,0.35);
+  background: rgba(22,22,22,0.35);
   backdrop-filter: blur(16px);
 }
 
-body#index-page .logo-dark  { display: none; }
-body#index-page .logo-white { display: block; }
-
 body#index-page .pc-menu > li > a {
-  color: white;
-  text-shadow: 0 0 5px rgba(0,0,0,0.35);
+  color: #fff;
+  text-shadow: 0 0 5px rgba(0,0,0,0.4);
 }
+
+body#index-page .logo-white { display: block; }
+body#index-page .logo-dark  { display: none; }
 
 body#index-page.scrolled .header-inner {
-  background: rgba(255,255,255,0.97);
-  border-bottom: 1px solid rgba(0,0,0,0.05);
-}
-
-body#index-page.scrolled .pc-menu > li > a {
-  color: #222;
-  text-shadow: none;
-}
-
-body#index-page.scrolled .logo-dark  { display: block; }
-body#index-page.scrolled .logo-white { display: none; }
-
-/* ============================================================
-   SUBPAGE
-============================================================ */
-
-body:not(#index-page) .header-inner {
   background: rgba(255,255,255,0.96);
   border-bottom: 1px solid rgba(0,0,0,0.05);
 }
 
-body:not(#index-page) .pc-menu > li > a {
-  color: #111;
+body#index-page.scrolled .pc-menu > li > a {
+  color: #000 !important;
+  text-shadow: none;
 }
 
+body#index-page.scrolled .logo-white { display: none; }
+body#index-page.scrolled .logo-dark  { display: block; }
+
+
 /* ============================================================
-   LANGUAGE DROPDOWN — PC ONLY
+   SUBPAGE HEADER (항상 흰색)
+============================================================ */
+
+body:not(#index-page) .header-inner {
+  background: rgba(255,255,255,0.95);
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+
+body:not(#index-page) .pc-menu > li > a {
+  color: #000;
+}
+
+body:not(#index-page) .logo-white { display: none; }
+body:not(#index-page) .logo-dark  { display: block; }
+
+
+/* ============================================================
+   LANGUAGE DROPDOWN
 ============================================================ */
 
 .language-dropdown {
   position: relative;
-  display: inline-block;
 }
 
 .lang-toggle {
-  padding: 6px 12px;
-  border-radius: 18px;
   background: #fff;
-  border: 1px solid #ccc;
+  border: 1px solid #cfcfcf;
+  border-radius: 20px;
+  padding: 5px 14px;
   font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
 }
 
 .lang-list {
+  display: none;
   position: absolute;
   top: calc(100% + 6px);
   right: 0;
 
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-
+  width: 80px;
   list-style: none;
   padding: 6px 0;
-  width: 85px;
-
   background: #fff;
-  border-radius: 8px;
+
+  border-radius: 10px;
   border: 1px solid #ddd;
-  transition: 0.25s ease;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.07);
 }
 
 .language-dropdown.open .lang-list {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
+  display: block;
 }
 
+.lang-list li a {
+  display: block;
+  padding: 8px 14px;
+  font-size: 13px;
+  text-decoration: none;
+  color: #333;
+}
+
+
 /* ============================================================
-   MOBILE — SMARTPHONE OPTIMIZED
+   MOBILE ONLY — 햄버거 메뉴 + 풀스크린 네비
 ============================================================ */
+
+.mobile-menu-btn {
+  display: none;
+}
 
 @media (max-width: 1024px) {
 
-  .header-inner {
-    height: 56px;        
-    padding: 0 18px;
-  }
-
-  .logo {
-    width: 115px;
-  }
-
-  .pc-menu,
+  /* ▼ PC 메뉴 숨김 */
   .pc-nav {
     display: none !important;
   }
 
+  /* ▼ 햄버거 버튼 */
   .mobile-menu-btn {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    justify-content: center;
+    height: 64px; /* 헤더 높이에 맞춤 */
+    gap: 5px;
+
+    width: 34px;
     border: none;
     background: none;
-    width: 28px;
-    height: 22px;
     cursor: pointer;
   }
 
   .mobile-menu-btn span {
-    width: 24px;
-    height: 2.5px;
+    width: 26px;
+    height: 3px;
+    background: #000;
     border-radius: 2px;
-    background: #333;
+    transition: 0.25s ease;
   }
 
-  /* FULLSCREEN MENU */
+  /* 스크롤된 홈에서 햄버거 색 변경 */
+  body#index-page.scrolled .mobile-menu-btn span {
+    background: #000 !important;
+  }
+
+  /* 홈 초기 상태: 흰색 배경 위에서는 밝은색 */
+  body#index-page .mobile-menu-btn span {
+    background: #fff;
+  }
+
+
+  /* ============================================================
+     MOBILE OVERLAY (전체 화면 메뉴)
+  ============================================================ */
+
   .mobile-overlay {
     position: fixed;
     inset: 0;
     background: rgba(255,255,255,0.97);
     backdrop-filter: blur(10px);
+
     opacity: 0;
     visibility: hidden;
-    transition: 0.3s;
-    z-index: 9999;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+
+    z-index: 7000;
   }
 
   .mobile-overlay.open {
@@ -277,58 +312,76 @@ body:not(#index-page) .pc-menu > li > a {
   }
 
   .mobile-overlay-inner {
-    padding: 80px 24px 24px;
+    padding: 100px 26px 40px;
   }
+
+
+  /* ============================================================
+     MOBILE MENU STRUCTURE
+  ============================================================ */
 
   .mobile-menu {
     list-style: none;
-    padding: 0;
     margin: 0;
+    padding: 0;
   }
 
+  /* 1차 메뉴 */
   .m-item {
     width: 100%;
+    padding: 12px 0;
+    font-size: 15px;
+    font-weight: 700;
     background: none;
     border: none;
-    font-size: 15px; 
-    padding: 12px 0;
-    font-weight: 600;
     text-align: left;
     cursor: pointer;
   }
 
+  /* 2차 메뉴 (접힘/펼침) */
   .m-sub {
     list-style: none;
     padding-left: 14px;
+    margin-top: 0;
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.25s ease;
+    transition: max-height 0.3s ease;
   }
 
   .m-sub.open {
-    max-height: 300px;
+    max-height: 600px; /* 충분히 큰 값 */
   }
 
+  /* 2차 항목 */
   .m-sub li a {
     display: block;
     padding: 8px 0;
     font-size: 14px;
-    color: #222;
+    text-decoration: none;
+    color: #333;
   }
 
-  /* 🔥 모바일 언어 선택은 메뉴 하단 배치 */
-  .mobile-lang {
-    margin-top: 24px;
-    padding-top: 14px;
-    border-top: 1px solid #ddd;
+
+  /* ============================================================
+     MOBILE LANGUAGE DROPDOWN (상단 오른쪽)
+  ============================================================ */
+
+  .language-dropdown {
+    position: absolute;
+    top: 18px;
+    right: 20px;
   }
 
-  .mobile-lang button {
-    background: #f2f2f2;
-    border: 1px solid #ccc;
-    padding: 8px 12px;
-    border-radius: 8px;
-    font-size: 14px;
-    width: 100%;
+  .lang-toggle {
+    background: #fff;
+    border: 1px solid #bbb;
+    padding: 5px 12px;
+    font-size: 13px;
+    border-radius: 16px;
   }
-}
+
+  .lang-list {
+    width: 75px;
+  }
+
+} /* @media end */
