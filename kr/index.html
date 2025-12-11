@@ -702,15 +702,17 @@ document.addEventListener("scroll", () => {
 
 
 <script>
-  //모바일에서 배너 높이 작게
 document.addEventListener("DOMContentLoaded", () => {
-  if (window.innerWidth < 769) {
+  const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|Mobile/i.test(navigator.userAgent);
+
+  if (isMobile) {
     document.querySelector(".banner-slider").style.height = "55vh";
     document.querySelectorAll(".slide").forEach(s => s.style.height = "55vh");
     document.querySelectorAll(".slide img").forEach(i => i.style.height = "55vh");
   }
 });
 </script>
+
 
 
 
