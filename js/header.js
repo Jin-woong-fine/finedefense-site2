@@ -11,7 +11,7 @@ function waitForHeader(callback) {
       clearInterval(timer);
       callback();
     }
-  }, 60); // 더 빠른 반응 속도
+  }, 60);
 }
 
 // ======================================================
@@ -22,6 +22,7 @@ function initHeaderScript() {
   const overlay = document.querySelector(".mobile-overlay");
   const submenuButtons = document.querySelectorAll(".m-item");
   const body = document.body;
+  const mobileLinks = document.querySelectorAll(".mobile-menu a");
 
   if (!btn || !overlay) return; // 안전 장치
 
@@ -29,6 +30,8 @@ function initHeaderScript() {
   //  오버레이 열기 / 닫기 함수
   // -----------------------------
   const openOverlay = () => {
+    // 모바일에서만 동작
+    if (window.innerWidth > 1024) return;
     overlay.classList.add("open");
     body.style.overflow = "hidden";
   };
@@ -63,6 +66,7 @@ function initHeaderScript() {
   submenuButtons.forEach(button => {
     button.addEventListener("click", () => {
       const sub = button.nextElementSibling;
+      if (!sub) return;
 
       // 다른 아코디언 닫기
       document.querySelectorAll(".m-sub.open").forEach(opened => {
@@ -75,8 +79,17 @@ function initHeaderScript() {
   });
 
   // -----------------------------
-  //  PC 화면으로 전환 시 초기화
-  //  (Debounce 적용)
+  //  링크 클릭 시 오버레이 닫기
+  // -----------------------------
+  mobileLinks.forEach(link => {
+    link.addEventListener("click", () => {
+      closeOverlay();
+      // 페이지 이동은 기본 동작으로 그대로 진행
+    });
+  });
+
+  // -----------------------------
+  //  PC 화면으로 전환 시 초기화 (Debounce)
   // -----------------------------
   let resizeTimer = null;
 

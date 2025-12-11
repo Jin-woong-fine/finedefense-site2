@@ -213,14 +213,14 @@ body#index-page.scrolled .pc-menu a {
     justify-content: center;
     align-items: center;
 
-    width: 40px;
-    height: 28px;
+    width: 42px;
+    height: 32px;
     padding: 0;
 
     background: none;
     border: none;
     cursor: pointer;
-    z-index: 4000;
+    z-index: 6000; /* 헤더와 겹침 방지 */
   }
 
   .mobile-menu-btn span {
@@ -230,6 +230,7 @@ body#index-page.scrolled .pc-menu a {
     background: #111;
     margin: 4px 0;
     border-radius: 3px;
+    transition: 0.25s ease;
   }
 }
 
@@ -247,7 +248,7 @@ body#index-page.scrolled .pc-menu a {
   backdrop-filter: blur(14px);
   opacity: 0;
   visibility: hidden;
-  transition: 0.35s ease;
+  transition: opacity 0.35s ease, visibility 0.35s ease;
   z-index: 5000;
 }
 
@@ -258,8 +259,8 @@ body#index-page.scrolled .pc-menu a {
 
 .mobile-overlay-inner {
   position: relative;
-  padding: 140px 30px 40px;
-  z-index: 6000; /* 헤더보다 위 */
+  padding: 130px 30px 40px;
+  z-index: 6001; /* 메뉴 항목이 위로 */
 }
 
 .mobile-menu {
@@ -268,27 +269,31 @@ body#index-page.scrolled .pc-menu a {
   margin: 0;
 }
 
+/* 1차 메뉴 */
 .m-item {
   width: 100%;
   text-align: left;
-  padding: 18px 0;
+  padding: 16px 0;
   font-size: 20px;
   font-weight: 700;
   background: none;
   border: none;
   cursor: pointer;
+  color: #111;
+  display: block;
 }
 
+/* 2차 메뉴 */
 .m-sub {
   list-style: none;
-  padding-left: 12px;
+  padding-left: 14px;
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.25s;
+  transition: max-height 0.25s ease;
 }
 
 .m-sub.open {
-  max-height: 500px;
+  max-height: 500px; /* 충분히 큰 값 */
 }
 
 .m-sub li a {
@@ -296,6 +301,7 @@ body#index-page.scrolled .pc-menu a {
   padding: 10px 0;
   font-size: 15px;
   color: #222;
+  text-decoration: none;
 }
 
 /* ============================================== */
@@ -303,7 +309,24 @@ body#index-page.scrolled .pc-menu a {
 /* ============================================== */
 
 @media (max-width: 1024px) {
+
+  /* PC 메뉴는 숨김 */
   .pc-menu {
     display: none !important;
+  }
+
+  /* 모바일에서 헤더 요소 정렬 */
+  .header-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  /* 언어 선택과 햄버거 버튼이 겹치지 않도록 */
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 6000;
   }
 }
