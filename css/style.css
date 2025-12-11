@@ -327,48 +327,6 @@ body:not(#index-page) .language-dropdown.open .lang-list {
 
 
 /* ============================================== */
-/*                햄버거 메뉴 (모바일)             */
-/* ============================================== */
-
-.hamburger {
-  display: none;
-  flex-direction: column;
-  gap: 5px;
-  cursor: pointer;
-}
-
-.hamburger span {
-  background: #333;
-  height: 3px;
-  width: 28px;
-  border-radius: 2px;
-}
-
-/* 모바일 레이아웃 */
-@media (max-width: 1024px) {
-  .hamburger { display: flex; }
-  .main-menu {
-    position: static;
-    transform: none;
-    flex-direction: column;
-    width: 100%;
-    display: none;
-    border-top: 1px solid #eee;
-  }
-  .main-menu.show { display: flex; }
-
-  .submenu {
-    position: static;
-    opacity: 1;
-    visibility: visible;
-    transform: none;
-    background: #f8f8f8;
-    display: none;
-  }
-  .main-menu li.open > .submenu { display: block; }
-}
-
-/* ============================================== */
 /*                      FOOTER                    */
 /* ============================================== */
 
