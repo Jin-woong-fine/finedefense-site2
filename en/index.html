@@ -3,7 +3,7 @@
 <html lang="en">
   <head>
       <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="viewport" content="width=1200">
       <meta name="description" content="Fine Defense specializes in marine defense cables, submarine sonar cable assemblies, towed array sonar cables, and integrated termination systems for harsh deep-sea environments.">
 
       <title>Fine Defense | Marine Defense Cable & Sonar System Manufacturer</title>
@@ -623,6 +623,29 @@ document.addEventListener("scroll", () => {
 });
 </script>
 
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|Mobile/i.test(navigator.userAgent);
+
+  if (isMobile) {
+    // 배너 컨테이너는 높이를 자동으로
+    document.querySelector(".banner-slider").style.height = "auto";
+
+    // 각 슬라이드도 자동 높이
+    document.querySelectorAll(".slide").forEach(s => {
+      s.style.height = "auto";
+    });
+
+    // 이미지: 가로 100% + 비율 유지 + 전체가 보이도록 contain
+    document.querySelectorAll(".slide img").forEach(i => {
+      i.style.width = "100%";
+      i.style.height = "auto";
+      i.style.objectFit = "contain";   // 핵심
+      i.style.background = "#000";     // 여백 생길 때 자연스럽게
+    });
+  }
+});
+</script>
 
 
 <style>
