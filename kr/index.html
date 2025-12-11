@@ -10,9 +10,103 @@
 
       <link rel="stylesheet" href="/css/style.css">
       <link rel="stylesheet" href="/css/banner.css">
-      <link rel="stylesheet" href="/css/features.css">
 
       <style>
+        .business-area {
+          max-width: 1200px;
+          margin: 80px auto;
+          padding: 0 20px;
+          text-align: center;
+        }
+
+        .business-area h2 {
+          font-size: 2.0rem;
+          font-weight: 700;
+          color: #000000;
+          margin-bottom: 20px;
+        }
+
+        .business-area p {
+          font-size: 1.2rem;
+          font-weight: 500;
+          color: #555;
+          line-height: 1.7;
+          margin-bottom: 60px;
+        }
+
+        .features {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          gap: 35px;
+          justify-content: center;
+        }
+
+        .feature-card {
+          position: relative;
+          width: 300px;
+          height: 300px;
+          border-radius: 14px;
+          background-size: cover;
+          background-position: center;
+          box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: flex-end;
+          padding: 25px;
+          transition: all 0.35s ease;
+          text-decoration: none !important;
+        }
+
+        .feature-card::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0.1));
+          transition: opacity 0.3s ease;
+        }
+
+        .feature-card:hover {
+          transform: translateY(-6px);
+          box-shadow: 0 8px 22px rgba(0,0,0,0.18);
+        }
+
+        .feature-card:hover::before {
+          opacity: 0.8;
+        }
+
+        .feature-card h3 {
+          position: relative;
+          z-index: 2;
+          color: #fff;
+          font-size: 20px;
+          font-weight: 600;
+          text-align: center;
+          line-height: 1.4;
+          margin-bottom: 5px;
+          text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+        }
+
+        .feature-card span {
+          display: block;
+          font-size: 14px;
+          font-weight: 400;
+          color: #d0d0d0;
+          margin-top: 4px;
+        }
+
+        .feature-card p {
+          position: relative;
+          z-index: 2;
+          color: #eaeaea;
+          font-size: 14px;
+          line-height: 1.5;
+          margin: 10px 0 0;
+          text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+        }
+
+
         .facilities {
         padding: 80px 5%;
         background: #f8f9fa; /* 밝은 회색 배경 */
