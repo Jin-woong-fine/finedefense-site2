@@ -510,82 +510,63 @@ body.has-admin-bar {
 
 
 /* ===========================================================
-   📱 모바일 (1024px 이하) — PC 레이아웃 유지 + 축소 버전
-   ※ index-page 의 clamp 로고 크기를 완전히 무력화하여 통일된 크기 적용
+      📱 MOBILE MENU (1024px 이하)
+      PC hover 기능 완전 차단 + 아코디언 전용 스타일 적용
 =========================================================== */
 @media (max-width: 1024px) {
 
-  /* 헤더 패딩 축소 */
-  .header-inner {
-    padding: 8px 12px !important;
+  /* 📌 PC hover 완전 비활성화 (hover로 안 열리게 차단) */
+  .main-menu li:hover > .submenu {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transform: none !important;
   }
 
-  /* 🔥 로고 크기 완전 고정 (PC Clamp 효과 제거) */
-  .header-left .logo {
-    width: 90px !important;
-    height: auto !important;
-    max-width: 90px !important;
-    min-width: 90px !important;
-  }
-
-  /* 메뉴 간격 줄이기 */
-  .main-menu {
-    gap: 16px !important;
-  }
-
-  /* 메뉴 텍스트 작게 */
-  .main-menu > li > a {
-    font-size: 11px !important;
-  }
-
-  /* 서브메뉴 크기 */
+  /* 📌 모바일 submenu = 아코디언 방식 */
   .submenu {
-    top: calc(100% + 12px) !important;
-    min-width: 135px !important;
-    padding: 6px 0 !important;
+    position: relative !important;
+
+    /* 항상 표시 상태로(visibility/opacity는 강제 ON) */
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+
+    display: block !important;
+    max-height: 0;
+    overflow: hidden;
+
+    border: none !important;
+    box-shadow: none !important;
+    margin-top: 8px;
+
+    transition: max-height 0.25s ease;
   }
 
+  /* 📌 메뉴 열릴 때 */
+  .main-menu li.open > .submenu {
+    max-height: 600px;
+  }
+
+  /* 📌 서브메뉴 항목 (모바일 UI 스타일) */
   .submenu li a {
-    font-size: 11px !important;
-    padding: 6px 8px !important;
+    font-size: 14px !important;
+    padding: 10px 14px !important;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+  }
+  .submenu li:last-child a {
+    border-bottom: none;
   }
 
-  /* 모바일에서는 hover 효과 제거 (JS 토글과 충돌 방지) */
-  .main-menu li:hover .submenu {
-    display: none !important;
+  /* 📌 메뉴를 세로형 메뉴로 전환 */
+  .main-menu {
+    flex-direction: column !important;
+    gap: 12px !important;
+
+    position: static !important;
+    transform: none !important;
+    left: unset !important;
+    top: unset !important;
   }
 }
 
-/* ===========================================================
-   📱 초소형 모바일 (600px 이하)
-=========================================================== */
-@media (max-width: 600px) {
-
-  /* 더 작은 로고 */
-  .header-left .logo {
-    width: 65px !important;
-    max-width: 65px !important;
-    min-width: 65px !important;
-  }
-
-  /* 메뉴 간격 최소화 */
-  .main-menu {
-    gap: 10px !important;
-  }
-
-  /* 텍스트 줄이기 */
-  .main-menu > li > a {
-    font-size: 10px !important;
-  }
-
-  /* 서브메뉴 더 컴팩트 */
-  .submenu {
-    min-width: 120px !important;
-    top: calc(100% + 8px) !important;
-  }
-
-  .submenu li a {
-    font-size: 10px !important;
-    padding: 5px 6px !important;
-  }
-}
