@@ -157,7 +157,7 @@
       list.innerHTML = data.files.map(f => `
         <div class="file-item">
           <span>${f.original_name} (${formatSize(f.file_size)})</span>
-          <a href="${f.file_path}" download>다운로드</a>
+          <a href="/api/downloads/get-file?id=${f.id}">다운로드</a>
         </div>
       `).join("");
     }

@@ -340,4 +340,55 @@ router.delete("/delete/:id", verifyToken, async (req, res) => {
   }
 });
 
+// ============================================================
+// 📥 파일 다운로드 (download_count 증가 포함)
+//    GET /api/downloads/get-file?id=파일ID
+// ============================================================
+router.get("/get-file", async (req, res) => {
+  try {
+    const fileId = Number(req.query.id);
+    if (!fileId) return res.status(400).json({ message: "invalid file id" });
+
+    // 1) 파일 정보 조회
+    const [[file]] = await db.execute(
+      `SELECT id, file_path, original_name, download_count
+         FROM downloads_files
+        WHERE id=?`,
+      [fileId]
+    );
+
+    if (!file) {
+      return res.status(404).json({ message: "file not found" });
+    }
+
+    // 2) 디스크 경로 변환
+    const diskPath = toDiskPath(file.file_path);
+    if (!diskPath || !fs.existsSync(diskPath)) {
+      return res.status(404).json({ message: "file not found on disk" });
+    }
+
+    // 3) 다운로드 카운트 증가
+    await db.execute(
+      `UPDATE downloads_files 
+          SET download_count = download_count + 1
+        WHERE id=?`,
+      [fileId]
+    );
+
+    // 4) 정확한 파일명으로 다운로드
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename*=UTF-8''${encodeURIComponent(file.original_name)}`
+    );
+
+    // 5) 파일 전송
+    return res.download(diskPath);
+
+  } catch (err) {
+    console.error("📌 download error:", err);
+    res.status(500).json({ message: "download error" });
+  }
+});
+
+
 export default router;

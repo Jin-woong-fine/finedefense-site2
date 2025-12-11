@@ -32,7 +32,7 @@ router.get("/dashboard", verifyToken, async (req, res) => {
       SELECT COUNT(*) AS cnt FROM posts
     `);
 
-    // TOP 5 인기글
+    // 인기글 TOP 5
     const [topPosts] = await pool.execute(`
       SELECT p.id, p.title,
              COUNT(v.id) AS total_views
@@ -43,7 +43,22 @@ router.get("/dashboard", verifyToken, async (req, res) => {
       LIMIT 5
     `);
 
-    // 최근 등록 제품 5개
+    // 자료실 다운로드 TOP 5
+    const [downloadTop] = await pool.execute(`
+      SELECT 
+        i.id,
+        i.title,
+        (
+          SELECT SUM(download_count)
+          FROM downloads_files f
+          WHERE f.item_id = i.id
+        ) AS total_downloads
+      FROM downloads_items i
+      ORDER BY total_downloads DESC
+      LIMIT 5
+    `);
+
+    // 최신 제품 5개
     const [recentProducts] = await pool.execute(`
       SELECT id, title, category, thumbnail
       FROM products
@@ -55,12 +70,14 @@ router.get("/dashboard", verifyToken, async (req, res) => {
       p.image = p.thumbnail || null;
     });
 
+    // 🎯 최종 응답 — 단 1번만 전송!
     res.json({
       thisMonthViews: thisMonth.cnt,
       lastMonthViews: lastMonth.cnt,
       postCount: postCount.cnt,
       topPosts,
-      recentProducts
+      recentProducts,
+      downloadTop
     });
 
   } catch (err) {
@@ -68,6 +85,7 @@ router.get("/dashboard", verifyToken, async (req, res) => {
     res.status(500).json({ message: "Dashboard load error" });
   }
 });
+
 
 
 /* ============================================================

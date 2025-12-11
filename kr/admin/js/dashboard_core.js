@@ -61,6 +61,27 @@ async function loadDashboardStats() {
       }
     }
 
+
+
+    const downloadTop = data.downloadTop ?? [];
+
+    // 자료실 다운로드 Top 5
+    const dlList = document.getElementById("downloadTopList");
+    if (dlList) {
+      if (downloadTop.length === 0) {
+        dlList.innerHTML = `<li style="color:#777;">다운로드 기록이 없습니다.</li>`;
+      } else {
+        dlList.innerHTML = downloadTop.map(d => `
+          <li>
+            ${d.title} — 
+            <strong>${d.total_downloads || 0}</strong> 회
+          </li>
+        `).join("");
+      }
+    }
+
+
+
     // 최근 등록 제품
     const recentBox = document.getElementById("recentProducts");
     if (recentBox) {
