@@ -8,60 +8,92 @@
   align-items: center;
   width: 100%;
   padding: clamp(0.5rem, 1.5vw, 1.5rem) 2vw;
-  box-sizing: border-box;
   position: relative;
   z-index: 2000;
+  box-sizing: border-box;
+  isolation: isolate;
 }
 
-.header-left { display: flex; align-items: center; }
-.header-right { display: flex; align-items: center; gap: 20px; }
+.header-left {
+  display: flex;
+  align-items: center;
+}
 
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+/* 로고 공통 */
 .header-left .logo {
   width: clamp(120px, 12vw, 190px);
+  height: auto;
 }
 
-/* 메뉴는 absolute 금지 — PC/모바일 공통 안정화 */
-.main-menu {
+/* 가운데 정렬 컨테이너 */
+.main-menu-container {
+  flex: 1;
   display: flex;
-  gap: clamp(40px, 4vw, 120px);
+  justify-content: center;
+}
+
+/* ✅ PC 기준: 메뉴를 헤더 한가운데(absolute + translate) */
+.main-menu {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  gap: clamp(50px, 4vw, 150px);
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-/* PC에서 submenu 구조 */
 .main-menu > li {
   position: relative;
 }
 
+/* 메뉴 텍스트 공통 */
 .main-menu a {
-  font-family: "Noto Sans KR";
+  text-decoration: none;
+  font-family: 'Noto Sans KR', sans-serif;
   font-weight: 600;
   font-size: clamp(15px, 1vw, 18px);
-  text-decoration: none;
-  transition: .25s;
-  color: inherit;
+  letter-spacing: -0.2px;
+  transition: color 0.25s ease, opacity 0.25s ease;
 }
 
-/* 서브메뉴 */
+/* ============================================== */
+/*                서브메뉴 (PC 기준)             */
+/* ============================================== */
+
 .submenu {
+  list-style: none;
+  opacity: 0;
+  visibility: hidden;
+
   position: absolute;
-  top: calc(100% + 18px);
+  top: calc(100% + 22px);
   left: 50%;
   transform: translateX(-50%) translateY(10px);
 
   background: #fff;
   border: 1px solid rgba(0,0,0,0.15);
   border-radius: 6px;
-  padding: 10px 0;
   min-width: 180px;
-  opacity: 0;
-  visibility: hidden;
-  transition: .25s;
+  padding: 10px 0;
+  margin: 0;
+  text-align: center;
+
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  transition: opacity 0.25s ease, transform 0.25s ease;
   z-index: 200;
 }
 
-.main-menu li:hover > .submenu {
+/* PC: hover로 서브메뉴 표시 */
+.main-menu > li:hover > .submenu {
   opacity: 1;
   visibility: visible;
   transform: translateX(-50%) translateY(0);
@@ -70,122 +102,258 @@
 .submenu li a {
   display: block;
   padding: 10px 14px;
-  font-size: 15px;
+  font-size: 16px;
+  font-weight: 400;
   color: #222;
+  white-space: nowrap;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.submenu li a:hover {
+  background: #eef3ff;
+  color: #0f2679;
 }
 
 /* ============================================== */
-/*            서브페이지 white-header             */
+/*         서브페이지용 헤더(흰색 고정 헤더)      */
 /* ============================================== */
 
 body:not(#index-page) .header-inner {
   background: rgba(255,255,255,0.97);
-  border-bottom: 1px solid rgba(0,0,0,0.08);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
   padding: 22px 4vw !important;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.07);
 }
 
+/* 서브페이지 로고: dark만 사용 */
 body:not(#index-page) .logo-dark { display: block !important; }
-body:not(#index-page) .logo-white { display: none  !important; }
+body:not(#index-page) .logo-white { display: none !important; }
 
-body:not(#index-page) .main-menu a { color: #111 !important; }
+/* 서브페이지 메뉴 텍스트 */
+body:not(#index-page) .main-menu a {
+  color: #111 !important;
+  text-shadow: none !important;
+  opacity: 0.95;
+}
+
+body:not(#index-page) .main-menu a:hover {
+  color: #0f2679 !important;
+  opacity: 1;
+}
+
+/* 서브페이지 서브메뉴(색만 보정) */
+body:not(#index-page) .submenu {
+  background: #fff !important;
+  border: 1px solid rgba(0,0,0,0.15) !important;
+}
 
 /* ============================================== */
-/*                 INDEX PAGE HEADER              */
+/*               INDEX PAGE HEADER                */
 /* ============================================== */
 
 body#index-page .header-inner {
   position: fixed;
   top: 0;
+  left: 0;
   width: 100%;
-  background: rgba(15,15,15,0.35);
-  backdrop-filter: blur(18px);
-  border-bottom: 1px solid rgba(255,255,255,0.2);
-  transition: .35s;
+  padding: 22px 4vw;
+
+  background: rgba(15, 15, 15, 0.35);
+  backdrop-filter: blur(18px) brightness(1.25);
+  -webkit-backdrop-filter: blur(18px) brightness(1.25);
+
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+  box-shadow: none;
+
+  transition:
+    background 0.35s ease,
+    padding 0.35s ease,
+    box-shadow 0.35s ease,
+    border-color 0.35s ease;
 }
 
+/* 인덱스 페이지 로고: 초기엔 white */
 body#index-page .logo-white { display: block !important; }
 body#index-page .logo-dark  { display: none  !important; }
 
+/* 인덱스 메뉴 텍스트: 밝은색 */
 body#index-page .main-menu a {
-  color: white !important;
-  text-shadow: 0 2px 5px rgba(0,0,0,0.35);
+  color: #f6f6f6 !important;
+  text-shadow: 0 0 5px rgba(0,0,0,0.35);
 }
 
+/* 스크롤 후: 화이트 헤더 + dark 로고 */
 body#index-page.scrolled .header-inner {
   background: rgba(255,255,255,0.97);
-  box-shadow: 0 3px 10px rgba(0,0,0,0.07);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
   backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  padding: 22px 4vw;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.07);
 }
 
 body#index-page.scrolled .logo-white { display: none !important; }
 body#index-page.scrolled .logo-dark  { display: block !important; }
+
 body#index-page.scrolled .main-menu a {
   color: #111 !important;
   text-shadow: none;
+  font-weight: 600;
 }
 
 /* ============================================== */
-/*              언어 선택 드롭다운                */
+/*      언어 선택 드롭다운 (공통)                 */
 /* ============================================== */
 
 .language-dropdown {
   position: relative;
+  display: inline-block;
+  font-family: 'Noto Sans KR', sans-serif;
 }
 
 .lang-toggle {
   background: #fff;
-  border: 1px solid #ddd;
+  border: 1px solid #cfcfcf;
   border-radius: 20px;
   padding: 6px 16px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #333;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.25s ease;
+}
+
+.lang-toggle::after {
+  content: "▼";
+  font-size: 0.7rem;
+  margin-left: 4px;
+  opacity: 0.75;
+}
+
+.lang-toggle:hover {
+  background: #f3f6ff;
+  border-color: #0f2679;
+  color: #0f2679;
 }
 
 .lang-list {
-  display: none;
-  position: absolute;
-  top: calc(100% + 6px);
-  right: 0;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  width: 80px;
+  list-style: none;
   padding: 8px 0;
+  margin: 0;
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: #fff;
+  border: 1px solid #d6d6d6;
+  border-radius: 10px;
+  width: 80px;
+  display: none;
   box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+  overflow: hidden;
+  z-index: 10000;
 }
 
 .language-dropdown.open .lang-list {
   display: block;
 }
 
+.lang-list li a {
+  text-align: center;
+  display: block;
+  padding: 10px 16px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 550;
+  color: #333;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.lang-list li a:hover {
+  background: #eef3ff;
+  color: #0f2679;
+}
+
 /* ============================================== */
-/*                 MOBILE MENU (≤1024px)          */
+/*               MOBILE (≤1024px)                 */
 /* ============================================== */
 
-@media (max-width:1024px) {
+@media (max-width: 1024px) {
 
-  /* 메뉴를 세로형으로 전환 */
-  .main-menu {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
+  /* 헤더 패딩 축소 */
+  .header-inner {
+    padding: 12px 4vw;
   }
 
+  /* ✅ 가운데 정렬 absolute 제거 → 세로 메뉴 */
+  .main-menu {
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
+    transform: none !important;
+
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  /* ✅ 아코디언용 서브메뉴 (JS가 li.open 토글함) */
   .submenu {
     position: relative;
-    transform: none !important;
+    top: 0;
+    left: 0;
+    transform: none;
+
     opacity: 1 !important;
     visibility: visible !important;
+
     max-height: 0;
     overflow: hidden;
-    border: none;
-    box-shadow: none;
-    transition: max-height .25s ease;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0;
+    margin-top: 4px;
+    text-align: left;
+    transition: max-height 0.25s ease;
   }
 
   .main-menu li.open > .submenu {
-    max-height: 500px;
+    max-height: 600px;
   }
 
-  /* PC hover 삭제 금지!! */
+  .submenu li a {
+    font-size: 14px;
+    padding: 10px 12px;
+    border-bottom: 1px solid #eee;
+  }
+
+  .submenu li:last-child a {
+    border-bottom: none;
+  }
+}
+
+/* ============================================== */
+/*               SMALL MOBILE (≤600px)            */
+/* ============================================== */
+
+@media (max-width: 600px) {
+
+  .header-inner {
+    padding: 10px 3vw;
+  }
+
+  .header-left .logo {
+    width: 110px;
+  }
+
+  .main-menu a {
+    font-size: 13px;
+  }
+
+  .lang-toggle {
+    padding: 4px 12px;
+    font-size: 0.85rem;
+  }
 }
