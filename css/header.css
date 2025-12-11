@@ -7,7 +7,7 @@
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  padding: 20px 3vw;
+  padding: 10px 3vw; /* 🔥 실제 감소값: 두께 2/3 완전 적용 */
   position: fixed;
   top: 0;
   z-index: 5000;
@@ -15,9 +15,29 @@
   transition: 0.3s ease;
 }
 
-/* 로고 렌더링 문제 해결 (보라색 선 제거) */
-.logo-wrap { line-height: 0; }
-.header-left .logo { display: block; width: clamp(120px, 12vw, 180px); }
+/* ================= 로고 문제 완전 해결 ================ */
+
+/* inline baseline 제거 + 클릭 outline 제거 */
+.logo-wrap {
+  display: inline-flex;
+  align-items: center;
+  line-height: 0;
+  outline: none;
+  border: none;
+}
+.logo-wrap:focus,
+.logo-wrap:active {
+  outline: none !important;
+}
+
+/* 로고 이미지: baseline artifact + focus 잔상 제거 */
+.header-left .logo {
+  display: block;
+  vertical-align: top;   /* 🔥 줄 생기는 근본 원인 제거 */
+  width: clamp(120px, 12vw, 170px);
+  border: none !important;
+  outline: none !important;
+}
 
 /* ============================================== */
 /*                    PC 메뉴                      */
@@ -30,11 +50,12 @@
   align-items: center;
 }
 
+/* 🔥 메뉴 간격 실제로 더 좁게 조정 (가운데 모임) */
 .pc-menu {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(26px, 2.5vw, 48px); /* 🔥 적정 간격으로 복구 */
+  gap: clamp(16px, 1.2vw, 26px); /* 이전보다 20~30% 더 촘촘 */
   list-style: none;
   padding: 0;
   margin: 0;
@@ -48,29 +69,28 @@
   text-decoration: none;
   font-family: 'Noto Sans KR', sans-serif;
   font-weight: 600;
-  font-size: 17px;
+  font-size: 16px;
   transition: 0.25s;
 }
 
 /* ============================================== */
-/*                PC submenu (hover)              */
+/*                PC submenu                      */
 /* ============================================== */
 
 .pc-menu .submenu {
   opacity: 0;
   visibility: hidden;
-
   list-style: none;
-  position: absolute;
 
-  top: calc(100% + 30px); /* 🔥 문제 해결: 아래로 여백 확보 */
+  position: absolute;
+  top: calc(100% + 26px);  /* 🔥 in-between spacing 안정화 */
   left: 50%;
   transform: translateX(-50%) translateY(10px);
 
   background: #fff;
-  border: 1px solid rgba(0,0,0,0.1);
+  border: 1px solid rgba(0,0,0,0.12);
   border-radius: 6px;
-  min-width: 180px;
+  min-width: 170px;
   padding: 10px 0;
   text-align: center;
 
@@ -85,7 +105,7 @@
   transform: translateX(-50%) translateY(0);
 }
 
-.pc-menu .submenu li a {
+.pc-menu .submenu a {
   display: block;
   padding: 10px 14px;
   font-size: 15px;
@@ -97,7 +117,7 @@
 /* ============================================== */
 
 body:not(#index-page) .header-inner {
-  background: rgba(255,255,255,0.97);
+  background: rgba(255,255,255,0.96);
   border-bottom: 1px solid rgba(0,0,0,0.06);
   box-shadow: 0 3px 10px rgba(0,0,0,0.07);
 }
@@ -145,9 +165,7 @@ body#index-page.scrolled .pc-menu > li > a {
 /*           LANGUAGE DROPDOWN                    */
 /* ============================================== */
 
-.language-dropdown {
-  position: relative;
-}
+.language-dropdown { position: relative; }
 
 .lang-toggle {
   background: #fff;
@@ -171,9 +189,7 @@ body#index-page.scrolled .pc-menu > li > a {
   border-radius: 10px;
 }
 
-.language-dropdown.open .lang-list {
-  display: block;
-}
+.language-dropdown.open .lang-list { display: block; }
 
 /* ============================================== */
 /*               MOBILE HAMBURGER                */
@@ -204,9 +220,7 @@ body#index-page.scrolled .pc-menu > li > a {
     border-radius: 3px;
   }
 
-  .pc-menu {
-    display: none !important;
-  }
+  .pc-menu { display: none !important; }
 }
 
 /* ============================================== */
