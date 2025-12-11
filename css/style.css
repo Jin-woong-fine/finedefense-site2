@@ -534,7 +534,7 @@ body.has-admin-bar {
 
   /* 메뉴 글자 */
   .main-menu a {
-    font-size: 13px !important;
+    font-size: 11px !important;
   }
 
   /* 서브메뉴 */
@@ -545,7 +545,7 @@ body.has-admin-bar {
   }
 
   .submenu li a {
-    font-size: 13px !important;
+    font-size: 11px !important;
     padding: 6px 8px !important;
   }
 }
@@ -570,7 +570,7 @@ body.has-admin-bar {
 
   /* 글자 더 작게 */
   .main-menu a {
-    font-size: 12px !important;
+    font-size: 10px !important;
   }
 
   /* 서브메뉴 */
@@ -580,7 +580,7 @@ body.has-admin-bar {
   }
 
   .submenu li a {
-    font-size: 12px !important;
+    font-size: 10px !important;
     padding: 5px 6px !important;
   }
 }
