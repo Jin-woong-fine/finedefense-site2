@@ -2,7 +2,29 @@
 
 console.log("%c[sidebar] 로드 완료", "color:#4caf50;font-weight:bold;");
 
-function loadSidebar(activePage = "") {
+// -------------------------------------------------------------
+// 🔵 1) 프로필 API에서 avatar 가져오기 (비동기)
+// -------------------------------------------------------------
+async function fetchUserAvatar() {
+  try {
+    const res = await fetch("/api/users/me", {
+      headers: authHeaders(),
+    });
+
+    if (!res.ok) return null;
+
+    const data = await res.json();
+    return data.avatar || null; // avatar URL
+  } catch (err) {
+    console.warn("[sidebar] avatar 불러오기 실패:", err);
+    return null;
+  }
+}
+
+// -------------------------------------------------------------
+// 🔵 2) 사이드바 렌더 함수
+// -------------------------------------------------------------
+async function loadSidebar(activePage = "") {
   const wrap = document.getElementById("sidebar");
   if (!wrap) {
     console.warn("[sidebar] #sidebar 요소를 찾을 수 없습니다.");
@@ -11,6 +33,11 @@ function loadSidebar(activePage = "") {
 
   const role = localStorage.getItem("role") || "user";
   const name = localStorage.getItem("name") || "관리자";
+
+  // 🔹 API에서 avatar 자동 로드
+  const avatarUrl = await fetchUserAvatar();
+  const avatarSrc =
+    avatarUrl || "/img/admin/avatar-placeholder.png"; // 기본 이미지도 제공
 
   const menu = [
     { title: "대시보드", link: "/kr/admin/dashboard.html", key: "dashboard" },
@@ -43,6 +70,9 @@ function loadSidebar(activePage = "") {
     menu.push({ title: "사용자 관리", link: "/kr/admin/users.html", key: "users" });
   }
 
+  // -------------------------------------------------------------
+  // 🔵 사이드바 HTML 렌더링
+  // -------------------------------------------------------------
   wrap.innerHTML = `
     <div class="sidebar">
 
@@ -51,7 +81,7 @@ function loadSidebar(activePage = "") {
       </div>
 
       <div class="user-block">
-        <img class="avatar" src="/img/logo/fd-symbol-white.png" alt="avatar" />
+        <img class="avatar" src="${avatarSrc}" alt="avatar" />
         <div class="user-info">
           <div class="name">${name}</div>
           <div class="role">${role}</div>
@@ -63,7 +93,6 @@ function loadSidebar(activePage = "") {
       <div class="sidebar-menu">
         ${menu
           .map((item) => {
-            // 서브메뉴 있는 그룹
             if (item.children) {
               const open = item.children.some((ch) => ch.key === activePage);
               return `
@@ -85,7 +114,6 @@ function loadSidebar(activePage = "") {
               `;
             }
 
-            // 단일 메뉴
             return `
               <a class="menu-item ${item.key === activePage ? "active" : ""}"
                  href="${item.link}">
@@ -99,7 +127,7 @@ function loadSidebar(activePage = "") {
     </div>
   `;
 
-  // 🔹 서브메뉴 토글
+  // 🔵 서브메뉴 토글
   wrap.querySelectorAll(".menu-group > .menu-item").forEach((el) => {
     el.addEventListener("click", () => {
       el.parentElement.classList.toggle("open");
@@ -109,7 +137,10 @@ function loadSidebar(activePage = "") {
   console.log("[sidebar] 렌더 완료 — activePage:", activePage);
 }
 
-// 🔹 모든 admin 페이지에서 자동으로 사이드바 로드
+
+// -------------------------------------------------------------
+// 🔵 3) 자동 로딩 (모든 admin 페이지 공통)
+// -------------------------------------------------------------
 document.addEventListener("DOMContentLoaded", () => {
   const active = document.body.dataset.adminPage || "";
   loadSidebar(active);
