@@ -21,47 +21,47 @@ function initHeaderScript() {
     const link = li.querySelector("a");
     const submenu = li.querySelector(".submenu");
 
-    // 서브메뉴 없는 경우 스킵
-    if (!submenu) return;
+    if (!submenu) return; // 서브메뉴 없는 항목 스킵
 
-    // ----------------------------------------------
-    // 📌 모바일 클릭으로 아코디언 열기
-    // ----------------------------------------------
     link.addEventListener("click", (e) => {
       const isMobile = window.innerWidth <= 1024;
 
-      if (!isMobile) return; // PC는 기본 이동
+      if (!isMobile) return; // PC에서는 기본 hover 유지
 
-      // 모바일에서는 이동 막기
-      e.preventDefault();
+      e.preventDefault(); // 모바일에서는 링크 이동 막기
 
-      // 현재 메뉴 상태 확인
-      const willOpen = !li.classList.contains("open");
+      const isOpen = li.classList.contains("open");
 
-      // 모든 메뉴 닫기
-      document.querySelectorAll(".main-menu > li").forEach(item => {
+      // -------------------------
+      // 🔥 모든 메뉴 닫기
+      // -------------------------
+      document.querySelectorAll(".main-menu > li.open").forEach(item => {
         item.classList.remove("open");
       });
 
-      // 클릭한 항목만 열기
-      if (willOpen) {
-        li.classList.add("open");
-      }
+      // -------------------------
+      // 🔥 이미 열려있던 메뉴이면 닫기만 하고 끝
+      // -------------------------
+      if (isOpen) return;
+
+      // -------------------------
+      // 🔥 닫혀있던 메뉴는 열기
+      // -------------------------
+      li.classList.add("open");
     });
   });
 
-  // ----------------------------------------------
-  // 📌 화면 크기 변경 시 메뉴 초기화
-  // ----------------------------------------------
+  // -------------------------
+  // 📌 화면 크기 변경 시 초기화
+  // -------------------------
   window.addEventListener("resize", () => {
     if (window.innerWidth > 1024) {
-      // PC 전환 시 아코디언 초기화
-      document.querySelectorAll(".main-menu > li").forEach(li => {
+      document.querySelectorAll(".main-menu > li.open").forEach(li => {
         li.classList.remove("open");
       });
     }
   });
 }
 
-// include.js가 DOM에 header.html 삽입할 때까지 기다림
+// include.js로 header가 로드될 때까지 대기
 waitForHeader(initHeaderScript);
