@@ -107,11 +107,11 @@ html, body {
   visibility: hidden;
 
   list-style: none;
-  min-width: 200px;   /* 🔥 메뉴 폭 고정 → 정확한 가운데 */
-  padding: 12px 0;
+  min-width: 180px;               /* 더 컴팩트 */
+  padding: 8px 0;                 /* 🔥 위아래 패딩 감소 */
 
   background: #fff;
-  border-radius: 10px;
+  border-radius: 8px;             /* 더 고급스러움 */
   border: 1px solid rgba(0,0,0,0.1);
   box-shadow: 0 8px 20px rgba(0,0,0,0.08);
 
@@ -129,12 +129,14 @@ html, body {
 /* 서브메뉴 항목 */
 .pc-menu .submenu li a {
   display: block;
-  padding: 12px 20px;
+  padding: 10px 18px;             /* 🔥 위아래 간격 줄임 */
   font-size: 15px;
   color: #222;
   text-decoration: none;
+  line-height: 1.3;               /* 텍스트 간격 조절 */
 }
 
+/* hover 시 부드러운 하이라이트 */
 .pc-menu .submenu li a:hover {
   background: #eef3ff;
   color: #0f2679;
@@ -236,49 +238,45 @@ body:not(#index-page) .logo-dark  { display: block !important; }
    MOBILE MENU BUTTON
 ============================================================ */
 
-.mobile-menu-btn {
-  display: none;
-}
-
+/* 모바일 햄버거 버튼 */
 @media (max-width: 1024px) {
   .mobile-menu-btn {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    height: 100%;
-    gap: 4px;
-
     width: 32px;
+    height: 28px;
     background: none;
     border: none;
     cursor: pointer;
+    gap: 5px;
   }
 
   .mobile-menu-btn span {
-    width: 24px;
+    width: 26px;
     height: 3px;
-    background: #333;
+    background: #222;
     border-radius: 2px;
+    transition: 0.25s ease;
   }
 
+  /* PC 메뉴 숨김 */
   .pc-menu {
     display: none !important;
   }
 }
 
-/* ============================================================
-   MOBILE FULLSCREEN MENU
-============================================================ */
 
+/* 전체 모바일 오버레이 */
 .mobile-overlay {
   position: fixed;
   inset: 0;
   background: rgba(255,255,255,0.96);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(10px);
   opacity: 0;
   visibility: hidden;
-  transition: 0.3s ease;
-  z-index: 7000;
+  transition: opacity .25s ease;
+  z-index: 9000;
 }
 
 .mobile-overlay.open {
@@ -286,31 +284,69 @@ body:not(#index-page) .logo-dark  { display: block !important; }
   visibility: visible;
 }
 
+/* 내부 여백 */
 .mobile-overlay-inner {
-  padding: 110px 28px 40px;
+  padding: 120px 30px 50px;
 }
 
-.mobile-menu {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+/* 1차 메뉴 */
+.mobile-menu > li {
+  margin-bottom: 10px;
 }
 
 .m-item {
   width: 100%;
-  padding: 14px 0;
-  font-size: 17px;
+  padding: 16px 0;
+  font-size: 19px;
   font-weight: 700;
+  color: #111;
+  background: none;
+  border: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
 }
 
+.m-item::after {
+  content: "▾";                     /* 🔥 대기업식 드롭다운 표시 */
+  font-size: 16px;
+  color: #777;
+  transition: 0.25s ease;
+}
+
+.m-item.active::after {
+  transform: rotate(-180deg);
+  color: #333;
+}
+
+/* 2차 메뉴 */
 .m-sub {
   list-style: none;
+  margin: 0;
   padding-left: 14px;
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.25s ease;
+  transition: max-height .3s ease;
 }
 
 .m-sub.open {
-  max-height: 350px;
+  max-height: 500px;               /* 충분히 크게 */
+}
+
+.m-sub li a {
+  display: block;
+  padding: 12px 0;
+  color: #444;
+  font-size: 15px;
+  text-decoration: none;
+  border-bottom: 1px solid #eee;
+}
+
+.m-sub li:last-child a {
+  border-bottom: none;
+}
+
+.m-sub li a:hover {
+  color: #0f2679;
 }
