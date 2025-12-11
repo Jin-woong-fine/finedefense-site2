@@ -60,7 +60,7 @@ router.get("/dashboard", verifyToken, async (req, res) => {
 
     // 최신 제품 5개
     const [recentProducts] = await pool.execute(`
-      SELECT id, title, category, thumbnail
+      SELECT id, title, category, lang, thumbnail
       FROM products
       ORDER BY created_at DESC
       LIMIT 5
