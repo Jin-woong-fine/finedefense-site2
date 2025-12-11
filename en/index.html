@@ -14,6 +14,104 @@
       <link rel="stylesheet" href="/css/features.css">
 
       <style>
+
+      .business-area {
+        max-width: 1200px;
+        margin: 80px auto;
+        padding: 0 20px;
+        text-align: center;
+      }
+
+      .business-area h2 {
+        font-size: 2.0rem;
+        font-weight: 700;
+        color: #000000;
+        margin-bottom: 20px;
+      }
+
+      .business-area p {
+        font-size: 1.2rem;
+        font-weight: 500;
+        color: #555;
+        line-height: 1.7;
+        margin-bottom: 60px;
+      }
+
+      .features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 35px;
+        justify-content: center;
+      }
+
+      .feature-card {
+        position: relative;
+        width: 300px;
+        height: 300px;
+        border-radius: 14px;
+        background-size: cover;
+        background-position: center;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-end;
+        padding: 25px;
+        transition: all 0.35s ease;
+        text-decoration: none !important;
+      }
+
+      .feature-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0.1));
+        transition: opacity 0.3s ease;
+      }
+
+      .feature-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 8px 22px rgba(0,0,0,0.18);
+      }
+
+      .feature-card:hover::before {
+        opacity: 0.8;
+      }
+
+      .feature-card h3 {
+        position: relative;
+        z-index: 2;
+        color: #fff;
+        font-size: 20px;
+        font-weight: 600;
+        text-align: center;
+        line-height: 1.4;
+        margin-bottom: 5px;
+        text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+      }
+
+      .feature-card span {
+        display: block;
+        font-size: 14px;
+        font-weight: 400;
+        color: #d0d0d0;
+        margin-top: 4px;
+      }
+
+      .feature-card p {
+        position: relative;
+        z-index: 2;
+        color: #eaeaea;
+        font-size: 14px;
+        line-height: 1.5;
+        margin: 10px 0 0;
+        text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+      }
+
+
+
+
         .facilities {
         padding: 80px 5%;
         background: #f8f9fa; /* 밝은 회색 배경 */
@@ -358,138 +456,144 @@
         width: clamp(120px, 12vw, 190px) !important;
       }
 
-    /* ===========================================================
-      📱 1024px 이하 — 카드 + 본문 전체 축소
-    =========================================================== */
-    @media (max-width: 1024px) {
+      /* ===========================================================
+        🔵 SMALL PC / LAPTOP (max-width: 1439px)
+        - 일반 노트북 화면 최적화
+      =========================================================== */
+      @media (max-width: 1439px) {
 
-      /* 섹션 패딩 축소 */
-      section, .news, .facilities, .business-area {
-        padding: 50px 4% !important;
-      }
+        /* 전체 레이아웃 폭 축소 */
+        section, .news, .facilities, .business-area {
+          max-width: 900px;
+          margin: 60px auto !important;
+          padding: 0 20px !important;
+        }
 
-      /* 제목 크기 축소 */
-      section h2 {
-        font-size: 1.6rem !important;
-      }
+        /* 제목·본문 축소 */
+        section h2,
+        .news h2,
+        .facilities h2,
+        .business-area h2 {
+          font-size: 1.7rem !important;
+        }
 
-      /* 본문 텍스트 */
-      section p {
-        font-size: 1rem !important;
-        line-height: 1.55 !important;
-      }
+        section p,
+        .news p,
+        .facilities p,
+        .business-area p {
+          font-size: 1.05rem !important;
+          line-height: 1.55 !important;
+        }
 
-      /* ===== 시설 카드 ===== */
-      .facility-card {
-        max-width: 260px !important;
-      }
-      .facility-card img {
-        height: 160px !important;
-      }
-      .facility-card h3 {
-        font-size: 1.1rem !important;
-      }
-      .facility-card p {
-        font-size: 0.9rem !important;
-      }
+        /* 카드 3열 → 2열 */
+        .features,
+        .facility-grid,
+        .news-grid {
+          display: grid !important;
+          grid-template-columns: repeat(2, 1fr) !important;
+          gap: 28px !important;
+          justify-content: center !important;
+        }
 
-      /* ===== 뉴스 카드 ===== */
-      .news-card {
-        width: 260px !important;
-      }
-      .news-card img {
-        height: 150px !important;
-      }
-      .news-card h3 {
-        font-size: 1.1rem !important;
-      }
-      .news-card p {
-        font-size: 0.9rem !important;
-      }
+        /* 카드 전체 폭 자동화 */
+        .feature-card,
+        .facility-card,
+        .news-card {
+          width: 100% !important;
+          max-width: 100% !important;
+        }
 
-      /* 배너 텍스트 */
-      .banner-text {
-        font-size: 1.4rem !important;
-      }
-      .banner-subtext {
-        font-size: 1rem !important;
-      }
-    }
+        /* 이미지 크기 축소 */
+        .facility-card img { height: 170px !important; }
+        .news-card img     { height: 160px !important; }
 
-
-    /* ===========================================================
-      📱 600px 이하 — 스마트폰 UI 최적화
-    =========================================================== */
-    @media (max-width: 600px) {
-
-      /* 섹션 패딩 더 줄이기 */
-      section, .news, .facilities, .business-area {
-        padding: 35px 4% !important;
+        /* 제목 크기 축소 */
+        .feature-card h3,
+        .facility-card h3,
+        .news-card h3 {
+          font-size: 1.1rem !important;
+        }
       }
 
-      /* 제목 크기 */
-      section h2 {
-        font-size: 1.35rem !important;
-        margin-bottom: 0.6rem !important;
+
+      /* ===========================================================
+        🔵 TABLET / LARGE MOBILE (max-width: 1024px)
+        - 태블릿·작은 화면 PC
+      =========================================================== */
+      @media (max-width: 1024px) {
+
+        /* 본문 여백 축소 */
+        section, .news, .facilities, .business-area {
+          padding: 45px 4% !important;
+        }
+
+        section h2 { font-size: 1.5rem !important; }
+        section p  { font-size: 0.95rem !important; }
+
+        /* 카드 2열 유지 */
+        .features,
+        .facility-grid,
+        .news-grid {
+          grid-template-columns: repeat(2, 1fr) !important;
+          gap: 20px !important;
+        }
+
+        /* 카드 크기 축소 */
+        .feature-card  { height: 170px !important; }
+        .facility-card img { height: 150px !important; }
+        .news-card img     { height: 140px !important; }
+
+        /* 텍스트 축소 */
+        .feature-card h3,
+        .facility-card h3,
+        .news-card h3 {
+          font-size: 1rem !important;
+        }
       }
 
-      /* 본문 텍스트 */
-      section p {
-        font-size: 0.9rem !important;
-        line-height: 1.45 !important;
-        margin-bottom: 22px !important;
+
+      /* ===========================================================
+        🔵 MOBILE (max-width: 600px)
+        - 스마트폰
+      =========================================================== */
+      @media (max-width: 600px) {
+
+        /* 전체 패딩 축소 */
+        section, .news, .facilities, .business-area {
+          padding: 28px 4% !important;
+        }
+
+        section h2 { font-size: 1.3rem !important; }
+        section p  { font-size: 0.9rem !important; line-height: 1.4 !important; }
+
+        /* 카드 2열 유지 */
+        .features,
+        .facility-grid,
+        .news-grid {
+          grid-template-columns: repeat(2, 1fr) !important;
+          gap: 12px !important;
+        }
+
+        /* 카드 더 축소 */
+        .feature-card       { height: 140px !important; }
+        .facility-card img  { height: 120px !important; }
+        .news-card img      { height: 110px !important; }
+
+        /* 텍스트 더 축소 */
+        .feature-card h3,
+        .facility-card h3,
+        .news-card h3 {
+          font-size: 0.9rem !important;
+        }
+
+        /* CTA 버튼 축소 */
+        .contact-btn {
+          font-size: 0.95rem !important;
+          padding: 10px 18px !important;
+        }
       }
 
-      /* ===== 시설 카드 ===== */
-      .facility-card {
-        max-width: 220px !important;
-      }
-      .facility-card img {
-        height: 130px !important;
-      }
-      .facility-card h3 {
-        font-size: 1rem !important;
-        margin: 12px 0 !important;
-      }
-      .facility-card p {
-        font-size: 0.85rem !important;
-      }
 
-      /* ===== 뉴스 카드 ===== */
-      .news-card {
-        width: 220px !important;
-      }
-      .news-card img {
-        height: 120px !important;
-      }
-      .news-card h3 {
-        font-size: 1rem !important;
-      }
-      .news-card p {
-        font-size: 0.85rem !important;
-      }
-
-      /* ===== 배너 텍스트 ===== */
-      .banner-text {
-        font-size: 1.2rem !important;
-        max-width: 90% !important;
-      }
-      .banner-subtext {
-        font-size: 0.85rem !important;
-      }
-
-      /* CTA */
-      .contact-cta h2 {
-        font-size: 1.4rem !important;
-      }
-      .contact-cta p {
-        font-size: 0.95rem !important;
-      }
-      .contact-btn {
-        font-size: 1rem !important;
-        padding: 10px 20px !important;
-      }
-    }
 
     </style>
 
