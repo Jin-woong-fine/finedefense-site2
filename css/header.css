@@ -1,231 +1,258 @@
 /* ============================================== */
-/*                 HEADER 기본 구조                 */
+/*                HEADER 기본 구조                */
 /* ============================================== */
 
 .header-inner {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  /* 🟢 수정: 상하 패딩(20px -> 13px)을 줄여 두께를 감소 */
-  padding: 13px 3vw; 
-  position: fixed;
-  top: 0;
-  z-index: 5000;
-  background: transparent;
-  transition: 0.3s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 20px 3vw;
+  position: fixed;
+  top: 0;
+  z-index: 5000;
+  background: transparent;
+  transition: 0.3s ease;
 }
 
-/* 로고를 감싸는 링크 요소의 기본 테두리 제거 및 정렬 */
-.header-left .logo-wrap {
-  display: block;
-  line-height: 0;
-}
-
-/* 로고 위/아래 선 제거 */
-.header-left .logo {
-  display: block;
-  width: clamp(120px, 12vw, 170px);
-  /* 🟢 수정: 이상한 보라색 줄(border/outline) 확실히 제거 */
-  border: none;
-  outline: none; 
-}
+/* 로고 렌더링 문제 해결 (보라색 선 제거) */
+.logo-wrap { line-height: 0; }
+.header-left .logo { display: block; width: clamp(120px, 12vw, 180px); }
 
 /* ============================================== */
-/*                     PC 메뉴                       */
+/*                    PC 메뉴                      */
 /* ============================================== */
 
 .pc-nav {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-/* 🔥 메뉴 간격 좁게 + 가운데 모이도록 */
 .pc-menu {
-  display: flex;
-  gap: clamp(28px, 2.4vw, 48px);
-  padding: 0;
-  margin: 0;
-  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(26px, 2.5vw, 48px); /* 🔥 적정 간격으로 복구 */
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .pc-menu > li {
-  position: relative;
+  position: relative;
 }
 
 .pc-menu > li > a {
-  font-weight: 600;
-  font-size: 17px;
-  text-decoration: none;
-  transition: 0.25s;
+  text-decoration: none;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 600;
+  font-size: 17px;
+  transition: 0.25s;
 }
 
 /* ============================================== */
-/*                 PC submenu                      */
+/*                PC submenu (hover)              */
 /* ============================================== */
 
 .pc-menu .submenu {
-  /* 🟢 수정: 서브 메뉴 리스트의 동그라미(마커) 제거 */
-  list-style: none; 
-  opacity: 0;
-  visibility: hidden;
-  position: absolute;
-  top: calc(100% + 28px);
-  left: 50%;
-  transform: translateX(-50%) translateY(10px);
-  transition: 0.25s ease;
+  opacity: 0;
+  visibility: hidden;
 
-  min-width: 170px;
-  background: #fff;
-  border-radius: 8px;
-  border: 1px solid rgba(0,0,0,0.1);
-  padding: 10px 0;
-  text-align: center;
+  list-style: none;
+  position: absolute;
+
+  top: calc(100% + 30px); /* 🔥 문제 해결: 아래로 여백 확보 */
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 6px;
+  min-width: 180px;
+  padding: 10px 0;
+  text-align: center;
+
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  transition: 0.25s ease;
+  z-index: 200;
 }
 
 .pc-menu > li:hover .submenu {
-  opacity: 1;
-  visibility: visible;
-  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
 }
 
-.pc-menu .submenu a {
-  display: block;
-  padding: 10px 0;
-  color: #333;
-  font-size: 15px;
+.pc-menu .submenu li a {
+  display: block;
+  padding: 10px 14px;
+  font-size: 15px;
+  color: #222;
 }
 
 /* ============================================== */
-/*             INDEX PAGE HEADER STYLE             */
+/*         서브페이지용 흰색 고정 헤더            */
+/* ============================================== */
+
+body:not(#index-page) .header-inner {
+  background: rgba(255,255,255,0.97);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.07);
+}
+
+body:not(#index-page) .logo-dark { display: block !important; }
+body:not(#index-page) .logo-white { display: none !important; }
+
+body:not(#index-page) .pc-menu > li > a {
+  color: #111 !important;
+}
+
+/* ============================================== */
+/*                INDEX PAGE HEADER                */
 /* ============================================== */
 
 body#index-page .header-inner {
-  background: rgba(25, 25, 25, 0.35);
-  backdrop-filter: blur(12px);
-  border-bottom: none;
+  background: rgba(20,20,20,0.35);
+  backdrop-filter: blur(14px);
+  border-bottom: none;
 }
 
+body#index-page .logo-white { display: block !important; }
+body#index-page .logo-dark  { display: none !important; }
+
+body#index-page .pc-menu > li > a {
+  color: #f5f5f5 !important;
+  text-shadow: 0 0 5px rgba(0,0,0,0.35);
+}
+
+/* 스크롤 후 */
 body#index-page.scrolled .header-inner {
-  background: rgba(255,255,255,0.96);
-  border-bottom: 1px solid rgba(0,0,0,0.07);
+  background: rgba(255,255,255,0.97);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+
+body#index-page.scrolled .logo-white { display: none !important; }
+body#index-page.scrolled .logo-dark  { display: block !important; }
+
+body#index-page.scrolled .pc-menu > li > a {
+  color: #111 !important;
+  text-shadow: none;
 }
 
 /* ============================================== */
-/*                 LANGUAGE DROPDOWN                */
+/*           LANGUAGE DROPDOWN                    */
 /* ============================================== */
 
 .language-dropdown {
-  position: relative;
+  position: relative;
 }
 
 .lang-toggle {
-  border-radius: 20px;
-  padding: 6px 15px;
-  font-size: 14px;
-  border: 1px solid #d1d1d1;
-  background: #fff;
-  cursor: pointer;
+  background: #fff;
+  border: 1px solid #cfcfcf;
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 .lang-list {
-  display: none;
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  width: 80px;
-  background: white;
-  padding: 8px 0;
-  border-radius: 10px;
-  border: 1px solid #ddd;
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  width: 85px;
+  padding: 8px 0;
+  background: #fff;
+  border: 1px solid #d1d1d1;
+  border-radius: 10px;
 }
 
 .language-dropdown.open .lang-list {
-  display: block;
+  display: block;
 }
 
 /* ============================================== */
-/*                MOBILE HAMBURGER                */
+/*               MOBILE HAMBURGER                */
 /* ============================================== */
 
 .mobile-menu-btn {
-  display: none;
-  /* !important는 필요하지 않을 수 있지만 유지보수 차원에서 z-index만으로 충분한지 확인 필요 */
-  z-index: 9999 !important; 
+  display: none;
+  z-index: 9999 !important;
 }
 
 @media (max-width: 1024px) {
-  .mobile-menu-btn {
-    display: flex !important;
-    flex-direction: column;
-    justify-content: center;
-    gap: 4px;
-    width: 32px;
-    height: 28px;
-    background: none;
-    border: none;
-  }
+  .mobile-menu-btn {
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    width: 32px;
+    height: 26px;
+    background: none;
+    border: none;
+  }
 
-  .mobile-menu-btn span {
-    width: 24px;
-    height: 3px;
-    background: #111;
-    border-radius: 3px;
-  }
+  .mobile-menu-btn span {
+    display: block;
+    width: 24px;
+    height: 3px;
+    background: #111;
+    border-radius: 3px;
+  }
 
-  /* PC 메뉴 숨김 */
-  .pc-menu {
-    display: none !important;
-  }
+  .pc-menu {
+    display: none !important;
+  }
 }
 
 /* ============================================== */
-/*           FULLSCREEN MOBILE MENU                */
+/*           FULLSCREEN MOBILE MENU               */
 /* ============================================== */
 
 .mobile-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(255,255,255,0.95);
-  backdrop-filter: blur(5px);
-  opacity: 0;
-  visibility: hidden;
-  transition: 0.3s ease;
-  z-index: 6000;
+  position: fixed;
+  inset: 0;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  visibility: hidden;
+  transition: 0.3s ease;
+  z-index: 6000;
 }
 
 .mobile-overlay.open {
-  opacity: 1;
-  visibility: visible;
+  opacity: 1;
+  visibility: visible;
 }
 
 .mobile-overlay-inner {
-  padding: 110px 28px 40px;
+  padding: 110px 28px 40px;
 }
 
 .mobile-menu {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .m-item {
-  width: 100%;
-  font-size: 18px;
-  padding: 14px 0;
+  width: 100%;
+  font-size: 18px;
+  padding: 14px 0;
 }
 
 .m-sub {
-  /* 🟢 수정: 모바일 서브 메뉴 리스트의 동그라미(마커) 제거 */
   list-style: none;
-  padding-left: 14px;
-  max-height: 0;
-  overflow: hidden;
-  transition: 0.25s ease;
+  padding-left: 14px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.25s ease;
 }
 
 .m-sub.open {
-  max-height: 300px;
+  max-height: 350px;
 }
