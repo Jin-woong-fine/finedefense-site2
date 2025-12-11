@@ -1,6 +1,6 @@
-/* ============================================== */
-/*            GLOBAL RESET (대기업 공통)           */
-/* ============================================== */
+/* ============================================================
+   GLOBAL RESET (대기업 공통) 
+============================================================ */
 
 html, body {
   margin: 0;
@@ -12,17 +12,16 @@ html, body {
   box-sizing: border-box;
 }
 
-/* ============================================== */
-/*                HEADER 기본 구조                */
-/* ============================================== */
+/* ============================================================
+   HEADER BASE STYLE
+============================================================ */
 
 .header-inner {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  max-width: 100%;          /* 🔥 가로폭 절대 넘지 않도록 고정 */
-  height: 68px;             /* ✔ 대기업 헤더 평균 높이 */
+  height: 66px;                  /* ✔ 대기업 평균 헤더 높이 */
   padding: 0 3vw;
 
   display: flex;
@@ -34,15 +33,13 @@ html, body {
   z-index: 5000;
 }
 
-/* ============================================== */
-/*                     로고                        */
-/* ============================================== */
+/* ============================================================
+   LOGO AREA (보라색 줄 완전 제거)
+============================================================ */
 
-/* 로고 클릭 outline 및 baseline 문제 해결 */
 .logo-wrap {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
   height: 100%;
   line-height: 0;
   outline: none;
@@ -56,61 +53,70 @@ html, body {
 
 .header-left .logo {
   display: block;
-  vertical-align: top;      /* 🔥 1px 라인 생성 원인 제거 */
-  width: clamp(110px, 9vw, 150px);  /* 대기업 로고 비율 수준 */
+  vertical-align: top;           /* ✔ 라인 유발 제거 */
+  width: clamp(100px, 8vw, 135px);
 }
 
-/* ============================================== */
-/*                    PC 메뉴                      */
-/* ============================================== */
+/* ============================================================
+   PC NAVIGATION
+============================================================ */
 
 .pc-nav {
   flex: 1;
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 
 .pc-menu {
   display: flex;
-  gap: clamp(20px, 1.8vw, 36px); /* ✔ 대기업 표준 간격 */
+  gap: clamp(16px, 1.4vw, 28px); /* ✔ 대기업 스타일 */
   list-style: none;
   padding: 0;
   margin: 0;
-  align-items: center;
+}
+
+.pc-menu > li {
+  position: relative;
 }
 
 .pc-menu > li > a {
   text-decoration: none;
   font-weight: 600;
   font-size: 16px;
+  padding: 12px 0;                /* ✔ hover 안정성 */
+  line-height: 1;
   color: inherit;
-  line-height: 1;            /* 🔥 헤더 높이 불필요 증가 제거 */
   transition: color 0.2s ease;
 }
 
-/* ============================================== */
-/*                PC submenu                      */
-/* ============================================== */
+/* ============================================================
+   PC SUBMENU (hover dropdown)
+============================================================ */
 
 .pc-menu .submenu {
   position: absolute;
   top: calc(100% + 22px);
   left: 50%;
-  transform: translateX(-50%) translateY(10px);
+  transform: translateX(-50%) translateY(12px);
 
   opacity: 0;
   visibility: hidden;
-  transition: 0.25s ease;
 
-  background: #fff;
   padding: 10px 0;
   min-width: 170px;
   list-style: none;
+
+  background: #fff;
   border-radius: 6px;
   border: 1px solid rgba(0,0,0,0.1);
   box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  z-index: 200;
 }
 
+/* 🔥 반드시 이 코드만 유지해야 정상! */
 .pc-menu > li:hover > .submenu {
   opacity: 1;
   visibility: visible;
@@ -121,28 +127,27 @@ html, body {
   display: block;
   padding: 10px;
   font-size: 15px;
-  color: #222;
   text-decoration: none;
+  color: #222;
 }
 
-/* ============================================== */
-/*                INDEX PAGE HEADER                */
-/* ============================================== */
+/* ============================================================
+   INDEX PAGE (투명 → 스크롤 흰색)
+============================================================ */
 
 body#index-page .header-inner {
   background: rgba(20,20,20,0.35);
-  backdrop-filter: blur(18px);
+  backdrop-filter: blur(16px);
 }
 
 body#index-page .pc-menu > li > a {
-  color: white;
+  color: #fff;
   text-shadow: 0 0 5px rgba(0,0,0,0.35);
 }
 
 body#index-page .logo-white { display: block; }
 body#index-page .logo-dark  { display: none; }
 
-/* 스크롤 후 */
 body#index-page.scrolled .header-inner {
   background: rgba(255,255,255,0.96);
   border-bottom: 1px solid rgba(0,0,0,0.05);
@@ -156,9 +161,9 @@ body#index-page.scrolled .pc-menu > li > a {
 body#index-page.scrolled .logo-white { display: none; }
 body#index-page.scrolled .logo-dark  { display: block; }
 
-/* ============================================== */
-/*         서브페이지 (항상 흰 헤더)              */
-/* ============================================== */
+/* ============================================================
+   SUBPAGE (항상 흰 헤더)
+============================================================ */
 
 body:not(#index-page) .header-inner {
   background: rgba(255,255,255,0.96);
@@ -172,9 +177,9 @@ body:not(#index-page) .pc-menu > li > a {
 body:not(#index-page) .logo-white { display: none; }
 body:not(#index-page) .logo-dark  { display: block; }
 
-/* ============================================== */
-/*           LANGUAGE DROPDOWN                    */
-/* ============================================== */
+/* ============================================================
+   LANGUAGE DROPDOWN
+============================================================ */
 
 .language-dropdown {
   position: relative;
@@ -196,9 +201,11 @@ body:not(#index-page) .logo-dark  { display: block; }
   top: calc(100% + 6px);
   right: 0;
 
-  background: #fff;
   width: 80px;
   padding: 8px 0;
+  list-style: none;
+
+  background: #fff;
   border-radius: 10px;
   border: 1px solid #ddd;
 }
@@ -207,24 +214,23 @@ body:not(#index-page) .logo-dark  { display: block; }
   display: block;
 }
 
-/* ============================================== */
-/*               MOBILE HAMBURGER                */
-/* ============================================== */
+/* ============================================================
+   MOBILE NAV (햄버거)
+============================================================ */
 
 .mobile-menu-btn {
   display: none;
 }
 
 @media (max-width: 1024px) {
-  /* 햄버거 버튼 노출 */
   .mobile-menu-btn {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    height: 100%;                     /* ✔ 헤더 높이에 맞춤 */
     gap: 4px;
 
     width: 32px;
-    height: 26px;
     border: none;
     background: none;
     cursor: pointer;
@@ -237,15 +243,15 @@ body:not(#index-page) .logo-dark  { display: block; }
     border-radius: 2px;
   }
 
-  /* PC 메뉴 숨김 */
+  /* PC 네비 숨김 */
   .pc-menu {
     display: none !important;
   }
 }
 
-/* ============================================== */
-/*           FULLSCREEN MOBILE MENU               */
-/* ============================================== */
+/* ============================================================
+   FULLSCREEN MOBILE MENU
+============================================================ */
 
 .mobile-overlay {
   position: fixed;
