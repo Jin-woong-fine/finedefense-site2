@@ -5,27 +5,26 @@ import { verifyToken } from "../middleware/auth.js";
 
 const router = express.Router();
 
-/* ==========================================
-   📊 관리자 대시보드 통계 API
-   👉 GET /api/admin/dashboard
-   🔥 로그인 사용자라면 모두 접근 가능
-========================================== */
+/* ============================================================
+   📊 1) 관리자 대시보드 통계 API
+   GET /api/admin/dashboard
+============================================================ */
 router.get("/dashboard", verifyToken, async (req, res) => {
   try {
     // 이번달 조회수
     const [[thisMonth]] = await pool.execute(`
-      SELECT SUM(views) AS total
-      FROM post_view_stats
-      WHERE year = YEAR(NOW())
-        AND month = MONTH(NOW())
+      SELECT COUNT(*) AS cnt
+      FROM post_view_logs
+      WHERE YEAR(viewed_at) = YEAR(NOW())
+        AND MONTH(viewed_at) = MONTH(NOW())
     `);
 
     // 지난달 조회수
     const [[lastMonth]] = await pool.execute(`
-      SELECT SUM(views) AS total
-      FROM post_view_stats
-      WHERE year = YEAR(DATE_SUB(NOW(), INTERVAL 1 MONTH))
-        AND month = MONTH(DATE_SUB(NOW(), INTERVAL 1 MONTH))
+      SELECT COUNT(*) AS cnt
+      FROM post_view_logs
+      WHERE YEAR(viewed_at) = YEAR(DATE_SUB(NOW(), INTERVAL 1 MONTH))
+        AND MONTH(viewed_at) = MONTH(DATE_SUB(NOW(), INTERVAL 1 MONTH))
     `);
 
     // 전체 게시물 수
@@ -33,22 +32,18 @@ router.get("/dashboard", verifyToken, async (req, res) => {
       SELECT COUNT(*) AS cnt FROM posts
     `);
 
-    // 조회수 TOP 5
+    // TOP 5 인기글
     const [topPosts] = await pool.execute(`
-      SELECT 
-        p.id,
-        p.title,
-        (
-          SELECT SUM(views)
-          FROM post_view_stats s
-          WHERE s.post_id = p.id
-        ) AS total_views
+      SELECT p.id, p.title,
+             COUNT(v.id) AS total_views
       FROM posts p
+      LEFT JOIN post_view_logs v ON p.id = v.post_id
+      GROUP BY p.id
       ORDER BY total_views DESC
       LIMIT 5
     `);
 
-    // 최근 제품 5개
+    // 최근 등록 제품 5개
     const [recentProducts] = await pool.execute(`
       SELECT id, title, category, thumbnail
       FROM products
@@ -61,8 +56,8 @@ router.get("/dashboard", verifyToken, async (req, res) => {
     });
 
     res.json({
-      thisMonthViews: thisMonth.total || 0,
-      lastMonthViews: lastMonth.total || 0,
+      thisMonthViews: thisMonth.cnt,
+      lastMonthViews: lastMonth.cnt,
       postCount: postCount.cnt,
       topPosts,
       recentProducts
@@ -74,20 +69,20 @@ router.get("/dashboard", verifyToken, async (req, res) => {
   }
 });
 
-/* ==========================================
-   📈 월별 조회수 API
-   👉 GET /api/admin/monthly-views
-   🔥 로그인 사용자라면 모두 접근 가능
-========================================== */
+
+/* ============================================================
+   📈 2) 월별 조회수 그래프 API
+   GET /api/admin/monthly-views
+============================================================ */
 router.get("/monthly-views", verifyToken, async (req, res) => {
   try {
     const [rows] = await pool.execute(`
-      SELECT 
-        year,
-        month,
-        SUM(views) AS total_views
-      FROM post_view_stats
-      GROUP BY year, month
+      SELECT
+        YEAR(viewed_at) AS year,
+        MONTH(viewed_at) AS month,
+        COUNT(*) AS total_views
+      FROM post_view_logs
+      GROUP BY YEAR(viewed_at), MONTH(viewed_at)
       ORDER BY year DESC, month DESC
       LIMIT 12
     `);
