@@ -1,188 +1,122 @@
-/* ============================================================
-   GLOBAL BASE
-============================================================ */
-
-html, body {
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
-}
+/* ============================================== */
+/*                   기본 설정                    */
+/* ============================================== */
 
 body {
+  margin: 0;
   font-family: Arial, sans-serif;
 }
 
-/* data-include 영역이 div를 안 깨먹게 */
-[data-include] {
-  display: contents !important;
-}
-
-/* ============================================================
-   HEADER LAYOUT (PC 공통)
-============================================================ */
+/* ============================================== */
+/*                HEADER 기본 구조                */
+/* ============================================== */
 
 .header-inner {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-
-  height: 64px;
-  padding: 0 4vw;
-
   display: flex;
   justify-content: space-between;
   align-items: center;
-
-  background: rgba(255, 255, 255, 0.97);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-
+  width: 100%;
+  padding: clamp(0.5rem, 1.5vw, 1.5rem) 2vw;
+  position: relative;
+  z-index: 2000;
   box-sizing: border-box;
-  z-index: 6000;
-
-  transition:
-    background 0.3s ease,
-    box-shadow 0.3s ease,
-    border-color 0.3s ease,
-    padding 0.3s ease;
+  isolation: isolate;
 }
 
-/* 관리자 세션바가 있을 때 헤더 살짝 내려주기 */
-body.has-admin-bar .header-inner {
-  top: 38px;
+/* 레이아웃 영역 정의 */
+.header-left { display: flex; align-items: center; }
+.header-right { display: flex; align-items: center; gap: 20px; }
+
+/* 로고 공통 사이즈 */
+.header-left .logo {
+  width: clamp(120px, 12vw, 190px);
+  height: auto;
 }
 
-/* 헤더 안쪽 기본 정렬 */
-.header-left,
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-}
-
-/* ============================================================
-   LOGO
-============================================================ */
-
-.logo-wrap {
-  display: inline-flex;
-  align-items: center;
-  height: 100%;
-  line-height: 0;
-  text-decoration: none;
-  border: none;
-  outline: none;
-}
-
-.logo-wrap img {
-  display: block;
-  vertical-align: top;
-}
-
-/* 기본: 서브페이지/일반페이지 → 다크 로고 우선 */
-.logo {
-  width: clamp(120px, 11vw, 180px);
-}
-
-.logo-dark { display: block; }
-.logo-white { display: none; }
-
-/* 포커스 아웃라인 제거 */
-.logo-wrap:focus,
-.logo-wrap:active {
-  outline: none;
-}
-
-/* ============================================================
-   PC NAVIGATION
-============================================================ */
-
-.pc-nav {
+/* 메뉴 중앙 정렬 컨테이너 */
+.main-menu-container {
   flex: 1;
   display: flex;
   justify-content: center;
-  align-items: center;
 }
 
-.pc-menu {
+/* 메뉴 */
+.main-menu {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   display: flex;
-  align-items: center;
-  gap: 40px;          /* 메인 메뉴 간격 */
+  gap: clamp(50px, 4vw, 150px);
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.pc-menu > li {
+/* 메뉴 항목 */
+.main-menu a {
+  text-decoration: none;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 600;
+  font-size: clamp(15px, 1vw, 18px);
+  letter-spacing: -0.2px;
+  transition: color .25s ease, opacity .25s ease;
+}
+
+/* 서브메뉴 기본 구조 */
+.main-menu > li {
   position: relative;
 }
 
-.pc-menu > li > a {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 8px 0;
-  text-decoration: none;
-  font-size: 15px;
-  font-weight: 600;
-
-  color: #111;
-  white-space: nowrap;
-  transition: color 0.2s ease;
-}
-
-.pc-menu > li > a:hover {
-  color: #0f2679;
-}
-
-/* ============================================================
-   PC SUBMENU (드롭다운)
-============================================================ */
-
-.submenu {
+.main-menu > li::after {
+  content: "";
   position: absolute;
-  left: 50%;
-  top: calc(100% + 14px);
-  transform: translateX(-50%);
-  min-width: 180px;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  height: 30px;
+}
 
-  margin: 0;
-  padding: 6px 0;
-
+/* 서브메뉴 */
+.submenu {
   list-style: none;
-  background: #fff;
-  border-radius: 8px;
-  border: 1px solid rgba(0,0,0,0.10);
-  box-shadow: 0 10px 24px rgba(0,0,0,0.12);
-
   opacity: 0;
   visibility: hidden;
-  pointer-events: none;
-  transition:
-    opacity 0.22s ease,
-    transform 0.22s ease;
-  z-index: 6100;
+
+  position: absolute;
+  top: calc(100% + 22px);
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.15);
+  border-radius: 6px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+
+  padding: 10px 0;
+  min-width: 180px;
+  margin: 0;
+  text-align: center;
+
+  transition: opacity .25s ease, transform .25s ease;
+  z-index: 200;
 }
 
-/* hover 시 표시 (마우스가 li 안에 있는 동안 유지) */
-.pc-menu > li:hover > .submenu {
+.main-menu li:hover > .submenu {
   opacity: 1;
   visibility: visible;
-  pointer-events: auto;
   transform: translateX(-50%) translateY(0);
 }
 
+/* 서브메뉴 글씨 */
 .submenu li a {
   display: block;
-  padding: 8px 16px;
-  font-size: 14px;
-  font-weight: 500;
-  text-decoration: none;
+  padding: 10px 14px;
+  font-size: 16px;
+  font-weight: 400;
   color: #222;
   white-space: nowrap;
-  transition: background 0.18s ease, color 0.18s ease;
+  transition: background .2s ease, color .2s ease;
 }
 
 .submenu li a:hover {
@@ -190,272 +124,253 @@ body.has-admin-bar .header-inner {
   color: #0f2679;
 }
 
-/* ============================================================
-   LANGUAGE DROPDOWN (PC)
-============================================================ */
+/* =================================================================== */
+/*     서브페이지 전용 헤더 스타일 — index.scrolled 과 100% 동일     */
+/* =================================================================== */
 
-.language-dropdown {
-  position: relative;
-  font-size: 13px;
+body:not(#index-page) .header-inner {
+  background: rgba(255,255,255,0.97) !important;
+  border-bottom: 1px solid rgba(0,0,0,0.06) !important;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.07) !important;
+
+  padding: 22px 4vw !important;
+
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+
+  width: 100% !important;
+  position: relative !important;
+  z-index: 2000 !important;
 }
 
-.lang-toggle {
-  min-width: 56px;
-  padding: 6px 14px;
-  border-radius: 999px;
-
-  background: #ffffff;
-  border: 1px solid #d0d4dd;
-  color: #333;
-
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-
-  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+/* 로고 = dark 로고 + 동일 크기 */
+body:not(#index-page) .logo-dark {
+  display: block !important;
+  width: clamp(120px, 12vw, 190px) !important;
+}
+body:not(#index-page) .logo-white {
+  display: none !important;
 }
 
-.lang-toggle:hover {
-  background: #f3f5fb;
-  border-color: #b8bfd3;
-  box-shadow: 0 0 0 1px rgba(15,38,121,0.08);
+/* ============================= */
+/*        메인메뉴 텍스트        */
+/* ============================= */
+
+body:not(#index-page) .main-menu a {
+  color: #111 !important;
+  text-shadow: none !important;
+
+  font-family: 'Noto Sans KR', sans-serif !important;
+  font-size: clamp(15px, 1vw, 18px) !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.2px !important;
+
+  opacity: 0.95 !important;
+  text-decoration: none !important;
+
+  transition: color .25s ease, opacity .25s ease;
 }
 
-.lang-list {
-  position: absolute;
-  top: calc(100% + 6px);
-  right: 0;
-  min-width: 80px;
-
-  margin: 0;
-  padding: 6px 0;
-  list-style: none;
-
-  background: #fff;
-  border-radius: 10px;
-  border: 1px solid #d0d4dd;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-
-  display: none;
-  z-index: 6200;
+body:not(#index-page) .main-menu a:hover {
+  color: #0f2679 !important;
+  opacity: 1 !important;
 }
 
-/* language.js 에서 .open 토글한다고 가정 */
-.language-dropdown.open .lang-list {
-  display: block;
-}
+/* ============================= */
+/*        서브메뉴 (설정 동일)   */
+/* ============================= */
 
-.lang-list li a {
-  display: block;
-  padding: 6px 14px;
-  font-size: 12px;
-  font-weight: 500;
-  color: #222;
-  text-decoration: none;
-  cursor: pointer;
-}
+body:not(#index-page) .submenu {
+  background: #fff !important;
+  border: 1px solid rgba(0,0,0,0.15) !important;
+  border-radius: 6px !important;
+  padding: 10px 0 !important;
 
-.lang-list li a:hover {
-  background: #eef3ff;
-  color: #0f2679;
-}
-
-/* ============================================================
-   MOBILE TOGGLE 기본값
-============================================================ */
-
-.mobile-menu-btn {
-  display: none;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-
-  width: 32px;
-  height: 32px;
-
-  border: none;
-  background: none;
-  padding: 0;
-  cursor: pointer;
-}
-
-.mobile-menu-btn span {
-  width: 22px;
-  height: 2px;
-  border-radius: 999px;
-  background: #111;
-  margin: 3px 0;
-}
-
-/* ============================================================
-   MOBILE OVERLAY (FULLSCREEN MENU)
-============================================================ */
-
-.mobile-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(255,255,255,0.97);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  min-width: 180px !important;
 
   opacity: 0;
   visibility: hidden;
-  pointer-events: none;
-
-  transition: opacity 0.25s ease, visibility 0.25s ease;
-  z-index: 7000;
+  transform: translateX(-50%) translateY(10px);
+  transition: opacity .25s ease, transform .25s ease;
 }
 
-.mobile-overlay.open {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
+body:not(#index-page) .main-menu > li:hover > .submenu {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateX(-50%) translateY(0) !important;
 }
 
-.mobile-overlay-inner {
+/* 서브메뉴 텍스트 */
+body:not(#index-page) .submenu li a {
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  color: #222 !important;
+
+  padding: 10px 14px !important;
+  letter-spacing: -0.15px !important;
+  text-shadow: none !important;
+  white-space: nowrap !important;
+
+  transition: background .2s ease, color .2s ease;
+}
+
+body:not(#index-page) .submenu li a:hover {
+  background: #eef3ff !important;
+  color: #0f2679 !important;
+}
+
+/* ============================= */
+/*      언어 선택(공통 적용)     */
+/* ============================= */
+
+body:not(#index-page) .lang-toggle,
+body:not(#index-page) .lang-toggle *,
+body:not(#index-page) .language-dropdown .lang-list * {
+  color: #111 !important;
+  text-shadow: none !important;
+}
+
+body:not(#index-page) .language-dropdown.open .lang-list {
+  background: #fff !important;
+  border: 1px solid #ddd !important;
+}
+
+
+
+
+
+
+
+/* ============================================== */
+/*      LANG DROPDOWN — FINAL OVERRIDE FIX        */
+/* ============================================== */
+
+.header-right .language-dropdown {
   position: relative;
-  max-width: 480px;
-  margin: 0 auto;
-  padding: 80px 24px 40px;
+  display: inline-block;
+  font-family: 'Noto Sans KR', sans-serif;
 }
 
-/* 모바일 닫기 버튼 (X) */
-.mobile-close-btn {
+/* 토글 버튼 */
+.header-right .lang-toggle {
+  background: #fff !important;
+  border: 1px solid #cfcfcf !important;
+  border-radius: 20px !important;
+  padding: 6px 16px !important;
+  font-size: 0.95rem !important;
+  font-weight: 600;
+  color: #333 !important;
+  cursor: pointer;
+  display: flex !important;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.25s ease;
+  outline: none;
+}
+
+/* hover */
+.header-right .lang-toggle:hover {
+  background: #f3f6ff !important;
+  border-color: #0f2679 !important;
+  color: #0f2679 !important;
+}
+
+/* ▼ 아이콘 */
+.header-right .lang-toggle::after {
+  content: "▼";
+  font-size: 0.7rem;
+  margin-left: 4px;
+  opacity: 0.75;
+}
+
+/* 드롭다운 박스 */
+.header-right .lang-list {
+  list-style: none;
+  padding: 8px 0 !important;
+  margin: 0;
   position: absolute;
-  top: 20px;
-  right: 24px;
-  background: none;
-  border: none;
-  font-size: 26px;
-  line-height: 1;
-  cursor: pointer;
-}
-
-/* 모바일 메뉴 구조 */
-.mobile-menu {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.mobile-menu > li {
-  border-bottom: 1px solid #e2e4ec;
-  padding: 4px 0 8px;
-}
-
-/* 1차 버튼 */
-.m-item {
-  width: 100%;
-  padding: 10px 0;
-  background: none;
-  border: none;
-  text-align: left;
-
-  font-size: 15px;
-  font-weight: 700;
-  color: #111;
-  cursor: pointer;
-}
-
-/* 2차 목록 */
-.m-sub {
-  list-style: none;
-  margin: 0;
-  padding-left: 4px;
-
-  max-height: 0;
+  top: calc(100% + 8px) !important;
+  right: 0 !important;
+  background: #fff !important;
+  border: 1px solid #d6d6d6 !important;
+  border-radius: 10px !important;
+  width: 80px !important;
+  display: none;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
   overflow: hidden;
-  transition: max-height 0.25s ease;
+  z-index: 10000 !important;
 }
 
-.m-sub.open {
-  max-height: 300px;  /* 아코디언 열릴 때 최대 높이 */
+/* 열렸을 때 */
+.header-right .language-dropdown.open .lang-list {
+  display: block !important;
 }
 
-.m-sub li a {
+/* 항목 */
+.header-right .lang-list li a {
+  text-align: center;
   display: block;
-  padding: 6px 0 6px 10px;
-  font-size: 13px;
-  color: #444;
+  padding: 10px 16px !important;
   text-decoration: none;
+  font-size: 0.9rem !important;
+  font-weight: 550;
+  color: #333 !important;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
-.m-sub li a:hover {
-  color: #0f2679;
+/* hover */
+.header-right .lang-list li a:hover {
+  background: #eef3ff !important;
+  color: #0f2679 !important;
 }
 
-/* ============================================================
-   RESPONSIVE BREAKPOINTS (HEADER)
-============================================================ */
 
-/* 1024px 이하 → PC 메뉴 숨기고 모바일 메뉴 버튼 표시 */
+/* ============================================== */
+/*                햄버거 메뉴 (모바일)             */
+/* ============================================== */
+
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.hamburger span {
+  background: #333;
+  height: 3px;
+  width: 28px;
+  border-radius: 2px;
+}
+
+/* 모바일 레이아웃 */
 @media (max-width: 1024px) {
+  .hamburger { display: flex; }
+  .main-menu {
+    position: static;
+    transform: none;
+    flex-direction: column;
+    width: 100%;
+    display: none;
+    border-top: 1px solid #eee;
+  }
+  .main-menu.show { display: flex; }
 
-  .pc-nav {
+  .submenu {
+    position: static;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    background: #f8f8f8;
     display: none;
   }
-
-  .mobile-menu-btn {
-    display: flex;
-  }
-
-  .header-inner {
-    height: 60px;
-    padding: 0 16px;
-  }
-
-  .logo {
-    width: 130px;
-  }
-
-  .language-dropdown {
-    display: none; /* 필요하면 모바일 메뉴 안으로 이전해도 됨 */
-  }
+  .main-menu li.open > .submenu { display: block; }
 }
 
-/* 600px 이하 → 모바일 최적화 */
-@media (max-width: 600px) {
-  .mobile-overlay-inner {
-    width: 100%;
-    max-width: none;
-    padding: 76px 20px 32px;
-  }
-
-  .m-item {
-    font-size: 15px;
-  }
-
-  .m-sub li a {
-    font-size: 12px;
-  }
-}
-
-/* ============================================================
-   SUBPAGE HEADER (공통) 
-   - 메인(index-page)에서만 body#index-page에서 오버라이드
-============================================================ */
-
-body:not(#index-page) .header-inner {
-  background: rgba(255,255,255,0.97);
-  border-bottom: 1px solid rgba(0,0,0,0.06);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-}
-
-body:not(#index-page) .pc-menu > li > a {
-  color: #111;
-}
-
-body:not(#index-page) .logo-dark { display: block; }
-body:not(#index-page) .logo-white { display: none; }
-
-/* ============================================================
-   FOOTER  (기존 코드 유지)
-============================================================ */
+/* ============================================== */
+/*                      FOOTER                    */
+/* ============================================== */
 
 footer {
   width: 100%;
@@ -477,6 +392,7 @@ footer {
   text-align: left;
 }
 
+/* 왼쪽 메뉴(회사소개/개인정보/1:1 문의/다운로드센터) */
 .footer-left {
   flex: 1;
   min-width: 180px;
@@ -495,6 +411,7 @@ footer {
   color: #fff;
 }
 
+/* 가운데 회사 정보 */
 .footer-info {
   flex: 2;
   min-width: 260px;
@@ -507,6 +424,7 @@ footer {
   margin: 4px 0;
 }
 
+/* 오른쪽 패밀리 사이트 */
 .footer-right {
   flex: 1;
   min-width: 150px;
@@ -550,7 +468,6 @@ footer {
   border-top: 1px solid #444;
 }
 
-/* 반응형 footer */
 @media (max-width: 1300px) {
   .footer-container {
     flex-direction: column;
@@ -574,9 +491,10 @@ footer {
   }
 }
 
-/* ============================================================
-   ADMIN SESSION BAR (기존 유지)
-============================================================ */
+
+/* ============================================== */
+/*               ADMIN SESSION BAR                */
+/* ============================================== */
 
 #adminSessionBar {
   position: fixed;
@@ -588,10 +506,10 @@ footer {
   color: #fff;
   padding: 6px 16px;
   box-sizing: border-box;
-  display: none;
+  display: none;                   /* 기본 숨김 */
   justify-content: space-between;
   align-items: center;
-  z-index: 9999 !important;
+  z-index: 9999 !important;        /* 최상단 */
 }
 
 #adminSessionBar .admin-left,
@@ -621,6 +539,12 @@ footer {
   background: #eef1ff;
 }
 
+/* admin bar가 있을 때 페이지 전체 내려감 */
 body.has-admin-bar {
   padding-top: 38px !important;
 }
+
+
+
+
+[data-include] { display: contents !important; }

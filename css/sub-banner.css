@@ -179,93 +179,21 @@
 
 
 /* ===============================
-   🔥 반응형 최적화
+   ✅ 반응형
 ================================*/
-
-/* 🔵 태블릿 (≤1024px) */
-@media (max-width: 1024px) {
-
-  .sub-banner {
-    height: 250px;
-  }
-
-  .banner-text {
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-  }
-
-  .banner-text h1 {
-    font-size: 2.2rem;
-  }
-
-  .banner-text p {
-    font-size: 1.05rem;
-    max-width: 380px;
-  }
-
-  /* breadcrumb */
-  .breadcrumb {
-    padding: 12px 6%;
-    gap: 30px;
-    font-size: 0.95rem;
-  }
-
-  #side-tabs {
-    left: 10%;
-  }
-}
-
-/* 🔵 모바일 (≤768px) */
 @media (max-width: 768px) {
-
-  .sub-banner {
-    height: 220px;
-  }
-
-  .banner-text h1 {
-    font-size: 1.8rem;
-  }
-
-  .banner-text p {
-    font-size: 0.95rem;
-  }
-
   .breadcrumb {
-    padding: 10px 5%;
-    gap: 14px;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
+    padding: 12px 5%;
+    gap: 16px;
   }
 
   #side-tabs {
     left: 6%;
     width: 200px;
   }
-}
 
-/* 🔵 초소형 모바일 (≤480px) */
-@media (max-width: 480px) {
-
-  .sub-banner {
-    height: 180px;
-  }
-
-  .banner-text h1 {
-    font-size: 1.5rem;
-  }
-
-  .banner-text p {
-    font-size: 0.85rem;
-  }
-
-  .breadcrumb {
-    padding: 10px 4%;
-    gap: 10px;
-    font-size: 0.8rem;
-  }
-
-  #side-tabs {
-    width: 180px;
-    left: 5%;
+  #side-tabs a {
+    font-size: 0.9rem;
   }
 }

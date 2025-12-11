@@ -1,179 +1,18 @@
 <!-- /kr/index.html -->
 <!DOCTYPE html>
 <html lang="ko">
-    <head>
+  <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <meta name="description" content="화인디펜스는 해양방위체계용 케이블, 잠수함 소나 케이블조립체, 예인소나(TAS) 케이블 및 커넥터·터미네이션을 전문적으로 제작하는 방산 제조 기업입니다.">
 
       <title>화인디펜스 | 해양방위 케이블·소나체계 전문 제조기업</title>
 
-      <!-- 공통 스타일 -->
       <link rel="stylesheet" href="/css/style.css">
       <link rel="stylesheet" href="/css/banner.css">
       <link rel="stylesheet" href="/css/features.css">
 
-      <!-- 전역 헤더 CSS (모든 페이지 공통) -->
-      <link rel="stylesheet" href="/css/header.css">
-
-
-      <!-- ============================================================
-            INDEX PAGE 전용 커스텀 스타일 (header.css 위에 override)
-      ============================================================ -->
       <style>
-
-      /* ==========================================
-        INDEX PAGE — 헤더 투명 + 로고 변경
-      ========================================== */
-
-      body#index-page .header-inner {
-        background: rgba(15, 15, 15, 0.32);
-        backdrop-filter: blur(18px) brightness(1.25);
-        -webkit-backdrop-filter: blur(18px) brightness(1.25);
-        border-bottom: 1px solid rgba(255,255,255,0.15);
-      }
-
-      /* 로고 자동 변경 */
-      body#index-page .logo-white { display: block; }
-      body#index-page .logo-dark  { display: none; }
-
-      body#index-page.scrolled .logo-white { display: none; }
-      body#index-page.scrolled .logo-dark  { display: block; }
-
-      /* 메뉴 텍스트 */
-      body#index-page .main-menu a {
-        color: #f6f6f6;
-        text-shadow: 0 0 5px rgba(0,0,0,0.35);
-      }
-
-      body#index-page.scrolled .main-menu a {
-        color: #111;
-        text-shadow: none;
-        font-weight: 600;
-      }
-
-      /* 서브메뉴 스타일 – 메인 배너에서도 항상 흰색 */
-      body#index-page .submenu {
-        background: #fff !important;
-        border: 1px solid rgba(0,0,0,0.12);
-      }
-
-      body#index-page .submenu a {
-        color: #222 !important;
-      }
-
-      body#index-page .submenu a:hover {
-        background: #eef3ff !important;
-        color: #0f2679 !important;
-      }
-
-      /* 언어 토글 */
-      body#index-page .lang-toggle,
-      body#index-page .language-dropdown * {
-        color: #fff !important;
-      }
-      body#index-page.scrolled .lang-toggle,
-      body#index-page.scrolled .language-dropdown * {
-        color: #111 !important;
-      }
-
-
-      .business-area {
-        max-width: 1200px;
-        margin: 80px auto;
-        padding: 0 20px;
-        text-align: center;
-      }
-
-      .business-area h2 {
-        font-size: 2.0rem;
-        font-weight: 700;
-        color: #000000;
-        margin-bottom: 20px;
-      }
-
-      .business-area p {
-        font-size: 1.2rem;
-        font-weight: 500;
-        color: #555;
-        line-height: 1.7;
-        margin-bottom: 60px;
-      }
-
-      .features {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 35px;
-        justify-content: center;
-      }
-
-      .feature-card {
-        position: relative;
-        width: 300px;
-        height: 300px;
-        border-radius: 14px;
-        background-size: cover;
-        background-position: center;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-end;
-        padding: 25px;
-        transition: all 0.35s ease;
-        text-decoration: none !important;
-      }
-
-      .feature-card::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0.1));
-        transition: opacity 0.3s ease;
-      }
-
-      .feature-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 8px 22px rgba(0,0,0,0.18);
-      }
-
-      .feature-card:hover::before {
-        opacity: 0.8;
-      }
-
-      .feature-card h3 {
-        position: relative;
-        z-index: 2;
-        color: #fff;
-        font-size: 20px;
-        font-weight: 600;
-        text-align: center;
-        line-height: 1.4;
-        margin-bottom: 5px;
-        text-shadow: 0 2px 6px rgba(0,0,0,0.6);
-      }
-
-      .feature-card span {
-        display: block;
-        font-size: 14px;
-        font-weight: 400;
-        color: #d0d0d0;
-        margin-top: 4px;
-      }
-
-      .feature-card p {
-        position: relative;
-        z-index: 2;
-        color: #eaeaea;
-        font-size: 14px;
-        line-height: 1.5;
-        margin: 10px 0 0;
-        text-shadow: 0 1px 3px rgba(0,0,0,0.4);
-      }
-
-
-
         .facilities {
         padding: 80px 5%;
         background: #f8f9fa; /* 밝은 회색 배경 */
@@ -335,6 +174,12 @@
         color: #001a66;
       }
 
+      /* 반응형 */
+      @media (max-width: 768px) {
+        .news-card {
+          width: 90%;
+        }
+      }
 
       .contact-cta {
         position: relative;
@@ -396,147 +241,146 @@
         box-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
       }
 
-      /* ===========================================================
-        🔵 SMALL PC / LAPTOP (max-width: 1439px)
-        - 일반 노트북 화면 최적화
-      =========================================================== */
-      @media (max-width: 1439px) {
-
-        /* 전체 레이아웃 폭 축소 */
-        section, .news, .facilities, .business-area {
-          max-width: 900px;
-          margin: 60px auto !important;
-          padding: 0 20px !important;
+      /* 반응형 */
+      @media (max-width: 768px) {
+        .contact-cta {
+          padding: 80px 5%;
+          background-position: center;
         }
-
-        /* 제목·본문 축소 */
-        section h2,
-        .news h2,
-        .facilities h2,
-        .business-area h2 {
-          font-size: 1.7rem !important;
+        .contact-cta h2 {
+          font-size: 1.6rem;
         }
-
-        section p,
-        .news p,
-        .facilities p,
-        .business-area p {
-          font-size: 1.05rem !important;
-          line-height: 1.55 !important;
-        }
-
-        /* 카드 3열 → 2열 */
-        .features,
-        .facility-grid,
-        .news-grid {
-          display: grid !important;
-          grid-template-columns: repeat(2, 1fr) !important;
-          gap: 28px !important;
-          justify-content: center !important;
-        }
-
-        /* 카드 전체 폭 자동화 */
-        .feature-card,
-        .facility-card,
-        .news-card {
-          width: 100% !important;
-          max-width: 100% !important;
-        }
-
-        /* 이미지 크기 축소 */
-        .facility-card img { height: 170px !important; }
-        .news-card img     { height: 160px !important; }
-
-        /* 제목 크기 축소 */
-        .feature-card h3,
-        .facility-card h3,
-        .news-card h3 {
-          font-size: 1.1rem !important;
+        .contact-cta p {
+          font-size: 1rem;
         }
       }
 
+      /* ============================================================
+          INDEX PAGE — TRANSPARENT BLUR HEADER + LOGO AUTO SWAP
+          (완전 최적화된 최종본)
+      ============================================================ */
 
-      /* ===========================================================
-        🔵 TABLET / LARGE MOBILE (max-width: 1024px)
-        - 태블릿·작은 화면 PC
-      =========================================================== */
-      @media (max-width: 1024px) {
+      /* 1) 초기 헤더: 배너 위 투명 + 블러 */
+      body#index-page .header-inner {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        padding: 22px 4vw;
 
-        /* 본문 여백 축소 */
-        section, .news, .facilities, .business-area {
-          padding: 45px 4% !important;
-        }
+        background: rgba(15, 15, 15, 0.35);
+        backdrop-filter: blur(18px) brightness(1.25);
+        -webkit-backdrop-filter: blur(18px) brightness(1.25);
 
-        section h2 { font-size: 1.5rem !important; }
-        section p  { font-size: 0.95rem !important; }
+        border-bottom: 1px solid rgba(255,255,255,0.15);
+        z-index: 6000;
 
-        /* 카드 2열 유지 */
-        .features,
-        .facility-grid,
-        .news-grid {
-          grid-template-columns: repeat(2, 1fr) !important;
-          gap: 20px !important;
-        }
+        transition:
+          background 0.35s ease,
+          padding 0.35s ease,
+          box-shadow 0.35s ease,
+          border-color 0.35s ease;
+      }
 
-        /* 카드 크기 축소 */
-        .feature-card  { height: 170px !important; }
-        .facility-card img { height: 150px !important; }
-        .news-card img     { height: 140px !important; }
+      /* 2) 로고 자동 전환 */
+      body#index-page .logo-white { display: block !important; }
+      body#index-page .logo-dark  { display: none  !important; }
 
-        /* 텍스트 축소 */
-        .feature-card h3,
-        .facility-card h3,
-        .news-card h3 {
-          font-size: 1rem !important;
-        }
+      body#index-page.scrolled .logo-white { display: none  !important; }
+      body#index-page.scrolled .logo-dark  { display: block !important; }
+
+      /* 3) 메인메뉴 텍스트 */
+      body#index-page .main-menu a {
+        color: #f6f6f6 !important;
+        text-shadow: 0px 0px 5px rgba(0,0,0,0.35);
+        text-decoration: none !important;
+        font-family: 'Noto Sans KR', sans-serif !important;
+      }
+
+      body#index-page .main-menu a:hover {
+        color: #fff !important;
+      }
+
+      /* 스크롤 후: 검정 글씨 */
+      body#index-page.scrolled .main-menu a {
+        color: #111 !important;
+        text-shadow: none !important;
+        font-weight: 600 !important;   /* ← 추가 */
+      }
+
+      /* 4) 스크롤 후 헤더 → 화이트 */
+      body#index-page.scrolled .header-inner {
+        background: rgba(255,255,255,0.97);
+        border-bottom: 1px solid rgba(0,0,0,0.06);
+
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+
+        padding: 22px 4vw;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.07);
+      }
+
+      /* 5) 언어 선택 토글은 항상 검정 */
+      body#index-page .lang-toggle,
+      body#index-page .lang-toggle *,
+      body#index-page .language-dropdown .lang-list *,
+      body#index-page.scrolled .lang-toggle,
+      body#index-page.scrolled .lang-toggle *,
+      body#index-page.scrolled .language-dropdown .lang-list * {
+        color: #111 !important;
+        text-shadow: none !important;
+      }
+
+      /* 언어 목록 배경 */
+      body#index-page .language-dropdown.open .lang-list {
+        background: #fff !important;
+        border: 1px solid #ddd !important;
+      }
+
+      /* 6) 서브메뉴 — 항상 흰 배경 + 검정 글씨 */
+      body#index-page .submenu,
+      body#index-page .header-inner .main-menu li .submenu {
+        background: #fff !important;
+        border: 1px solid rgba(0,0,0,0.15) !important;
+      }
+
+      body#index-page .submenu li a,
+      body#index-page .header-inner .main-menu li .submenu li a {
+        color: #222 !important;
+        text-shadow: none !important;
+      }
+
+      body#index-page .submenu li a:hover,
+      body#index-page .header-inner .main-menu li .submenu li a:hover {
+        background: #eef3ff !important;
+        color: #0f2679 !important;
+      }
+
+      /* 7) 관리자 세션바 대응 */
+      body#index-page.has-admin-bar .header-inner {
+        top: 38px !important;
+      }
+
+      /* 8) 배너와 간격 보정 */
+      body#index-page .banner-slider {
+        margin-top: 0 !important;
+      }
+
+      /* 스크롤 전·후 공통: 서브메뉴 글씨 굵기 항상 동일하게 */
+      .header-inner .submenu li a,
+      body#index-page .header-inner .submenu li a {
+        font-weight: 500 !important;  /* 원하는 굵기로 조절 */
+      }
+
+      /* 메인페이지 기본 로고 크기 */
+      body#index-page .header-left .logo {
+        width: clamp(120px, 12vw, 190px) !important;
       }
 
 
-      /* ===========================================================
-        🔵 MOBILE (max-width: 600px)
-        - 스마트폰
-      =========================================================== */
-      @media (max-width: 600px) {
-
-        /* 전체 패딩 축소 */
-        section, .news, .facilities, .business-area {
-          padding: 28px 4% !important;
-        }
-
-        section h2 { font-size: 1.3rem !important; }
-        section p  { font-size: 0.9rem !important; line-height: 1.4 !important; }
-
-        /* 카드 2열 유지 */
-        .features,
-        .facility-grid,
-        .news-grid {
-          grid-template-columns: repeat(2, 1fr) !important;
-          gap: 12px !important;
-        }
-
-        /* 카드 더 축소 */
-        .feature-card       { height: 140px !important; }
-        .facility-card img  { height: 120px !important; }
-        .news-card img      { height: 110px !important; }
-
-        /* 텍스트 더 축소 */
-        .feature-card h3,
-        .facility-card h3,
-        .news-card h3 {
-          font-size: 0.9rem !important;
-        }
-
-        /* CTA 버튼 축소 */
-        .contact-btn {
-          font-size: 0.95rem !important;
-          padding: 10px 18px !important;
-        }
-      }
 
 
-
-
-  </style>
+      </style>
 
   </head>
 
@@ -697,7 +541,7 @@
           수중케이블 솔루션에 대한 기술 상담이나 견적이 필요하신가요?<br>
           화인디펜스의 기술연구소 및 영업팀으로 문의해 주세요.
         </p>
-        <a href="/kr/sub/support/inquiry/index.html" class="contact-btn">문의 페이지로 이동 →</a>
+        <a href="/sub/support/inquiry/index.html" class="contact-btn">문의 페이지로 이동 →</a>
       </div>
     </section>
 
@@ -712,7 +556,6 @@
   <script src="/js/session_timer.js"></script>
   <script src="/js/language.js"></script>
 
-  <script src="/js/header.js"></script>
 
 
 
