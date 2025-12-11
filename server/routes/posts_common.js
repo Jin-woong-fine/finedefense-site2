@@ -13,7 +13,11 @@ router.post("/view/:id", async (req, res) => {
     const postId = Number(req.params.id);
     if (!postId) return res.status(400).json({ message: "invalid id" });
 
-    const token = req.headers.authorization?.split(" ")[1];
+    // 안전한 토큰 파싱
+    let token = null;
+    try {
+      token = req.headers.authorization?.split(" ")[1] || null;
+    } catch {}
 
     // 관리자 제외
     if (token) {
@@ -25,9 +29,13 @@ router.post("/view/:id", async (req, res) => {
       } catch {}
     }
 
-    const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.ip;
-    const ua = req.headers["user-agent"] || "unknown";
+    // 안전한 IP / UA 파싱
+    const rawIp = req.headers["x-forwarded-for"]?.split(",")[0] || req.ip || "0.0.0.0";
+    const ip = rawIp.substring(0, 100);
 
+    const ua = (req.headers["user-agent"] || "unknown").substring(0, 255);
+
+    // 중복 체크
     const [exists] = await db.execute(
       `SELECT id FROM post_view_logs 
        WHERE post_id=? AND ip=? AND user_agent=? 
@@ -35,11 +43,12 @@ router.post("/view/:id", async (req, res) => {
       [postId, ip, ua]
     );
 
-    if (exists.length)
-      return res.json({ message: "중복 조회", added: false });
+    if (exists.length) return res.json({ message: "중복 조회", added: false });
 
+    // INSERT
     await db.execute(
-      `INSERT INTO post_view_logs (post_id, ip, user_agent) VALUES (?, ?, ?)`,
+      `INSERT INTO post_view_logs (post_id, ip, user_agent)
+       VALUES (?, ?, ?)`,
       [postId, ip, ua]
     );
 
