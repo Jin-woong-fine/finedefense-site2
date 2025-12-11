@@ -21,7 +21,7 @@ html, body {
   top: 0;
   left: 0;
   width: 100%;
-  height: 66px;                  /* ✔ 대기업 평균 헤더 높이 */
+  height: 66px; /* 대기업 평균 높이 */
   padding: 0 3vw;
 
   display: flex;
@@ -41,19 +41,21 @@ html, body {
   display: inline-flex;
   align-items: center;
   height: 100%;
-  line-height: 0;
-  outline: none;
-  border: none;
+  
+  line-height: 0 !important;  /* 🔥 baseline 완전 제거 */
+  font-size: 0 !important;    /* 🔥 inline baseline 잔재 제거 */
+
+  border: none !important;
+  outline: none !important;
+  text-decoration: none !important;
 }
 
-.logo-wrap:focus,
-.logo-wrap:active {
-  outline: none !important;
+.logo-wrap img {
+  display: block !important;   /* 이미지 아래 1px 라인 제거 */
+  vertical-align: top !important;
 }
 
 .header-left .logo {
-  display: block;
-  vertical-align: top;           /* ✔ 라인 유발 제거 */
   width: clamp(100px, 8vw, 135px);
 }
 
@@ -65,12 +67,11 @@ html, body {
   flex: 1;
   display: flex;
   justify-content: center;
-  align-items: center;
 }
 
 .pc-menu {
   display: flex;
-  gap: clamp(16px, 1.4vw, 28px); /* ✔ 대기업 스타일 */
+  gap: clamp(16px, 1.4vw, 28px); 
   list-style: none;
   padding: 0;
   margin: 0;
@@ -78,37 +79,39 @@ html, body {
 
 .pc-menu > li {
   position: relative;
+  text-align: center;   /* 🔥 submenu 정확한 가운데 정렬 핵심 */
 }
 
 .pc-menu > li > a {
-  text-decoration: none;
-  font-weight: 600;
+  display: inline-block;
+  padding: 14px 0;
   font-size: 16px;
-  padding: 12px 0;                /* ✔ hover 안정성 */
-  line-height: 1;
+  font-weight: 600;
+  text-decoration: none;
   color: inherit;
+  line-height: 1;
   transition: color 0.2s ease;
 }
 
 /* ============================================================
-   PC SUBMENU (hover dropdown)
+   PC SUBMENU (센터정렬 + hover 유지)
 ============================================================ */
 
 .pc-menu .submenu {
   position: absolute;
-  top: calc(100% + 22px);
+  top: calc(100% + 20px);
   left: 50%;
   transform: translateX(-50%) translateY(12px);
 
   opacity: 0;
   visibility: hidden;
 
-  padding: 10px 0;
-  min-width: 170px;
   list-style: none;
+  min-width: 200px;   /* 🔥 메뉴 폭 고정 → 정확한 가운데 */
+  padding: 12px 0;
 
   background: #fff;
-  border-radius: 6px;
+  border-radius: 10px;
   border: 1px solid rgba(0,0,0,0.1);
   box-shadow: 0 8px 20px rgba(0,0,0,0.08);
 
@@ -116,23 +119,39 @@ html, body {
   z-index: 200;
 }
 
-/* 🔥 반드시 이 코드만 유지해야 정상! */
+/* 🔥 서브메뉴 정상 작동 핵심 */
 .pc-menu > li:hover > .submenu {
   opacity: 1;
   visibility: visible;
   transform: translateX(-50%) translateY(0);
 }
 
-.pc-menu .submenu a {
+/* 서브메뉴 항목 */
+.pc-menu .submenu li a {
   display: block;
-  padding: 10px;
+  padding: 12px 20px;
   font-size: 15px;
-  text-decoration: none;
   color: #222;
+  text-decoration: none;
+}
+
+.pc-menu .submenu li a:hover {
+  background: #eef3ff;
+  color: #0f2679;
+}
+
+/* 🔥 hover 유지 영역 (아래로 이동해도 안사라짐) */
+.pc-menu > li::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  height: 28px;
 }
 
 /* ============================================================
-   INDEX PAGE (투명 → 스크롤 흰색)
+   INDEX PAGE HEADER (투명 → 스크롤 흰색)
 ============================================================ */
 
 body#index-page .header-inner {
@@ -145,8 +164,8 @@ body#index-page .pc-menu > li > a {
   text-shadow: 0 0 5px rgba(0,0,0,0.35);
 }
 
-body#index-page .logo-white { display: block; }
-body#index-page .logo-dark  { display: none; }
+body#index-page .logo-white { display: block !important; }
+body#index-page .logo-dark  { display: none !important; }
 
 body#index-page.scrolled .header-inner {
   background: rgba(255,255,255,0.96);
@@ -155,14 +174,14 @@ body#index-page.scrolled .header-inner {
 
 body#index-page.scrolled .pc-menu > li > a {
   color: #111 !important;
-  text-shadow: none;
+  text-shadow: none !important;
 }
 
-body#index-page.scrolled .logo-white { display: none; }
-body#index-page.scrolled .logo-dark  { display: block; }
+body#index-page.scrolled .logo-white { display: none !important; }
+body#index-page.scrolled .logo-dark  { display: block !important; }
 
 /* ============================================================
-   SUBPAGE (항상 흰 헤더)
+   SUBPAGE HEADER (항상 흰색)
 ============================================================ */
 
 body:not(#index-page) .header-inner {
@@ -174,8 +193,8 @@ body:not(#index-page) .pc-menu > li > a {
   color: #111;
 }
 
-body:not(#index-page) .logo-white { display: none; }
-body:not(#index-page) .logo-dark  { display: block; }
+body:not(#index-page) .logo-white { display: none !important; }
+body:not(#index-page) .logo-dark  { display: block !important; }
 
 /* ============================================================
    LANGUAGE DROPDOWN
@@ -200,11 +219,10 @@ body:not(#index-page) .logo-dark  { display: block; }
   position: absolute;
   top: calc(100% + 6px);
   right: 0;
-
   width: 80px;
   padding: 8px 0;
-  list-style: none;
 
+  list-style: none;
   background: #fff;
   border-radius: 10px;
   border: 1px solid #ddd;
@@ -215,7 +233,7 @@ body:not(#index-page) .logo-dark  { display: block; }
 }
 
 /* ============================================================
-   MOBILE NAV (햄버거)
+   MOBILE MENU BUTTON
 ============================================================ */
 
 .mobile-menu-btn {
@@ -227,12 +245,12 @@ body:not(#index-page) .logo-dark  { display: block; }
     display: flex;
     flex-direction: column;
     justify-content: center;
-    height: 100%;                     /* ✔ 헤더 높이에 맞춤 */
+    height: 100%;
     gap: 4px;
 
     width: 32px;
-    border: none;
     background: none;
+    border: none;
     cursor: pointer;
   }
 
@@ -243,14 +261,13 @@ body:not(#index-page) .logo-dark  { display: block; }
     border-radius: 2px;
   }
 
-  /* PC 네비 숨김 */
   .pc-menu {
     display: none !important;
   }
 }
 
 /* ============================================================
-   FULLSCREEN MOBILE MENU
+   MOBILE FULLSCREEN MENU
 ============================================================ */
 
 .mobile-overlay {
@@ -258,7 +275,6 @@ body:not(#index-page) .logo-dark  { display: block; }
   inset: 0;
   background: rgba(255,255,255,0.96);
   backdrop-filter: blur(8px);
-
   opacity: 0;
   visibility: hidden;
   transition: 0.3s ease;
@@ -285,7 +301,6 @@ body:not(#index-page) .logo-dark  { display: block; }
   padding: 14px 0;
   font-size: 17px;
   font-weight: 700;
-  text-align: left;
 }
 
 .m-sub {
