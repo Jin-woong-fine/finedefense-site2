@@ -240,19 +240,18 @@ textarea {
 }
 
 /* ===========================================================
-   DASHBOARD — STAT CARDS (4열 고정 + 크기 안정화 버전)
+   DASHBOARD — STAT CARDS (정상 작동 버전)
 =========================================================== */
 
-/* KPI 카드 행: 4열 유지 */
+/* KPI 카드 영역 */
 .stats-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);  /* 항상 4칸 */
+  grid-template-columns: repeat(4, 1fr);
   gap: 18px;
 
-  max-width: 1200px;   /* 전체 열 폭 제한 */
-  margin-left: auto;
-  margin-right: auto;
-  margin-bottom: 35px;
+  /* 전체 폭 제한 */
+  max-width: 1200px;
+  margin: 0 auto 35px;
 }
 
 /* KPI 카드 */
@@ -265,9 +264,7 @@ textarea {
   border-left: 6px solid #0f2679;
   transition: transform .15s;
 
-  max-width: 260px;  /* 카드 자체 폭 제한 */
-  width: 100%;
-  margin: 0 auto;    /* 정렬 안정화 */
+  width: 100%;   /* 셀 크기에 맞게 */
 }
 
 .stat-card:hover {
@@ -285,7 +282,6 @@ textarea {
   font-weight: 700;
   color: #0f2679;
 }
-
 
 /* ===========================================================
    Top Posts List
