@@ -6,46 +6,37 @@ body {
   padding: 0;
   font-family: 'Noto Sans KR', sans-serif;
   background: #f3f5fa;
-  display: flex;
+  color: #333;
 }
 
 /* ===========================================================
-   SIDEBAR
+   SIDEBAR (FIXED LAYOUT)
 =========================================================== */
 #sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 240px;
+  height: 100vh;
   background: #0f2679;
   color: #fff;
-  min-height: 100vh;
-  flex-shrink: 0;
-}
-
-/* Sidebar wrapper */
-#sidebar .sidebar {
   padding: 30px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  z-index: 1000;
 }
 
-/* ========== Sidebar Header (Logo + User info) ========== */
-.sidebar-header {
-  margin-bottom: 18px;
-}
-
-.sidebar-header .logo {
-  color: #fff;
+#sidebar .logo {
   font-size: 18px;
   font-weight: 700;
   margin-bottom: 16px;
 }
 
-/* 사용자 프로필 */
 .user-block {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 0;
+  margin-bottom: 16px;
 }
 
 .user-block .avatar {
@@ -56,27 +47,24 @@ body {
   border: 2px solid rgba(255,255,255,0.35);
 }
 
-.user-block .user-info .name {
-  font-weight: 600;
+.user-info .name {
   font-size: 15px;
-  color: #fff;
+  font-weight: 600;
 }
 
-.user-block .user-info .role {
+.user-info .role {
   font-size: 13px;
   color: #cbd6ff;
-  margin-top: 2px;
 }
 
-/* ========== Menu section title ========== */
+/* 메뉴 타이틀 */
 .menu-title {
-  margin: 22px 0 6px;
+  margin: 22px 0 8px;
   font-size: 13px;
   color: #9fb3e3;
-  padding-left: 4px;
 }
 
-/* ========== Menu items ========== */
+/* 사이드 메뉴 */
 .sidebar-menu {
   display: flex;
   flex-direction: column;
@@ -84,32 +72,63 @@ body {
 }
 
 .menu-item {
-  display: block;
   padding: 12px 16px;
-  text-decoration: none;
-  color: #cfd5e3;
   border-radius: 8px;
-  transition: background 0.18s, color 0.18s;
-  font-size: 15px;
+  color: #cfd5e3;
+  text-decoration: none;
+  transition: 0.2s;
+  cursor: pointer;
 }
 
 .menu-item:hover {
-  background: rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.15);
   color: #fff;
 }
 
 .menu-item.active {
   background: rgba(255,255,255,0.28);
-  font-weight: 600;
+  font-weight: 700;
   color: #fff;
+}
+
+/* 그룹 타이틀 */
+.menu-group > .menu-item {
+  font-weight: 700;
+  background: rgba(255,255,255,0.08);
+  border-left: 4px solid rgba(255,255,255,0.5);
+  margin-top: 10px;
+}
+
+.menu-group.open > .menu-item {
+  background: rgba(255,255,255,0.18);
+  border-left: 4px solid #fff;
+}
+
+/* 하위 메뉴 */
+.submenu .menu-item {
+  padding-left: 28px;
+  opacity: 0.85;
+}
+
+.submenu .menu-item:hover {
+  background: rgba(255,255,255,0.15);
+  opacity: 1;
+}
+
+.submenu .menu-item.active {
+  background: rgba(255,255,255,0.28);
+  opacity: 1;
+  font-weight: 600;
 }
 
 /* ===========================================================
    MAIN CONTENT
 =========================================================== */
 .main {
-  flex: 1;
+  margin-left: 240px;
   padding: 22px 26px;
+  box-sizing: border-box;
+  min-height: 100vh;
 }
 
 /* ===========================================================
@@ -130,13 +149,11 @@ body {
 
 .topbar button {
   padding: 8px 14px;
-  border-radius: 8px;
-  border: none;
   background: #0f2679;
   color: white;
-  font-size: 14px;
+  border: none;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background 0.2s;
 }
 
 .topbar button:hover {
@@ -144,54 +161,40 @@ body {
 }
 
 /* ===========================================================
-   TOPBAR — USER DROPDOWN
+   KPI STAT CARDS (유동형 auto-fit)
 =========================================================== */
-.topbar-user {
-  position: relative;
-  cursor: pointer;
-  color: #0f2679;
-  font-weight: 600;
-  padding: 6px 10px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto 35px auto;
 }
 
-.topbar-user:hover {
-  background: rgba(15, 38, 121, 0.1);
-}
-
-.topbar-user .avatar-small {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.user-dropdown {
-  position: absolute;
-  top: 42px;
-  right: 0;
-  width: 180px;
+.stat-card {
   background: #fff;
-  border-radius: 10px;
-  padding: 10px 0;
-  box-shadow: 0 4px 12px rgba(0,0,0,.15);
-  display: none;
-  z-index: 999;
+  padding: 22px 20px;
+  border-radius: 14px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  border-left: 6px solid #0f2679;
+  text-align: center;
+  transition: transform .15s;
 }
 
-.user-dropdown a {
-  display: block;
-  padding: 10px 16px;
-  text-decoration: none;
-  color: #333;
-  font-size: 15px;
+.stat-card:hover {
+  transform: translateY(-4px);
 }
 
-.user-dropdown a:hover {
-  background: #f3f5fa;
+.stat-card h3 {
+  font-size: 16px;
+  color: #444;
+  margin-bottom: 10px;
+}
+
+.stat-value {
+  font-size: 30px;
+  font-weight: 700;
+  color: #0f2679;
 }
 
 /* ===========================================================
@@ -205,19 +208,11 @@ body {
   margin-bottom: 35px;
 }
 
-.panel h2,
-.panel h3 {
-  font-weight: 700;
-  color: #0f2679;
-  margin: 0 0 18px 0;
-}
-
 .panel h2 {
   font-size: 20px;
-}
-
-.panel h3 {
-  font-size: 17px;
+  font-weight: 700;
+  color: #0f2679;
+  margin-bottom: 18px;
 }
 
 /* ===========================================================
@@ -235,219 +230,40 @@ textarea {
   border-radius: 8px;
   font-size: 15px;
   background: #fff;
+  margin-bottom: 12px;
+}
+
+/* 리스트 */
+#topPostsList li,
+#pageViewList li,
+#referrerList li,
+#downloadTopList li,
+#catalogViewTopList li,
+#catalogDownloadTopList li {
   margin-bottom: 10px;
-  box-sizing: border-box;
-}
-
-/* ===========================================================
-   DASHBOARD — KPI STAT CARDS (유동형, 반응형 설계)
-=========================================================== */
-
-/* 카드 4개여도 균등 배치, 3개여도 균등, 5~6개여도 균형 유지 */
-.stats-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-  gap: 20px;
-
-  max-width: 1200px;
-  margin: 0 auto 35px auto;
-  padding: 0 10px;  /* 좌우 여백 */
-}
-
-/* 카드 크기 */
-.stat-card {
-  background: #fff;
-  padding: 25px 22px;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  text-align: center;
-  border-left: 6px solid #0f2679;
-  transition: transform 0.15s ease;
-
-  width: 100%;
-}
-
-/* hover 효과 */
-.stat-card:hover {
-  transform: translateY(-4px);
-}
-
-.stat-card h3 {
-  font-size: 15px;
-  color: #444;
-  margin-bottom: 10px;
-}
-
-.stat-value {
-  font-size: 30px;
-  font-weight: 700;
-  color: #0f2679;
-}
-
-/* ===========================================================
-   Top Posts List
-=========================================================== */
-#topPostsList {
-  padding-left: 16px;
   font-size: 15px;
 }
-
-#topPostsList li {
-  margin-bottom: 10px;
-  color: #333;
-}
-
-#topPostsList li strong {
-  color: #0f2679;
-}
-
 
 .session-timer {
   padding: 6px 10px;
   background: #0f2679;
-  color: white;
   border-radius: 6px;
-  font-size: 13px;
+  color: #fff;
   font-weight: 600;
 }
 
+/* 알림 (toast) */
 .toast-notice {
   position: fixed;
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
   background: #0f2679;
-  color: white;
+  color: #fff;
   padding: 12px 20px;
   border-radius: 8px;
-  font-size: 15px;
   font-weight: 600;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.15);
   opacity: 0;
-  transition: opacity 0.4s ease;
+  transition: 0.4s;
   z-index: 9999;
-}
-
-
-
-/* ===========================================================
-   🔧 SIDEBAR FORCE FIX (글자 안 보임, 스타일 미적용 방지)
-=========================================================== */
-
-/* 사이드바를 최상위에서 확실히 스타일링 */
-#sidebar, 
-#sidebar * {
-  box-sizing: border-box;
-}
-
-/* flex 레이아웃 깨짐 방지 */
-#sidebar {
-  display: flex;
-  flex-direction: column;
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  width: 240px;
-  background: #0f2679 !important;
-  padding: 0;
-  z-index: 1000; /* 가림 현상 제거 */
-}
-
-/* sidebar.js가 넣는 컨테이너를 자동 인식 */
-#sidebar > div,
-#sidebar .sidebar {
-  width: 100%;
-  padding: 30px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-/* 메뉴 공통 */
-#sidebar a,
-#sidebar .menu-item {
-  text-decoration: none;
-  color: #cfd5e3 !important;
-  display: block;
-  padding: 12px 16px;
-  border-radius: 8px;
-  transition: 0.2s;
-  font-size: 15px;
-}
-
-/* hover */
-#sidebar a:hover,
-#sidebar .menu-item:hover {
-  background: rgba(255,255,255,0.15);
-  color: #fff !important;
-}
-
-/* 활성 메뉴 */
-#sidebar .menu-item.active {
-  background: rgba(255,255,255,0.28);
-  font-weight: 700;
-  color: #fff !important;
-}
-
-/* 메뉴 제목 */
-#sidebar .menu-title {
-  color: #9fb3e3 !important;
-  font-size: 13px;
-  margin: 20px 0 6px;
-}
-
-/* 메인 영역 밀기 */
-.main {
-  margin-left: 240px !important;
-}
-
-
-/* ===============================
-   📌 사이드바 그룹 타이틀 (트래픽 분석 / 게시물 관리 등)
-   =============================== */
-#sidebar .menu-group > .menu-item {
-  font-weight: 700 !important;
-  font-size: 15px !important;
-  color: #ffffff !important;
-  background: rgba(255,255,255,0.08);
-  border-left: 4px solid rgba(255,255,255,0.5);
-  margin-top: 8px;
-  cursor: pointer;
-}
-
-#sidebar .menu-group.open > .menu-item {
-  background: rgba(255,255,255,0.18) !important;
-  border-left: 4px solid #ffffff !important;
-}
-
-#sidebar .menu-item.dashboard-root {
-  font-weight: 700 !important;
-  font-size: 15px !important;
-  color: #ffffff !important;
-  background: rgba(255,255,255,0.12);
-  border-left: 4px solid rgba(255,255,255,0.6);
-  margin-top: 6px;
-}
-
-
-
-
-#sidebar .submenu .menu-item {
-  padding-left: 28px !important;
-  font-size: 14px !important;
-  font-weight: 400 !important;
-  opacity: 0.85;
-}
-
-#sidebar .submenu .menu-item:hover {
-  background: rgba(255,255,255,0.15) !important;
-  opacity: 1;
-}
-
-#sidebar .submenu .menu-item.active {
-  background: rgba(255,255,255,0.28) !important;
-  font-weight: 600 !important;
-  color: #fff !important;
-  opacity: 1;
 }
