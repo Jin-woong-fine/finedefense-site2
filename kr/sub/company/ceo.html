@@ -58,6 +58,75 @@
         background: rgba(255, 255, 255, 0.808);
         border-radius: 12px;
       }
+
+      /* ================================================
+        🔵 Small Laptop / Tablet (max-width: 1024px)
+        PC 레이아웃 유지 + 자연 축소
+      ================================================ */
+      @media (max-width: 1024px) {
+
+        .ceo-section {
+          max-width: 90%;
+          padding: 30px 25px !important;
+          margin: 50px auto !important;
+        }
+
+        .ceo-section h1 {
+          font-size: 1.7rem !important;
+          margin-bottom: 30px !important;
+        }
+
+        .ceo-message {
+          font-size: 1rem !important;
+          line-height: 1.7 !important;
+        }
+
+        .ceo-signature {
+          font-size: 1.2rem !important;
+        }
+
+        /* 배경 심볼 축소 */
+        body {
+          background-size: 450px auto !important;
+          background-position: center 480px !important;
+        }
+      }
+
+      /* ================================================
+        🔵 Mobile (max-width: 600px)
+        텍스트/여백 더 축소
+      ================================================ */
+      @media (max-width: 600px) {
+
+        .ceo-section {
+          max-width: 94%;
+          padding: 22px 20px !important;
+        }
+
+        .ceo-section h1 {
+          font-size: 1.45rem !important;
+          margin-bottom: 25px !important;
+        }
+
+        .ceo-message {
+          font-size: 0.95rem !important;
+          line-height: 1.6 !important;
+        }
+
+        .ceo-message p {
+          margin-bottom: 18px !important;
+        }
+
+        .ceo-signature {
+          font-size: 1.1rem !important;
+        }
+
+        body {
+          background-size: 350px auto !important;
+          background-position: center 450px !important;
+        }
+      }
+
     </style>
   </head>
 
