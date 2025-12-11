@@ -302,6 +302,43 @@ router.post("/download/:id", async (req, res) => {
   }
 });
 
+/* ======================================================
+   📌 8) 카탈로그 조회수 TOP 5
+====================================================== */
+router.get("/top-views", async (req, res) => {
+  try {
+    const [rows] = await db.execute(
+      `SELECT id, title, views
+       FROM catalog_items
+       ORDER BY views DESC
+       LIMIT 5`
+    );
+    res.json(rows);
+  } catch (err) {
+    console.error("[catalog top views] 오류:", err);
+    res.status(500).json([]);
+  }
+});
+
+
+/* ======================================================
+   📌 9) 카탈로그 다운로드 TOP 5
+====================================================== */
+router.get("/top-downloads", async (req, res) => {
+  try {
+    const [rows] = await db.execute(
+      `SELECT id, title, downloads
+       FROM catalog_items
+       ORDER BY downloads DESC
+       LIMIT 5`
+    );
+    res.json(rows);
+  } catch (err) {
+    console.error("[catalog top downloads] 오류:", err);
+    res.status(500).json([]);
+  }
+});
+
 
 
 export default router; 
