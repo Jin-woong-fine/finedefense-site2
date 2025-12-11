@@ -30,6 +30,7 @@ import downloadsRouter from "./routes/downloads.js";
 
 import uploadsEditorRouter from "./routes/uploads_editor.js";
 
+import trafficRouter from "./routes/traffic.js";
 
 
 
@@ -85,6 +86,8 @@ app.use("/api/catalog", catalogRouter);
 app.use("/api/uploads/editor", uploadsEditorRouter);
 
 app.use("/api/downloads", downloadsRouter);
+
+app.use("/api/traffic", trafficRouter);
 
 
 

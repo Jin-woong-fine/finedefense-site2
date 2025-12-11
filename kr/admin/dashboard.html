@@ -5,137 +5,112 @@
   <meta charset="UTF-8">
   <title>관리자 대시보드 | Fine Defense</title>
 
-  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <!-- CSS -->
   <link rel="stylesheet" href="./css/admin.css">
 
-  <!-- 인증 스크립트 -->
   <script src="./js/common_auth.js"></script>
-
-  <!-- 세션 매니저 (공통 세션 관리) -->
   <script type="module" src="/js/session_manager.js"></script>
-
-  <!-- 대시보드 세션 타이머 -->
   <script type="module" src="./js/dashboard_session_timer.js"></script>
 
+  <style>
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 22px;
+    }
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-bottom: 30px;
+    }
+  </style>
 </head>
 
 <body>
 
-  <!-- 접근 권한 체크 -->
-  <script>
-    requireAnyUser();  // 로그인 안했으면 로그인창으로 이동하는 함수
-  </script>
+<script> requireAnyUser(); </script>
 
-  <!-- 사이드바 -->
-  <div id="sidebar"></div>
+<div id="sidebar"></div>
 
-  <!-- 메인 -->
-  <div class="main">
+<div class="main">
 
-    <!-- TOPBAR -->
-    <div class="topbar">
-      <div class="title">관리자 대시보드</div>
-
-      <div style="display:flex; align-items:center; gap:12px;">
-
-        <!-- ⭐ JWT 기반 세션 타이머 -->
-        <span id="session-timer" class="session-timer">세션 계산중...</span>
-
-        <!-- 사용자 UI -->
-        <div class="topbar-user" id="topbarUser">
-          <span id="topbarUserName">관리자</span> ▾
-          <div class="user-dropdown" id="userDropdown"></div>
-        </div>
-
-        <button onclick="location.href='../index.html'">홈으로</button>
+  <div class="topbar">
+    <div class="title">관리자 대시보드</div>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <span id="session-timer" class="session-timer">세션 계산중...</span>
+      <div class="topbar-user" id="topbarUser">
+        <span id="topbarUserName">관리자</span> ▾
+        <div class="user-dropdown" id="userDropdown"></div>
       </div>
+      <button onclick="location.href='../index.html'">홈으로</button>
     </div>
-
-    <!-- 통계 카드 -->
-    <section class="stats-container">
-      <div class="stat-card">
-        <h3>이번달 조회수</h3>
-        <p id="thisMonthViews" class="stat-value">0</p>
-      </div>
-      <div class="stat-card">
-        <h3>지난달 조회수</h3>
-        <p id="lastMonthViews" class="stat-value">0</p>
-      </div>
-      <div class="stat-card">
-        <h3>증가율</h3>
-        <p id="growthRate" class="stat-value">0%</p>
-      </div>
-      <div class="stat-card">
-        <h3>전체 게시물 수</h3>
-        <p id="totalPosts" class="stat-value">0</p>
-      </div>
-    </section>
-
-    <!-- 월별 그래프 -->
-    <section class="panel">
-      <h2>월별 조회수 그래프</h2>
-      <canvas id="monthlyChart" style="max-height:350px;"></canvas>
-    </section>
-
-    <!-- TOP 5 -->
-    <section class="panel">
-      <h2>조회수 TOP 5 게시물</h2>
-      <ul id="topPostsList"></ul>
-    </section>
-
-    <!-- ⭐ 자료실 다운로드 TOP 5 -->
-    <section class="panel">
-      <h2>자료실 다운로드 TOP 5</h2>
-      <ul id="downloadTopList"></ul>
-    </section>
-
-    <!-- 최근 등록 제품 -->
-    <section class="panel">
-      <h2>최근 등록 제품</h2>
-      <div id="recentProducts"></div>
-    </section>
-
   </div>
 
-  <!-- JS -->
-  <script src="./js/sidebar.js"></script>
-  <script src="./js/dashboard_core.js"></script>
+  <!-- 🔷 1) KPI 요약 -->
+  <section class="stats-row">
+    <div class="stat-card"><h3>오늘 방문자</h3><p id="visitToday" class="stat-value">0</p></div>
+    <div class="stat-card"><h3>이번달 방문자</h3><p id="visitThisMonth" class="stat-value">0</p></div>
+    <div class="stat-card"><h3>증가율</h3><p id="visitGrowth" class="stat-value">0%</p></div>
+    <div class="stat-card"><h3>전체 게시물 수</h3><p id="totalPosts" class="stat-value">0</p></div>
+  </section>
 
-  <script>
-    // 사이드바 로드
-    loadSidebar("dashboard");
+  <!-- 🔷 2) 주요 트래픽 영역 -->
+  <section class="grid-2">
+    <div class="panel">
+      <h2>최근 30일 방문자</h2>
+      <canvas id="dailyChart"></canvas>
+    </div>
 
-    // 사용자 dropdown 초기화
-    (function initTopbarUser() {
-      const name = localStorage.getItem("name") || "사용자";
-      const role = localStorage.getItem("role");
-      const nameSpan = document.getElementById("topbarUserName");
-      const dropdown = document.getElementById("userDropdown");
-      const userBox = document.getElementById("topbarUser");
+    <div class="panel">
+      <h2>디바이스 비율</h2>
+      <canvas id="deviceChart"></canvas>
+    </div>
+  </section>
 
-      if (nameSpan) nameSpan.textContent = name;
+  <!-- 🔷 3) 국가 / 유입경로 -->
+  <section class="grid-2">
+    <div class="panel">
+      <h2>국가별 방문자</h2>
+      <canvas id="countryChart"></canvas>
+    </div>
 
-      let html = `<a href="/kr/admin/user_profile.html">내 프로필</a>`;
-      if (role === "admin" || role === "superadmin") {
-        html += `<a href="/kr/admin/users.html">사용자 관리</a>`;
-      }
-      html += `<a href="javascript:void(0);" onclick="logout()">로그아웃</a>`;
-      dropdown.innerHTML = html;
+    <div class="panel">
+      <h2>유입경로 TOP 5</h2>
+      <ul id="referrerList"></ul>
+    </div>
+  </section>
 
-      userBox.addEventListener("click", (e) => {
-        e.stopPropagation();
-        dropdown.style.display =
-          dropdown.style.display === "block" ? "none" : "block";
-      });
+  <!-- 🔷 4) 콘텐츠 성과 -->
+  <section class="grid-2">
+    <div class="panel">
+      <h2>조회수 TOP 5 게시물</h2>
+      <ul id="topPostsList"></ul>
+    </div>
 
-      document.addEventListener("click", () => {
-        dropdown.style.display = "none";
-      });
-    })();
-  </script>
+    <div class="panel">
+      <h2>페이지뷰 TOP 5</h2>
+      <ul id="pageViewList"></ul>
+    </div>
+  </section>
+
+  <!-- 🔷 5) 다운로드 / 제품 -->
+  <section class="grid-2">
+    <div class="panel">
+      <h2>자료실 다운로드 TOP 5</h2>
+      <ul id="downloadTopList"></ul>
+    </div>
+
+    <div class="panel">
+      <h2>최근 등록 제품</h2>
+      <div id="recentProducts"></div>
+    </div>
+  </section>
+
+</div>
+
+<script src="./js/sidebar.js"></script>
+<script src="./js/dashboard_core.js"></script>
 
 </body>
 </html>

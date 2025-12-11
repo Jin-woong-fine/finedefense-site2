@@ -43,3 +43,18 @@ document.addEventListener("DOMContentLoaded", () => {
     document.dispatchEvent(new Event("includeLoaded"));
   }, 20);
 });
+
+
+
+
+
+document.addEventListener("includeLoaded", () => {
+  fetch("/api/traffic/visit", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      page: location.pathname,
+      referrer: document.referrer || ""
+    })
+  });
+});
