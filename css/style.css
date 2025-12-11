@@ -520,31 +520,33 @@ body.has-admin-bar {
     padding: 8px 12px !important;
   }
 
-  /* 로고 더 작게 */
+  /* 📌 로고 확실히 작게 (clamp 완전 무력화) */
   .header-left .logo {
-    width: 70px !important;
+    width: 90px !important;
+    max-width: 90px !important;
+    min-width: 90px !important;
   }
 
-  /* 🔥 메뉴 간격 크게 축소 */
+  /* 메뉴 간격 */
   .main-menu {
-    gap: 16px !important;   /* 기존 25px → 16px */
+    gap: 16px !important;
   }
 
-  /* 🔥 메뉴 글씨 더 작게 */
+  /* 메뉴 글자 */
   .main-menu a {
-    font-size: 12px !important;   /* 기존 14px → 12px */
+    font-size: 13px !important;
   }
 
-  /* 서브메뉴 사이즈 축소 */
+  /* 서브메뉴 */
   .submenu {
-    top: calc(100% + 10px) !important;
-    min-width: 130px !important;  /* 기존 150 → 130 */
-    padding: 6px 0 !important;    /* 기존 10px → 6px */
+    top: calc(100% + 12px) !important;
+    min-width: 135px !important;
+    padding: 6px 0 !important;
   }
 
   .submenu li a {
-    font-size: 12px !important;   /* 기존 14 → 12 */
-    padding: 6px 8px !important;  /* 기존 8px 10px → 6px 8px */
+    font-size: 13px !important;
+    padding: 6px 8px !important;
   }
 }
 
@@ -554,29 +556,31 @@ body.has-admin-bar {
 =========================================================== */
 @media (max-width: 600px) {
 
-  /* 로고 아주 작게 */
+  /* 📌 작은 모바일용 로고 */
   .header-left .logo {
-    width: 50px !important;
+    width: 65px !important;
+    max-width: 65px !important;
+    min-width: 65px !important;
   }
 
-  /* 메뉴 간격 최소화 */
+  /* 메뉴 간격 ↓ */
   .main-menu {
     gap: 10px !important;
   }
 
-  /* 글씨 더 작은 모바일 폰트 */
+  /* 글자 더 작게 */
   .main-menu a {
-    font-size: 11px !important;
+    font-size: 12px !important;
   }
 
-  /* 서브메뉴도 아주 컴팩트하게 */
+  /* 서브메뉴 */
   .submenu {
-    min-width: 110px !important;
+    min-width: 120px !important;
     top: calc(100% + 8px) !important;
   }
 
   .submenu li a {
-    font-size: 11px !important;
+    font-size: 12px !important;
     padding: 5px 6px !important;
   }
 }
