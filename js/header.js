@@ -1,11 +1,12 @@
-// ================================================
-//  Fine Defense — Mobile Header Menu (Accordion)
-// ================================================
+// ======================================================
+//   Fine Defense — Mobile Fullscreen Overlay Menu
+// ======================================================
 
-// 헤더 로드 대기
+// 헤더가 include.js로 로드될 때까지 대기
 function waitForHeader(callback) {
   const timer = setInterval(() => {
-    if (document.querySelector(".main-menu")) {
+    if (document.querySelector(".mobile-menu-btn") &&
+        document.querySelector(".mobile-overlay")) {
       clearInterval(timer);
       callback();
     }
@@ -13,49 +14,64 @@ function waitForHeader(callback) {
 }
 
 function initHeaderScript() {
-  const menuLinks = document.querySelectorAll(".main-menu > li > a");
-  const panel = document.querySelector(".mobile-menu-panel"); // 모바일 패널
+  const btn = document.querySelector(".mobile-menu-btn");
+  const overlay = document.querySelector(".mobile-overlay");
+  const submenuButtons = document.querySelectorAll(".m-item");
+  const body = document.body;
 
-  menuLinks.forEach(link => {
-    link.addEventListener("click", (e) => {
-      const isMobile = window.innerWidth <= 1024;
+  // -----------------------------------------------
+  // 1) 햄버거 버튼 → 오버레이 열기
+  // -----------------------------------------------
+  btn.addEventListener("click", () => {
+    overlay.classList.add("open");
+    body.style.overflow = "hidden"; // 스크롤 방지
+  });
 
-      if (!isMobile) return; // PC에서는 기본 hover
+  // -----------------------------------------------
+  // 2) 오버레이 닫기 (배경 클릭 시)
+  // -----------------------------------------------
+  overlay.addEventListener("click", (e) => {
+    if (e.target.classList.contains("mobile-overlay")) {
+      closeOverlay();
+    }
+  });
 
-      // 패널이 닫혀 있으면 아코디언 실행하지 않음 (중요!)
-      if (panel && !panel.classList.contains("open")) return;
+  // -----------------------------------------------
+  // 3) 아코디언 메뉴 동작
+  // -----------------------------------------------
+  submenuButtons.forEach(button => {
+    button.addEventListener("click", () => {
 
-      const li = link.parentElement;
-      const submenu = li.querySelector(".submenu");
+      const sub = button.nextElementSibling;
 
-      if (!submenu) return; // 서브 없는 경우는 이동 허용
-
-      e.preventDefault(); // 모바일에서는 열기/닫기만
-
-      // 이미 열려있으면 닫기
-      if (li.classList.contains("open")) {
-        li.classList.remove("open");
-        return;
-      }
-
-      // 다른 모든 open 닫기
-      document.querySelectorAll(".main-menu li.open").forEach(openLi => {
-        openLi.classList.remove("open");
+      // 다른 모든 아코디언 닫기
+      document.querySelectorAll(".m-sub.open").forEach(opened => {
+        if (opened !== sub) opened.classList.remove("open");
       });
 
-      // 현재 li 열기
-      li.classList.add("open");
+      // 현재 아코디언 토글
+      sub.classList.toggle("open");
     });
   });
 
-  // PC로 전환시 초기화
+  // -----------------------------------------------
+  // 4) PC로 전환 시 초기화
+  // -----------------------------------------------
   window.addEventListener("resize", () => {
     if (window.innerWidth > 1024) {
-      document.querySelectorAll(".main-menu li.open").forEach(li => {
-        li.classList.remove("open");
-      });
+      closeOverlay();
     }
   });
+
+  function closeOverlay() {
+    overlay.classList.remove("open");
+    body.style.overflow = ""; // 스크롤 복원
+
+    // 열려 있던 아코디언 모두 닫기
+    document.querySelectorAll(".m-sub.open").forEach(sub => {
+      sub.classList.remove("open");
+    });
+  }
 }
 
 waitForHeader(initHeaderScript);

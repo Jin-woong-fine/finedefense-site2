@@ -1,13 +1,16 @@
 <header class="header-inner">
 
+  <!-- 좌측: 로고 -->
   <div class="header-left">
-    <a href="/en/index.html">
+    <a href="/en/index.html" class="logo-wrap">
       <img src="/img/logo_dark.png" class="logo logo-dark">
       <img src="/img/logo_white.png" class="logo logo-white">
     </a>
+  </div>
 
-    <!-- PC Main Menu -->
-    <ul class="main-menu pc-menu">
+  <!-- PC 중앙 메뉴 -->
+  <nav class="pc-menu">
+    <ul class="main-menu">
       <li>
         <a href="/en/sub/company/overview.html">About Us</a>
         <ul class="submenu">
@@ -49,8 +52,9 @@
         </ul>
       </li>
     </ul>
-  </div>
+  </nav>
 
+  <!-- 우측: 언어변경 + 모바일 햄버거 -->
   <div class="header-right">
     <div class="language-dropdown">
       <button class="lang-toggle">ENG</button>
@@ -59,51 +63,66 @@
         <li><a data-lang="en">ENG</a></li>
       </ul>
     </div>
+
+    <!-- 모바일 햄버거 버튼 -->
+    <button class="mobile-menu-btn">
+      <span></span><span></span><span></span>
+    </button>
   </div>
+
 </header>
 
-<!-- Mobile Panel -->
-<nav class="mobile-menu-panel">
-  <ul class="main-menu mobile-menu">
-    <li>
-      <a href="/en/sub/company/overview.html">About Us</a>
-      <ul class="submenu">
-        <li><a href="/en/sub/company/overview.html">Overview</a></li>
-        <li><a href="/en/sub/company/ceo.html">CEO Message</a></li>
-        <li><a href="/en/sub/company/history.html">History</a></li>
-        <li><a href="/en/sub/company/vision.html">Vision & Philosophy</a></li>
-        <li><a href="/en/sub/company/organization.html">Organization</a></li>
-        <li><a href="/en/sub/company/location.html">Location</a></li>
-      </ul>
-    </li>
 
-    <li>
-      <a href="/en/sub/products/sub-towed.html">Products</a>
-      <ul class="submenu">
-        <li><a href="/en/sub/products/sub-towed.html">Towed Underwater Cables</a></li>
-        <li><a href="/en/sub/products/sub-fixed.html">Fixed Underwater Cables</a></li>
-        <li><a href="/en/sub/products/sub-connector.html">Underwater Connectors</a></li>
-        <li><a href="/en/sub/products/sub-custom.html">Custom Cables</a></li>
-      </ul>
-    </li>
+<!-- =============================================== -->
+<!--   모바일 전체화면 오버레이 메뉴               -->
+<!-- =============================================== -->
+<div class="mobile-overlay">
 
-    <li>
-      <a href="/en/sub/pr/newsroom/index.html">Media Center</a>
-      <ul class="submenu">
-        <li><a href="/en/sub/pr/notice/index.html">Notices</a></li>
-        <li><a href="/en/sub/pr/newsroom/index.html">Newsroom</a></li>
-        <li><a href="/en/sub/pr/gallery/index.html">Gallery</a></li>
-        <li><a href="/en/sub/pr/certification/index.html">Certifications & Patents</a></li>
-        <li><a href="/en/sub/pr/catalog/index.html">Catalogs</a></li>
-      </ul>
-    </li>
+  <div class="mobile-overlay-inner">
 
-    <li>
-      <a href="/en/sub/support/inquiry/index.html">Support</a>
-      <ul class="submenu">
-        <li><a href="/en/sub/support/inquiry/index.html">1:1 Inquiry</a></li>
-        <li><a href="/en/sub/support/downloads/index.html">Downloads</a></li>
-      </ul>
-    </li>
-  </ul>
-</nav>
+    <ul class="mobile-menu">
+
+      <li>
+        <button class="m-item">About Us</button>
+        <ul class="m-sub">
+          <li><a href="/en/sub/company/overview.html">Overview</a></li>
+          <li><a href="/en/sub/company/ceo.html">CEO Message</a></li>
+          <li><a href="/en/sub/company/history.html">History</a></li>
+          <li><a href="/en/sub/company/vision.html">Vision & Philosophy</a></li>
+          <li><a href="/en/sub/company/organization.html">Organization</a></li>
+          <li><a href="/en/sub/company/location.html">Location</a></li>
+        </ul>
+      </li>
+
+      <li>
+        <button class="m-item">Products</button>
+        <ul class="m-sub">
+          <li><a href="/en/sub/products/sub-towed.html">Towed Underwater Cables</a></li>
+          <li><a href="/en/sub/products/sub-fixed.html">Fixed Underwater Cables</a></li>
+          <li><a href="/en/sub/products/sub-connector.html">Underwater Connectors</a></li>
+          <li><a href="/en/sub/products/sub-custom.html">Custom Cables</a></li>
+        </ul>
+      </li>
+
+      <li>
+        <button class="m-item">Media Center</button>
+        <ul class="m-sub">
+          <li><a href="/en/sub/pr/notice/index.html">Notices</a></li>
+          <li><a href="/en/sub/pr/newsroom/index.html">Newsroom</a></li>
+          <li><a href="/en/sub/pr/gallery/index.html">Gallery</a></li>
+          <li><a href="/en/sub/pr/certification/index.html">Certifications & Patents</a></li>
+          <li><a href="/en/sub/pr/catalog/index.html">Catalogs</a></li>
+        </ul>
+      </li>
+
+      <li>
+        <button class="m-item">Support</button>
+        <ul class="m-sub">
+          <li><a href="/en/sub/support/inquiry/index.html">1:1 Inquiry</a></li>
+          <li><a href="/en/sub/support/downloads/index.html">Downloads</a></li>
+        </ul>
+      </li>
+
+    </ul>
+  </div>
+</div>

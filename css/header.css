@@ -9,7 +9,7 @@
   width: 100%;
   padding: clamp(0.5rem, 1.5vw, 1.5rem) 2vw;
   position: relative;
-  z-index: 2000;
+  z-index: 3000;
   box-sizing: border-box;
   isolation: isolate;
 }
@@ -37,7 +37,14 @@
   justify-content: center;
 }
 
-/* PC 기준: 가운데 정렬 absolute */
+/* ============================================== */
+/*                   PC 전용 메뉴                 */
+/* ============================================== */
+
+.pc-nav {
+  display: flex;
+}
+
 .main-menu {
   position: absolute;
   top: 50%;
@@ -54,7 +61,6 @@
   position: relative;
 }
 
-/* ▼ hover 유지용 투명 패딩 */
 .main-menu > li::after {
   content: "";
   position: absolute;
@@ -62,7 +68,6 @@
   left: 0;
   width: 100%;
   height: 40px;
-  display: block;
 }
 
 /* 메뉴 텍스트 */
@@ -76,7 +81,7 @@
 }
 
 /* ============================================== */
-/*                서브메뉴 (PC)                   */
+/*                PC Submenu (Hover)              */
 /* ============================================== */
 
 .submenu {
@@ -115,7 +120,6 @@
   font-weight: 400;
   color: #222;
   white-space: nowrap;
-  transition: background 0.2s ease, color 0.2s ease;
 }
 
 .submenu li a:hover {
@@ -139,11 +143,6 @@ body:not(#index-page) .logo-white { display: none !important; }
 
 body:not(#index-page) .main-menu a {
   color: #111 !important;
-  opacity: 0.95;
-}
-
-body:not(#index-page) .main-menu a:hover {
-  color: #0f2679 !important;
 }
 
 /* ============================================== */
@@ -153,18 +152,17 @@ body:not(#index-page) .main-menu a:hover {
 body#index-page .header-inner {
   position: fixed;
   top: 0;
-  left: 0;
   width: 100%;
   padding: 22px 4vw;
 
   background: rgba(15, 15, 15, 0.35);
   backdrop-filter: blur(18px) brightness(1.25);
   border-bottom: 1px solid rgba(255,255,255,0.15);
-  transition: 0.35s ease;
+  transition: 0.35s;
 }
 
 body#index-page .logo-white { display: block !important; }
-body#index-page .logo-dark  { display: none  !important; }
+body#index-page .logo-dark  { display: none !important; }
 
 body#index-page .main-menu a {
   color: #f6f6f6 !important;
@@ -174,7 +172,6 @@ body#index-page .main-menu a {
 body#index-page.scrolled .header-inner {
   background: rgba(255,255,255,0.97);
   border-bottom: 1px solid rgba(0,0,0,0.06);
-  backdrop-filter: none;
 }
 
 body#index-page.scrolled .logo-white { display: none !important; }
@@ -186,12 +183,11 @@ body#index-page.scrolled .main-menu a {
 }
 
 /* ============================================== */
-/*         언어 선택 드롭다운 공통               */
+/*           LANGUAGE DROPDOWN                    */
 /* ============================================== */
 
 .language-dropdown {
   position: relative;
-  display: inline-block;
 }
 
 .lang-toggle {
@@ -201,139 +197,120 @@ body#index-page.scrolled .main-menu a {
   padding: 6px 16px;
   font-weight: 600;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.lang-toggle::after {
-  content: "▼";
-  font-size: 0.7rem;
 }
 
 .lang-list {
-  list-style: none;
-  padding: 8px 0;
-  margin: 0;
+  display: none;
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
+  width: 80px;
+  padding: 8px 0;
   background: #fff;
   border: 1px solid #d6d6d6;
   border-radius: 10px;
-  width: 80px;
-  display: none;
-  box-shadow: 0 8px 18px rgba(0,0,0,0.12);
-  z-index: 10000;
 }
 
 .language-dropdown.open .lang-list {
   display: block;
 }
 
-.lang-list li a {
+/* ============================================== */
+/*          MOBILE HAMBURGER BUTTON               */
+/* ============================================== */
+
+.mobile-menu-btn {
+  width: 32px;
+  height: 26px;
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.mobile-menu-btn span {
   display: block;
-  padding: 10px 16px;
-  text-align: center;
-  font-size: 0.9rem;
-  color: #333;
+  width: 100%;
+  height: 3px;
+  background: #111;
+  border-radius: 6px;
 }
 
 /* ============================================== */
-/*           MOBILE MENU PANEL (≤1024px)          */
+/*        FULLSCREEN MOBILE OVERLAY MENU          */
+/* ============================================== */
+
+.mobile-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255,255,255,0.65);
+  backdrop-filter: blur(12px);
+  opacity: 0;
+  visibility: hidden;
+  transition: 0.35s ease;
+  z-index: 5000;
+}
+
+.mobile-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.mobile-overlay-inner {
+  padding: 140px 30px 40px;
+}
+
+.mobile-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.m-item {
+  width: 100%;
+  text-align: left;
+  padding: 18px 0;
+  font-size: 20px;
+  font-weight: 700;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.m-sub {
+  list-style: none;
+  padding-left: 12px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.25s ease;
+}
+
+.m-sub.open {
+  max-height: 500px;
+}
+
+.m-sub li a {
+  display: block;
+  padding: 10px 0;
+  font-size: 15px;
+  color: #222;
+}
+
+/* ============================================== */
+/*             RESPONSIVE SETTINGS                */
 /* ============================================== */
 
 @media (max-width: 1024px) {
-
-  /* 헤더 자체는 축소 */
-  .header-inner {
-    padding: 12px 4vw;
+  .pc-nav {
+    display: none;
   }
-
-  /* 모바일 메뉴 패널: 헤더 아래 펼쳐지는 공간 */
-  .mobile-menu-panel {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
-    background: #ffffff;
-    overflow: hidden;
-    max-height: 0;
-    transition: max-height 0.35s ease;
-    z-index: 1500;
-    border-bottom: 1px solid #ececec;
-  }
-
-  .mobile-menu-panel.open {
-    max-height: 600px;
-  }
-
-  /* 모바일은 세로 메뉴 */
-  .main-menu {
-    flex-direction: column;
-    padding: 10px 16px;
-    gap: 4px;
-    position: static !important;
-    transform: none !important;
-    width: 100%;
-  }
-
-  .main-menu > li {
-    width: 100%;
-  }
-
-  .main-menu > li > a {
-    display: block;
-    padding: 12px 4px;
-    text-align: left;
-  }
-
-  /* 아코디언 */
-  .submenu {
-    position: static !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    max-height: 0;
-    overflow: hidden;
-    padding-left: 10px;
-    border-left: 2px solid #eee;
-    transition: max-height 0.25s ease;
-  }
-
-  .main-menu li.open > .submenu {
-    max-height: 500px;
+  .mobile-menu-btn {
+    display: flex;
   }
 }
 
-/* ============================================== */
-/*              SMALL MOBILE (≤600px)             */
-/* ============================================== */
-
-@media (max-width: 600px) {
-
-  .header-inner {
-    padding: 10px 3vw;
-  }
-
-  .header-left .logo {
-    width: 110px;
-  }
-
-  .main-menu a {
-    font-size: 13px;
-  }
-
-  .lang-toggle {
-    padding: 4px 12px;
-    font-size: 0.85rem;
-  }
-}
-
-
-
-/* PC에서는 모바일 메뉴 패널 숨김 */
-@media (min-width: 1025px) {
-  .mobile-menu-panel {
-    display: none !important;
-  }
-}
