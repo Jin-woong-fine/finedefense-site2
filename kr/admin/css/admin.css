@@ -321,3 +321,76 @@ textarea {
 
 
 
+/* ===========================================================
+   🔧 SIDEBAR FORCE FIX (글자 안 보임, 스타일 미적용 방지)
+=========================================================== */
+
+/* 사이드바를 최상위에서 확실히 스타일링 */
+#sidebar, 
+#sidebar * {
+  color: #fff !important;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+/* flex 레이아웃 깨짐 방지 */
+#sidebar {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 240px;
+  background: #0f2679 !important;
+  padding: 0;
+  z-index: 1000; /* 가림 현상 제거 */
+}
+
+/* sidebar.js가 넣는 컨테이너를 자동 인식 */
+#sidebar > div,
+#sidebar .sidebar {
+  width: 100%;
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* 메뉴 공통 */
+#sidebar a,
+#sidebar .menu-item {
+  text-decoration: none;
+  color: #cfd5e3 !important;
+  display: block;
+  padding: 12px 16px;
+  border-radius: 8px;
+  transition: 0.2s;
+  font-size: 15px;
+}
+
+/* hover */
+#sidebar a:hover,
+#sidebar .menu-item:hover {
+  background: rgba(255,255,255,0.15);
+  color: #fff !important;
+}
+
+/* 활성 메뉴 */
+#sidebar .menu-item.active {
+  background: rgba(255,255,255,0.28);
+  font-weight: 700;
+  color: #fff !important;
+}
+
+/* 메뉴 제목 */
+#sidebar .menu-title {
+  color: #9fb3e3 !important;
+  font-size: 13px;
+  margin: 20px 0 6px;
+}
+
+/* 메인 영역 밀기 */
+.main {
+  margin-left: 240px !important;
+}
