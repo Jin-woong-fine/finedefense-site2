@@ -240,27 +240,22 @@ textarea {
 }
 
 /* ===========================================================
-   DASHBOARD — STAT CARDS (업그레이드 버전)
-   - 카드 과도한 확대 방지
-   - 반응형 1~4열 자동 배치
-   - 전체 레이아웃 중앙 정렬
+   DASHBOARD — STAT CARDS (4열 고정 + 크기 안정화 버전)
 =========================================================== */
 
-/* KPI 카드 전체 레이아웃 */
-.stats-container,
+/* KPI 카드 행: 4열 유지 */
 .stats-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 22px;
-  margin-bottom: 35px;
+  grid-template-columns: repeat(4, 1fr);  /* 항상 4칸 */
+  gap: 18px;
 
-  /* 넓은 화면에서 너무 퍼지지 않도록 */
-  max-width: 1200px;
+  max-width: 1200px;   /* 전체 열 폭 제한 */
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 35px;
 }
 
-/* 개별 KPI 카드 */
+/* KPI 카드 */
 .stat-card {
   background: white;
   padding: 25px 22px;
@@ -270,9 +265,9 @@ textarea {
   border-left: 6px solid #0f2679;
   transition: transform .15s;
 
-  /* 카드가 넓어지지 않도록 최대폭 제한 */
-  max-width: 260px;
-  margin: 0 auto;
+  max-width: 260px;  /* 카드 자체 폭 제한 */
+  width: 100%;
+  margin: 0 auto;    /* 정렬 안정화 */
 }
 
 .stat-card:hover {
