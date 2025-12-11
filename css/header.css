@@ -385,3 +385,26 @@ body:not(#index-page) .logo-dark  { display: block; }
   }
 
 } /* @media end */
+
+
+@media (max-width: 1024px) {
+  nav.pc-nav,
+  .pc-menu,
+  .pc-menu > li,
+  .pc-menu > li > a,
+  .pc-menu .submenu {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  .mobile-menu-btn {
+    display: flex !important;
+  }
+
+  .mobile-overlay {
+    display: block !important;
+  }
+}
