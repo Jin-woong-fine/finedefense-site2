@@ -571,13 +571,15 @@
   <script src="/js/session_timer.js"></script>
   <script src="/js/language.js"></script>
 
+  <script src="/js/header.js"></script>
+
 
 
 
 <script>
 async function loadLatestPosts() {
   try {
-    const res = await fetch(`/api/posts/latest?lang=kr&limit=4`);
+    const res = await fetch(`/api/posts/latest?lang=en&limit=4`);
     const list = await res.json();
 
     const grid = document.getElementById("newsGrid");
