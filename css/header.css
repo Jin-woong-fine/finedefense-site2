@@ -44,6 +44,14 @@
   list-style: none;
 }
 
+.pc-nav {
+  position: relative;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+
 .pc-menu > li {
   position: relative;
 }
@@ -328,5 +336,24 @@ body#index-page.scrolled .pc-menu a {
     align-items: center;
     gap: 12px;
     z-index: 6000;
+  }
+}
+
+
+/* 🔥 PC에서는 모바일 오버레이 완전 차단 */
+@media (min-width: 1025px) {
+  .mobile-overlay,
+  .mobile-overlay.open {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+}
+
+@media (min-width: 1025px) {
+  .pc-nav,
+  .pc-menu {
+    display: flex !important;
   }
 }
