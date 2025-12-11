@@ -22,7 +22,7 @@
   display: flex;
   align-items: center;
   gap: 20px;
-  min-width: 110px; /* 햄버거 잘림 방지 */
+  min-width: 110px;
 }
 
 .header-left .logo {
@@ -30,43 +30,32 @@
   height: auto;
 }
 
+
 /* ============================================== */
 /*                    PC 메뉴                      */
 /* ============================================== */
 
-.pc-menu {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  gap: clamp(50px, 4vw, 150px);
-  list-style: none;
-}
-
 .pc-nav {
-  position: relative;
   flex: 1;
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 
+.pc-menu {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(50px, 4vw, 150px);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
 
 .pc-menu > li {
   position: relative;
 }
 
-/* PC Hover 유지 패딩 */
-.pc-menu > li::after {
-  content: "";
-  position: absolute;
-  top: 100%;
-  left: 0;
-  width: 100%;
-  height: 40px;
-}
-
-/* 메뉴 텍스트 */
 .pc-menu a {
   text-decoration: none;
   font-family: 'Noto Sans KR', sans-serif;
@@ -74,6 +63,7 @@
   font-size: clamp(15px, 1vw, 18px);
   transition: 0.25s;
 }
+
 
 /* ============================================== */
 /*                PC submenu (hover)              */
@@ -85,7 +75,7 @@
   visibility: hidden;
 
   position: absolute;
-  top: calc(100% + 22px);
+  top: calc(100% + 18px);
   left: 50%;
   transform: translateX(-50%) translateY(10px);
 
@@ -119,6 +109,7 @@
   color: #0f2679;
 }
 
+
 /* ============================================== */
 /*         서브페이지용 흰색 고정 헤더            */
 /* ============================================== */
@@ -126,7 +117,7 @@
 body:not(#index-page) .header-inner {
   background: rgba(255,255,255,0.97);
   border-bottom: 1px solid rgba(0,0,0,0.06);
-  padding: 22px 4vw !important;
+  padding: 22px 4vw;
   box-shadow: 0 3px 10px rgba(0,0,0,0.07);
 }
 
@@ -136,6 +127,7 @@ body:not(#index-page) .logo-white { display: none !important; }
 body:not(#index-page) .pc-menu a {
   color: #111 !important;
 }
+
 
 /* ============================================== */
 /*                INDEX PAGE HEADER                */
@@ -207,6 +199,7 @@ body#index-page.scrolled .pc-menu a {
   display: block;
 }
 
+
 /* ============================================== */
 /*          MOBILE HAMBURGER BUTTON               */
 /* ============================================== */
@@ -228,7 +221,7 @@ body#index-page.scrolled .pc-menu a {
     background: none;
     border: none;
     cursor: pointer;
-    z-index: 6000; /* 헤더와 겹침 방지 */
+    z-index: 6000;
   }
 
   .mobile-menu-btn span {
@@ -238,7 +231,7 @@ body#index-page.scrolled .pc-menu a {
     background: #111;
     margin: 4px 0;
     border-radius: 3px;
-    transition: 0.25s ease;
+    transition: 0.25s;
   }
 }
 
@@ -266,9 +259,7 @@ body#index-page.scrolled .pc-menu a {
 }
 
 .mobile-overlay-inner {
-  position: relative;
   padding: 130px 30px 40px;
-  z-index: 6001; /* 메뉴 항목이 위로 */
 }
 
 .mobile-menu {
@@ -288,7 +279,6 @@ body#index-page.scrolled .pc-menu a {
   border: none;
   cursor: pointer;
   color: #111;
-  display: block;
 }
 
 /* 2차 메뉴 */
@@ -301,7 +291,7 @@ body#index-page.scrolled .pc-menu a {
 }
 
 .m-sub.open {
-  max-height: 500px; /* 충분히 큰 값 */
+  max-height: 500px;
 }
 
 .m-sub li a {
@@ -317,43 +307,14 @@ body#index-page.scrolled .pc-menu a {
 /* ============================================== */
 
 @media (max-width: 1024px) {
-
-  /* PC 메뉴는 숨김 */
   .pc-menu {
     display: none !important;
   }
-
-  /* 모바일에서 헤더 요소 정렬 */
-  .header-inner {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  /* 언어 선택과 햄버거 버튼이 겹치지 않도록 */
-  .header-right {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    z-index: 6000;
-  }
 }
 
-
-/* 🔥 PC에서는 모바일 오버레이 완전 차단 */
+/* PC에서는 모바일 메뉴 비활성화 */
 @media (min-width: 1025px) {
-  .mobile-overlay,
-  .mobile-overlay.open {
+  .mobile-overlay {
     display: none !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-  }
-}
-
-@media (min-width: 1025px) {
-  .pc-nav,
-  .pc-menu {
-    display: flex !important;
   }
 }
