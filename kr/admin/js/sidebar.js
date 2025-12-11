@@ -4,11 +4,14 @@ console.log("%c[sidebar] 로드 완료", "color:#4caf50;font-weight:bold;");
 
 function loadSidebar(activePage = "") {
   const wrap = document.getElementById("sidebar");
-  if (!wrap) return;
+  if (!wrap) {
+    console.warn("[sidebar] #sidebar 요소를 찾을 수 없습니다.");
+    return;
+  }
 
   const role = localStorage.getItem("role") || "user";
+  const name = localStorage.getItem("name") || "관리자";
 
-  // 메뉴 구성
   const menu = [
     { title: "대시보드", link: "/kr/admin/dashboard.html", key: "dashboard" },
 
@@ -40,7 +43,6 @@ function loadSidebar(activePage = "") {
     menu.push({ title: "사용자 관리", link: "/kr/admin/users.html", key: "users" });
   }
 
-  // ★ CSS 구조에 맞게 HTML 구성
   wrap.innerHTML = `
     <div class="sidebar">
 
@@ -49,9 +51,9 @@ function loadSidebar(activePage = "") {
       </div>
 
       <div class="user-block">
-        <img class="avatar" src="/img/logo/fd-symbol-white.png" />
+        <img class="avatar" src="/img/logo/fd-symbol-white.png" alt="avatar" />
         <div class="user-info">
-          <div class="name">${localStorage.getItem("name") || "관리자"}</div>
+          <div class="name">${name}</div>
           <div class="role">${role}</div>
         </div>
       </div>
@@ -59,35 +61,56 @@ function loadSidebar(activePage = "") {
       <div class="menu-title">메뉴</div>
 
       <div class="sidebar-menu">
-        ${menu.map(item => {
-          if (item.children) {
-            const open = item.children.some(ch => ch.key === activePage);
-            return `
-              <div class="menu-group ${open ? "open" : ""}">
-                <div class="menu-item">${item.title}</div>
-                <div class="submenu">
-                  ${item.children
-                    .map(ch => `
-                      <a class="menu-item ${ch.key === activePage ? "active" : ""}"
-                         href="${ch.link}">
-                        ${ch.title}
-                      </a>
-                    `)
-                    .join("")}
+        ${menu
+          .map((item) => {
+            // 서브메뉴 있는 그룹
+            if (item.children) {
+              const open = item.children.some((ch) => ch.key === activePage);
+              return `
+                <div class="menu-group ${open ? "open" : ""}">
+                  <div class="menu-item">${item.title}</div>
+                  <div class="submenu">
+                    ${item.children
+                      .map(
+                        (ch) => `
+                          <a class="menu-item ${ch.key === activePage ? "active" : ""}"
+                             href="${ch.link}">
+                            ${ch.title}
+                          </a>
+                        `
+                      )
+                      .join("")}
+                  </div>
                 </div>
-              </div>
-            `;
-          }
+              `;
+            }
 
-          return `
-            <a class="menu-item ${item.key === activePage ? "active" : ""}"
-               href="${item.link}">
-              ${item.title}
-            </a>
-          `;
-        }).join("")}
+            // 단일 메뉴
+            return `
+              <a class="menu-item ${item.key === activePage ? "active" : ""}"
+                 href="${item.link}">
+                ${item.title}
+              </a>
+            `;
+          })
+          .join("")}
       </div>
 
     </div>
   `;
+
+  // 🔹 서브메뉴 토글
+  wrap.querySelectorAll(".menu-group > .menu-item").forEach((el) => {
+    el.addEventListener("click", () => {
+      el.parentElement.classList.toggle("open");
+    });
+  });
+
+  console.log("[sidebar] 렌더 완료 — activePage:", activePage);
 }
+
+// 🔹 모든 admin 페이지에서 자동으로 사이드바 로드
+document.addEventListener("DOMContentLoaded", () => {
+  const active = document.body.dataset.adminPage || "";
+  loadSidebar(active);
+});
