@@ -327,7 +327,9 @@ body {
 =========================================================== */
 .grid-2 {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 22px;
-  justify-items: center;
+
+  max-width: 1300px;     /* 전체 패널 영역 폭 제한 */
+  margin: 0 auto;        /* 가운데 정렬 */
 }
