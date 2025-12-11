@@ -115,8 +115,8 @@ async function loadSidebar(activePage = "") {
             }
 
             return `
-              <a class="menu-item ${item.key === activePage ? "active" : ""}"
-                 href="${item.link}">
+              <a class="menu-item ${item.special || ""} ${item.key === activePage ? "active" : ""}"
+                href="${item.link}">
                 ${item.title}
               </a>
             `;
