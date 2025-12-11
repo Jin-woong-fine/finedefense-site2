@@ -240,45 +240,46 @@ textarea {
 }
 
 /* ===========================================================
-   DASHBOARD — STAT CARDS (정상 작동 버전)
+   DASHBOARD — KPI STAT CARDS (유동형, 반응형 설계)
 =========================================================== */
 
-/* KPI 카드 영역 */
+/* 카드 4개여도 균등 배치, 3개여도 균등, 5~6개여도 균형 유지 */
 .stats-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 18px;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 20px;
 
-  /* 전체 폭 제한 */
   max-width: 1200px;
-  margin: 0 auto 35px;
+  margin: 0 auto 35px auto;
+  padding: 0 10px;  /* 좌우 여백 */
 }
 
-/* KPI 카드 */
+/* 카드 크기 */
 .stat-card {
-  background: white;
+  background: #fff;
   padding: 25px 22px;
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   text-align: center;
   border-left: 6px solid #0f2679;
-  transition: transform .15s;
+  transition: transform 0.15s ease;
 
-  width: 100%;   /* 셀 크기에 맞게 */
+  width: 100%;
 }
 
+/* hover 효과 */
 .stat-card:hover {
   transform: translateY(-4px);
 }
 
 .stat-card h3 {
-  font-size: 16px;
+  font-size: 15px;
   color: #444;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .stat-value {
-  font-size: 32px;
+  font-size: 30px;
   font-weight: 700;
   color: #0f2679;
 }
