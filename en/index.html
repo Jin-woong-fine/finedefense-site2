@@ -175,12 +175,6 @@
         color: #001a66;
       }
 
-      /* 반응형 */
-      @media (max-width: 768px) {
-        .news-card {
-          width: 90%;
-        }
-      }
 
       .contact-cta {
         position: relative;
@@ -240,20 +234,6 @@
         background: #fff;
         color: #001a66;
         box-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
-      }
-
-      /* 반응형 */
-      @media (max-width: 768px) {
-        .contact-cta {
-          padding: 80px 5%;
-          background-position: center;
-        }
-        .contact-cta h2 {
-          font-size: 1.6rem;
-        }
-        .contact-cta p {
-          font-size: 1rem;
-        }
       }
 
       /* ============================================================
@@ -572,12 +552,10 @@
   <script src="/js/language.js"></script>
 
 
-
-
 <script>
 async function loadLatestPosts() {
   try {
-    const res = await fetch(`/api/posts/latest?lang=kr&limit=4`);
+    const res = await fetch(`/api/posts/latest?lang=en&limit=4`);
     const list = await res.json();
 
     const grid = document.getElementById("newsGrid");
