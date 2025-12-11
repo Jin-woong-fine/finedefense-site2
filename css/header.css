@@ -328,3 +328,12 @@ body#index-page.scrolled .main-menu a {
     font-size: 0.85rem;
   }
 }
+
+
+
+/* PC에서는 모바일 메뉴 패널 숨김 */
+@media (min-width: 1025px) {
+  .mobile-menu-panel {
+    display: none !important;
+  }
+}
