@@ -298,7 +298,7 @@ body#index-page.scrolled .main-menu a {
     padding: 12px 4vw;
   }
 
-  /* ✅ 가운데 정렬 absolute 제거 → 세로 메뉴 */
+  /* 메인메뉴 - PC 중앙 absolute 제거 */
   .main-menu {
     position: static !important;
     top: auto !important;
@@ -306,38 +306,59 @@ body#index-page.scrolled .main-menu a {
     transform: none !important;
 
     flex-direction: column;
-    align-items: flex-start;
+    width: 100%;
     gap: 8px;
+    padding: 0;
+    margin-top: 10px;
   }
 
-  /* ✅ 아코디언용 서브메뉴 (JS가 li.open 토글함) */
-  .submenu {
-    position: relative;
-    top: 0;
-    left: 0;
-    transform: none;
+  /* 각 메뉴 li가 폭 100% */
+  .main-menu > li {
+    width: 100%;
+  }
 
+  /* 상위 메뉴 스타일 */
+  .main-menu > li > a {
+    width: 100%;
+    display: block;
+    padding: 12px 10px;
+    text-align: left;
+  }
+
+  /* 아코디언용 서브메뉴 */
+  .submenu {
+    position: relative !important;
+    left: 0 !important;
+    transform: none !important;
+
+    width: 100% !important;     /* ← 부모의 전체 폭 */
     opacity: 1 !important;
     visibility: visible !important;
 
     max-height: 0;
     overflow: hidden;
+
     border: none !important;
     box-shadow: none !important;
+
     padding: 0;
-    margin-top: 4px;
-    text-align: left;
+    margin: 0;
     transition: max-height 0.25s ease;
   }
 
+  /* 아코디언 열릴 때 */
   .main-menu li.open > .submenu {
     max-height: 600px;
   }
 
+  /* 서브메뉴 항목 */
   .submenu li a {
     font-size: 14px;
-    padding: 10px 12px;
+    padding: 10px 16px;
     border-bottom: 1px solid #eee;
+    background: #fafafa;
+    display: block;
+    width: 100%;
   }
 
   .submenu li:last-child a {
