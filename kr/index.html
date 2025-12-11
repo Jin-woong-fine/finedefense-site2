@@ -706,9 +706,21 @@ document.addEventListener("DOMContentLoaded", () => {
   const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|Mobile/i.test(navigator.userAgent);
 
   if (isMobile) {
-    document.querySelector(".banner-slider").style.height = "55vh";
-    document.querySelectorAll(".slide").forEach(s => s.style.height = "55vh");
-    document.querySelectorAll(".slide img").forEach(i => i.style.height = "55vh");
+    // 배너 컨테이너는 높이를 자동으로
+    document.querySelector(".banner-slider").style.height = "auto";
+
+    // 각 슬라이드도 자동 높이
+    document.querySelectorAll(".slide").forEach(s => {
+      s.style.height = "auto";
+    });
+
+    // 이미지: 가로 100% + 비율 유지 + 전체가 보이도록 contain
+    document.querySelectorAll(".slide img").forEach(i => {
+      i.style.width = "100%";
+      i.style.height = "auto";
+      i.style.objectFit = "contain";   // 핵심
+      i.style.background = "#000";     // 여백 생길 때 자연스럽게
+    });
   }
 });
 </script>
