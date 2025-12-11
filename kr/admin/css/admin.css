@@ -328,8 +328,6 @@ textarea {
 /* 사이드바를 최상위에서 확실히 스타일링 */
 #sidebar, 
 #sidebar * {
-  color: #fff !important;
-  font-size: 14px;
   box-sizing: border-box;
 }
 
@@ -393,4 +391,42 @@ textarea {
 /* 메인 영역 밀기 */
 .main {
   margin-left: 240px !important;
+}
+
+
+/* ===============================
+   📌 사이드바 그룹 타이틀 (트래픽 분석 / 게시물 관리 등)
+   =============================== */
+#sidebar .menu-group > .menu-item {
+  font-weight: 700 !important;
+  font-size: 15px !important;
+  color: #ffffff !important;
+  background: rgba(255,255,255,0.08);
+  border-left: 4px solid rgba(255,255,255,0.5);
+  margin-top: 8px;
+  cursor: pointer;
+}
+
+#sidebar .menu-group.open > .menu-item {
+  background: rgba(255,255,255,0.18) !important;
+  border-left: 4px solid #ffffff !important;
+}
+
+#sidebar .submenu .menu-item {
+  padding-left: 28px !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  opacity: 0.85;
+}
+
+#sidebar .submenu .menu-item:hover {
+  background: rgba(255,255,255,0.15) !important;
+  opacity: 1;
+}
+
+#sidebar .submenu .menu-item.active {
+  background: rgba(255,255,255,0.28) !important;
+  font-weight: 600 !important;
+  color: #fff !important;
+  opacity: 1;
 }
