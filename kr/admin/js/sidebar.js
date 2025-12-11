@@ -1,63 +1,123 @@
-window.loadSidebar = function (activeKey) {
-  const sidebarContainer = document.getElementById("sidebar");
-  if (!sidebarContainer) return;
+// /kr/admin/js/sidebar.js
 
-  /* 🔥 role 안정 처리 */
-  const rawRole = localStorage.getItem("role");
-  const role = rawRole ? rawRole : "viewer";
+console.log("%c[sidebar] 로드 완료", "color:#4caf50;font-weight:bold;");
 
-  const name = localStorage.getItem("name") || "사용자";
-  const avatar = localStorage.getItem("avatar")
-    ? `/uploads/avatars/${localStorage.getItem("avatar")}`
-    : "/kr/admin/img/default-avatar.png";
+function loadSidebar(activePage = "") {
+  const sidebar = document.getElementById("sidebar");
+  if (!sidebar) return;
 
-  /* 메뉴 데이터 */
-  const menuItems = [
-    { key: "dashboard", label: "대시보드", link: "/kr/admin/dashboard.html", roles: ["superadmin", "admin", "editor", "viewer"] },
-    { key: "users", label: "사용자 관리", link: "/kr/admin/users.html", roles: ["superadmin", "admin"] },
-    { key: "products", label: "제품 관리", link: "/kr/admin/products-list.html", roles: ["superadmin", "admin", "editor"] },
-    { key: "newsroom", label: "뉴스룸 관리", link: "/kr/admin/news-list.html", roles: ["superadmin", "admin", "editor"] },
-    { key: "notice", label: "공지사항 관리", link: "/kr/admin/notice-list.html", roles: ["superadmin", "admin", "editor"] },
-    { key: "gallery", label: "갤러리 관리", link: "/kr/admin/gallery-list.html", roles: ["superadmin", "admin", "editor"] },
+  const role = localStorage.getItem("role") || "user";
 
-    // ⭐ 인증/특허
-    { key: "certifications", label: "인증/특허 관리", link: "/kr/admin/certification-list.html", roles: ["superadmin", "admin", "editor"] },
-
-    // ⭐ 카탈로그 (추가됨)
-    { key: "catalog", label: "카탈로그 관리", link: "/kr/admin/catalog-list.html", roles: ["superadmin", "admin", "editor"] },
-
-    // ⭐ 1:1 문의 관리
-    { key: "inquiry", label: "1:1 문의 관리", link: "/kr/admin/inquiry-list.html", roles: ["superadmin", "admin"] },
-
-    { key: "downloads", label: "자료실 관리", link: "/kr/admin/downloads-list.html", roles: ["superadmin", "admin", "editor"] },
-
-    { key: "loginlogs", label: "로그인 기록", link: "/kr/admin/login_logs.html", roles: ["superadmin", "admin"] },
+  // 메뉴 구성
+  const menu = [
+    {
+      title: "대시보드",
+      icon: "📊",
+      link: "/kr/admin/dashboard.html",
+      key: "dashboard"
+    },
+    {
+      title: "트래픽 분석",
+      icon: "🌐",
+      key: "traffic",
+      children: [
+        { title: "일별 통계", link: "/kr/admin/traffic_daily.html", key: "traffic_daily" },
+        { title: "월별 통계", link: "/kr/admin/traffic_monthly.html", key: "traffic_monthly" },
+        { title: "유입경로", link: "/kr/admin/traffic_referrer.html", key: "traffic_referrer" },
+        { title: "페이지 조회", link: "/kr/admin/traffic_pages.html", key: "traffic_pages" },
+        { title: "국가/디바이스", link: "/kr/admin/traffic_device_country.html", key: "traffic_device_country" }
+      ]
+    },
+    {
+      title: "게시물 관리",
+      icon: "📝",
+      key: "posts",
+      children: [
+        { title: "공지사항", link: "/kr/admin/notice-list.html", key: "notice" },
+        { title: "뉴스룸", link: "/kr/admin/news-list.html", key: "news" }
+      ]
+    },
+    {
+      title: "자료실",
+      icon: "📁",
+      link: "/kr/admin/downloads-list.html",
+      key: "downloads"
+    },
+    {
+      title: "제품 관리",
+      icon: "📦",
+      link: "/kr/admin/products-list.html",
+      key: "products"
+    },
+    {
+      title: "고객 문의",
+      icon: "💬",
+      link: "/kr/admin/inquiry-list.html",
+      key: "inquiry"
+    }
   ];
 
-  /* 메뉴 렌더링 */
-  const menuHTML = menuItems
-    .filter(item => item.roles.includes(role))
-    .map(item => `
-      <a href="${item.link}" class="menu-item ${activeKey === item.key ? "active" : ""}">
-        ${item.label}
-      </a>
-    `).join("");
+  // 관리자만 추가되는 영역
+  if (role === "admin" || role === "superadmin") {
+    menu.push({
+      title: "사용자 관리",
+      icon: "👤",
+      link: "/kr/admin/users.html",
+      key: "users"
+    });
+  }
 
-  sidebarContainer.innerHTML = `
-    <div class="sidebar">
-      <div class="sidebar-logo">FINE DEFENSE ADMIN</div>
-
-      <div class="sidebar-profile">
-        <img src="${avatar}" class="sidebar-avatar"/>
-        <div>
-          <div class="profile-name">${name}</div>
-          <div class="profile-role">${role.toUpperCase()}</div>
-        </div>
-      </div>
-
-      <nav class="sidebar-menu">
-        ${menuHTML}
-      </nav>
+  // HTML 렌더링
+  sidebar.innerHTML = `
+    <div class="sidebar-logo">
+      <img src="/img/logo/fd-logo-white.png" alt="Fine Defense" />
     </div>
+    <ul class="sidebar-menu">
+      ${menu
+        .map((item) => {
+          // 서브 메뉴가 있는 경우
+          if (item.children) {
+            const open = item.children.some((ch) => ch.key === activePage);
+            return `
+              <li class="menu-group ${open ? "open" : ""}">
+                <div class="menu-title">
+                  <span class="icon">${item.icon}</span>
+                  ${item.title}
+                </div>
+                <ul class="submenu">
+                  ${item.children
+                    .map(
+                      (child) => `
+                    <li class="${child.key === activePage ? "active" : ""}">
+                      <a href="${child.link}">${child.title}</a>
+                    </li>
+                  `
+                    )
+                    .join("")}
+                </ul>
+              </li>
+            `;
+          }
+
+          // 단일 메뉴
+          return `
+            <li class="${item.key === activePage ? "active" : ""}">
+              <a href="${item.link}">
+                <span class="icon">${item.icon}</span>
+                ${item.title}
+              </a>
+            </li>
+          `;
+        })
+        .join("")}
+    </ul>
   `;
-};
+
+  // 서브메뉴 클릭 시 토글 기능
+  document.querySelectorAll(".menu-group .menu-title").forEach((el) => {
+    el.addEventListener("click", () => {
+      const parent = el.parentElement;
+      parent.classList.toggle("open");
+    });
+  });
+}
