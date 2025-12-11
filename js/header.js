@@ -1,13 +1,11 @@
 // ================================================
-//  Fine Defense — Header Menu Controller
-//  (PC: hover, Mobile: click-accordion)
+//  Fine Defense — Header Controller (Full Toggle Fix)
 // ================================================
 
-// 헤더가 include로 로드되어도 안전하게 기다림
+// include로 header가 로드될 때까지 대기
 function waitForHeader(callback) {
   const timer = setInterval(() => {
-    const menu = document.querySelector(".main-menu");
-    if (menu) {
+    if (document.querySelector(".main-menu")) {
       clearInterval(timer);
       callback();
     }
@@ -15,45 +13,37 @@ function waitForHeader(callback) {
 }
 
 function initHeaderScript() {
-  const menuItems = document.querySelectorAll(".main-menu > li");
+  const menuItems = document.querySelectorAll(".main-menu > li > a");
 
-  menuItems.forEach(li => {
-    const link = li.querySelector("a");
-    const submenu = li.querySelector(".submenu");
-
-    if (!submenu) return; // 서브메뉴 없는 항목 스킵
-
-    link.addEventListener("click", (e) => {
+  menuItems.forEach(aTag => {
+    aTag.addEventListener("click", (e) => {
       const isMobile = window.innerWidth <= 1024;
 
-      if (!isMobile) return; // PC에서는 기본 hover 유지
+      if (!isMobile) return; // PC는 클릭 영향 없음(hover 로 동작)
 
-      e.preventDefault(); // 모바일에서는 링크 이동 막기
+      const li = aTag.parentElement;
+      const submenu = li.querySelector(".submenu");
 
-      const isOpen = li.classList.contains("open");
+      if (!submenu) return; // 서브메뉴 없는 경우 allow link
 
-      // -------------------------
-      // 🔥 모든 메뉴 닫기
-      // -------------------------
-      document.querySelectorAll(".main-menu > li.open").forEach(item => {
-        item.classList.remove("open");
+      e.preventDefault(); // 링크 이동 막기
+
+      // 🔥 이미 열려있으면 닫기
+      if (li.classList.contains("open")) {
+        li.classList.remove("open");
+        return; // 여기서 끝! (닫힘)
+      }
+
+      // 🔥 열려 있지 않으면 다른 서브메뉴 닫고 이것만 열기
+      document.querySelectorAll(".main-menu > li.open").forEach(openLi => {
+        openLi.classList.remove("open");
       });
 
-      // -------------------------
-      // 🔥 이미 열려있던 메뉴이면 닫기만 하고 끝
-      // -------------------------
-      if (isOpen) return;
-
-      // -------------------------
-      // 🔥 닫혀있던 메뉴는 열기
-      // -------------------------
       li.classList.add("open");
     });
   });
 
-  // -------------------------
-  // 📌 화면 크기 변경 시 초기화
-  // -------------------------
+  // PC 사이즈로 돌아오면 모두 초기화
   window.addEventListener("resize", () => {
     if (window.innerWidth > 1024) {
       document.querySelectorAll(".main-menu > li.open").forEach(li => {
@@ -63,5 +53,4 @@ function initHeaderScript() {
   });
 }
 
-// include.js로 header가 로드될 때까지 대기
 waitForHeader(initHeaderScript);
