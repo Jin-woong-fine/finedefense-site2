@@ -510,34 +510,35 @@ body.has-admin-bar {
 
 
 /* ===========================================================
-   📱 모바일 전용 헤더 크기 조정 (1024px 이하)
-   PC 레이아웃 유지하되, 크기만 자연스럽게 축소
+   📱 모바일 (1024px 이하) — PC 레이아웃 유지 + 축소 버전
+   ※ index-page 의 clamp 로고 크기를 완전히 무력화하여 통일된 크기 적용
 =========================================================== */
 @media (max-width: 1024px) {
 
-  /* 헤더 더 얇게 */
+  /* 헤더 패딩 축소 */
   .header-inner {
     padding: 8px 12px !important;
   }
 
-  /* 📌 로고 확실히 작게 (clamp 완전 무력화) */
+  /* 🔥 로고 크기 완전 고정 (PC Clamp 효과 제거) */
   .header-left .logo {
     width: 90px !important;
+    height: auto !important;
     max-width: 90px !important;
     min-width: 90px !important;
   }
 
-  /* 메뉴 간격 */
+  /* 메뉴 간격 줄이기 */
   .main-menu {
     gap: 16px !important;
   }
 
-  /* 메뉴 글자 */
-  .main-menu a {
+  /* 메뉴 텍스트 작게 */
+  .main-menu > li > a {
     font-size: 11px !important;
   }
 
-  /* 서브메뉴 */
+  /* 서브메뉴 크기 */
   .submenu {
     top: calc(100% + 12px) !important;
     min-width: 135px !important;
@@ -548,32 +549,36 @@ body.has-admin-bar {
     font-size: 11px !important;
     padding: 6px 8px !important;
   }
+
+  /* 모바일에서는 hover 효과 제거 (JS 토글과 충돌 방지) */
+  .main-menu li:hover .submenu {
+    display: none !important;
+  }
 }
 
-
 /* ===========================================================
-   📱 더 작은 화면 최적화 (600px 이하)
+   📱 초소형 모바일 (600px 이하)
 =========================================================== */
 @media (max-width: 600px) {
 
-  /* 📌 작은 모바일용 로고 */
+  /* 더 작은 로고 */
   .header-left .logo {
     width: 65px !important;
     max-width: 65px !important;
     min-width: 65px !important;
   }
 
-  /* 메뉴 간격 ↓ */
+  /* 메뉴 간격 최소화 */
   .main-menu {
     gap: 10px !important;
   }
 
-  /* 글자 더 작게 */
-  .main-menu a {
+  /* 텍스트 줄이기 */
+  .main-menu > li > a {
     font-size: 10px !important;
   }
 
-  /* 서브메뉴 */
+  /* 서브메뉴 더 컴팩트 */
   .submenu {
     min-width: 120px !important;
     top: calc(100% + 8px) !important;
