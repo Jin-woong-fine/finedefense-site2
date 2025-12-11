@@ -522,7 +522,7 @@ body.has-admin-bar {
 
   /* 로고 더 작게 */
   .header-left .logo {
-    width: 110px !important;
+    width: 70px !important;
   }
 
   /* 🔥 메뉴 간격 크게 축소 */
@@ -556,7 +556,7 @@ body.has-admin-bar {
 
   /* 로고 아주 작게 */
   .header-left .logo {
-    width: 95px !important;
+    width: 50px !important;
   }
 
   /* 메뉴 간격 최소화 */
