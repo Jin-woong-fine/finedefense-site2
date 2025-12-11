@@ -515,67 +515,68 @@ body.has-admin-bar {
 =========================================================== */
 @media (max-width: 1024px) {
 
-  /* 헤더 padding 줄이기 */
+  /* 헤더 더 얇게 */
   .header-inner {
-    padding: 12px 16px !important;
+    padding: 8px 12px !important;
   }
 
-  /* 로고 크기 축소 */
+  /* 로고 더 작게 */
   .header-left .logo {
-    width: 130px !important;
+    width: 110px !important;
   }
 
-  /* 메인메뉴 간격 줄이기 */
+  /* 🔥 메뉴 간격 크게 축소 */
   .main-menu {
-    gap: 25px !important;
+    gap: 16px !important;   /* 기존 25px → 16px */
   }
 
-  /* 메인메뉴 텍스트 */
+  /* 🔥 메뉴 글씨 더 작게 */
   .main-menu a {
-    font-size: 14px !important;
+    font-size: 12px !important;   /* 기존 14px → 12px */
   }
 
-  /* 서브메뉴 위치를 좀 위로 붙여서 불필요한 공간 제거 */
+  /* 서브메뉴 사이즈 축소 */
   .submenu {
-    top: calc(100% + 14px) !important;
-    min-width: 150px !important;
+    top: calc(100% + 10px) !important;
+    min-width: 130px !important;  /* 기존 150 → 130 */
+    padding: 6px 0 !important;    /* 기존 10px → 6px */
   }
 
-  /* 서브메뉴 내부 텍스트 크기/패딩 축소 */
   .submenu li a {
-    font-size: 14px !important;
-    padding: 8px 10px !important;
+    font-size: 12px !important;   /* 기존 14 → 12 */
+    padding: 6px 8px !important;  /* 기존 8px 10px → 6px 8px */
   }
 }
+
 
 /* ===========================================================
    📱 더 작은 화면 최적화 (600px 이하)
 =========================================================== */
 @media (max-width: 600px) {
 
-  /* 로고 더 작게 */
+  /* 로고 아주 작게 */
   .header-left .logo {
-    width: 115px !important;
+    width: 95px !important;
   }
 
-  /* 메뉴 간격 더 축소 */
+  /* 메뉴 간격 최소화 */
   .main-menu {
-    gap: 16px !important;
+    gap: 10px !important;
   }
 
+  /* 글씨 더 작은 모바일 폰트 */
   .main-menu a {
-    font-size: 13px !important;
+    font-size: 11px !important;
   }
 
-  /* 서브메뉴도 더 컴팩트하게 */
+  /* 서브메뉴도 아주 컴팩트하게 */
   .submenu {
-    min-width: 130px !important;
-    top: calc(100% + 10px) !important;
+    min-width: 110px !important;
+    top: calc(100% + 8px) !important;
   }
 
   .submenu li a {
-    font-size: 13px !important;
-    padding: 7px 8px !important;
+    font-size: 11px !important;
+    padding: 5px 6px !important;
   }
-
 }
