@@ -70,19 +70,6 @@
   word-break: keep-all;
 }
 
-/* ✅ 모바일일 때 — 폭과 폰트 크기 자동 조정 */
-@media (max-width: 768px) {
-  .banner-text {
-    width: 90%;
-    padding: 1rem;
-    font-size: clamp(0.9rem, 3.5vw, 1.6rem);
-  }
-
-  .banner-subtext {
-    font-size: clamp(0.8rem, 3vw, 1.2rem);
-    line-height: 1.4;
-  }
-}
 
 /* 이전/다음 버튼 */
 .prev, .next {
