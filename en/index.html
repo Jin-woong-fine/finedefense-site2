@@ -358,9 +358,28 @@
         width: clamp(120px, 12vw, 190px) !important;
       }
 
+    /* ===========================================================
+      📱 1024px 이하 — 카드 + 본문 전체 축소
+    =========================================================== */
     @media (max-width: 1024px) {
 
-      /* 시설 카드 */
+      /* 섹션 패딩 축소 */
+      section, .news, .facilities, .business-area {
+        padding: 50px 4% !important;
+      }
+
+      /* 제목 크기 축소 */
+      section h2 {
+        font-size: 1.6rem !important;
+      }
+
+      /* 본문 텍스트 */
+      section p {
+        font-size: 1rem !important;
+        line-height: 1.55 !important;
+      }
+
+      /* ===== 시설 카드 ===== */
       .facility-card {
         max-width: 260px !important;
       }
@@ -374,7 +393,7 @@
         font-size: 0.9rem !important;
       }
 
-      /* 뉴스 카드 */
+      /* ===== 뉴스 카드 ===== */
       .news-card {
         width: 260px !important;
       }
@@ -384,11 +403,44 @@
       .news-card h3 {
         font-size: 1.1rem !important;
       }
+      .news-card p {
+        font-size: 0.9rem !important;
+      }
+
+      /* 배너 텍스트 */
+      .banner-text {
+        font-size: 1.4rem !important;
+      }
+      .banner-subtext {
+        font-size: 1rem !important;
+      }
     }
 
+
+    /* ===========================================================
+      📱 600px 이하 — 스마트폰 UI 최적화
+    =========================================================== */
     @media (max-width: 600px) {
 
-      /* 시설 카드 */
+      /* 섹션 패딩 더 줄이기 */
+      section, .news, .facilities, .business-area {
+        padding: 35px 4% !important;
+      }
+
+      /* 제목 크기 */
+      section h2 {
+        font-size: 1.35rem !important;
+        margin-bottom: 0.6rem !important;
+      }
+
+      /* 본문 텍스트 */
+      section p {
+        font-size: 0.9rem !important;
+        line-height: 1.45 !important;
+        margin-bottom: 22px !important;
+      }
+
+      /* ===== 시설 카드 ===== */
       .facility-card {
         max-width: 220px !important;
       }
@@ -403,7 +455,7 @@
         font-size: 0.85rem !important;
       }
 
-      /* 뉴스 카드 */
+      /* ===== 뉴스 카드 ===== */
       .news-card {
         width: 220px !important;
       }
@@ -416,7 +468,29 @@
       .news-card p {
         font-size: 0.85rem !important;
       }
+
+      /* ===== 배너 텍스트 ===== */
+      .banner-text {
+        font-size: 1.2rem !important;
+        max-width: 90% !important;
+      }
+      .banner-subtext {
+        font-size: 0.85rem !important;
+      }
+
+      /* CTA */
+      .contact-cta h2 {
+        font-size: 1.4rem !important;
+      }
+      .contact-cta p {
+        font-size: 0.95rem !important;
+      }
+      .contact-btn {
+        font-size: 1rem !important;
+        padding: 10px 20px !important;
+      }
     }
+
     </style>
 
   </head>
