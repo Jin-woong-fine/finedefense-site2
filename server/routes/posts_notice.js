@@ -224,12 +224,21 @@ router.get("/download-file", async (req, res) => {
       return res.status(404).json({ message: "file not found" });
     }
 
+    // 🔥 여기서 원래 저장된 파일명에서 숫자 제거
+    // storedName = 실제 저장된 파일명
+    const storedName = path.basename(file.file_path);
+
+    // cleanName = 사용자에게 보여줄 깨끗한 파일명
+    const cleanName = storedName.replace(/^\d+_\d+_/, "");
+
+    // 헤더 설정 (안 해도 되지만 호환성↑)
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename*=UTF-8''${encodeURIComponent(file.original_name)}`
+      `attachment; filename*=UTF-8''${encodeURIComponent(cleanName)}`
     );
 
-    res.download(diskPath);
+    // 파일 다운로드 (두 번째 인자로 cleanName을 명시!)
+    res.download(diskPath, cleanName);
 
   } catch (err) {
     console.error("📌 다운로드 오류:", err);
