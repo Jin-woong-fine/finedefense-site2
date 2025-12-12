@@ -21,42 +21,26 @@
 </script>
 
 <!-- =========================================================
-     ADMIN LAYOUT
+     ADMIN LAYOUT (DASHBOARD SAME)
 ========================================================= -->
 <div class="admin-wrapper">
 
-  <!-- ===================== SIDEBAR ====================== -->
+  <!-- SIDEBAR -->
   <aside id="sidebar" class="admin-sidebar"></aside>
 
-  <!-- ===================== CONTENT ====================== -->
+  <!-- CONTENT -->
   <div class="admin-content">
     <div class="main">
 
-      <!-- ===================== TOPBAR ====================== -->
-      <div class="topbar">
-        <div class="title">공지사항 수정</div>
+      <!-- ✅ TOPBAR (공통 컴포넌트) -->
+      <div id="topbar"></div>
 
-        <div class="topbar-right">
-          <button id="topbarUser" class="topbar-user" type="button">
-            <span id="topbarUserName">관리자</span> ▾
-          </button>
-
-          <div id="userDropdown" class="user-dropdown">
-            <button class="dropdown-item" data-action="logout" type="button">
-              로그아웃
-            </button>
-          </div>
-
-          <button type="button" onclick="location.href='./notice-list.html'">
-            목록으로
-          </button>
-        </div>
-      </div>
-
-      <!-- ===================== FORM ====================== -->
+      <!-- =================================================
+           FORM
+      ================================================== -->
       <form id="noticeForm" enctype="multipart/form-data">
 
-        <!-- 🔹 공지 정보 -->
+        <!-- 공지 정보 -->
         <section class="panel">
           <h2>공지 정보 수정</h2>
 
@@ -84,7 +68,7 @@
           <div id="editor"></div>
         </section>
 
-        <!-- 🔹 첨부파일 -->
+        <!-- 첨부파일 -->
         <section class="panel">
           <h2>첨부파일</h2>
 
@@ -164,9 +148,9 @@
     const res = await fetch(`/api/posts/detail/${noticeId}`);
     const data = await res.json();
 
-    document.getElementById("title").value = data.title;
-    document.getElementById("lang").value = data.lang;
-    document.getElementById("sort_order").value = data.sort_order ?? "";
+    title.value = data.title;
+    lang.value = data.lang;
+    sort_order.value = data.sort_order ?? "";
 
     initEditor(data.content);
 
@@ -192,19 +176,17 @@
   }
 
   function markFileForDelete(index) {
-    const file = oldFileList[index];
-    removeOldFiles.push(file.file_path);
+    removeOldFiles.push(oldFileList[index].file_path);
     oldFileList.splice(index, 1);
     renderOldFiles();
   }
 
-  document.getElementById("newFiles").addEventListener("change", (e) => {
-    const files = [...e.target.files];
-    document.getElementById("newFilePreview").innerHTML =
-      files.map(f => `<div class="file-item">${f.name}</div>`).join("");
+  newFiles.addEventListener("change", (e) => {
+    newFilePreview.innerHTML =
+      [...e.target.files].map(f => `<div class="file-item">${f.name}</div>`).join("");
   });
 
-  document.getElementById("noticeForm").addEventListener("submit", async (e) => {
+  noticeForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const formData = new FormData();
