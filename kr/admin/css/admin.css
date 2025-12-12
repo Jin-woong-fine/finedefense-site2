@@ -1,339 +1,269 @@
 /* ===========================================================
-   GLOBAL RESET & BASE
+   GLOBAL LAYOUT
 =========================================================== */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Noto Sans KR', sans-serif;
   background: #f3f5fa;
-  color: #1d1d1f;
-}
-
-/* ===========================================================
-   ADMIN LAYOUT (CORE)
-=========================================================== */
-.admin-wrapper {
   display: flex;
-  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
 }
 
 /* ===========================================================
-   ADMIN SIDEBAR — CLEAN / ENTERPRISE / APPLE STYLE
+   SIDEBAR
 =========================================================== */
-
-#sidebar.admin-sidebar {
-  width: 200px;                 /* 핵심: 폭 줄이기 */
+#sidebar {
+  width: 240px;
+  background: #0f2679;
+  color: #fff;
+  min-height: 100vh;
   flex-shrink: 0;
 
-  background: #0f2679;          /* 단색 (애플/대기업 정석) */
-  color: #ffffff;
-
-  position: sticky;
+  position: fixed;
   top: 0;
-  height: 100vh;
-  z-index: 10;
-
+  left: 0;
+  bottom: 0;
+  z-index: 999;
   overflow-y: auto;
-  overflow-x: hidden;
 }
 
-/* 내부 컨테이너 */
 #sidebar .sidebar {
-  padding: 24px 16px;
+  padding: 30px 20px;
   display: flex;
   flex-direction: column;
+  gap: 18px;
 }
 
-/* ===========================================================
-   SIDEBAR HEADER
-=========================================================== */
+/* Sidebar Header */
 .sidebar-header {
-  margin-bottom: 14px;
+  margin-bottom: 18px;
 }
 
 .sidebar-header .logo {
-  font-size: 15px;
+  color: #fff;
+  font-size: 18px;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  color: #ffffff;
+  margin-bottom: 16px;
 }
 
-/* ===========================================================
-   USER BLOCK (톤 다운)
-=========================================================== */
+/* 사용자 프로필 */
 .user-block {
   display: flex;
   align-items: center;
-  gap: 10px;
-
-  padding: 12px 0 16px;
-  margin-bottom: 18px;
-
-  border-bottom: 1px solid rgba(255,255,255,0.12);
+  gap: 12px;
+  padding: 10px 0;
 }
 
 .user-block .avatar {
-  width: 36px;
-  height: 36px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
   object-fit: cover;
-
-  border: 1px solid rgba(255,255,255,0.35);
+  border: 2px solid rgba(255,255,255,0.35);
 }
 
 .user-info .name {
-  font-size: 13px;
   font-weight: 600;
+  font-size: 15px;
 }
 
 .user-info .role {
-  font-size: 11px;
-  color: rgba(255,255,255,0.65);
+  font-size: 13px;
+  color: #cbd6ff;
+  margin-top: 2px;
 }
 
-/* ===========================================================
-   MENU STRUCTURE
-=========================================================== */
+/* 메뉴 그룹 타이틀 */
+.menu-title {
+  margin: 22px 0 6px;
+  font-size: 13px;
+  color: #9fb3e3;
+  padding-left: 4px;
+}
+
+/* 메뉴 아이템 */
 .sidebar-menu {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
-/* 섹션 타이틀 */
-.menu-title {
-  margin: 18px 0 6px;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.5);
-}
-
-/* ===========================================================
-   MENU ITEM (FLAT / QUIET)
-=========================================================== */
 .menu-item {
   display: block;
-  padding: 8px 12px;
-  border-radius: 10px;
-
-  font-size: 13px;
-  font-weight: 500;
-  color: rgba(255,255,255,0.85);
+  padding: 12px 16px;
   text-decoration: none;
-
-  transition: background 0.15s ease, color 0.15s ease;
+  color: #cfd5e3;
+  border-radius: 8px;
+  transition: background 0.18s, color 0.18s;
+  font-size: 15px;
 }
 
-/* Hover는 약하게 */
 .menu-item:hover {
-  background: rgba(255,255,255,0.12);
-  color: #ffffff;
+  background: rgba(255,255,255,0.18);
+  color: #fff;
 }
 
-/* Active만 명확 */
 .menu-item.active {
-  background: rgba(255,255,255,0.22);
-  color: #ffffff;
+  background: rgba(255,255,255,0.28);
   font-weight: 600;
+  color: #fff;
 }
 
-/* ===========================================================
-   GROUP / SUBMENU (ALWAYS OPEN)
-=========================================================== */
-.menu-group {
-  margin-bottom: 8px;
+/* ===============================
+   메뉴 그룹 상단 (타이틀 역할)
+=============================== */
+#sidebar .menu-group > .menu-item {
+  font-weight: 700;
+  color: #ffffff;
+  background: rgba(255,255,255,0.08);
+  border-left: 4px solid rgba(255,255,255,0.5);
+  margin-top: 8px;
+  cursor: pointer;
 }
 
-.menu-group > .menu-title {
-  margin-top: 16px;
+#sidebar .menu-group.open > .menu-item {
+  background: rgba(255,255,255,0.18);
+  border-left: 4px solid #ffffff;
 }
 
-.submenu {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+/* 서브메뉴 */
+#sidebar .submenu .menu-item {
+  padding-left: 28px;
+  font-size: 14px;
+  font-weight: 400;
+  opacity: 0.85;
 }
 
-.submenu .menu-item {
-  padding-left: 18px;
-  font-size: 12.5px;
-  opacity: 0.8;
-}
-
-.submenu .menu-item.active {
+#sidebar .submenu .menu-item:hover {
+  background: rgba(255,255,255,0.15);
   opacity: 1;
-  background: rgba(255,255,255,0.25);
+}
+
+#sidebar .submenu .menu-item.active {
+  background: rgba(255,255,255,0.28);
+  font-weight: 600;
+  color: #fff;
+  opacity: 1;
+}
+
+/* 대시보드 단독 메뉴 강조 */
+#sidebar .menu-item.dashboard-root {
+  font-weight: 700;
+  color: #ffffff;
+  background: rgba(255,255,255,0.12);
+  border-left: 4px solid rgba(255,255,255,0.6);
+  margin-top: 6px;
 }
 
 /* ===========================================================
-   REMOVE OLD VISUAL NOISE
+   MAIN CONTENT
 =========================================================== */
-.menu-item.dashboard-root {
-  border-left: none;
-  background: rgba(255,255,255,0.22);
-}
-
-
-/* ===========================================================
-   CONTENT / MAIN
-=========================================================== */
-.admin-content {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  position: relative;
-}
-
 .main {
-  flex: 1;
-  padding: 26px 30px;
-  min-width: 0;
-  height: 100vh;
-  overflow-y: auto;
+  margin-left: 240px;                  /* 사이드바 너비만큼 이동 */
+  padding: 22px 26px;
+  width: calc(100% - 240px);           /* 충돌 방지용 */
+  box-sizing: border-box;
 }
 
 /* ===========================================================
-   🍎 APPLE STYLE TOPBAR (FINAL)
+   TOPBAR
 =========================================================== */
 .topbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-
-  position: sticky;
-  top: 14px;
-  z-index: 100;
-
-  background: rgba(255,255,255,0.82);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-
-  border-radius: 16px;
-  padding: 14px 20px;
-  margin-bottom: 34px;
-
-  box-shadow:
-    0 1px 2px rgba(0,0,0,0.05),
-    0 10px 30px rgba(0,0,0,0.08);
+  margin-bottom: 30px;
 }
 
 .topbar .title {
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 700;
-  letter-spacing: -0.01em;
   color: #0f2679;
 }
 
-.topbar-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  position: relative;
-}
-
-/* 관리자 버튼 */
-.topbar-user {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-
-  padding: 7px 12px;
-  border-radius: 12px;
-  border: none;
-  background: rgba(15,38,121,0.06);
-
-  font-size: 14px;
-  font-weight: 600;
-  color: #0f2679;
-  cursor: pointer;
-}
-
-.topbar-user:hover {
-  background: rgba(15,38,121,0.12);
-}
-
-/* 홈으로 버튼 – 애플식 소프트 버튼 */
 .topbar button {
-  padding: 7px 12px;
-  border-radius: 12px;
+  padding: 8px 14px;
+  border-radius: 8px;
   border: none;
-  background: rgba(15,38,121,0.08);
-  color: #0f2679;
-  font-weight: 600;
+  background: #0f2679;
+  color: white;
+  font-size: 14px;
   cursor: pointer;
+  transition: background 0.2s;
 }
 
 .topbar button:hover {
-  background: rgba(15,38,121,0.16);
-}
-
-/* 드롭다운 */
-.user-dropdown {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-
-  min-width: 150px;
-  background: rgba(255,255,255,0.96);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-
-  border-radius: 14px;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.16);
-
-  display: none;
-  padding: 6px 0;
-  z-index: 300;
-}
-
-.user-dropdown.open {
-  display: block;
-}
-
-.dropdown-item {
-  padding: 10px 16px;
-  font-size: 14px;
-  background: none;
-  border: none;
-  text-align: left;
-  width: 100%;
-  cursor: pointer;
-}
-
-.dropdown-item:hover {
-  background: #f3f5fa;
+  background: #1a358a;
 }
 
 /* ===========================================================
-   DASHBOARD
+   PANELS
 =========================================================== */
+.panel {
+  background: white;
+  padding: 24px 28px;              /* 패딩 약간 줄여서 안정감 */
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  margin-bottom: 35px;
+
+  max-width: 600px;                /* 패널 크기 제한 = 핵심 */
+  width: 100%;                     /* 반응형 대응 */
+  margin-left: auto;
+  margin-right: auto;              /* 가운대로 정렬 */
+}
+
+.panel h2,
+.panel h3 {
+  font-weight: 700;
+  color: #0f2679;
+  margin: 0 0 18px 0;
+}
+
+.panel h2 {
+  font-size: 20px;
+}
+
+.panel h3 {
+  font-size: 17px;
+}
+
+/* ===========================================================
+   DASHBOARD — KPI CARDS (유동형 버전)
+=========================================================== */
+
 .stats-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 22px;
+  gap: 20px;
+  margin: 0 auto 35px auto;
   max-width: 1200px;
-  margin: 0 auto 40px;
 }
 
 .stat-card {
   background: #fff;
-  border-radius: 18px;
-  padding: 22px;
-  box-shadow: 0 8px 22px rgba(0,0,0,0.08);
+  padding: 22px 20px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   border-left: 6px solid #0f2679;
-  transition: transform .2s ease;
+  text-align: center;
+  transition: transform .15s;
 }
 
 .stat-card:hover {
   transform: translateY(-4px);
+}
+
+.stat-card h3 {
+  font-size: 16px;
+  margin-bottom: 12px;
+  color: #444;
 }
 
 .stat-value {
@@ -343,53 +273,63 @@ body {
 }
 
 /* ===========================================================
-   PANELS
+   LISTS
 =========================================================== */
-.panel {
-  background: #fff;
-  border-radius: 18px;
-  padding: 26px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+#topPostsList {
+  padding-left: 16px;
+  font-size: 15px;
 }
 
-.panel h2 {
-  font-size: 19px;
-  font-weight: 700;
-  margin-bottom: 16px;
+#topPostsList li {
+  margin-bottom: 10px;
+  color: #333;
+}
+
+#topPostsList li strong {
   color: #0f2679;
-}
-
-.grid-2 {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 26px;
-  max-width: 1300px;
-  margin: 0 auto 40px;
 }
 
 /* ===========================================================
-   SESSION TIMER & TOAST
+   SESSION TIMER
 =========================================================== */
 .session-timer {
   padding: 6px 10px;
-  border-radius: 10px;
-  background: rgba(15,38,121,0.12);
-  color: #0f2679;
-  font-size: 12px;
+  background: #0f2679;
+  color: white;
+  border-radius: 6px;
+  font-size: 13px;
   font-weight: 600;
 }
 
+/* ===========================================================
+   TOAST NOTICE
+=========================================================== */
 .toast-notice {
   position: fixed;
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
   background: #0f2679;
-  color: #fff;
+  color: white;
   padding: 12px 20px;
-  border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.15);
   opacity: 0;
-  transition: opacity .4s ease;
+  transition: opacity 0.4s ease;
   z-index: 9999;
+}
+
+
+/* ===========================================================
+   DASHBOARD — PANEL GRID (2열 고정)
+=========================================================== */
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 22px;
+
+  max-width: 1300px;     /* 전체 패널 영역 폭 제한 */
+  margin: 0 auto;        /* 가운데 정렬 */
 }

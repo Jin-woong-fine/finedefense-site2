@@ -17,155 +17,118 @@
   <!-- 세션 매니저 -->
   <script type="module" src="/js/session_manager.js"></script>
   <script type="module" src="./js/dashboard_session_timer.js"></script>
+
 </head>
 
-<!-- ⭐ 페이지 식별자 -->
+<!-- ⭐ 페이지 식별자 (사이드바 active 표시용) -->
 <body data-admin-page="dashboard">
 
-<script>
-  requireAnyUser();
-</script>
+<script> requireAnyUser(); </script>
 
-<!-- =========================================================
-     ADMIN LAYOUT WRAPPER
-========================================================= -->
-<div class="admin-wrapper">
+<!-- ⭐ 사이드바 -->
+<div id="sidebar"></div>
 
-  <!-- =====================
-       SIDEBAR
-  ====================== -->
-  <aside id="sidebar" class="admin-sidebar"></aside>
+<!-- 메인 콘텐츠 -->
+<div class="main">
 
-  <!-- =====================
-       CONTENT AREA
-  ====================== -->
-  <div class="admin-content">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="title">관리자 대시보드</div>
 
-    <!-- =====================
-         MAIN (SCROLL AREA)
-    ====================== -->
-    <div class="main">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <span id="session-timer" class="session-timer">세션 계산중...</span>
 
-      <!-- =====================
-           TOPBAR
-      ====================== -->
-      <div class="topbar">
-
-        <div class="title">관리자 대시보드</div>
-
-        <div class="topbar-right">
-          <span id="session-timer" class="session-timer">세션 계산중...</span>
-
-          <!-- ✅ 관리자 버튼 -->
-          <button id="topbarUser" class="topbar-user" type="button">
-            <span id="topbarUserName">관리자</span> ▾
-          </button>
-
-          <!-- ✅ 드롭다운 -->
-          <div id="userDropdown" class="user-dropdown">
-            <button id="logoutBtn" class="dropdown-item" type="button">
-              로그아웃
-            </button>
-          </div>
-
-          <button type="button" onclick="location.href='../index.html'">
-            홈으로
-          </button>
-        </div>
+      <div class="topbar-user" id="topbarUser">
+        <span id="topbarUserName">관리자</span> ▾
+        <div class="user-dropdown" id="userDropdown"></div>
       </div>
 
-      <!-- 🔷 1) KPI 카드 -->
-      <section class="stats-row">
-        <div class="stat-card">
-          <h3>오늘 방문자</h3>
-          <p id="visitToday" class="stat-value">0</p>
-        </div>
-        <div class="stat-card">
-          <h3>이번달 방문자</h3>
-          <p id="visitThisMonth" class="stat-value">0</p>
-        </div>
-        <div class="stat-card">
-          <h3>증가율</h3>
-          <p id="visitGrowth" class="stat-value">0%</p>
-        </div>
-        <div class="stat-card">
-          <h3>전체 게시물 수</h3>
-          <p id="totalPosts" class="stat-value">0</p>
-        </div>
-      </section>
-
-      <!-- 🔷 2) 트래픽 -->
-      <section class="grid-2">
-        <div class="panel">
-          <h2>최근 30일 방문자</h2>
-          <canvas id="dailyChart"></canvas>
-        </div>
-        <div class="panel">
-          <h2>디바이스 비율</h2>
-          <canvas id="deviceChart"></canvas>
-        </div>
-      </section>
-
-      <!-- 🔷 3) 국가 / 유입 -->
-      <section class="grid-2">
-        <div class="panel">
-          <h2>국가별 방문자</h2>
-          <canvas id="countryChart"></canvas>
-        </div>
-        <div class="panel">
-          <h2>유입경로 TOP 5</h2>
-          <ul id="referrerList"></ul>
-        </div>
-      </section>
-
-      <!-- 🔷 4) 콘텐츠 성과 -->
-      <section class="grid-2">
-        <div class="panel">
-          <h2>조회수 TOP 5 게시물</h2>
-          <ul id="topPostsList"></ul>
-        </div>
-        <div class="panel">
-          <h2>페이지뷰 TOP 5</h2>
-          <ul id="pageViewList"></ul>
-        </div>
-      </section>
-
-      <!-- 🔷 5) 다운로드 / 제품 -->
-      <section class="grid-2">
-        <div class="panel">
-          <h2>자료실 다운로드 TOP 5</h2>
-          <ul id="downloadTopList"></ul>
-        </div>
-        <div class="panel">
-          <h2>최근 등록 제품</h2>
-          <div id="recentProducts"></div>
-        </div>
-      </section>
-
-      <!-- 🔷 6) 카탈로그 -->
-      <section class="grid-2">
-        <div class="panel">
-          <h2>카탈로그 조회수 TOP 5</h2>
-          <ul id="catalogViewTopList"></ul>
-        </div>
-        <div class="panel">
-          <h2>카탈로그 다운로드 TOP 5</h2>
-          <ul id="catalogDownloadTopList"></ul>
-        </div>
-      </section>
-
+      <button onclick="location.href='../index.html'">홈으로</button>
     </div>
-    <!-- /main -->
   </div>
-  <!-- /admin-content -->
-</div>
-<!-- /admin-wrapper -->
 
-<!-- =====================
-     SCRIPTS
-====================== -->
+  <!-- 🔷 1) KPI 카드 -->
+  <section class="stats-row">
+    <div class="stat-card"><h3>오늘 방문자</h3><p id="visitToday" class="stat-value">0</p></div>
+    <div class="stat-card"><h3>이번달 방문자</h3><p id="visitThisMonth" class="stat-value">0</p></div>
+    <div class="stat-card"><h3>증가율</h3><p id="visitGrowth" class="stat-value">0%</p></div>
+    <div class="stat-card"><h3>전체 게시물 수</h3><p id="totalPosts" class="stat-value">0</p></div>
+  </section>
+
+  <!-- 🔷 2) 트래픽 패널 -->
+  <section class="grid-2">
+    <div class="panel">
+      <h2>최근 30일 방문자</h2>
+      <canvas id="dailyChart"></canvas>
+    </div>
+
+    <div class="panel">
+      <h2>디바이스 비율</h2>
+      <canvas id="deviceChart"></canvas>
+    </div>
+  </section>
+
+  <!-- 🔷 3) 국가/유입 경로 -->
+  <section class="grid-2">
+    <div class="panel">
+      <h2>국가별 방문자</h2>
+      <canvas id="countryChart"></canvas>
+    </div>
+
+    <div class="panel">
+      <h2>유입경로 TOP 5</h2>
+      <ul id="referrerList"></ul>
+    </div>
+  </section>
+
+  <!-- 🔷 4) 콘텐츠 성과 -->
+  <section class="grid-2">
+    <div class="panel">
+      <h2>조회수 TOP 5 게시물</h2>
+      <ul id="topPostsList"></ul>
+    </div>
+
+    <div class="panel">
+      <h2>페이지뷰 TOP 5</h2>
+      <ul id="pageViewList"></ul>
+    </div>
+  </section>
+
+  <!-- 🔷 5) 다운로드 / 제품 -->
+  <section class="grid-2">
+    <div class="panel">
+      <h2>자료실 다운로드 TOP 5</h2>
+      <ul id="downloadTopList"></ul>
+    </div>
+
+    <div class="panel">
+      <h2>최근 등록 제품</h2>
+      <div id="recentProducts"></div>
+    </div>
+  </section>
+
+  <!-- 🔷 6) 카탈로그 분석 -->
+  <section class="grid-2">
+    <div class="panel">
+      <h2>카탈로그 조회수 TOP 5</h2>
+      <ul id="catalogViewTopList"></ul>
+    </div>
+
+    <div class="panel">
+      <h2>카탈로그 다운로드 TOP 5</h2>
+      <ul id="catalogDownloadTopList"></ul>
+    </div>
+  </section>
+
+
+
+
+</div>
+
+<!-- 사이드바 자동 로드 스크립트 -->
 <script src="./js/sidebar.js"></script>
-<script src="./js/topbar.js"></script>
+
+<!-- 대시보드 데이터 스크립트 -->
 <script src="./js/dashboard_core.js"></script>
 
 </body>
