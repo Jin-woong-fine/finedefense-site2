@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
    * 2) 드롭다운 메뉴 구성
    * =============================== */
   dropdown.innerHTML = `
-    <a href="/kr/admin/profile.html" class="dropdown-item">내 정보</a>
+    <a href="/kr/admin/user_profile.html" class="dropdown-item">내 정보</a>
     <button type="button" class="dropdown-item danger" id="logoutBtn">
       로그아웃
     </button>

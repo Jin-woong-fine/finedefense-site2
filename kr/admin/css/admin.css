@@ -282,17 +282,16 @@ body {
 =========================================================== */
 .panel {
   background: white;
-  padding: 24px 28px;              /* 패딩 약간 줄여서 안정감 */
+  padding: 24px 28px;
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   margin-bottom: 35px;
 
-  max-width: 600px;                /* 패널 크기 제한 = 핵심 */
-  width: 100%;                     /* 반응형 대응 */
-  margin-left: auto;
-  margin-right: auto;              /* 가운대로 정렬 */
+  /* ❌ 가로폭 제한 제거 */
+  width: 100%;
 }
 
+/* 제목 */
 .panel h2,
 .panel h3 {
   font-weight: 700;
@@ -300,13 +299,9 @@ body {
   margin: 0 0 18px 0;
 }
 
-.panel h2 {
-  font-size: 20px;
-}
+.panel h2 { font-size: 20px; }
+.panel h3 { font-size: 17px; }
 
-.panel h3 {
-  font-size: 17px;
-}
 
 /* ===========================================================
    DASHBOARD — KPI CARDS (유동형 버전)
