@@ -22,9 +22,9 @@ body {
   min-height: 100vh;
 }
 
-/* =====================
-   SIDEBAR (NO FIXED)
-===================== */
+/* ===========================================================
+   SIDEBAR
+=========================================================== */
 #sidebar.admin-sidebar {
   width: 240px;
   flex-shrink: 0;
@@ -32,7 +32,6 @@ body {
   color: #fff;
   overflow-y: auto;
 
-  /* 핵심 */
   position: sticky;
   top: 0;
   height: 100vh;
@@ -45,36 +44,6 @@ body {
   flex-direction: column;
   gap: 18px;
 }
-
-/* =====================
-   CONTENT WRAPPER
-===================== */
-.admin-content {
-  flex: 1;
-  min-width: 0;              /* grid / chart overflow 방지 */
-  display: flex;
-}
-
-/* =====================
-   MAIN SCROLL AREA
-===================== */
-.main {
-  flex: 1;
-  min-width: 0;
-  padding: 22px 26px;
-
-  /* 스크롤은 main만 */
-  height: 100vh;
-  overflow-y: auto;
-
-  /* ❌ 기존 보정 제거 */
-  margin-left: 0;
-  width: auto;
-}
-
-/* ===========================================================
-   SIDEBAR CONTENT
-=========================================================== */
 
 /* Sidebar Header */
 .sidebar-header {
@@ -115,7 +84,7 @@ body {
   margin-top: 2px;
 }
 
-/* 메뉴 그룹 타이틀 */
+/* 메뉴 타이틀 */
 .menu-title {
   margin: 22px 0 6px;
   font-size: 13px;
@@ -123,7 +92,7 @@ body {
   padding-left: 4px;
 }
 
-/* 메뉴 아이템 */
+/* 메뉴 */
 .sidebar-menu {
   display: flex;
   flex-direction: column;
@@ -136,8 +105,8 @@ body {
   text-decoration: none;
   color: #cfd5e3;
   border-radius: 8px;
-  transition: background 0.18s ease, color 0.18s ease;
   font-size: 15px;
+  transition: background .18s, color .18s;
 }
 
 .menu-item:hover {
@@ -151,13 +120,11 @@ body {
   color: #fff;
 }
 
-/* 메뉴 그룹 헤더 */
+/* 메뉴 그룹 */
 #sidebar .menu-group > .menu-item {
   font-weight: 700;
-  color: #fff;
   background: rgba(255,255,255,0.08);
   border-left: 4px solid rgba(255,255,255,0.5);
-  margin-top: 8px;
   cursor: pointer;
 }
 
@@ -170,7 +137,6 @@ body {
 #sidebar .submenu .menu-item {
   padding-left: 28px;
   font-size: 14px;
-  font-weight: 400;
   opacity: 0.85;
 }
 
@@ -190,23 +156,42 @@ body {
   font-weight: 700;
   background: rgba(255,255,255,0.12);
   border-left: 4px solid rgba(255,255,255,0.6);
-  margin-top: 6px;
 }
 
 /* ===========================================================
-   TOPBAR (CLICK SAFE)
+   CONTENT / MAIN
+=========================================================== */
+.admin-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  position: relative;
+  z-index: 1;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  padding: 22px 26px;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+/* ===========================================================
+   TOPBAR (ENTERPRISE STANDARD)
 =========================================================== */
 .topbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 30px;
 
   position: sticky;
   top: 0;
-  z-index: 50;
+  z-index: 100;
   background: #f3f5fa;
+
   padding: 12px 0;
+  margin-bottom: 30px;
 }
 
 .topbar .title {
@@ -215,6 +200,36 @@ body {
   color: #0f2679;
 }
 
+/* 오른쪽 영역 */
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+}
+
+/* 관리자 버튼 */
+.topbar-user {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  background: transparent;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f2679;
+  cursor: pointer;
+}
+
+.topbar-user:hover {
+  background: rgba(15,38,121,0.08);
+}
+
+/* 홈으로 버튼 */
 .topbar button {
   padding: 8px 14px;
   border-radius: 8px;
@@ -229,33 +244,41 @@ body {
   background: #1a358a;
 }
 
-/* 드롭다운 안전 */
+/* 드롭다운 */
 .user-dropdown {
   position: absolute;
-  z-index: 999;
-}
+  top: calc(100% + 6px);
+  right: 0;
 
-/* ===========================================================
-   PANELS
-=========================================================== */
-.panel {
+  min-width: 140px;
   background: #fff;
-  padding: 24px 28px;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  margin-bottom: 35px;
-  width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+
+  display: none;
+  z-index: 300;
 }
 
-.panel h2 {
-  font-size: 20px;
-  font-weight: 700;
-  color: #0f2679;
-  margin-bottom: 18px;
+.user-dropdown.open {
+  display: block;
+}
+
+.dropdown-item {
+  width: 100%;
+  padding: 10px 14px;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.dropdown-item:hover {
+  background: #f3f5fa;
 }
 
 /* ===========================================================
-   DASHBOARD KPI
+   DASHBOARD
 =========================================================== */
 .stats-row {
   display: grid;
@@ -274,7 +297,7 @@ body {
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   border-left: 6px solid #0f2679;
   text-align: center;
-  transition: transform 0.15s ease;
+  transition: transform .15s;
 }
 
 .stat-card:hover {
@@ -294,40 +317,33 @@ body {
 }
 
 /* ===========================================================
-   GRID PANELS
+   PANELS & GRID
 =========================================================== */
+.panel {
+  background: #fff;
+  padding: 24px 28px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  width: 100%;
+}
+
+.panel h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f2679;
+  margin-bottom: 18px;
+}
+
 .grid-2 {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 22px;
   max-width: 1300px;
-  margin: 0 auto;
-}
-
-.grid-2 .panel {
-  max-width: none;
-  margin: 0;
+  margin: 0 auto 35px;
 }
 
 /* ===========================================================
-   LISTS
-=========================================================== */
-#topPostsList {
-  padding-left: 16px;
-  font-size: 15px;
-}
-
-#topPostsList li {
-  margin-bottom: 10px;
-  color: #333;
-}
-
-#topPostsList li strong {
-  color: #0f2679;
-}
-
-/* ===========================================================
-   SESSION TIMER
+   SESSION TIMER & TOAST
 =========================================================== */
 .session-timer {
   padding: 6px 10px;
@@ -338,9 +354,6 @@ body {
   font-weight: 600;
 }
 
-/* ===========================================================
-   TOAST
-=========================================================== */
 .toast-notice {
   position: fixed;
   top: 20px;
@@ -354,37 +367,6 @@ body {
   font-weight: 600;
   box-shadow: 0 3px 10px rgba(0,0,0,0.15);
   opacity: 0;
-  transition: opacity 0.4s ease;
+  transition: opacity .4s;
   z-index: 9999;
-}
-
-
-/* ===============================
-   TOPBAR CLICK SAFETY FIX
-=============================== */
-
-.admin-content {
-  position: relative;
-  z-index: 1;
-}
-
-.topbar {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.topbar-user {
-  position: relative;
-  z-index: 200;
-  cursor: pointer;
-}
-
-.user-dropdown {
-  z-index: 300;
-}
-
-/* sidebar 클릭 침범 방지 */
-.admin-sidebar {
-  overflow-x: hidden;
 }

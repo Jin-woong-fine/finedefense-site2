@@ -19,7 +19,7 @@
   <script type="module" src="./js/dashboard_session_timer.js"></script>
 </head>
 
-<!-- ⭐ 페이지 식별자 (사이드바 active 표시용) -->
+<!-- ⭐ 페이지 식별자 -->
 <body data-admin-page="dashboard">
 
 <script>
@@ -46,19 +46,31 @@
     ====================== -->
     <div class="main">
 
-      <!-- TOPBAR -->
+      <!-- =====================
+           TOPBAR
+      ====================== -->
       <div class="topbar">
+
         <div class="title">관리자 대시보드</div>
 
-        <div style="display:flex; align-items:center; gap:12px;">
+        <div class="topbar-right">
           <span id="session-timer" class="session-timer">세션 계산중...</span>
 
-          <div class="topbar-user" id="topbarUser">
+          <!-- ✅ 관리자 버튼 -->
+          <button id="topbarUser" class="topbar-user" type="button">
             <span id="topbarUserName">관리자</span> ▾
-            <div class="user-dropdown" id="userDropdown"></div>
+          </button>
+
+          <!-- ✅ 드롭다운 -->
+          <div id="userDropdown" class="user-dropdown">
+            <button id="logoutBtn" class="dropdown-item" type="button">
+              로그아웃
+            </button>
           </div>
 
-          <button onclick="location.href='../index.html'">홈으로</button>
+          <button type="button" onclick="location.href='../index.html'">
+            홈으로
+          </button>
         </div>
       </div>
 
@@ -82,26 +94,24 @@
         </div>
       </section>
 
-      <!-- 🔷 2) 트래픽 패널 -->
+      <!-- 🔷 2) 트래픽 -->
       <section class="grid-2">
         <div class="panel">
           <h2>최근 30일 방문자</h2>
           <canvas id="dailyChart"></canvas>
         </div>
-
         <div class="panel">
           <h2>디바이스 비율</h2>
           <canvas id="deviceChart"></canvas>
         </div>
       </section>
 
-      <!-- 🔷 3) 국가 / 유입 경로 -->
+      <!-- 🔷 3) 국가 / 유입 -->
       <section class="grid-2">
         <div class="panel">
           <h2>국가별 방문자</h2>
           <canvas id="countryChart"></canvas>
         </div>
-
         <div class="panel">
           <h2>유입경로 TOP 5</h2>
           <ul id="referrerList"></ul>
@@ -114,7 +124,6 @@
           <h2>조회수 TOP 5 게시물</h2>
           <ul id="topPostsList"></ul>
         </div>
-
         <div class="panel">
           <h2>페이지뷰 TOP 5</h2>
           <ul id="pageViewList"></ul>
@@ -127,20 +136,18 @@
           <h2>자료실 다운로드 TOP 5</h2>
           <ul id="downloadTopList"></ul>
         </div>
-
         <div class="panel">
           <h2>최근 등록 제품</h2>
           <div id="recentProducts"></div>
         </div>
       </section>
 
-      <!-- 🔷 6) 카탈로그 분석 -->
+      <!-- 🔷 6) 카탈로그 -->
       <section class="grid-2">
         <div class="panel">
           <h2>카탈로그 조회수 TOP 5</h2>
           <ul id="catalogViewTopList"></ul>
         </div>
-
         <div class="panel">
           <h2>카탈로그 다운로드 TOP 5</h2>
           <ul id="catalogDownloadTopList"></ul>
@@ -149,10 +156,8 @@
 
     </div>
     <!-- /main -->
-
   </div>
   <!-- /admin-content -->
-
 </div>
 <!-- /admin-wrapper -->
 
@@ -160,6 +165,7 @@
      SCRIPTS
 ====================== -->
 <script src="./js/sidebar.js"></script>
+<script src="./js/topbar.js"></script>
 <script src="./js/dashboard_core.js"></script>
 
 </body>
