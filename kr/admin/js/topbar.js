@@ -1,46 +1,41 @@
 // /kr/admin/js/topbar.js
-
 document.addEventListener("DOMContentLoaded", () => {
   const userBtn = document.getElementById("topbarUser");
   const dropdown = document.getElementById("userDropdown");
+  const nameEl = document.getElementById("topbarUserName");
+
+  if (nameEl) {
+    nameEl.textContent = localStorage.getItem("name") || "관리자";
+  }
 
   if (!userBtn || !dropdown) return;
 
-  /* =========================
-     관리자 버튼 → 드롭다운
-  ========================= */
-  userBtn.addEventListener("click", (e) => {
+  const close = () => dropdown.classList.remove("open");
+  const toggle = (e) => {
     e.stopPropagation();
     dropdown.classList.toggle("open");
-  });
+  };
 
-  /* =========================
-     외부 클릭 시 닫기
-  ========================= */
-  document.addEventListener("click", () => {
-    dropdown.classList.remove("open");
-  });
+  userBtn.addEventListener("click", toggle);
 
-  /* =========================
-     ESC 키로 닫기 (UX +1)
-  ========================= */
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-      dropdown.classList.remove("open");
-    }
-  });
+  document.addEventListener("click", close);
+  window.addEventListener("blur", close);
+  window.addEventListener("scroll", close, { passive: true });
 
-  /* =========================
-     로그아웃 (dropdown 내부)
-  ========================= */
-  dropdown.addEventListener("click", (e) => {
-    const target = e.target;
+  // 드롭다운 내부 클릭은 밖 클릭으로 안 닫히게
+  dropdown.addEventListener("click", (e) => e.stopPropagation());
 
-    if (target.matches("[data-action='logout']")) {
-      e.preventDefault();
-
-      localStorage.clear();
-      location.href = "/kr/login.html";
-    }
+  // data-action 처리
+  dropdown.querySelectorAll("[data-action]").forEach((el) => {
+    el.addEventListener("click", () => {
+      const action = el.dataset.action;
+      if (action === "logout") {
+        if (typeof logout === "function") logout();
+        else {
+          localStorage.clear();
+          location.href = "/kr/login.html";
+        }
+      }
+    });
   });
 });

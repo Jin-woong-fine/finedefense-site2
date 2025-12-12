@@ -3,320 +3,454 @@
 =========================================================== */
 *,
 *::before,
-*::after {
-  box-sizing: border-box;
-}
+*::after { box-sizing: border-box; }
 
-body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #f3f5fa;
-  color: #1d1d1f;
-}
+html, body { height: 100%; }
 
-/* ===========================================================
-   ADMIN LAYOUT
-=========================================================== */
-.admin-wrapper {
-  display: flex;
-  min-height: 100vh;
+body{
+  margin:0;
+  padding:0;
+  font-family:'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+  background:#f3f5fa;
+  color:#1d1d1f;
 }
 
 /* ===========================================================
-   SIDEBAR
+   ADMIN LAYOUT (CORE)
 =========================================================== */
-#sidebar.admin-sidebar {
-  width: 200px;
-  flex-shrink: 0;
-  background: #0f2679;
-  color: #fff;
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  overflow-y: auto;
+.admin-wrapper{
+  display:flex;
+  min-height:100vh;
 }
 
-#sidebar .sidebar {
-  padding: 24px 16px;
-  display: flex;
-  flex-direction: column;
+/* 좌측 사이드바 */
+#sidebar.admin-sidebar{
+  width:220px;
+  flex-shrink:0;
+  background:#0f2679;
+  color:#fff;
+
+  position:sticky;
+  top:0;
+  height:100vh;
+  z-index:10;
+
+  overflow-y:auto;
+  overflow-x:hidden;
 }
 
-.sidebar-header .logo {
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: .06em;
+#sidebar .sidebar{
+  padding:24px 16px;
+  display:flex;
+  flex-direction:column;
 }
 
-.user-block {
-  display: flex;
-  gap: 10px;
-  padding: 14px 0;
-  margin-bottom: 16px;
-  border-bottom: 1px solid rgba(255,255,255,.12);
+/* 우측 콘텐츠 */
+.admin-content{
+  flex:1;
+  min-width:0;
+  position:relative;
 }
 
-.user-block .avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-}
-
-.user-info .name {
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.user-info .role {
-  font-size: 11px;
-  opacity: .65;
-}
-
-.sidebar-menu {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.menu-title {
-  margin: 18px 0 6px;
-  font-size: 10px;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  opacity: .5;
-}
-
-.menu-item {
-  padding: 8px 12px;
-  border-radius: 10px;
-  font-size: 13px;
-  color: rgba(255,255,255,.85);
-  text-decoration: none;
-}
-
-.menu-item:hover {
-  background: rgba(255,255,255,.12);
-}
-
-.menu-item.active {
-  background: rgba(255,255,255,.22);
-  font-weight: 600;
-}
-
-.submenu .menu-item {
-  padding-left: 18px;
-  font-size: 12.5px;
-  opacity: .8;
+.main{
+  padding:26px 30px;
+  min-width:0;
+  height:100vh;
+  overflow-y:auto;
 }
 
 /* ===========================================================
-   MAIN / CONTENT
+   SIDEBAR (structure-safe)
 =========================================================== */
-.admin-content {
-  flex: 1;
-  min-width: 0;
+.sidebar-header{ margin-bottom:14px; }
+.sidebar-header .logo{
+  font-size:15px;
+  font-weight:800;
+  letter-spacing:.06em;
+  color:#fff;
 }
 
-.main {
-  padding: 26px 30px;
-  height: 100vh;
-  overflow-y: auto;
+.user-block{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:14px 0 16px;
+  margin-bottom:16px;
+  border-bottom:1px solid rgba(255,255,255,.12);
+}
+.user-block .avatar{
+  width:36px; height:36px; border-radius:50%;
+  object-fit:cover;
+  border:1px solid rgba(255,255,255,.35);
+}
+.user-info .name{ font-size:13px; font-weight:700; }
+.user-info .role{ font-size:11px; opacity:.65; }
+
+.menu-title{
+  margin:18px 0 6px;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  opacity:.55;
+  padding-left:2px;
+}
+
+.sidebar-menu{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+
+.menu-item{
+  display:block;
+  padding:8px 12px;
+  border-radius:10px;
+  font-size:13px;
+  font-weight:500;
+  color:rgba(255,255,255,.86);
+  text-decoration:none;
+  transition:background .15s ease, color .15s ease;
+  user-select:none;
+}
+
+.menu-item:hover{
+  background:rgba(255,255,255,.12);
+  color:#fff;
+}
+
+.menu-item.active{
+  background:rgba(255,255,255,.22);
+  color:#fff;
+  font-weight:700;
+}
+
+/* 그룹(토글 헤더) - sidebar.js 구조 그대로 */
+.menu-group{ margin-bottom:8px; }
+.menu-group > .menu-item{
+  font-weight:700;
+  background:rgba(255,255,255,.08);
+  cursor:pointer;
+}
+.menu-group.open > .menu-item{
+  background:rgba(255,255,255,.14);
+}
+
+/* 서브메뉴 */
+.submenu{
+  display:none;
+  flex-direction:column;
+  gap:2px;
+  margin-top:4px;
+  padding-left:2px;
+}
+.menu-group.open .submenu{ display:flex; }
+
+.submenu .menu-item{
+  padding-left:18px;
+  font-size:12.5px;
+  opacity:.85;
+}
+.submenu .menu-item.active{
+  opacity:1;
+  background:rgba(255,255,255,.25);
+}
+
+.menu-item.dashboard-root{
+  background:rgba(255,255,255,.22);
+  font-weight:800;
 }
 
 /* ===========================================================
-   TOPBAR (APPLE STYLE)
+   TOPBAR (APPLE STYLE) — click safe
 =========================================================== */
-.topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: sticky;
-  top: 14px;
-  z-index: 100;
-  background: rgba(255,255,255,.82);
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  position:sticky;
+  top:14px;
+  z-index:100;
+
+  background:rgba(255,255,255,.86);
   backdrop-filter: blur(16px);
-  border-radius: 16px;
-  padding: 14px 20px;
-  margin-bottom: 34px;
-  box-shadow: 0 10px 30px rgba(0,0,0,.08);
+  -webkit-backdrop-filter: blur(16px);
+
+  border-radius:16px;
+  padding:14px 20px;
+  margin-bottom:22px;
+
+  box-shadow:
+    0 1px 2px rgba(0,0,0,.05),
+    0 10px 30px rgba(0,0,0,.08);
+
+  /* 클릭 먹통 방지(overlay 의심 대응) */
+  pointer-events:auto;
 }
 
-.topbar .title {
-  font-size: 24px;
-  font-weight: 700;
-  color: #0f2679;
+.topbar .title{
+  font-size:24px;
+  font-weight:800;
+  color:#0f2679;
+  letter-spacing:-.01em;
 }
 
-.topbar-right {
-  display: flex;
-  gap: 10px;
-  position: relative;
+.topbar-right{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  position:relative;
+  pointer-events:auto;
 }
 
+/* 탑바 버튼들 공통 */
 .topbar-user,
-.topbar button {
-  padding: 7px 12px;
-  border-radius: 12px;
-  border: none;
-  background: rgba(15,38,121,.08);
-  font-weight: 600;
-  color: #0f2679;
-  cursor: pointer;
+.topbar button{
+  padding:7px 12px;
+  border-radius:12px;
+  border:none;
+  background:rgba(15,38,121,.08);
+  font-weight:700;
+  color:#0f2679;
+  cursor:pointer;
 }
 
 .topbar-user:hover,
-.topbar button:hover {
-  background: rgba(15,38,121,.16);
+.topbar button:hover{
+  background:rgba(15,38,121,.16);
 }
 
-.user-dropdown {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  min-width: 150px;
-  background: rgba(255,255,255,.96);
-  border-radius: 14px;
-  box-shadow: 0 12px 30px rgba(0,0,0,.16);
-  display: none;
+/* 드롭다운 */
+.user-dropdown{
+  position:absolute;
+  top:calc(100% + 8px);
+  right:0;
+  min-width:150px;
+
+  background:rgba(255,255,255,.96);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  border-radius:14px;
+  box-shadow:0 12px 30px rgba(0,0,0,.16);
+
+  display:none;
+  padding:6px 0;
+  z-index:300;
+
+  /* 드롭다운이 버튼 클릭을 가리지 않도록 */
+  pointer-events:auto;
+}
+.user-dropdown.open{ display:block; }
+
+.dropdown-item{
+  padding:10px 16px;
+  background:none;
+  border:none;
+  width:100%;
+  text-align:left;
+  cursor:pointer;
+  font-weight:700;
+  color:#111;
+}
+.dropdown-item:hover{ background:#f3f5fa; }
+
+/* ===========================================================
+   COMMON PANEL
+=========================================================== */
+.panel{
+  background:#fff;
+  border-radius:18px;
+  padding:22px 24px;
+  box-shadow:0 10px 30px rgba(0,0,0,.08);
+  margin-bottom:18px;
 }
 
-.user-dropdown.open {
-  display: block;
-}
+/* 페이지 내부 컨텐츠 래퍼(필요 시) */
+.page-content{ max-width:1300px; margin:0 auto; }
 
-.dropdown-item {
-  padding: 10px 16px;
-  background: none;
-  border: none;
-  width: 100%;
-  cursor: pointer;
+/* ===========================================================
+   DASHBOARD
+=========================================================== */
+.stats-row{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap:22px;
+  max-width:1200px;
+  margin:0 auto 28px;
+}
+.stat-card{
+  background:#fff;
+  border-radius:18px;
+  padding:22px;
+  box-shadow:0 8px 22px rgba(0,0,0,.08);
+  border-left:6px solid #0f2679;
+  transition: transform .2s ease;
+}
+.stat-card:hover{ transform: translateY(-4px); }
+.stat-card h3{ margin:0 0 10px 0; color:#444; font-size:14px; font-weight:700; }
+.stat-value{ margin:0; font-size:30px; font-weight:900; color:#0f2679; }
+
+.grid-2{
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  gap:26px;
+  max-width:1300px;
+  margin:0 auto 26px;
+}
+@media (max-width: 1024px){
+  #sidebar.admin-sidebar{ width:200px; }
+  .grid-2{ grid-template-columns: 1fr; }
 }
 
 /* ===========================================================
-   PANEL
+   LIST PAGES (notice/news/downloads...)
 =========================================================== */
-.panel {
-  background: #fff;
-  border-radius: 18px;
-  padding: 28px 30px;
-  box-shadow: 0 10px 30px rgba(0,0,0,.08);
-}
-
-/* ===========================================================
-   ADMIN CONTROLS (LIST)
-=========================================================== */
-.admin-controls {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+.admin-controls{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:16px;
 }
 
 .admin-controls-left,
-.admin-controls-right {
-  display: flex;
-  gap: 10px;
+.admin-controls-right{
+  display:flex;
+  align-items:center;
+  gap:10px;
 }
 
-.search-input {
-  width: 260px;
-  height: 38px;
-  padding: 0 14px;
-  border-radius: 12px;
-  border: 1px solid rgba(0,0,0,.15);
+/* 검색 input */
+.search-input{
+  width:260px;
+  height:38px;
+  padding:0 14px;
+  border-radius:12px;
+  border:1px solid rgba(0,0,0,.15);
+  font-size:14px;
+  background:#fff;
+}
+.search-input:focus{
+  outline:none;
+  border-color:#0f2679;
+  box-shadow:0 0 0 3px rgba(15,38,121,.12);
 }
 
-.lang-filter {
-  display: inline-flex;
-  gap: 4px;
-  padding: 4px;
-  background: rgba(15,38,121,.08);
-  border-radius: 14px;
+/* segmented(lang) */
+.lang-filter{
+  display:inline-flex;
+  gap:4px;
+  padding:4px;
+  background:rgba(15,38,121,.08);
+  border-radius:14px;
+
+  /* 클릭 막힘 방지 */
+  pointer-events:auto;
+}
+.lang-btn{
+  min-width:44px;
+  height:30px;
+  border-radius:10px;
+  border:none;
+  background:transparent;
+  font-weight:800;
+  color:#0f2679;
+  cursor:pointer;
+
+  /* 클릭 막힘 방지 */
+  pointer-events:auto;
+}
+.lang-btn.active{
+  background:#0f2679;
+  color:#fff;
 }
 
-.lang-btn {
-  min-width: 44px;
-  height: 30px;
-  border-radius: 10px;
-  border: none;
-  background: transparent;
-  font-weight: 600;
-  color: #0f2679;
+/* primary button */
+.btn-primary{
+  height:38px;
+  padding:0 16px;
+  border-radius:12px;
+  border:none;
+  background:#0f2679;
+  color:#fff;
+  font-weight:800;
+  cursor:pointer;
+}
+.btn-primary:hover{ background:#1a3590; }
+
+/* 테이블 */
+.admin-table{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0;
+}
+.admin-table thead th{
+  padding:14px 16px;
+  font-size:12px;
+  font-weight:900;
+  color:#6b7280;
+  border-bottom:1px solid rgba(0,0,0,.12);
+  text-align:left;
+  white-space:nowrap;
+}
+.admin-table tbody td{
+  padding:16px;
+  border-bottom:1px solid rgba(0,0,0,.06);
+  vertical-align:middle;
+}
+.admin-table tbody tr:hover td{
+  background:rgba(15,38,121,.04);
 }
 
-.lang-btn.active {
-  background: #0f2679;
-  color: #fff;
+/* 액션 버튼 */
+.actions{ display:flex; gap:6px; }
+.btn-small{
+  padding:6px 10px;
+  border-radius:8px;
+  font-size:12px;
+  font-weight:800;
+  border:none;
+  cursor:pointer;
 }
+.btn-gray{ background:rgba(0,0,0,.06); }
+.btn-gray:hover{ background:rgba(0,0,0,.12); }
 
-.btn-primary {
-  height: 38px;
-  padding: 0 16px;
-  border-radius: 12px;
-  border: none;
-  background: #0f2679;
-  color: #fff;
-  font-weight: 600;
+.btn-danger{ background:rgba(220,38,38,.12); color:#dc2626; }
+.btn-danger:hover{ background:rgba(220,38,38,.22); }
+
+/* 페이지네이션 */
+.pagination{
+  display:flex;
+  justify-content:center;
+  gap:8px;
+  margin-top:18px;
+}
+.pagination button{
+  min-width:32px;
+  height:32px;
+  border-radius:10px;
+  border:none;
+  background:rgba(0,0,0,.06);
+  font-weight:900;
+  cursor:pointer;
+}
+.pagination button.active{
+  background:#0f2679;
+  color:#fff;
 }
 
 /* ===========================================================
-   ADMIN TABLE
+   MISC
 =========================================================== */
-.admin-table {
-  width: 100%;
-  border-collapse: separate;
+.session-timer{
+  padding:6px 10px;
+  border-radius:10px;
+  background:rgba(15,38,121,.12);
+  color:#0f2679;
+  font-size:12px;
+  font-weight:900;
 }
 
-.admin-table th {
-  padding: 14px 16px;
-  font-size: 12px;
-  color: #6b7280;
-  border-bottom: 1px solid rgba(0,0,0,.12);
-}
-
-.admin-table td {
-  padding: 16px;
-  border-bottom: 1px solid rgba(0,0,0,.06);
-}
-
-.admin-table tr:hover td {
-  background: rgba(15,38,121,.04);
-}
-
-.actions {
-  display: flex;
-  gap: 6px;
-}
-
-.btn-small {
-  padding: 6px 10px;
-  border-radius: 8px;
-  font-size: 12px;
-  border: none;
-}
-
-.btn-gray { background: rgba(0,0,0,.06); }
-.btn-danger { background: rgba(220,38,38,.12); color: #dc2626; }
-
-/* ===========================================================
-   PAGINATION
-=========================================================== */
-.pagination {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 24px;
-}
-
-.pagination button {
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
-  border: none;
-}
-
-.pagination button.active {
-  background: #0f2679;
-  color: #fff;
-}
+/* 어떤 요소가 위를 덮어서 클릭 막는 케이스 대비 */
+.panel, .admin-controls, .lang-filter, .topbar-right { position: relative; z-index: 1; }
