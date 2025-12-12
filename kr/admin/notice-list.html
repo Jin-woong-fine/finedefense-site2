@@ -7,124 +7,103 @@
 
   <!-- 공통 관리자 CSS -->
   <link rel="stylesheet" href="/kr/admin/css/admin.css" />
-
-  <style>
-    .panel {
-      background:#fff;
-      padding:25px;
-      border-radius:10px;
-      box-shadow:0 2px 8px rgba(0,0,0,0.06);
-      margin-bottom:35px;
-    }
-
-    .search-input {
-      width: 240px;
-      padding: 8px 12px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 0.95rem;
-    }
-
-    .lang-filter { display:flex; gap:6px; align-items:center; }
-
-    .lang-btn {
-      padding:7px 14px;
-      border-radius:6px;
-      border:1px solid #ccc;
-      background:white;
-      cursor:pointer;
-      font-size:0.85rem;
-    }
-    .lang-btn.active {
-      background:#0f2679; color:white; border-color:#0f2679;
-    }
-
-    .notice-table { width:100%; border-collapse:collapse; margin-top:10px; }
-    .notice-table th, .notice-table td {
-      padding:10px 12px; border-bottom:1px solid #ddd; text-align:left;
-    }
-    .notice-table th { background:#0f2679; color:#fff; }
-    .notice-table tr:hover td { background:#f3f6ff; cursor:pointer; }
-
-    .actions { display:flex; gap:6px; }
-
-    .pagination {
-      display:flex; justify-content:center; gap:4px; margin-top:18px;
-    }
-    .pagination button {
-      min-width:32px; padding:6px 10px; border-radius:4px;
-      border:1px solid #ccc; background:#fff; cursor:pointer;
-    }
-    .pagination button.active {
-      background:#0f2679; color:white; border-color:#0f2679;
-    }
-  </style>
 </head>
 
-<body>
+<body data-admin-page="notice">
 
-<!-- ⭐ 사이드바 -->
-<div id="sidebar" data-active="notice"></div>
+<script src="/kr/admin/js/common_auth.js"></script>
+<script>
+  requireAdminOrEditor();
+</script>
 
-<!-- ⭐ 메인 -->
-<div class="main">
+<!-- =========================================================
+     ADMIN LAYOUT
+========================================================= -->
+<div class="admin-wrapper">
 
-  <div class="topbar">
-    <h2>공지사항 관리</h2>
-    <div>
-      <button class="btn btn-primary" onclick="location.href='../index.html'">홈으로</button>
-      <button id="logoutBtn" class="btn btn-danger">로그아웃</button>
-    </div>
-  </div>
+  <!-- =====================
+       SIDEBAR
+  ====================== -->
+  <aside id="sidebar" class="admin-sidebar"></aside>
 
-  <section class="panel">
+  <!-- =====================
+       CONTENT
+  ====================== -->
+  <div class="admin-content">
+    <div class="main">
 
-    <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
-      <input type="text" id="searchInput" class="search-input" placeholder="제목 검색" />
+      <!-- =====================
+           TOPBAR (공통)
+      ====================== -->
+      <div class="topbar">
+        <div class="title">공지사항 관리</div>
 
-      <div class="lang-filter">
-        <button class="lang-btn active" data-lang="kr">KR</button>
-        <button class="lang-btn" data-lang="en">EN</button>
-        <button class="lang-btn" data-lang="all">ALL</button>
+        <div class="topbar-right">
+          <button class="topbar-user" id="topbarUser">
+            <span id="topbarUserName">관리자</span> ▾
+          </button>
+
+          <div class="user-dropdown" id="userDropdown">
+            <button class="dropdown-item" onclick="logout()">로그아웃</button>
+          </div>
+
+          <button onclick="location.href='../index.html'">홈으로</button>
+        </div>
       </div>
 
-      <button class="btn btn-primary" onclick="goWrite()">공지 작성하기</button>
+      <!-- =====================
+           MAIN PANEL
+      ====================== -->
+      <section class="panel">
+
+        <!-- 상단 컨트롤 -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <input type="text" id="searchInput" class="search-input" placeholder="제목 검색" />
+
+          <div class="lang-filter">
+            <button class="lang-btn active" data-lang="kr">KR</button>
+            <button class="lang-btn" data-lang="en">EN</button>
+            <button class="lang-btn" data-lang="all">ALL</button>
+          </div>
+
+          <button class="btn btn-primary" onclick="goWrite()">공지 작성</button>
+        </div>
+
+        <!-- 테이블 -->
+        <table class="notice-table">
+          <thead>
+            <tr>
+              <th style="width:70px;">번호</th>
+              <th style="width:70px;">정렬</th>
+              <th>제목</th>
+              <th style="width:120px;">작성일</th>
+              <th style="width:80px;">조회수</th>
+              <th style="width:120px;">관리</th>
+            </tr>
+          </thead>
+          <tbody id="noticeTbody">
+            <tr><td colspan="6">불러오는 중...</td></tr>
+          </tbody>
+        </table>
+
+        <div class="pagination" id="pagination"></div>
+      </section>
+
     </div>
-
-    <table class="notice-table">
-      <thead>
-        <tr>
-          <th style="width:70px;">번호</th>
-          <th style="width:70px;">정렬</th>
-          <th>제목</th>
-          <th style="width:120px;">작성일</th>
-          <th style="width:80px;">조회수</th>
-          <th style="width:120px;">관리</th>
-        </tr>
-      </thead>
-      <tbody id="noticeTbody">
-        <tr><td colspan="6">불러오는 중...</td></tr>
-      </tbody>
-    </table>
-
-    <div class="pagination" id="pagination"></div>
-  </section>
-
+  </div>
 </div>
 
-<!-- 공통 JS -->
-<script src="/kr/admin/js/common_auth.js"></script>
+<!-- =========================================================
+     SCRIPTS
+========================================================= -->
 <script src="/kr/admin/js/sidebar.js"></script>
+<script src="/kr/admin/js/topbar.js"></script>
 
 <script>
-  /* 🔐 권한 체크 */
-  requireAdminOrEditor();
-
-  document.getElementById("logoutBtn").addEventListener("click", logout);
-
   /* ===========================
-      전역 변수
+      기존 JS 로직은 그대로
   =========================== */
+
   const PAGE_SIZE = 10;
   let allNotices = [];
   let filteredNotices = [];
@@ -136,13 +115,9 @@
   }
 
   function formatDate(d) {
-    const date = new Date(d);
-    return date.toLocaleDateString();
+    return new Date(d).toLocaleDateString();
   }
 
-  /* ===========================
-      언어 필터
-  =========================== */
   document.querySelectorAll(".lang-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       document.querySelectorAll(".lang-btn").forEach(b => b.classList.remove("active"));
@@ -152,19 +127,14 @@
     });
   });
 
-  /* ===========================
-      검색 이벤트
-  =========================== */
   document.getElementById("searchInput").addEventListener("input", applyFilter);
 
-  /* 필터 적용 */
   function applyFilter() {
     const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
 
     filteredNotices = allNotices.filter(n => {
       const langOk = (currentLang === "all" || n.lang === currentLang);
-      const matchTitle = n.title.toLowerCase().includes(keyword);
-      return langOk && matchTitle;
+      return langOk && n.title.toLowerCase().includes(keyword);
     });
 
     currentPage = 1;
@@ -172,9 +142,6 @@
     renderPagination();
   }
 
-  /* ===========================
-      표 렌더링
-  =========================== */
   function renderTable() {
     const tbody = document.getElementById("noticeTbody");
 
@@ -204,9 +171,6 @@
     `).join("");
   }
 
-  /* ===========================
-      페이지네이션
-  =========================== */
   function renderPagination() {
     const pag = document.getElementById("pagination");
     pag.innerHTML = "";
@@ -227,9 +191,6 @@
     }
   }
 
-  /* ===========================
-      CRUD
-  =========================== */
   function openPublicView(id) {
     window.open(`/kr/sub/pr/notice/notice-view.html?id=${id}`, "_blank");
   }
@@ -246,45 +207,23 @@
       headers: { Authorization: "Bearer " + localStorage.getItem("token") }
     });
 
-    const out = await res.json();
-
     if (res.ok) {
       alert("삭제 완료");
       loadNotices();
     } else {
-      alert("삭제 실패: " + out.message);
+      alert("삭제 실패");
     }
   }
 
-  /* ===========================
-      공지 데이터 로드
-      (KR/EN/ALL 전체)
-  =========================== */
   async function loadNotices() {
     const res = await fetch(`/api/posts/list/notice?lang=all`);
     const data = await res.json();
-
-    console.log("🔥 공지 응답:", data);
-
-    // 배열 or 객체(list) 모두 안정적으로 처리
     const list = Array.isArray(data) ? data : (data.list || []);
-
-    if (!Array.isArray(list)) {
-      console.error("❌ list가 배열이 아님:", list);
-      return;
-    }
-
-    // 기존 정렬 그대로
     allNotices = list.sort((a, b) => a.sort_order - b.sort_order);
-
     applyFilter();
   }
 
-  /* 초기 실행 */
   loadNotices();
-
-  /* 사이드바 활성화 */
-  loadSidebar("notice");
 </script>
 
 </body>
