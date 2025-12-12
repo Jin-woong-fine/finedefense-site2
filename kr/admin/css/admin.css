@@ -24,124 +24,95 @@ body {
 }
 
 /* ===========================================================
-   SIDEBAR (CORPORATE SOLID)
+   🍎 APPLE STYLE SIDEBAR
 =========================================================== */
+
 #sidebar.admin-sidebar {
-  width: 240px;
-  flex-shrink: 0;
-  background: linear-gradient(180deg, #0f2679 0%, #0c1f5e 100%);
-  color: #fff;
-  overflow-y: auto;
-
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  z-index: 10;
+  background: linear-gradient(180deg, #0f2679 0%, #0b1f5c 100%);
+  padding: 24px 18px;
 }
 
-#sidebar .sidebar {
-  padding: 28px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-/* Sidebar Header */
-.sidebar-header {
-  margin-bottom: 16px;
-}
-
-.sidebar-header .logo {
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-}
-
-/* 사용자 프로필 */
+/* 사용자 블록 */
 .user-block {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 0 14px;
+  padding-bottom: 18px;
+  margin-bottom: 22px;
   border-bottom: 1px solid rgba(255,255,255,0.12);
 }
 
-.user-block .avatar {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid rgba(255,255,255,0.4);
-}
-
-.user-info .name {
-  font-weight: 600;
-  font-size: 14px;
-}
-
-.user-info .role {
-  font-size: 12px;
-  color: #c7d2ff;
-  margin-top: 2px;
-}
-
-/* 메뉴 */
+/* 메뉴 타이틀 */
 .menu-title {
-  margin: 22px 0 6px;
-  font-size: 12px;
-  color: #9fb3e3;
-  letter-spacing: 0.04em;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.55);
+  margin: 18px 0 8px;
+  text-transform: uppercase;
 }
 
+/* 메뉴 리스트 */
 .sidebar-menu {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
+/* 메뉴 아이템 */
 .menu-item {
-  padding: 11px 14px;
-  border-radius: 10px;
+  padding: 10px 14px;
+  border-radius: 12px;
   font-size: 14px;
-  color: #d7ddf0;
-  text-decoration: none;
+  font-weight: 500;
+  color: rgba(255,255,255,0.85);
   transition: background .2s ease, color .2s ease;
 }
 
+/* Hover는 약하게 */
 .menu-item:hover {
-  background: rgba(255,255,255,0.14);
-  color: #fff;
+  background: rgba(255,255,255,0.12);
 }
 
+/* 활성 메뉴 */
 .menu-item.active {
-  background: rgba(255,255,255,0.26);
+  background: rgba(255,255,255,0.22);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* =========================
+   메뉴 그룹 (Apple식)
+========================= */
+
+/* 그룹 헤더 */
+.menu-group > .menu-item {
+  background: transparent;
+  border-left: none;
+  cursor: default;
   font-weight: 600;
   color: #fff;
+  opacity: 0.9;
 }
 
-/* 메뉴 그룹 */
-.menu-group > .menu-item {
-  font-weight: 600;
-  background: rgba(255,255,255,0.08);
-  border-left: 3px solid rgba(255,255,255,0.5);
+/* 서브메뉴는 항상 노출 */
+.menu-group .submenu {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 6px;
 }
 
-.menu-group.open > .menu-item {
-  background: rgba(255,255,255,0.18);
-  border-left-color: #fff;
-}
-
-/* 서브메뉴 */
+/* 서브메뉴 아이템 */
 .submenu .menu-item {
-  padding-left: 26px;
+  padding-left: 22px;
   font-size: 13px;
+  border-radius: 10px;
   opacity: 0.85;
 }
 
+/* 서브메뉴 활성 */
 .submenu .menu-item.active {
+  background: rgba(255,255,255,0.25);
   opacity: 1;
   font-weight: 600;
 }
+
 
 /* ===========================================================
    CONTENT / MAIN
