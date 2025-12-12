@@ -357,3 +357,34 @@ body {
   transition: opacity 0.4s ease;
   z-index: 9999;
 }
+
+
+/* ===============================
+   TOPBAR CLICK SAFETY FIX
+=============================== */
+
+.admin-content {
+  position: relative;
+  z-index: 1;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.topbar-user {
+  position: relative;
+  z-index: 200;
+  cursor: pointer;
+}
+
+.user-dropdown {
+  z-index: 300;
+}
+
+/* sidebar 클릭 침범 방지 */
+.admin-sidebar {
+  overflow-x: hidden;
+}
