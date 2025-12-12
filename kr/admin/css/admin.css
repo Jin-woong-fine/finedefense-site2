@@ -188,7 +188,8 @@ body {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: #f3f5fa;
+  background: #ffffff;
+  border-bottom: 1px solid rgba(15,38,121,0.08);
 
   padding: 12px 0;
   margin-bottom: 30px;
