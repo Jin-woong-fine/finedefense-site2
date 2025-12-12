@@ -24,93 +24,161 @@ body {
 }
 
 /* ===========================================================
-   🍎 APPLE STYLE SIDEBAR
+   ADMIN SIDEBAR — CLEAN / ENTERPRISE / APPLE STYLE
 =========================================================== */
 
 #sidebar.admin-sidebar {
-  background: linear-gradient(180deg, #0f2679 0%, #0b1f5c 100%);
-  padding: 24px 18px;
+  width: 200px;                 /* 핵심: 폭 줄이기 */
+  flex-shrink: 0;
+
+  background: #0f2679;          /* 단색 (애플/대기업 정석) */
+  color: #ffffff;
+
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  z-index: 10;
+
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
-/* 사용자 블록 */
+/* 내부 컨테이너 */
+#sidebar .sidebar {
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===========================================================
+   SIDEBAR HEADER
+=========================================================== */
+.sidebar-header {
+  margin-bottom: 14px;
+}
+
+.sidebar-header .logo {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #ffffff;
+}
+
+/* ===========================================================
+   USER BLOCK (톤 다운)
+=========================================================== */
 .user-block {
-  padding-bottom: 18px;
-  margin-bottom: 22px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 12px 0 16px;
+  margin-bottom: 18px;
+
   border-bottom: 1px solid rgba(255,255,255,0.12);
 }
 
-/* 메뉴 타이틀 */
-.menu-title {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  color: rgba(255,255,255,0.55);
-  margin: 18px 0 8px;
-  text-transform: uppercase;
+.user-block .avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+
+  border: 1px solid rgba(255,255,255,0.35);
 }
 
-/* 메뉴 리스트 */
+.user-info .name {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.user-info .role {
+  font-size: 11px;
+  color: rgba(255,255,255,0.65);
+}
+
+/* ===========================================================
+   MENU STRUCTURE
+=========================================================== */
 .sidebar-menu {
+  display: flex;
+  flex-direction: column;
   gap: 4px;
 }
 
-/* 메뉴 아이템 */
+/* 섹션 타이틀 */
+.menu-title {
+  margin: 18px 0 6px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+}
+
+/* ===========================================================
+   MENU ITEM (FLAT / QUIET)
+=========================================================== */
 .menu-item {
-  padding: 10px 14px;
-  border-radius: 12px;
-  font-size: 14px;
+  display: block;
+  padding: 8px 12px;
+  border-radius: 10px;
+
+  font-size: 13px;
   font-weight: 500;
   color: rgba(255,255,255,0.85);
-  transition: background .2s ease, color .2s ease;
+  text-decoration: none;
+
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 /* Hover는 약하게 */
 .menu-item:hover {
   background: rgba(255,255,255,0.12);
+  color: #ffffff;
 }
 
-/* 활성 메뉴 */
+/* Active만 명확 */
 .menu-item.active {
   background: rgba(255,255,255,0.22);
-  color: #fff;
+  color: #ffffff;
   font-weight: 600;
 }
 
-/* =========================
-   메뉴 그룹 (Apple식)
-========================= */
-
-/* 그룹 헤더 */
-.menu-group > .menu-item {
-  background: transparent;
-  border-left: none;
-  cursor: default;
-  font-weight: 600;
-  color: #fff;
-  opacity: 0.9;
+/* ===========================================================
+   GROUP / SUBMENU (ALWAYS OPEN)
+=========================================================== */
+.menu-group {
+  margin-bottom: 8px;
 }
 
-/* 서브메뉴는 항상 노출 */
-.menu-group .submenu {
+.menu-group > .menu-title {
+  margin-top: 16px;
+}
+
+.submenu {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  margin-top: 6px;
+  gap: 2px;
 }
 
-/* 서브메뉴 아이템 */
 .submenu .menu-item {
-  padding-left: 22px;
-  font-size: 13px;
-  border-radius: 10px;
-  opacity: 0.85;
+  padding-left: 18px;
+  font-size: 12.5px;
+  opacity: 0.8;
 }
 
-/* 서브메뉴 활성 */
 .submenu .menu-item.active {
-  background: rgba(255,255,255,0.25);
   opacity: 1;
-  font-weight: 600;
+  background: rgba(255,255,255,0.25);
+}
+
+/* ===========================================================
+   REMOVE OLD VISUAL NOISE
+=========================================================== */
+.menu-item.dashboard-root {
+  border-left: none;
+  background: rgba(255,255,255,0.22);
 }
 
 
