@@ -11,16 +11,18 @@
   <!-- 공통 관리자 CSS -->
   <link rel="stylesheet" href="./css/admin.css">
 
-  <!-- 인증 -->
+  <!-- 인증 (전역 함수 requireAnyUser) -->
   <script src="./js/common_auth.js"></script>
 
   <!-- 세션 매니저 (❗절대 수정 금지❗) -->
+  <!-- ⚠ module은 DOM 로딩과 독립적으로 실행됨 -->
   <script type="module" src="/js/session_manager.js"></script>
   <script type="module" src="./js/dashboard_session_timer.js"></script>
 </head>
 
 <body data-admin-page="dashboard">
 
+<!-- 인증 가드 -->
 <script>
   requireAnyUser();
 </script>
@@ -34,7 +36,7 @@
   <div class="admin-content">
     <div class="main">
 
-      <!-- ✅ TOPBAR 컴포넌트 -->
+      <!-- TOPBAR (컴포넌트 주입 영역) -->
       <div id="topbar"></div>
 
       <!-- PAGE CONTENT -->
@@ -119,7 +121,7 @@
   </div>
 </div>
 
-<!-- SCRIPTS -->
+<!-- UI SCRIPTS (DOM 이후 실행되는 것들) -->
 <script src="./js/sidebar.js"></script>
 <script src="./js/topbar.js"></script>
 <script src="./js/dashboard_core.js"></script>
