@@ -50,13 +50,15 @@ body{
   flex:1;
   min-width:0;
   position:relative;
+  display: flex; /* ← 이거 필수 */
 }
 
-.main{
-  padding:26px 30px;
-  min-width:0;
-  height:100vh;
-  overflow-y:auto;
+.main {
+  flex: 1;
+  padding: 26px 30px;
+  min-width: 0;
+  overflow-y: auto;
+  height: auto;      /* ❌ 100vh 제거 */
 }
 
 /* ===========================================================

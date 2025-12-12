@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       if (action === "logout") {
         localStorage.clear();
-        location.href = "/kr/login.html";
+        location.href = "/kr/admin/login.html";
       }
 
       if (action === "home") {
