@@ -24,15 +24,13 @@ body {
 }
 
 /* ===========================================================
-   ADMIN SIDEBAR — CLEAN / ENTERPRISE / APPLE STYLE
+   ADMIN SIDEBAR — ENTERPRISE / APPLE STYLE
 =========================================================== */
-
 #sidebar.admin-sidebar {
-  width: 200px;                 /* 핵심: 폭 줄이기 */
+  width: 200px;
   flex-shrink: 0;
-
-  background: #0f2679;          /* 단색 (애플/대기업 정석) */
-  color: #ffffff;
+  background: #0f2679;
+  color: #fff;
 
   position: sticky;
   top: 0;
@@ -43,7 +41,6 @@ body {
   overflow-x: hidden;
 }
 
-/* 내부 컨테이너 */
 #sidebar .sidebar {
   padding: 24px 16px;
   display: flex;
@@ -61,20 +58,18 @@ body {
   font-size: 15px;
   font-weight: 700;
   letter-spacing: 0.06em;
-  color: #ffffff;
+  color: #fff;
 }
 
 /* ===========================================================
-   USER BLOCK (톤 다운)
+   USER BLOCK
 =========================================================== */
 .user-block {
   display: flex;
   align-items: center;
   gap: 10px;
-
   padding: 12px 0 16px;
   margin-bottom: 18px;
-
   border-bottom: 1px solid rgba(255,255,255,0.12);
 }
 
@@ -83,7 +78,6 @@ body {
   height: 36px;
   border-radius: 50%;
   object-fit: cover;
-
   border: 1px solid rgba(255,255,255,0.35);
 }
 
@@ -98,7 +92,7 @@ body {
 }
 
 /* ===========================================================
-   MENU STRUCTURE
+   SIDEBAR MENU
 =========================================================== */
 .sidebar-menu {
   display: flex;
@@ -106,7 +100,6 @@ body {
   gap: 4px;
 }
 
-/* 섹션 타이틀 */
 .menu-title {
   margin: 18px 0 6px;
   font-size: 10px;
@@ -116,44 +109,34 @@ body {
   color: rgba(255,255,255,0.5);
 }
 
-/* ===========================================================
-   MENU ITEM (FLAT / QUIET)
-=========================================================== */
 .menu-item {
   display: block;
   padding: 8px 12px;
   border-radius: 10px;
-
   font-size: 13px;
   font-weight: 500;
   color: rgba(255,255,255,0.85);
   text-decoration: none;
-
   transition: background 0.15s ease, color 0.15s ease;
 }
 
-/* Hover는 약하게 */
 .menu-item:hover {
   background: rgba(255,255,255,0.12);
-  color: #ffffff;
+  color: #fff;
 }
 
-/* Active만 명확 */
 .menu-item.active {
   background: rgba(255,255,255,0.22);
-  color: #ffffff;
+  color: #fff;
   font-weight: 600;
 }
 
-/* ===========================================================
-   GROUP / SUBMENU (ALWAYS OPEN)
-=========================================================== */
-.menu-group {
-  margin-bottom: 8px;
+.menu-item.dashboard-root {
+  background: rgba(255,255,255,0.22);
 }
 
-.menu-group > .menu-title {
-  margin-top: 16px;
+.menu-group {
+  margin-bottom: 8px;
 }
 
 .submenu {
@@ -174,22 +157,12 @@ body {
 }
 
 /* ===========================================================
-   REMOVE OLD VISUAL NOISE
-=========================================================== */
-.menu-item.dashboard-root {
-  border-left: none;
-  background: rgba(255,255,255,0.22);
-}
-
-
-/* ===========================================================
    CONTENT / MAIN
 =========================================================== */
 .admin-content {
   flex: 1;
   min-width: 0;
   display: flex;
-  position: relative;
 }
 
 .main {
@@ -201,7 +174,7 @@ body {
 }
 
 /* ===========================================================
-   🍎 APPLE STYLE TOPBAR (FINAL)
+   TOPBAR — APPLE STYLE
 =========================================================== */
 .topbar {
   display: flex;
@@ -228,7 +201,6 @@ body {
 .topbar .title {
   font-size: 24px;
   font-weight: 700;
-  letter-spacing: -0.01em;
   color: #0f2679;
 }
 
@@ -239,17 +211,11 @@ body {
   position: relative;
 }
 
-/* 관리자 버튼 */
 .topbar-user {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-
   padding: 7px 12px;
   border-radius: 12px;
   border: none;
   background: rgba(15,38,121,0.06);
-
   font-size: 14px;
   font-weight: 600;
   color: #0f2679;
@@ -260,7 +226,6 @@ body {
   background: rgba(15,38,121,0.12);
 }
 
-/* 홈으로 버튼 – 애플식 소프트 버튼 */
 .topbar button {
   padding: 7px 12px;
   border-radius: 12px;
@@ -275,20 +240,18 @@ body {
   background: rgba(15,38,121,0.16);
 }
 
-/* 드롭다운 */
+/* ===========================================================
+   USER DROPDOWN
+=========================================================== */
 .user-dropdown {
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
-
   min-width: 150px;
   background: rgba(255,255,255,0.96);
   backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-
   border-radius: 14px;
   box-shadow: 0 12px 30px rgba(0,0,0,0.16);
-
   display: none;
   padding: 6px 0;
   z-index: 300;
@@ -303,8 +266,8 @@ body {
   font-size: 14px;
   background: none;
   border: none;
-  text-align: left;
   width: 100%;
+  text-align: left;
   cursor: pointer;
 }
 
@@ -313,7 +276,7 @@ body {
 }
 
 /* ===========================================================
-   DASHBOARD
+   DASHBOARD KPI
 =========================================================== */
 .stats-row {
   display: grid;
@@ -343,7 +306,7 @@ body {
 }
 
 /* ===========================================================
-   PANELS
+   PANEL & GRID
 =========================================================== */
 .panel {
   background: #fff;
@@ -368,28 +331,162 @@ body {
 }
 
 /* ===========================================================
-   SESSION TIMER & TOAST
+   ADMIN CONTROLS (LIST PAGES)
 =========================================================== */
-.session-timer {
-  padding: 6px 10px;
+.admin-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.admin-controls-left,
+.admin-controls-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ===========================================================
+   SEARCH INPUT
+=========================================================== */
+.search-input {
+  width: 220px;
+  padding: 8px 12px;
   border-radius: 10px;
-  background: rgba(15,38,121,0.12);
+  border: 1px solid rgba(0,0,0,0.15);
+  font-size: 14px;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #0f2679;
+  box-shadow: 0 0 0 3px rgba(15,38,121,0.12);
+}
+
+/* ===========================================================
+   LANG FILTER
+=========================================================== */
+.lang-filter {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 12px;
+  background: rgba(15,38,121,0.08);
+}
+
+.lang-btn {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 600;
   color: #0f2679;
+  cursor: pointer;
+}
+
+.lang-btn.active {
+  background: #0f2679;
+  color: #fff;
+}
+
+/* ===========================================================
+   BUTTONS
+=========================================================== */
+.btn-primary {
+  padding: 8px 14px;
+  border-radius: 12px;
+  border: none;
+  background: #0f2679;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: #1a3590;
+}
+
+/* ===========================================================
+   ADMIN TABLE
+=========================================================== */
+.admin-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 14px;
+}
+
+.admin-table thead th {
   font-size: 12px;
+  font-weight: 700;
+  color: #6b7280;
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+.admin-table tbody td {
+  padding: 14px;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+
+.admin-table tbody tr:hover td {
+  background: rgba(15,38,121,0.04);
+}
+
+.admin-table td.clickable {
+  cursor: pointer;
+  font-weight: 600;
+  color: #0f2679;
+}
+
+/* ===========================================================
+   ACTION BUTTONS
+=========================================================== */
+.actions {
+  display: flex;
+  gap: 6px;
+}
+
+.btn-small {
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-gray {
+  background: rgba(0,0,0,0.06);
+}
+
+.btn-danger {
+  background: rgba(220,38,38,0.12);
+  color: #dc2626;
+}
+
+/* ===========================================================
+   PAGINATION
+=========================================================== */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 20px;
+}
+
+.pagination button {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(0,0,0,0.06);
   font-weight: 600;
 }
 
-.toast-notice {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
+.pagination button.active {
   background: #0f2679;
   color: #fff;
-  padding: 12px 20px;
-  border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.18);
-  opacity: 0;
-  transition: opacity .4s ease;
-  z-index: 9999;
 }
