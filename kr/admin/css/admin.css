@@ -182,18 +182,27 @@ body {
   margin-bottom: 30px;
 }
 
+/* 좌측 타이틀 */
 .topbar .title {
   font-size: 26px;
   font-weight: 700;
   color: #0f2679;
 }
 
+/* 우측 영역 공통 */
+.topbar > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* 홈으로 버튼 */
 .topbar button {
   padding: 8px 14px;
   border-radius: 8px;
   border: none;
   background: #0f2679;
-  color: white;
+  color: #fff;
   font-size: 14px;
   cursor: pointer;
   transition: background 0.2s;
@@ -202,6 +211,71 @@ body {
 .topbar button:hover {
   background: #1a358a;
 }
+
+/* ===========================================================
+   👤 TOPBAR USER (관리자 메뉴)
+=========================================================== */
+.topbar-user {
+  position: relative;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+  user-select: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: background 0.15s;
+}
+
+.topbar-user:hover {
+  background: rgba(15, 38, 121, 0.08);
+}
+
+/* ▼ 드롭다운 */
+.user-dropdown {
+  position: absolute;
+  top: 36px;
+  right: 0;
+  min-width: 160px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 8px;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.15);
+  display: none;
+  z-index: 100;
+}
+
+.user-dropdown.open {
+  display: block;
+}
+
+/* 드롭다운 아이템 */
+.user-dropdown .dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  background: none;
+  border: 0;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 8px;
+  color: #222;
+}
+
+.user-dropdown .dropdown-item:hover {
+  background: rgba(15, 38, 121, 0.08);
+}
+
+/* 로그아웃 강조 */
+.user-dropdown .dropdown-item.danger {
+  color: #c62828;
+}
+
+.user-dropdown .dropdown-item.danger:hover {
+  background: rgba(198, 40, 40, 0.1);
+}
+
 
 /* ===========================================================
    PANELS
