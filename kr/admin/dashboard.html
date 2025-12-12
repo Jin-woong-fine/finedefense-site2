@@ -14,7 +14,7 @@
   <!-- 인증 -->
   <script src="./js/common_auth.js"></script>
 
-  <!-- 세션 매니저 -->
+  <!-- 세션 매니저 (❗절대 수정 금지❗) -->
   <script type="module" src="/js/session_manager.js"></script>
   <script type="module" src="./js/dashboard_session_timer.js"></script>
 </head>
@@ -30,50 +30,15 @@
 ========================================================= -->
 <div class="admin-wrapper">
 
-  <!-- SIDEBAR -->
+  <!-- ===================== SIDEBAR ====================== -->
   <aside id="sidebar" class="admin-sidebar"></aside>
 
-  <!-- CONTENT -->
+  <!-- ===================== CONTENT ====================== -->
   <div class="admin-content">
     <div class="main">
 
-      <!-- =====================
-           TOPBAR (공통)
-      ====================== -->
-      <div class="topbar">
-        <div class="title">관리자 대시보드</div>
-
-        <div class="topbar-right">
-          <span id="session-timer" class="session-timer">세션 계산중...</span>
-
-          <button
-            id="topbarUser"
-            class="topbar-user"
-            type="button"
-            aria-haspopup="true"
-            aria-expanded="false"
-          >
-            <span id="topbarUserName">관리자</span> ▾
-          </button>
-
-          <div id="userDropdown" class="user-dropdown">
-            <button
-              class="dropdown-item"
-              data-action="logout"
-              type="button"
-            >
-              로그아웃
-            </button>
-          </div>
-
-          <button
-            type="button"
-            onclick="location.href='../index.html'"
-          >
-            홈으로
-          </button>
-        </div>
-      </div>
+      <!-- ✅ TOPBAR (컴포넌트 자리만 제공) -->
+      <div id="topbar"></div>
 
       <!-- =====================
            PAGE CONTENT

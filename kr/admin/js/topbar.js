@@ -3,22 +3,16 @@ console.log("%c[topbar] load", "color:#2196f3;font-weight:bold;");
 
 document.addEventListener("DOMContentLoaded", async () => {
   const wrap = document.getElementById("topbar");
-  if (!wrap) return;
-
-  /* ============================
-     1️⃣ TOPBAR HTML 로드
-  ============================ */
-  try {
-    const res = await fetch("/kr/admin/components/topbar.html");
-    wrap.innerHTML = await res.text();
-  } catch (e) {
-    console.error("[topbar] html load failed", e);
+  if (!wrap) {
+    console.warn("[topbar] #topbar 없음");
     return;
   }
 
-  /* ============================
-     2️⃣ 페이지 타이틀 설정
-  ============================ */
+  /* 1️⃣ HTML 로드 */
+  const res = await fetch("/kr/admin/components/topbar.html");
+  wrap.innerHTML = await res.text();
+
+  /* 2️⃣ 페이지 타이틀 */
   const page = document.body.dataset.adminPage || "";
   const titleMap = {
     dashboard: "관리자 대시보드",
@@ -31,37 +25,27 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
 
   const titleEl = document.getElementById("pageTitle");
-  if (titleEl) {
-    titleEl.textContent = titleMap[page] || "관리자";
-  }
+  if (titleEl) titleEl.textContent = titleMap[page] || "관리자";
 
-  /* ============================
-     3️⃣ 사용자 이름 표시
-  ============================ */
+  /* 3️⃣ 사용자 이름 */
   const name = localStorage.getItem("name") || "관리자";
   const nameEl = document.getElementById("topbarUserName");
   if (nameEl) nameEl.textContent = name;
 
-  /* ============================
-     4️⃣ 드롭다운 토글
-  ============================ */
+  /* 4️⃣ 드롭다운 */
   const userBtn = document.getElementById("topbarUser");
   const dropdown = document.getElementById("userDropdown");
 
-  if (userBtn && dropdown) {
-    userBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      dropdown.classList.toggle("open");
-    });
+  userBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    dropdown.classList.toggle("open");
+  });
 
-    document.addEventListener("click", () => {
-      dropdown.classList.remove("open");
-    });
-  }
+  document.addEventListener("click", () => {
+    dropdown.classList.remove("open");
+  });
 
-  /* ============================
-     5️⃣ 액션 처리
-  ============================ */
+  /* 5️⃣ 액션 */
   document.querySelectorAll("[data-action]").forEach(btn => {
     btn.addEventListener("click", () => {
       const action = btn.dataset.action;
@@ -77,10 +61,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   });
 
-  /* ============================
-     ⭐ 6️⃣ 세션 타이머 트리거
-     (로직 절대 수정 ❌)
-  ============================ */
+  /* 6️⃣ 세션 타이머 (건드리지 않음) */
   if (typeof window.initSessionCountdown === "function") {
     window.initSessionCountdown();
   }
