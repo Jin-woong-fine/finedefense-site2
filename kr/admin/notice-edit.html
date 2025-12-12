@@ -45,6 +45,76 @@
       margin-top: 4px;
     }
   </style>
+
+  <style>
+    /* ===========================================================
+      📌 공지 기본 정보 입력 UI (강제 적용)
+    =========================================================== */
+
+    /* 공지 정보 섹션 내부만 적용 */
+    .panel input.input,
+    .panel select.input {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 15px;
+      border-radius: 10px;
+      border: 1px solid #d0d7e2;
+      background: #fafbff;
+      transition: border 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+
+    .panel input.input::placeholder {
+      color: #9aa4b2;
+    }
+
+    .panel input.input:focus,
+    .panel select.input:focus {
+      outline: none;
+      border-color: #0f2679;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(15, 38, 121, 0.12);
+    }
+
+    /* 공지 제목 강조 */
+    #title {
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    /* 언어 + 정렬순번 정렬 */
+    .notice-meta {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 14px;
+      margin-top: 12px;
+    }
+
+    /* 셀렉트 화살표 통일 */
+    select.input {
+      appearance: none;
+      background-image:
+        linear-gradient(45deg, transparent 50%, #0f2679 50%),
+        linear-gradient(135deg, #0f2679 50%, transparent 50%);
+      background-position:
+        calc(100% - 18px) 50%,
+        calc(100% - 12px) 50%;
+      background-size: 6px 6px;
+      background-repeat: no-repeat;
+      padding-right: 36px;
+      cursor: pointer;
+    }
+
+    /* 도움말 텍스트 정리 */
+    .help-text {
+      margin-top: 8px;
+      font-size: 13px;
+      color: #666;
+      line-height: 1.5;
+    }
+  </style>
+
+
+
 </head>
 
 <body>
@@ -79,12 +149,20 @@
 
         <input id="title" class="input" placeholder="공지 제목" />
 
-        <select id="lang" class="input">
-          <option value="kr">한국어</option>
-          <option value="en">English</option>
-        </select>
+        <div class="notice-meta">
+          <select id="lang" class="input">
+            <option value="kr">한국어</option>
+            <option value="en">English</option>
+          </select>
 
-        <input id="sort_order" class="input" type="number" placeholder="정렬 순번" min="1" />
+          <input
+            id="sort_order"
+            class="input"
+            type="number"
+            placeholder="정렬 순번"
+            min="1"
+          />
+        </div>
 
         <div class="help-text">
           * 상단 고정 = 낮은 숫자 (예: 1,2,3)  
