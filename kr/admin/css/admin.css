@@ -16,7 +16,7 @@ body {
 }
 
 /* ===========================================================
-   ADMIN LAYOUT (CORE)
+   ADMIN LAYOUT
 =========================================================== */
 .admin-wrapper {
   display: flex;
@@ -24,21 +24,17 @@ body {
 }
 
 /* ===========================================================
-   ADMIN SIDEBAR — ENTERPRISE / APPLE STYLE
+   SIDEBAR
 =========================================================== */
 #sidebar.admin-sidebar {
   width: 200px;
   flex-shrink: 0;
   background: #0f2679;
   color: #fff;
-
   position: sticky;
   top: 0;
   height: 100vh;
-  z-index: 10;
-
   overflow-y: auto;
-  overflow-x: hidden;
 }
 
 #sidebar .sidebar {
@@ -47,38 +43,24 @@ body {
   flex-direction: column;
 }
 
-/* ===========================================================
-   SIDEBAR HEADER
-=========================================================== */
-.sidebar-header {
-  margin-bottom: 14px;
-}
-
 .sidebar-header .logo {
   font-size: 15px;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  color: #fff;
+  letter-spacing: .06em;
 }
 
-/* ===========================================================
-   USER BLOCK
-=========================================================== */
 .user-block {
   display: flex;
-  align-items: center;
   gap: 10px;
-  padding: 12px 0 16px;
-  margin-bottom: 18px;
-  border-bottom: 1px solid rgba(255,255,255,0.12);
+  padding: 14px 0;
+  margin-bottom: 16px;
+  border-bottom: 1px solid rgba(255,255,255,.12);
 }
 
 .user-block .avatar {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  object-fit: cover;
-  border: 1px solid rgba(255,255,255,0.35);
 }
 
 .user-info .name {
@@ -88,12 +70,9 @@ body {
 
 .user-info .role {
   font-size: 11px;
-  color: rgba(255,255,255,0.65);
+  opacity: .65;
 }
 
-/* ===========================================================
-   SIDEBAR MENU
-=========================================================== */
 .sidebar-menu {
   display: flex;
   flex-direction: column;
@@ -103,99 +82,64 @@ body {
 .menu-title {
   margin: 18px 0 6px;
   font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: .12em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.5);
+  opacity: .5;
 }
 
 .menu-item {
-  display: block;
   padding: 8px 12px;
   border-radius: 10px;
   font-size: 13px;
-  font-weight: 500;
-  color: rgba(255,255,255,0.85);
+  color: rgba(255,255,255,.85);
   text-decoration: none;
-  transition: background 0.15s ease, color 0.15s ease;
 }
 
 .menu-item:hover {
-  background: rgba(255,255,255,0.12);
-  color: #fff;
+  background: rgba(255,255,255,.12);
 }
 
 .menu-item.active {
-  background: rgba(255,255,255,0.22);
-  color: #fff;
+  background: rgba(255,255,255,.22);
   font-weight: 600;
-}
-
-.menu-item.dashboard-root {
-  background: rgba(255,255,255,0.22);
-}
-
-.menu-group {
-  margin-bottom: 8px;
-}
-
-.submenu {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
 }
 
 .submenu .menu-item {
   padding-left: 18px;
   font-size: 12.5px;
-  opacity: 0.8;
-}
-
-.submenu .menu-item.active {
-  opacity: 1;
-  background: rgba(255,255,255,0.25);
+  opacity: .8;
 }
 
 /* ===========================================================
-   CONTENT / MAIN
+   MAIN / CONTENT
 =========================================================== */
 .admin-content {
   flex: 1;
   min-width: 0;
-  display: flex;
 }
 
 .main {
-  flex: 1;
   padding: 26px 30px;
-  min-width: 0;
   height: 100vh;
   overflow-y: auto;
 }
 
 /* ===========================================================
-   TOPBAR — APPLE STYLE
+   TOPBAR (APPLE STYLE)
 =========================================================== */
 .topbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-
   position: sticky;
   top: 14px;
   z-index: 100;
-
-  background: rgba(255,255,255,0.82);
+  background: rgba(255,255,255,.82);
   backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-
   border-radius: 16px;
   padding: 14px 20px;
   margin-bottom: 34px;
-
-  box-shadow:
-    0 1px 2px rgba(0,0,0,0.05),
-    0 10px 30px rgba(0,0,0,0.08);
+  box-shadow: 0 10px 30px rgba(0,0,0,.08);
 }
 
 .topbar .title {
@@ -206,55 +150,35 @@ body {
 
 .topbar-right {
   display: flex;
-  align-items: center;
   gap: 10px;
   position: relative;
 }
 
-.topbar-user {
-  padding: 7px 12px;
-  border-radius: 12px;
-  border: none;
-  background: rgba(15,38,121,0.06);
-  font-size: 14px;
-  font-weight: 600;
-  color: #0f2679;
-  cursor: pointer;
-}
-
-.topbar-user:hover {
-  background: rgba(15,38,121,0.12);
-}
-
+.topbar-user,
 .topbar button {
   padding: 7px 12px;
   border-radius: 12px;
   border: none;
-  background: rgba(15,38,121,0.08);
-  color: #0f2679;
+  background: rgba(15,38,121,.08);
   font-weight: 600;
+  color: #0f2679;
   cursor: pointer;
 }
 
+.topbar-user:hover,
 .topbar button:hover {
-  background: rgba(15,38,121,0.16);
+  background: rgba(15,38,121,.16);
 }
 
-/* ===========================================================
-   USER DROPDOWN
-=========================================================== */
 .user-dropdown {
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
   min-width: 150px;
-  background: rgba(255,255,255,0.96);
-  backdrop-filter: blur(18px);
+  background: rgba(255,255,255,.96);
   border-radius: 14px;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.16);
+  box-shadow: 0 12px 30px rgba(0,0,0,.16);
   display: none;
-  padding: 6px 0;
-  z-index: 300;
 }
 
 .user-dropdown.open {
@@ -263,128 +187,62 @@ body {
 
 .dropdown-item {
   padding: 10px 16px;
-  font-size: 14px;
   background: none;
   border: none;
   width: 100%;
-  text-align: left;
   cursor: pointer;
 }
 
-.dropdown-item:hover {
-  background: #f3f5fa;
-}
-
 /* ===========================================================
-   DASHBOARD KPI
-=========================================================== */
-.stats-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 22px;
-  max-width: 1200px;
-  margin: 0 auto 40px;
-}
-
-.stat-card {
-  background: #fff;
-  border-radius: 18px;
-  padding: 22px;
-  box-shadow: 0 8px 22px rgba(0,0,0,0.08);
-  border-left: 6px solid #0f2679;
-  transition: transform .2s ease;
-}
-
-.stat-card:hover {
-  transform: translateY(-4px);
-}
-
-.stat-value {
-  font-size: 30px;
-  font-weight: 700;
-  color: #0f2679;
-}
-
-/* ===========================================================
-   PANEL & GRID
+   PANEL
 =========================================================== */
 .panel {
   background: #fff;
   border-radius: 18px;
-  padding: 26px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-}
-
-.panel h2 {
-  font-size: 19px;
-  font-weight: 700;
-  margin-bottom: 16px;
-  color: #0f2679;
-}
-
-.grid-2 {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 26px;
-  max-width: 1300px;
-  margin: 0 auto 40px;
+  padding: 28px 30px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.08);
 }
 
 /* ===========================================================
-   ADMIN CONTROLS (LIST PAGES)
+   ADMIN CONTROLS (LIST)
 =========================================================== */
 .admin-controls {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 18px;
+  margin-bottom: 20px;
 }
 
 .admin-controls-left,
 .admin-controls-right {
   display: flex;
-  align-items: center;
   gap: 10px;
 }
 
-/* ===========================================================
-   SEARCH INPUT
-=========================================================== */
 .search-input {
-  width: 220px;
-  padding: 8px 12px;
-  border-radius: 10px;
-  border: 1px solid rgba(0,0,0,0.15);
-  font-size: 14px;
+  width: 260px;
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,.15);
 }
 
-.search-input:focus {
-  outline: none;
-  border-color: #0f2679;
-  box-shadow: 0 0 0 3px rgba(15,38,121,0.12);
-}
-
-/* ===========================================================
-   LANG FILTER
-=========================================================== */
 .lang-filter {
   display: inline-flex;
   gap: 4px;
   padding: 4px;
-  border-radius: 12px;
-  background: rgba(15,38,121,0.08);
+  background: rgba(15,38,121,.08);
+  border-radius: 14px;
 }
 
 .lang-btn {
-  padding: 6px 12px;
-  border-radius: 8px;
+  min-width: 44px;
+  height: 30px;
+  border-radius: 10px;
   border: none;
   background: transparent;
-  font-size: 13px;
   font-weight: 600;
   color: #0f2679;
-  cursor: pointer;
 }
 
 .lang-btn.active {
@@ -392,21 +250,14 @@ body {
   color: #fff;
 }
 
-/* ===========================================================
-   BUTTONS
-=========================================================== */
 .btn-primary {
-  padding: 8px 14px;
+  height: 38px;
+  padding: 0 16px;
   border-radius: 12px;
   border: none;
   background: #0f2679;
   color: #fff;
   font-weight: 600;
-  cursor: pointer;
-}
-
-.btn-primary:hover {
-  background: #1a3590;
 }
 
 /* ===========================================================
@@ -415,36 +266,24 @@ body {
 .admin-table {
   width: 100%;
   border-collapse: separate;
-  border-spacing: 0;
-  font-size: 14px;
 }
 
-.admin-table thead th {
+.admin-table th {
+  padding: 14px 16px;
   font-size: 12px;
-  font-weight: 700;
   color: #6b7280;
-  padding: 12px 14px;
-  border-bottom: 1px solid rgba(0,0,0,0.1);
+  border-bottom: 1px solid rgba(0,0,0,.12);
 }
 
-.admin-table tbody td {
-  padding: 14px;
-  border-bottom: 1px solid rgba(0,0,0,0.06);
+.admin-table td {
+  padding: 16px;
+  border-bottom: 1px solid rgba(0,0,0,.06);
 }
 
-.admin-table tbody tr:hover td {
-  background: rgba(15,38,121,0.04);
+.admin-table tr:hover td {
+  background: rgba(15,38,121,.04);
 }
 
-.admin-table td.clickable {
-  cursor: pointer;
-  font-weight: 600;
-  color: #0f2679;
-}
-
-/* ===========================================================
-   ACTION BUTTONS
-=========================================================== */
 .actions {
   display: flex;
   gap: 6px;
@@ -454,19 +293,11 @@ body {
   padding: 6px 10px;
   border-radius: 8px;
   font-size: 12px;
-  font-weight: 600;
   border: none;
-  cursor: pointer;
 }
 
-.btn-gray {
-  background: rgba(0,0,0,0.06);
-}
-
-.btn-danger {
-  background: rgba(220,38,38,0.12);
-  color: #dc2626;
-}
+.btn-gray { background: rgba(0,0,0,.06); }
+.btn-danger { background: rgba(220,38,38,.12); color: #dc2626; }
 
 /* ===========================================================
    PAGINATION
@@ -474,16 +305,15 @@ body {
 .pagination {
   display: flex;
   justify-content: center;
-  gap: 6px;
-  margin-top: 20px;
+  gap: 8px;
+  margin-top: 24px;
 }
 
 .pagination button {
-  padding: 6px 10px;
-  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
   border: none;
-  background: rgba(0,0,0,0.06);
-  font-weight: 600;
 }
 
 .pagination button.active {
