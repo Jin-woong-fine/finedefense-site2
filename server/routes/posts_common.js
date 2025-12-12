@@ -47,9 +47,9 @@ router.post("/view/:id", async (req, res) => {
 
     // INSERT
     await db.execute(
-      `INSERT INTO post_view_logs (post_id, ip, user_agent)
-       VALUES (?, ?, ?)`,
-      [postId, ip, ua]
+      `INSERT IGNORE INTO post_view_logs (post_id, ip, user_agent)
+      VALUES (?, ?, ?)`,
+      [postId, ip, userAgent]
     );
 
     res.json({ message: "조회수 +1", added: true });
