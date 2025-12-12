@@ -45,6 +45,47 @@
       cursor: pointer;
       font-size: 13px;
     }
+
+    /* ============================================================
+      🚑 admin.css panel 충돌 강제 보정 (이 페이지 전용)
+    ============================================================ */
+
+    /* 대시보드용 panel flex / grid 영향 제거 */
+    .main > .panel,
+    .main section.panel {
+      all: unset;
+      display: block;
+    }
+
+    /* 신규 등록 페이지 전용 panel 스타일 재정의 */
+    .main section.panel {
+      background: #ffffff;
+      padding: 28px 32px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      margin: 0 auto 35px;
+      max-width: 980px;
+    }
+
+    /* panel 내부 요소 정렬 안정화 */
+    .main section.panel h2,
+    .main section.panel h3 {
+      margin-top: 0;
+    }
+
+    .main section.panel .input,
+    .main section.panel textarea,
+    .main section.panel select {
+      width: 100%;
+      box-sizing: border-box;
+      margin-bottom: 14px;
+    }
+
+    /* editor 영역 폭 고정 */
+    #editor {
+      width: 100%;
+    }
+
   </style>
 </head>
 
