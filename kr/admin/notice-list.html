@@ -11,6 +11,7 @@
 
 <body data-admin-page="notice">
 
+<!-- 인증 -->
 <script src="/kr/admin/js/common_auth.js"></script>
 <script>
   requireAdminOrEditor();
@@ -21,20 +22,14 @@
 ========================================================= -->
 <div class="admin-wrapper">
 
-  <!-- =====================
-       SIDEBAR
-  ====================== -->
+  <!-- ===================== SIDEBAR ====================== -->
   <aside id="sidebar" class="admin-sidebar"></aside>
 
-  <!-- =====================
-       CONTENT
-  ====================== -->
+  <!-- ===================== CONTENT ====================== -->
   <div class="admin-content">
     <div class="main">
 
-      <!-- =====================
-           TOPBAR (대시보드 공통)
-      ====================== -->
+      <!-- ===================== TOPBAR ====================== -->
       <div class="topbar">
         <div class="title">공지사항 관리</div>
 
@@ -55,13 +50,10 @@
         </div>
       </div>
 
-      <!-- =====================
-          PAGE CONTENT
-      ====================== -->
-
-      <!-- 🔹 FILTER / ACTION BAR -->
+      <!-- ===================== FILTER / ACTION ====================== -->
       <section class="panel">
         <div class="admin-controls">
+
           <div class="admin-controls-left">
             <input
               type="text"
@@ -80,10 +72,11 @@
           <div class="admin-controls-right">
             <button class="btn-primary" onclick="goWrite()">공지 작성</button>
           </div>
+
         </div>
       </section>
 
-      <!-- 🔹 LIST -->
+      <!-- ===================== LIST ====================== -->
       <section class="panel">
         <table class="admin-table">
           <thead>
@@ -96,12 +89,21 @@
               <th style="width:120px;"></th>
             </tr>
           </thead>
-          <tbody id="noticeTbody"></tbody>
+          <tbody id="noticeTbody">
+            <tr>
+              <td colspan="6" style="text-align:center;color:#777;">
+                불러오는 중...
+              </td>
+            </tr>
+          </tbody>
         </table>
 
         <div class="pagination" id="pagination"></div>
       </section>
 
+    </div>
+  </div>
+</div>
 
 <!-- =========================================================
      SCRIPTS
@@ -111,9 +113,8 @@
 
 <script>
   /* ===========================
-      기존 로직 (변경 없음)
+      DATA
   =========================== */
-
   const PAGE_SIZE = 10;
   let allNotices = [];
   let filteredNotices = [];
@@ -128,22 +129,31 @@
     return new Date(d).toLocaleDateString();
   }
 
-  document.querySelectorAll(".seg-btn").forEach(btn => {
+  /* ===========================
+      LANG FILTER (FIXED)
+  =========================== */
+  document.querySelectorAll(".lang-btn").forEach(btn => {
     btn.addEventListener("click", () => {
-      document.querySelectorAll(".seg-btn").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".lang-btn")
+        .forEach(b => b.classList.remove("active"));
+
       btn.classList.add("active");
       currentLang = btn.dataset.lang;
       applyFilter();
     });
   });
 
-  document.getElementById("searchInput").addEventListener("input", applyFilter);
+  document.getElementById("searchInput")
+    .addEventListener("input", applyFilter);
 
   function applyFilter() {
-    const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
+    const keyword =
+      document.getElementById("searchInput")
+        .value.trim().toLowerCase();
 
     filteredNotices = allNotices.filter(n => {
-      const langOk = (currentLang === "all" || n.lang === currentLang);
+      const langOk =
+        currentLang === "all" || n.lang === currentLang;
       return langOk && n.title.toLowerCase().includes(keyword);
     });
 
@@ -162,20 +172,23 @@
     }
 
     const start = (currentPage - 1) * PAGE_SIZE;
-    const pageItems = filteredNotices.slice(start, start + PAGE_SIZE);
+    const pageItems =
+      filteredNotices.slice(start, start + PAGE_SIZE);
     const total = filteredNotices.length;
 
     tbody.innerHTML = pageItems.map((n, i) => `
       <tr>
         <td>${total - (start + i)}</td>
         <td>${n.sort_order ?? "-"}</td>
-        <td onclick="openPublicView(${n.id})">${n.title}</td>
+        <td class="title-cell" onclick="openPublicView(${n.id})">
+          ${n.title}
+        </td>
         <td>${formatDate(n.created_at)}</td>
         <td>${n.views ?? "-"}</td>
         <td>
           <div class="actions">
-            <button class="btn btn-small btn-gray" onclick="editNotice(${n.id})">수정</button>
-            <button class="btn btn-small btn-danger" onclick="deleteNotice(${n.id})">삭제</button>
+            <button class="btn-small btn-gray" onclick="editNotice(${n.id})">수정</button>
+            <button class="btn-small btn-danger" onclick="deleteNotice(${n.id})">삭제</button>
           </div>
         </td>
       </tr>
@@ -186,7 +199,8 @@
     const pag = document.getElementById("pagination");
     pag.innerHTML = "";
 
-    const totalPages = Math.ceil(filteredNotices.length / PAGE_SIZE);
+    const totalPages =
+      Math.ceil(filteredNotices.length / PAGE_SIZE);
     if (totalPages <= 1) return;
 
     for (let p = 1; p <= totalPages; p++) {
@@ -215,7 +229,9 @@
 
     const res = await fetch(`/api/posts/notice/delete/${id}`, {
       method: "DELETE",
-      headers: { Authorization: "Bearer " + localStorage.getItem("token") }
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token")
+      }
     });
 
     if (res.ok) {
