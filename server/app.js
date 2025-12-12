@@ -45,6 +45,21 @@ app.use(cors());
 app.use(express.json({ limit: "30mb" }));
 app.use(express.urlencoded({ extended: true, limit: "30mb" }));
 
+// ======================================================
+// 🔍 트래픽 IP 디버그 (임시 확인용)
+// ======================================================
+app.use((req, res, next) => {
+  console.log("🌍 TRAFFIC DEBUG:", {
+    ip: req.ip,
+    forwarded: req.headers["x-forwarded-for"],
+    real: req.headers["x-real-ip"],
+    remote: req.socket.remoteAddress
+  });
+  next();
+});
+
+
+
 // ------------------------------------------------------
 // 📌 업로드 경로 (한글 파일명 깨짐 방지 헤더 포함)
 // ------------------------------------------------------
