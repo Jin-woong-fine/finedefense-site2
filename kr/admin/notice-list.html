@@ -56,61 +56,52 @@
       </div>
 
       <!-- =====================
-           PAGE CONTENT
+          PAGE CONTENT
       ====================== -->
-      <div class="page-content">
 
-        <!-- 🔹 FILTER PANEL -->
-        <section class="panel panel-filter">
-          <input
-            type="text"
-            id="searchInput"
-            class="search-input"
-            placeholder="제목 검색"
-          />
+      <!-- 🔹 FILTER / ACTION BAR -->
+      <section class="panel">
+        <div class="admin-controls">
+          <div class="admin-controls-left">
+            <input
+              type="text"
+              id="searchInput"
+              class="search-input"
+              placeholder="제목 검색"
+            />
 
-          <div class="segmented">
-            <button class="seg-btn active" data-lang="kr">KR</button>
-            <button class="seg-btn" data-lang="en">EN</button>
-            <button class="seg-btn" data-lang="all">ALL</button>
+            <div class="lang-filter">
+              <button class="lang-btn active" data-lang="kr">KR</button>
+              <button class="lang-btn" data-lang="en">EN</button>
+              <button class="lang-btn" data-lang="all">ALL</button>
+            </div>
           </div>
 
-          <button class="btn-primary" onclick="goWrite()">
-            공지 작성
-          </button>
-        </section>
+          <div class="admin-controls-right">
+            <button class="btn-primary" onclick="goWrite()">공지 작성</button>
+          </div>
+        </div>
+      </section>
 
-        <!-- 🔹 LIST PANEL -->
-        <section class="panel panel-list">
-          <table class="notice-table">
-            <thead>
-              <tr>
-                <th style="width:70px;">번호</th>
-                <th style="width:70px;">정렬</th>
-                <th>제목</th>
-                <th style="width:120px;">작성일</th>
-                <th style="width:80px;">조회</th>
-                <th style="width:120px;"></th>
-              </tr>
-            </thead>
-            <tbody id="noticeTbody">
-              <tr>
-                <td colspan="6" style="text-align:center;color:#777;">
-                  불러오는 중...
-                </td>
-              </tr>
-            </tbody>
-          </table>
+      <!-- 🔹 LIST -->
+      <section class="panel">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th style="width:70px;">번호</th>
+              <th style="width:70px;">정렬</th>
+              <th>제목</th>
+              <th style="width:120px;">작성일</th>
+              <th style="width:80px;">조회</th>
+              <th style="width:120px;"></th>
+            </tr>
+          </thead>
+          <tbody id="noticeTbody"></tbody>
+        </table>
 
-          <div class="pagination" id="pagination"></div>
-        </section>
+        <div class="pagination" id="pagination"></div>
+      </section>
 
-      </div>
-      <!-- /page-content -->
-
-    </div>
-  </div>
-</div>
 
 <!-- =========================================================
      SCRIPTS
