@@ -110,11 +110,6 @@ body {
   color: #fff;
 }
 
-.menu-item.active {
-  background: rgba(255,255,255,0.28);
-  font-weight: 600;
-  color: #fff;
-}
 
 /* ===============================
    메뉴 그룹 상단 (타이틀 역할)
@@ -146,12 +141,7 @@ body {
   opacity: 1;
 }
 
-#sidebar .submenu .menu-item.active {
-  background: rgba(255,255,255,0.28);
-  font-weight: 600;
-  color: #fff;
-  opacity: 1;
-}
+
 
 /* 대시보드 단독 메뉴 강조 */
 #sidebar .menu-item.dashboard-root {
