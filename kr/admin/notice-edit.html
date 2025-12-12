@@ -4,13 +4,16 @@
 <head>
   <meta charset="UTF-8" />
   <title>공지사항 수정 | Fine Defense 관리자</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- Toast UI Editor -->
   <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
 
   <!-- 공통 관리자 CSS (절대 경로 FIX) -->
   <link rel="stylesheet" href="/kr/admin/css/admin.css">
+
+  <!-- 세션 매니저 -->
+  <script type="module" src="/js/session_manager.js"></script>
+  <script type="module" src="./js/dashboard_session_timer.js"></script>
 
   <style>
     .file-item {
@@ -52,13 +55,21 @@
   <!-- 메인 -->
   <div class="main">
 
-    <div class="topbar">
-      <h2>공지사항 수정</h2>
-      <div>
-        <button class="btn btn-primary" onclick="location.href='./notice-list.html'">목록으로</button>
-        <button id="logoutBtn" class="btn btn-danger">로그아웃</button>
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="title">공지사항 수정</div>
+
+    <div style="display:flex; align-items:center; gap:12px;">
+      <span id="session-timer" class="session-timer">세션 계산중...</span>
+
+      <div class="topbar-user" id="topbarUser">
+        <span id="topbarUserName">관리자</span> ▾
+        <div class="user-dropdown" id="userDropdown"></div>
       </div>
+
+      <button onclick="location.href='../index.html'">홈으로</button>
     </div>
+  </div>
 
     <form id="noticeForm" enctype="multipart/form-data">
 
@@ -107,6 +118,7 @@
   <script src="/kr/admin/js/common_auth.js"></script>
   <script src="/kr/admin/js/sidebar.js"></script>
   <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+  <script src="./js/topbar_user_menu.js"></script>
 
   <script>
     let editor;
