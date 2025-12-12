@@ -1,165 +1,217 @@
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
-  <meta charset="UTF-8">
-  <title>뉴스 작성/수정 | Fine Defense</title>
+  <meta charset="UTF-8" />
+  <title>뉴스 작성/수정 | Fine Defense 관리자</title>
 
   <!-- Toast UI Editor -->
   <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
-  <link rel="stylesheet" href="./css/admin.css">
+
+  <!-- 공통 관리자 CSS -->
+  <link rel="stylesheet" href="/kr/admin/css/admin.css">
+
+  <!-- 세션 매니저 -->
+  <script type="module" src="/js/session_manager.js"></script>
+  <script type="module" src="./js/dashboard_session_timer.js"></script>
 
   <style>
-    .preview-img {
-      width: 120px;
-      height: 80px;
-      object-fit: cover;
-      margin-right: 10px;
-      border-radius: 8px;
-      border: 1px solid #ddd;
+    /* ===============================
+       📌 뉴스 입력 UI (공지 스타일)
+    =============================== */
+
+    .panel input.input,
+    .panel select.input {
+      width:100%;
+      padding:14px 16px;
+      font-size:15px;
+      border-radius:10px;
+      border:1px solid #d0d7e2;
+      background:#fafbff;
     }
+
+    .panel input.input:focus,
+    .panel select.input:focus {
+      outline:none;
+      border-color:#0f2679;
+      background:#fff;
+      box-shadow:0 0 0 3px rgba(15,38,121,0.12);
+    }
+
+    #title {
+      font-size:17px;
+      font-weight:600;
+    }
+
+    .news-meta {
+      display:grid;
+      grid-template-columns:160px 1fr;
+      gap:14px;
+      margin-top:12px;
+    }
+
     .image-row {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 10px;
-      flex-wrap: wrap;
+      display:flex;
+      gap:10px;
+      margin-top:10px;
+      flex-wrap:wrap;
+    }
+
+    .preview-img {
+      width:120px;
+      height:80px;
+      object-fit:cover;
+      border-radius:8px;
+      border:1px solid #ddd;
     }
   </style>
 </head>
 
 <body>
 
-  <!-- 공통 인증 -->
-  <script src="./js/common_auth.js"></script>
-  <script>
-    requireAdminOrEditor();
-  </script>
+<!-- ⭐ 사이드바 -->
+<div id="sidebar" data-active="newsroom"></div>
 
-  <!-- 사이드바 -->
-  <div id="sidebar"></div>
-  <script src="./js/sidebar.js"></script>
-  <script>
-    loadSidebar("newsroom");
-  </script>
+<!-- ⭐ 메인 -->
+<div class="main">
 
-  <div class="main">
-    <div class="topbar">
-      <div class="title">뉴스 작성 / 수정</div>
-    </div>
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="title">뉴스 작성 / 수정</div>
 
-    <div class="form-box">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <span id="session-timer" class="session-timer">세션 계산중...</span>
 
-      <label>언어</label>
-      <select id="lang">
-        <option value="kr">KR</option>
-        <option value="en">EN</option>
-      </select>
+      <div class="topbar-user" id="topbarUser">
+        <span id="topbarUserName">관리자</span> ▾
+        <div class="user-dropdown" id="userDropdown"></div>
+      </div>
 
-      <label>제목</label>
-      <input id="title" type="text">
-
-      <label>이미지 (여러장)</label>
-      <input id="images" type="file" accept="image/*" multiple>
-      <div id="preview" class="image-row"></div>
-
-      <label>내용</label>
-      <div id="editor"></div>
-
-      <button onclick="save()">저장</button>
+      <button onclick="location.href='../index.html'">홈으로</button>
     </div>
   </div>
 
-  <!-- Toast UI Editor JS -->
-  <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+  <!-- 📌 폼 -->
+  <form class="panel" id="newsForm" enctype="multipart/form-data">
 
-  <script>
-    let editor;
+    <h2>뉴스 정보</h2>
 
-    document.addEventListener("DOMContentLoaded", () => {
-      editor = new toastui.Editor({
-        el: document.querySelector('#editor'),
-        height: '600px',
-        initialEditType: 'wysiwyg',
-        previewStyle: 'vertical'
-      });
+    <input id="title" class="input" placeholder="뉴스 제목" />
+
+    <div class="news-meta">
+      <select id="lang" class="input">
+        <option value="kr">한국어</option>
+        <option value="en">English</option>
+      </select>
+    </div>
+
+    <h3 style="margin-top:20px;">썸네일 / 이미지</h3>
+    <input id="images" type="file" accept="image/*" multiple class="input">
+    <div id="preview" class="image-row"></div>
+
+    <h3 style="margin-top:20px;">뉴스 내용</h3>
+    <div id="editor" style="border:1px solid #ccc;border-radius:6px;"></div>
+
+    <button type="submit" class="btn btn-primary" style="margin-top:18px;">
+      저장
+    </button>
+  </form>
+
+</div>
+
+<!-- 공통 JS -->
+<script src="/kr/admin/js/common_auth.js"></script>
+<script src="/kr/admin/js/sidebar.js"></script>
+<script src="./js/topbar_user_menu.js"></script>
+
+<!-- Toast UI Editor -->
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+
+<script>
+  requireAdminOrEditor();
+  loadSidebar();
+
+  let editor;
+  const id = new URLSearchParams(location.search).get("id");
+
+  document.addEventListener("DOMContentLoaded", () => {
+    editor = new toastui.Editor({
+      el: document.querySelector('#editor'),
+      height: '600px',
+      initialEditType: 'wysiwyg',
+      previewStyle: 'vertical'
     });
-
-    const id = new URLSearchParams(location.search).get("id");
-
-    /* ===============================
-       📌 기존 데이터 불러오기
-    =============================== */
-    async function load() {
-      if (!id) return;
-
-      const res = await fetch(`/api/posts/detail/${id}`);
-      const v = await res.json();
-
-      document.getElementById("lang").value = v.lang;
-      document.getElementById("title").value = v.title;
-
-      // Toast Editor 본문 세팅
-      editor.setHTML(v.content || "");
-
-      // 이미지 미리보기
-      (v.images || []).forEach((img) => {
-        addPreview("/" + img.replace(/^\/+/, ""));
-      });
-    }
-
-    function addPreview(src) {
-      const img = document.createElement("img");
-      img.src = src;
-      img.className = "preview-img";
-      document.getElementById("preview").appendChild(img);
-    }
-
-    /* ===============================
-       📌 이미지 선택 시 미리보기
-    =============================== */
-    document.getElementById("images").addEventListener("change", function () {
-      document.getElementById("preview").innerHTML = "";
-      for (const f of this.files) {
-        const reader = new FileReader();
-        reader.onload = (e) => addPreview(e.target.result);
-        reader.readAsDataURL(f);
-      }
-    });
-
-    /* ===============================
-       📌 저장
-    =============================== */
-    async function save() {
-      const form = new FormData();
-      form.append("title", document.getElementById("title").value);
-      form.append("lang", document.getElementById("lang").value);
-      form.append("content", editor.getHTML());   // ⭐ Toast Editor 본문 추출
-
-      const imgs = document.getElementById("images").files;
-      for (const img of imgs) form.append("images", img);
-
-      const token = localStorage.getItem("token");
-
-      const url = id ? `/api/news/edit/${id}` : `/api/news/create`;
-      const method = id ? "PUT" : "POST";
-
-      const res = await fetch(url, {
-        method,
-        headers: { Authorization: "Bearer " + token },
-        body: form,
-      });
-
-      const out = await res.json();
-      if (out.message) {
-        alert(id ? "수정 완료!" : "등록 완료!");
-        location.href = "news-list.html";
-      } else {
-        alert("저장 실패");
-      }
-    }
 
     load();
-  </script>
+  });
+
+  /* ===============================
+     기존 데이터 불러오기
+  =============================== */
+  async function load() {
+    if (!id) return;
+
+    const res = await fetch(`/api/posts/detail/${id}`);
+    const v = await res.json();
+
+    document.getElementById("lang").value = v.lang;
+    document.getElementById("title").value = v.title;
+    editor.setHTML(v.content || "");
+
+    (v.images || []).forEach(img => {
+      addPreview("/" + img.replace(/^\/+/, ""));
+    });
+  }
+
+  function addPreview(src) {
+    const img = document.createElement("img");
+    img.src = src;
+    img.className = "preview-img";
+    document.getElementById("preview").appendChild(img);
+  }
+
+  document.getElementById("images").addEventListener("change", function () {
+    document.getElementById("preview").innerHTML = "";
+    [...this.files].forEach(f => {
+      const reader = new FileReader();
+      reader.onload = e => addPreview(e.target.result);
+      reader.readAsDataURL(f);
+    });
+  });
+
+  /* ===============================
+     저장
+  =============================== */
+  document.getElementById("newsForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const form = new FormData();
+    form.append("title", document.getElementById("title").value);
+    form.append("lang", document.getElementById("lang").value);
+    form.append("content", editor.getHTML());
+
+    const imgs = document.getElementById("images").files;
+    [...imgs].forEach(img => form.append("images", img));
+
+    const token = localStorage.getItem("token");
+    const url = id ? `/api/news/edit/${id}` : `/api/news/create`;
+    const method = id ? "PUT" : "POST";
+
+    const res = await fetch(url, {
+      method,
+      headers: { Authorization: "Bearer " + token },
+      body: form
+    });
+
+    const out = await res.json();
+
+    if (res.ok) {
+      alert(id ? "수정 완료!" : "등록 완료!");
+      location.href = "/kr/admin/news-list.html";
+    } else {
+      alert("저장 실패: " + (out.message || "오류"));
+    }
+  });
+</script>
 
 </body>
 </html>
