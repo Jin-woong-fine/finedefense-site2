@@ -2,245 +2,318 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>뉴스 관리 | Fine Defense</title>
+  <title>뉴스 관리 | Fine Defense Admin</title>
 
-  <link rel="stylesheet" href="./css/admin.css" />
-  
+  <!-- 공통 관리자 CSS -->
+  <link rel="stylesheet" href="/kr/admin/css/admin.css">
+
+  <!-- 세션 매니저 -->
+  <script type="module" src="/js/session_manager.js"></script>
+  <script type="module" src="./js/dashboard_session_timer.js"></script>
+
   <style>
-    /* ==========================
-       뉴스 리스트 테이블 스타일
-       ========================== */
-    table.list-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 25px;
-      background: #fff;
-      border-radius: 14px;
-      overflow: hidden;
-      box-shadow: 0 3px 15px rgba(0,0,0,0.05);
+    .panel {
+      background:#fff;
+      padding:25px;
+      border-radius:10px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.06);
+      margin-bottom:35px;
     }
 
-    .list-table thead {
-      background: #eef1f7;
+    .search-input {
+      width:240px;
+      padding:8px 12px;
+      border:1px solid #ccc;
+      border-radius:6px;
+      font-size:0.95rem;
     }
 
-    .list-table th {
-      padding: 14px;
-      font-size: 14px;
-      font-weight: 700;
-      border-bottom: 1px solid #e3e6ef;
-      color: #222;
+    .lang-filter { display:flex; gap:6px; align-items:center; }
+
+    .lang-btn {
+      padding:7px 14px;
+      border-radius:6px;
+      border:1px solid #ccc;
+      background:white;
+      cursor:pointer;
+      font-size:0.85rem;
+    }
+    .lang-btn.active {
+      background:#0f2679; color:white; border-color:#0f2679;
     }
 
-    .list-table td {
-      padding: 12px;
-      font-size: 14px;
-      border-bottom: 1px solid #f3f4f7;
-      vertical-align: middle;
-      text-align: center;
-      color: #333;
+    .news-table { width:100%; border-collapse:collapse; margin-top:10px; }
+    .news-table th, .news-table td {
+      padding:10px 12px;
+      border-bottom:1px solid #ddd;
+      text-align:left;
+    }
+    .news-table th {
+      background:#0f2679;
+      color:#fff;
+    }
+    .news-table tr:hover td {
+      background:#f3f6ff;
+      cursor:pointer;
     }
 
-    .list-table tbody tr:hover {
-      background: #f7faff;
-    }
-
-    /* 썸네일 */
     .thumb {
-      width: 90px;
-      height: 60px;
-      object-fit: cover;
-      border-radius: 8px;
-      background: #ddd;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+      width:80px;
+      height:52px;
+      object-fit:cover;
+      border-radius:6px;
+      background:#eee;
     }
 
-    /* 제목은 좌측 정렬 */
-    td.title-cell {
-      text-align: left;
-      max-width: 350px;
-      padding-left: 16px;
-      font-weight: 600;
-    }
+    .actions { display:flex; gap:6px; }
 
-    /* 관리 버튼 */
-    .list-table button {
-      padding: 6px 12px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 600;
-      transition: 0.15s;
-      margin: 2px;
+    .pagination {
+      display:flex;
+      justify-content:center;
+      gap:4px;
+      margin-top:18px;
     }
-
-    .btn-edit {
-      background: #0f2679;
-      color: white;
+    .pagination button {
+      min-width:32px;
+      padding:6px 10px;
+      border-radius:4px;
+      border:1px solid #ccc;
+      background:#fff;
+      cursor:pointer;
     }
-    .btn-edit:hover {
-      background: #152f93;
-    }
-
-    .btn-del {
-      background: #d9534f;
-      color: white;
-    }
-    .btn-del:hover {
-      background: #c9302c;
-    }
-
-    /* ==========================
-       언어 필터 버튼
-       ========================== */
-    .lang-filter {
-      display: flex;
-      gap: 10px;
-      margin-top: 15px;
-    }
-
-    .filter-btn {
-      padding: 7px 16px;
-      border-radius: 18px;
-      border: 1px solid #ccc;
-      cursor: pointer;
-      background: #fff;
-      font-size: 14px;
-      font-weight: 600;
-      transition: 0.2s;
-    }
-
-    .filter-btn:hover {
-      background: #eef2ff;
-    }
-
-    .filter-btn.active {
-      background: #0f2679;
-      border-color: #0f2679;
-      color: #fff;
+    .pagination button.active {
+      background:#0f2679;
+      color:white;
+      border-color:#0f2679;
     }
   </style>
 </head>
 
 <body>
 
-  <!-- 🔐 로그인 권한 체크 -->
-  <script src="./js/common_auth.js"></script>
-  <script>
-    requireAdminOrEditor();
-  </script>
+<!-- ⭐ 사이드바 -->
+<div id="sidebar" data-active="newsroom"></div>
 
-  <!-- 🔵 사이드바 -->
-  <div id="sidebar"></div>
-  <script src="./js/sidebar.js"></script>
-  <script> loadSidebar("newsroom"); </script>
+<!-- ⭐ 메인 -->
+<div class="main">
 
-  <!-- 🔵 메인 -->
-  <div class="main">
-    <div class="topbar">
-      <div class="title">뉴스 관리</div>
-      <button onclick="location.href='news-edit.html'">새 뉴스 등록</button>
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="title">뉴스 관리</div>
+
+    <div style="display:flex; align-items:center; gap:12px;">
+      <span id="session-timer" class="session-timer">세션 계산중...</span>
+
+      <div class="topbar-user" id="topbarUser">
+        <span id="topbarUserName">관리자</span> ▾
+        <div class="user-dropdown" id="userDropdown"></div>
+      </div>
+
+      <button onclick="location.href='../index.html'">홈으로</button>
     </div>
-
-    <!-- 🔥 언어 필터 -->
-    <div class="lang-filter">
-      <button class="filter-btn active" onclick="setFilter('all')">ALL</button>
-      <button class="filter-btn" onclick="setFilter('kr')">KR</button>
-      <button class="filter-btn" onclick="setFilter('en')">EN</button>
-    </div>
-
-    <table class="list-table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>썸네일</th>
-          <th>제목</th>
-          <th>언어</th>
-          <th>조회수</th>
-          <th>등록일</th>
-          <th>관리</th>
-        </tr>
-      </thead>
-      <tbody id="newsList"></tbody>
-    </table>
   </div>
 
-  <script>
-    let currentLang = "all";
+  <section class="panel">
 
-    function setFilter(lang) {
-      currentLang = lang;
+    <!-- 상단 컨트롤 -->
+    <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+      <input
+        type="text"
+        id="searchInput"
+        class="search-input"
+        placeholder="제목 검색"
+      />
 
-      document.querySelectorAll(".filter-btn").forEach(btn => 
-        btn.classList.remove("active")
-      );
+      <div class="lang-filter">
+        <button class="lang-btn active" data-lang="kr">KR</button>
+        <button class="lang-btn" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="all">ALL</button>
+      </div>
 
-      const map = { all: 0, kr: 1, en: 2 };
-      document.querySelectorAll(".filter-btn")[map[lang]].classList.add("active");
+      <button class="btn btn-primary" onclick="goWrite()">뉴스 작성하기</button>
+    </div>
 
+    <!-- 뉴스 테이블 -->
+    <table class="news-table">
+      <thead>
+        <tr>
+          <th style="width:70px;">번호</th>
+          <th style="width:90px;">썸네일</th>
+          <th>제목</th>
+          <th style="width:120px;">작성일</th>
+          <th style="width:80px;">조회수</th>
+          <th style="width:120px;">관리</th>
+        </tr>
+      </thead>
+      <tbody id="newsTbody">
+        <tr><td colspan="6">불러오는 중...</td></tr>
+      </tbody>
+    </table>
+
+    <div class="pagination" id="pagination"></div>
+  </section>
+
+</div>
+
+<!-- 공통 JS -->
+<script src="/kr/admin/js/common_auth.js"></script>
+<script src="/kr/admin/js/sidebar.js"></script>
+<script src="./js/topbar_user_menu.js"></script>
+
+<script>
+  /* 🔐 권한 체크 */
+  requireAdminOrEditor();
+
+  /* ===========================
+     전역 변수
+  =========================== */
+  const PAGE_SIZE = 10;
+  let allNews = [];
+  let filteredNews = [];
+  let currentLang = "kr";
+  let currentPage = 1;
+
+  function goWrite() {
+    location.href = "/kr/admin/news-edit.html";
+  }
+
+  function formatDate(d) {
+    return new Date(d).toLocaleDateString();
+  }
+
+  /* ===========================
+     언어 필터
+  =========================== */
+  document.querySelectorAll(".lang-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".lang-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      currentLang = btn.dataset.lang;
+      applyFilter();
+    });
+  });
+
+  /* 검색 */
+  document.getElementById("searchInput").addEventListener("input", applyFilter);
+
+  function applyFilter() {
+    const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
+
+    filteredNews = allNews.filter(n => {
+      const langOk = (currentLang === "all" || n.lang === currentLang);
+      const matchTitle = n.title.toLowerCase().includes(keyword);
+      return langOk && matchTitle;
+    });
+
+    currentPage = 1;
+    renderTable();
+    renderPagination();
+  }
+
+  /* ===========================
+     테이블 렌더링
+  =========================== */
+  function renderTable() {
+    const tbody = document.getElementById("newsTbody");
+
+    if (!filteredNews.length) {
+      tbody.innerHTML =
+        `<tr><td colspan="6" style="text-align:center;color:#777;">뉴스 없음</td></tr>`;
+      return;
+    }
+
+    const start = (currentPage - 1) * PAGE_SIZE;
+    const pageItems = filteredNews.slice(start, start + PAGE_SIZE);
+    const total = filteredNews.length;
+
+    tbody.innerHTML = pageItems.map((n, i) => `
+      <tr>
+        <td>${total - (start + i)}</td>
+        <td>
+          <img
+            src="${n.main_image || '/kr/admin/img/no-thumb.png'}"
+            class="thumb"
+          />
+        </td>
+        <td onclick="openPublicView(${n.id})">${n.title}</td>
+        <td>${formatDate(n.created_at)}</td>
+        <td>${n.views ?? "-"}</td>
+        <td>
+          <div class="actions">
+            <button class="btn btn-small btn-gray" onclick="editNews(${n.id})">수정</button>
+            <button class="btn btn-small btn-danger" onclick="deleteNews(${n.id})">삭제</button>
+          </div>
+        </td>
+      </tr>
+    `).join("");
+  }
+
+  function renderPagination() {
+    const pag = document.getElementById("pagination");
+    pag.innerHTML = "";
+
+    const totalPages = Math.ceil(filteredNews.length / PAGE_SIZE);
+    if (totalPages <= 1) return;
+
+    for (let p = 1; p <= totalPages; p++) {
+      const btn = document.createElement("button");
+      btn.textContent = p;
+      if (p === currentPage) btn.classList.add("active");
+      btn.onclick = () => {
+        currentPage = p;
+        renderTable();
+        renderPagination();
+      };
+      pag.appendChild(btn);
+    }
+  }
+
+  /* ===========================
+     CRUD
+  =========================== */
+  function openPublicView(id) {
+    window.open(`/kr/sub/pr/news/news-view.html?id=${id}`, "_blank");
+  }
+
+  function editNews(id) {
+    location.href = `/kr/admin/news-edit.html?id=${id}`;
+  }
+
+  async function deleteNews(id) {
+    if (!confirm("삭제하시겠습니까?")) return;
+
+    const res = await fetch(`/api/posts/news/delete/${id}`, {
+      method: "DELETE",
+      headers: { Authorization: "Bearer " + localStorage.getItem("token") }
+    });
+
+    const out = await res.json();
+
+    if (res.ok) {
+      alert("삭제 완료");
       loadNews();
+    } else {
+      alert("삭제 실패: " + out.message);
     }
+  }
 
-    async function loadNews() {
-      try {
-        const res = await fetch(`/api/posts/list/news?lang=${currentLang}`);
-        const data = await res.json();
-        const list = data.list || data || [];
+  /* ===========================
+     뉴스 데이터 로드
+  =========================== */
+  async function loadNews() {
+    const res = await fetch(`/api/posts/list/news?lang=all`);
+    const data = await res.json();
 
-        const tbody = document.getElementById("newsList");
+    const list = Array.isArray(data) ? data : (data.list || []);
+    if (!Array.isArray(list)) return;
 
-        if (!Array.isArray(list)) {
-          tbody.innerHTML = "<tr><td colspan='7'>불러오기 오류</td></tr>";
-          return;
-        }
+    allNews = list;
+    applyFilter();
+  }
 
-        tbody.innerHTML = list.map(v => `
-          <tr>
-            <td>${v.id}</td>
-            <td><img src="${v.main_image || '/kr/admin/img/no-thumb.png'}" class="thumb"></td>
-            <td class="title-cell">${v.title}</td>
-            <td>${v.lang.toUpperCase()}</td>
-            <td>${v.views || 0}</td>
-            <td>${v.created_at?.replace("T", " ").substring(0, 16)}</td>
-            <td>
-              <button class="btn-edit" onclick="edit(${v.id})">수정</button>
-              <button class="btn-del" onclick="del(${v.id})">삭제</button>
-            </td>
-          </tr>
-        `).join("");
-
-      } catch (err) {
-        console.error("뉴스 불러오기 오류:", err);
-        document.getElementById("newsList").innerHTML =
-          "<tr><td colspan='7'>LOAD ERROR</td></tr>";
-      }
-    }
-
-    function edit(id) {
-      location.href = `news-edit.html?id=${id}`;
-    }
-
-    async function del(id) {
-      if (!confirm("삭제하시겠습니까?")) return;
-
-      const res = await fetch(`/api/news/delete/${id}`, {
-        method: "DELETE",
-        headers: { Authorization: "Bearer " + localStorage.getItem("token") },
-      });
-
-      const out = await res.json();
-      if (out.message) {
-        alert("삭제 완료");
-        loadNews();
-      } else {
-        alert("삭제 실패");
-      }
-    }
-
-    // 최초 불러오기
-    loadNews();
-  </script>
+  loadNews();
+  loadSidebar();
+</script>
 
 </body>
 </html>
