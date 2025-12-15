@@ -108,23 +108,30 @@
         font-weight: 900;
       }
 
-
-
-      @media (max-width: 768px) {
-        .year-group {
-          flex-direction: column;
-        }
-        .group-year {
-          text-align: left;
-          border-right: none;
-          border-left: 3px solid #d0d8ff;
-          padding-left: 15px;
-          margin-bottom: 20px;
-        }
-        .group-events {
-          padding-left: 20px;
-        }
+      /* 연혁 문구 강조용 */
+      .highlight-navy {
+        color: #0f2679;
+        font-weight: 700;
       }
+
+      .highlight-navy-marker {
+        color: #0f2679;
+        font-weight: 700;
+        background: linear-gradient(
+          transparent 62%,
+          rgba(15, 38, 121, 0.18) 62%
+        );
+        padding: 0 2px;
+      } 
+
+      .highlight-navy-box {
+        color: #0f2679;
+        font-weight: 700;
+        background: rgba(15, 38, 121, 0.08);
+        padding: 3px 8px;
+        border-radius: 6px;
+      }
+
     </style>
   </head>
 
@@ -180,36 +187,42 @@
             </div>
 
             <div class="timeline-item">
-
             <div class="year">2022</div>
             <div class="events">
-                <p>KSQ/ISO 9001 : 2015 인증획득 (QA INTERNATIONAL/UKAS)</p>
-                <p>해군군수사 : KDX 소나돔 윈도우 및 수중 케이블 조립체 정비사업 수행 (1척)</p>
-                <p>국무총리상 수상 : 2022년 과학·정보통신의 날</p>
-                <p>터키 ASELSAN 수중 이동형 예인케이블 (FOTC, FOCC) 수출</p>
+                <p><strong class="highlight-navy-marker">Turkiye ASELSAN 수중 이동형 예인케이블 (FOTC, FOCC) 수출[$50만]</strong></p>
+                <p>국무총리상 수상 : 2022년 과학정보통신의 날</p>
+                <p><strong class="highlight-navy-marker">해군 군수사령부 : 구축함 음탐기 수중케이블 및 소나돔 윈도우 정비사업 수주[10억/22년]</strong></p>
+                <p>전기자동차 대용량 급속충전기용 케이블 특허 [등록번호:10-2440542]</p>
+                <p>전기자동차 초급속 충전기용 냉각케이블 조립체 특허 [등록번호:10-2483820]</p>
+                <p>KS Q / ISO 9001 : 2015 인증획득 [QA INTERNATIONAL /UKAS]</p>
             </div>
             </div>
 
             <div class="timeline-item">
-
-            <div class="year">2021</div>
+            <div class="year">2021 ~ 2024</div>
             <div class="events">
-                <p>LIG Nex1 국방과학연구소(ADD), KDDX 통합 소나 체계용 케이블 조립체 개발 수주</p>
-                <p>해군군수사령부 엄브리칼 케이블 조립체 부품 개발 협약
-                  <br>→ 장비명 : 유도탄 함상 발사장비, 시스패로우</p>
-                <p>국방기술진흥연구소 무기체계 부품 국산화 개발지원 사업 협약
-                  <br>→ 과제명 : KSS-II 잠수함용 선체부착배열소나 케이블 배선장치 (금액 25억, 3년)
-                  <br>→ 과제명 : 잠수함용 수중 이동형 예인케이블 조립체 3종 (금액 76억, 3년)
-                </p>
+                <p>국방기술진흥연구소[국기연, KRIT], 무기체계 부품 국산화 개발지원 사업 주관기업 수행 중<br>
+                  ▶ 과제명 : KSS-I,II,III 선배열예인센서용[TAS: Towing Array Sonar] 예인케이블조립체 3종 [76 억원/ 3년]<br>
+                  ▶ 과제명 : KSS-II 잠수함용 선체부착배열소나[FAS: Flank Array Sonar] 케이블 배선장치 [25 억원/ 3년]</p>
+                <p>해군군수사령부 엄브리칼 케이블조립체 [장비명 : 유도탄 함상 발사장비, 시스패로우] 부품 개발</p>
+            </div>
+            </div>
+
+
+            <div class="timeline-item">
+            <div class="year">2021 ~ 2030</div>
+            <div class="events">
+                <p>국방과학연구소[국과연, ADD] 주관, LIG넥스원(체계업체),  KDDX 소나체계사업 예인소나 송수신장비 설계, 개발, 전력화 수행 중<br>
+                  1. 가변심도 소나예인케이블[LTC]<br>
+                  2. 다기능예인 소나예인케이블[MTC]</p>
             </div>
             </div>
 
             <div class="timeline-item">
-
-            <div class="year">2020</div>
+            <div class="year">2020 ~ 2023</div>
             <div class="events">
-                <p>기품원 무기체계 개조개발 지원사업 선정 (금액 34억, 3년)
-                  <br>→ 과제명 : 터키향 수중이동형 예인케이블 및 잠수함 수중케이블 개발</p>
+                <p>국방기술진흥연구소[국기연, KRIT], 무기체계 개조개발 지원사업 [34 억원/ 3년] 주관기업 성공수행
+                  <br>▶ 과제명 : 터키향 수중이동형 예인케이블 및 잠수함 수중케이블 개발</p>
                 <p>국방부장관 표창 : 우수방산업체</p>
                 <p>KIOST(한국해양과학기술원) : 음원압력보상 시스템 예인 케이블 납품</p>
             </div>
@@ -220,7 +233,7 @@
 
         <div class="year-group">
           <div class="group-year">
-            2010 ~ 2019
+            2011 ~ 2019
                 <div class="year-icon">
                   <i class="fas fa-seedling"></i> <!-- 성장 아이콘 -->
                 </div>
@@ -232,7 +245,6 @@
               <div class="year">2019</div>
               <div class="events">
                   <p>미국 NORTHROP GRUMMAN과 차기 소해함 무인수상정(USV) AQS-24 와 NDA(Non-Disclosure Agreement) 체결</p>
-                  <p>NICE 평가정보 2019년 기술평가 우수기업 인증</p>
                   <p>화인 Group 편입</p>
               </div>
               </div>
@@ -241,20 +253,23 @@
               <div class="year">2018</div>
               <div class="events">
                   <p>해양수산부 NET(New Excellent Technology) 신기술 인정 획득
-                    <br>→ 기술명 : 수중 이동형 예인 케이블 제작 기술</p>
-                  <p>터키 ASELSAN와 NDA(Non-Disclosure Agreement) 체결</p>
-                  <p>터키 AOSAN과 Agent Agreement 체결</p>
+                    <br>▶ 기술명 : 수중 이동형 예인 케이블 제작 기술</p>
+                  <p>터키 ASELSAN와 NDA(Non-Disclosure Agreement) & AOSAN과 Agent Agreement 체결</p>
               </div>
               </div>
 
 
               <div class="timeline-item">
-              <div class="year">2017</div>
+              <div class="year">2017 ~ 2023</div>
               <div class="events">
-                  <p>[주]한화 광개토-Ⅲ B-Ⅱ(KDX-3, Batch-2) 통합 소나 체계용 케이블 조립체 수주 27억원</p>
-                  <p>수중 중량 예인케이블 제조방법에 대한 특허 획득 (등록번호 : 10-1736878호)</p>
-                  <p>해저복합케이블1 특허 획득 (등록번호 : 10-1768004호)</p>
-                  <p>해저복합케이블2 특허 획득 (등록번호 : 10-1772559호)</p>
+                  <p>국방과학연구소[국과연, ADD] 주관, 한화에어로스페이스(체계업체),  KDX—III, Batch-II 통합소나 체계사업 설계, 개발, 전력화 성공수행<br>
+                    1. 다기능예인배열 예인케이블(MTC)<br>
+                    2. 다기능 신호전송케이블(MSC)<br>
+                    3. 가변심도 예인케이블(LTC)<br>
+                    4. 가변심도 신호전송케이블(LSC)</p>
+                  <p>수중 중량 예인케이블 제조방법  [강선외장적용 제조방식] 특허(등록번호 : 10-1736878)</p>
+                  <p>해저복합케이블1 [2중 튜빙방식 전원공급 해저케이블 설계] 특허(등록번호 : 10-1768004)</p>
+                  <p>해저복합케이블2 [수중환경에 따른 접지방식] 특허(등록번호 : 10-1772559) </p>
               </div>
               </div>
 
@@ -263,32 +278,26 @@
               <div class="timeline-item">
               <div class="year">2016</div>
               <div class="events">
-                  <p>Buoy형 Project 개발 수주[4.8억원]
-                    <br>→ 센서용, 신호전송용 케이블[Back Bone Cable] 조립체 및 Fairing 개발 완료 후 초도 납품</p>
-                  <p>국방기술품질원[DTaQ]의 핵심부품 국산화 개발 지원사업 주관기업 선정 [48억원/3년]
-                    <br>→ “예인 음탐기용 광통신 방식 중·경량 케이블 조립체”</p>
+                  <p>한화, 부이(Buoy)형  수중 감시 응용과제 엄빌리컬케이블 [Umbilical Cable] 수주[4.8 억원] 개발성공</p>
+              </div>
+              </div>
+
+              <div class="timeline-item">
+              <div class="year">2016 ~ 2021</div>
+              <div class="events">
+                  <p>국방기술진흥연구소[국기연, KRIT], 핵심부품 국산화 개발 지원사업 [48 억원/3년] 주관기업 성공수행<br>
+                    ▶ 과제명: 예인 음탐기용 광통신 방식 중.경량 케이블조립체 [TASS] : 연구개발확인서 [제2022-011호]<br>
+                    ※ 대함, 대잠, 대항어뢰 체계[TASS: Towed Array Sonar System]</p>
               </div>
               </div>
 
 
               <div class="timeline-item">
-              <div class="year">2015</div>
+              <div class="year">2014 ~ 2016</div>
               <div class="events">
-                  <p>수중 예인케이블용 2,000PSI 케이블 접속 터미네이션 개발</p>
-                  <p>수중 예인케이블 양산용 제조설비 및 환경시험 장비 구축
-                      <br>→ 케이블 코어부 수밀을 위한 이액형 토출 시스템 장비 구축
-                      <br>→ 고장력 외장 충진을 위한 RAM Cart Assembly Kit 장비 구축
-                      <br>→ 고장력 외장 Preforming Cart Assembly M/C 장비 구축
-                      <br>→ 2,000PSI 내수압 측정 장비 구축</p>
-              </div>
-              </div>
-
-              <div class="timeline-item">
-              <div class="year">2014</div>
-              <div class="events">
-                  <p>	국방과학연구소[ADD],민군 겸용기술 개발 과제 사업[45억원/3년]획득
-                      <br>→ 과제명 : “수중 이동형 예인 케이블 개발”
-                      <br>→ 2014.06~2017.06 개발 완료</p>
+                <p>	국방과학연구소[국과연, ADD], 민군 겸용기술 개발 과제 사업 [45 억원/3년] 주관기업 성공수행
+                  <br>▶ 과제명: 수중 이동형 예인 케이블조립체 개발 [TACM]
+                  <br>※ 어뢰 음향 대항 체계(TACM: Torpedo Acoustic Counter Measure)</p>
 
               </div>
               </div>
@@ -297,8 +306,6 @@
               <div class="year">2013</div>
               <div class="events">
                   <p>	우방전선㈜ (충북 옥천 소재) 자회사 편입</p>
-                  <p>	울릉도 독도 프로젝트 : KIOST/한화 와 다목적 해양 감시시스템 사업 참여
-                      <br>[다목적 해저 광·전 복합 케이블 및 수중 센서케이블 개발]</p>
               </div>
               </div>
 
@@ -310,10 +317,9 @@
               </div>
 
               <div class="timeline-item">
-              <div class="year">2010</div>
+              <div class="year">2011 ~ 2014</div>
               <div class="events">
-                  <p>고정형 양산 설비 구축 / 해저 케이블 양산 기술 개발 완료[Copper Tubing 기술 완성]</p>
-                  <p>UzErae Cable Automotive Wire Plant 수출 및 제조기술 지원</p>
+                  <p>■ 항만 수중감시체계[HUSS] 백령도(218Km), 진해 (26Km), 부산 (41Km) 해저 광·전 복합 및 신호전송 케이블 공급</p>
               </div>
               </div>
 
@@ -323,7 +329,7 @@
 
         <div class="year-group">
           <div class="group-year">
-            2005 ~ 2009<br>
+            2005 ~ 2010<br>
             <i class="fas fa-building"></i>
           </div>
 
@@ -331,11 +337,11 @@
 
             <!-- 🔹 2009~2006 구간 -->
             <div class="timeline-item">
-              <div class="year">2009 ~ 2006</div>
+              <div class="year">2010 ~ 2006</div>
               <div class="events">
-                <p>㈜한화와 ADD주관 NAIMS[Naval Acoustic Information Management System] 프로젝트 개발 완료</p>
-                <p>기상청 주관 울릉도 프로젝트 참여 — 지진, 해일 감시시스템용 해저 광·전 복합 케이블 개발 완료</p>
-                <p>우즈베키스탄 Navoiy시 Uz Erae Cable Automotive Wire Plant 제조기술 수출 (600만$)</p>
+                <p>[주]한화 NAIMS, 해저 광·전 복합케이블[Back Bone Cable] 8.3km 및 센서케이블 1.9km 공급 </p>
+                <p>[주]한화 HUSS, 항만 수중감시 체계 고정형 해저케이블 양산 기술 개발 완료[Copper Tubing 기술 적용]<br>
+                  ※ 항만 수중감시 체계(HUSS: Harbor Underwater Surveillance System)</p>
               </div>
             </div>
 
