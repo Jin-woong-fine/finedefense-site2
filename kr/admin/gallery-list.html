@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <title>갤러리 관리 | Fine Defense Admin</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- 공통 관리자 CSS -->
   <link rel="stylesheet" href="/kr/admin/css/admin.css" />
@@ -81,11 +80,21 @@
 <!-- ⭐ 메인 -->
 <div class="main">
 
+  <!-- 🔵 TOPBAR -->
   <div class="topbar">
-    <h2>갤러리 관리</h2>
-    <div>
-      <button class="btn btn-primary" onclick="location.href='../index.html'">홈으로</button>
-      <button id="logoutBtn" class="btn btn-danger">로그아웃</button>
+    <div class="title">갤러리 관리</div>
+
+    <div style="display:flex; align-items:center; gap:12px;">
+
+      <!-- ⭐ 세션 타이머 -->
+      <span id="session-timer" class="session-timer">세션 계산중...</span>
+
+      <div class="topbar-user" id="topbarUser">
+        <span id="topbarUserName">관리자</span> ▾
+        <div class="user-dropdown" id="userDropdown"></div>
+      </div>
+
+      <button onclick="location.href='../index.html'">홈으로</button>
     </div>
   </div>
 
@@ -133,7 +142,7 @@
 <script>
   // 🔐 권한 체크
   requireAdminOrEditor();
-  document.getElementById("logoutBtn").addEventListener("click", logout);
+
 
   // ⭐ 사이드바 활성화
   loadSidebar("gallery");

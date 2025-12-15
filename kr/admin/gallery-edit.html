@@ -73,11 +73,22 @@
 <div id="sidebar" data-active="gallery"></div>
 
 <div class="main">
+
+  <!-- 🔵 TOPBAR -->
   <div class="topbar">
-    <h2>갤러리 작성 / 수정</h2>
-    <div>
-      <button class="btn btn-primary" onclick="location.href='gallery-list.html'">목록</button>
-      <button id="logoutBtn" class="btn btn-danger">로그아웃</button>
+    <div class="title">갤러리 작성 및 수정</div>
+
+    <div style="display:flex; align-items:center; gap:12px;">
+
+      <!-- ⭐ 세션 타이머 -->
+      <span id="session-timer" class="session-timer">세션 계산중...</span>
+
+      <div class="topbar-user" id="topbarUser">
+        <span id="topbarUserName">관리자</span> ▾
+        <div class="user-dropdown" id="userDropdown"></div>
+      </div>
+
+      <button onclick="location.href='../index.html'">홈으로</button>
     </div>
   </div>
 
@@ -117,7 +128,7 @@
 <script>
   // 권한 체크 & 사이드바
   requireAdminOrEditor();
-  document.getElementById("logoutBtn").addEventListener("click", logout);
+
   loadSidebar("gallery");
 
   const urlParams = new URLSearchParams(location.search);
