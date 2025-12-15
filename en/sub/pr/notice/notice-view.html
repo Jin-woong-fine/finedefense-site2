@@ -79,42 +79,26 @@
 
   <style>
     /* =====================================
-      Toast UI Viewer (공지 본문) 가독성
-    ====================================== */
+      Toast UI Viewer 가독성 (강제)
+    ===================================== */
 
-    /* 본문 텍스트 */
-    .toastui-editor-contents {
-      font-size: 16px;      /* ← 핵심 */
-      line-height: 1.7;
+    #viewer .toastui-editor-contents {
+      font-size: 17px;      /* 16은 티 안 남, 17부터 체감됨 */
+      line-height: 1.75;
       color: #222;
     }
 
-    /* 제목 계층 */
-    .toastui-editor-contents h1 {
-      font-size: 1.9rem;
-      margin: 1.2em 0 0.6em;
+    #viewer .toastui-editor-contents p,
+    #viewer .toastui-editor-contents li {
+      font-size: 17px;
     }
 
-    .toastui-editor-contents h2 {
-      font-size: 1.6rem;
-      margin: 1.1em 0 0.6em;
-    }
+    #viewer .toastui-editor-contents h1 { font-size: 2rem; }
+    #viewer .toastui-editor-contents h2 { font-size: 1.6rem; }
+    #viewer .toastui-editor-contents h3 { font-size: 1.3rem; }
 
-    .toastui-editor-contents h3 {
-      font-size: 1.3rem;
-      margin: 1em 0 0.5em;
-    }
-
-    /* 리스트 */
-    .toastui-editor-contents ul,
-    .toastui-editor-contents ol {
-      padding-left: 1.4em;
-      margin: 0.8em 0;
-    }
-
-    /* 표 */
-    .toastui-editor-contents table {
-      font-size: 15px;
+    #viewer .toastui-editor-contents table {
+      font-size: 16px;
     }
   </style>
 
