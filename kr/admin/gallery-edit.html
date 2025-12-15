@@ -1,3 +1,4 @@
+<!-- /kr/admin/gallery-edit.html -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -126,15 +127,18 @@
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 
 <script>
-  // 권한 체크 & 사이드바
+  // =====================================================
+  // 🔐 권한 & 사이드바
+  // =====================================================
   requireAdminOrEditor();
-
   loadSidebar("gallery");
 
   const urlParams = new URLSearchParams(location.search);
   const galleryId = urlParams.get("id");
 
-  // Toast UI Editor
+  // =====================================================
+  // 📝 Toast UI Editor
+  // =====================================================
   const editor = new toastui.Editor({
     el: document.querySelector('#editor'),
     height: '400px',
@@ -143,7 +147,9 @@
     initialValue: ''
   });
 
-  // 이미지 미리보기 공통 함수
+  // =====================================================
+  // 🖼️ 이미지 미리보기 공통
+  // =====================================================
   function createPreview(containerId, files) {
     const box = document.getElementById(containerId);
     box.innerHTML = "";
@@ -155,7 +161,9 @@
         div.className = "preview-item";
         div.innerHTML = `
           <img src="${e.target.result}" alt="">
-          <div class="preview-label">${idx === 0 && containerId === 'coverPreview' ? '대표' : '이미지'}</div>
+          <div class="preview-label">
+            ${containerId === "coverPreview" && idx === 0 ? "대표" : "이미지"}
+          </div>
         `;
         box.appendChild(div);
       };
@@ -163,24 +171,19 @@
     });
   }
 
-  document.getElementById("cover").addEventListener("change", (e) => {
-    if (e.target.files.length) {
-      createPreview("coverPreview", e.target.files);
-    } else {
-      document.getElementById("coverPreview").innerHTML = "";
-    }
+  document.getElementById("cover").addEventListener("change", e => {
+    createPreview("coverPreview", e.target.files);
   });
 
-  document.getElementById("images").addEventListener("change", (e) => {
-    if (e.target.files.length) {
-      createPreview("imagesPreview", e.target.files);
-    } else {
-      document.getElementById("imagesPreview").innerHTML = "";
-    }
+  document.getElementById("images").addEventListener("change", e => {
+    createPreview("imagesPreview", e.target.files);
   });
 
+  // =====================================================
+  // 📥 수정 모드: 기존 데이터 불러오기
+  // =====================================================
   async function loadDetail() {
-    if (!galleryId) return;
+    if (!galleryId) return; // 🔥 작성 모드면 그냥 통과
 
     try {
       const res = await fetch(`/api/gallery/detail/${galleryId}`);
@@ -190,21 +193,19 @@
       document.getElementById("title").value = data.title || "";
       editor.setHTML(data.description || "");
 
-      // 기존 대표 이미지 프리뷰
-      if (data.cover_image) {
-        const box = document.getElementById("coverPreview");
-        box.innerHTML = `
+      // ✅ 대표 이미지 (main_image 기준)
+      if (data.main_image) {
+        document.getElementById("coverPreview").innerHTML = `
           <div class="preview-item">
-            <img src="${data.cover_image}" alt="">
+            <img src="${data.main_image}" alt="">
             <div class="preview-label">현재 대표 이미지</div>
           </div>
         `;
       }
 
-      // 기존 추가 이미지 프리뷰
-      if (data.images && data.images.length) {
-        const box = document.getElementById("imagesPreview");
-        box.innerHTML = data.images.map(src => `
+      // ✅ 추가 이미지
+      if (Array.isArray(data.images) && data.images.length) {
+        document.getElementById("imagesPreview").innerHTML = data.images.map(src => `
           <div class="preview-item">
             <img src="${src}" alt="">
             <div class="preview-label">등록된 이미지</div>
@@ -213,75 +214,77 @@
       }
 
     } catch (e) {
-      console.error("갤러리 상세 불러오기 오류:", e);
-      alert("데이터 불러오기에 실패했습니다.");
+      console.error("갤러리 상세 로드 실패:", e);
+      alert("기존 데이터를 불러오지 못했습니다.");
     }
   }
 
-async function saveGallery() {
-  const title = document.getElementById("title").value.trim();
-  const lang = document.getElementById("lang").value;
-  const description = editor.getHTML() || "";
+  // =====================================================
+  // 💾 저장 (작성 / 수정 공용)
+  // =====================================================
+  async function saveGallery() {
+    const title = document.getElementById("title").value.trim();
+    const lang = document.getElementById("lang").value;
+    const description = editor.getHTML() || "";
 
-  if (!title) {
-    alert("제목은 필수입니다.");
-    document.getElementById("title").focus();
-    return;
-  }
-
-  const form = new FormData();
-  form.append("title", title);
-  form.append("lang", lang);
-  form.append("description", description);
-
-  // 🔥 대표 이미지(cover)도 images[]로 통일해서 append
-  const coverFile = document.getElementById("cover").files[0];
-  if (coverFile) {
-    form.append("images", coverFile); // ★ 수정 포인트
-  }
-
-  // 🔥 추가 이미지도 동일하게 append
-  const images = document.getElementById("images").files;
-  for (const img of images) {
-    form.append("images", img); // ★ 수정 포인트
-  }
-
-  const token = localStorage.getItem("token");
-  let url, method;
-
-  if (galleryId) {
-    url = `/api/gallery/edit/${galleryId}`;
-    method = "PUT";
-  } else {
-    url = `/api/gallery/create`;
-    method = "POST";
-  }
-
-  try {
-    const res = await fetch(url, {
-      method,
-      headers: { Authorization: "Bearer " + token },
-      body: form,
-    });
-
-    const out = await res.json().catch(() => ({}));
-
-    if (res.ok) {
-      alert(galleryId ? "수정 완료" : "등록 완료");
-      location.href = "gallery-list.html";
-    } else {
-      alert("저장 실패: " + (out.message || "알 수 없는 오류"));
+    if (!title) {
+      alert("제목은 필수입니다.");
+      document.getElementById("title").focus();
+      return;
     }
-  } catch (e) {
-    console.error("갤러리 저장 오류:", e);
-    alert("통신 중 오류가 발생했습니다.");
+
+    const form = new FormData();
+    form.append("title", title);
+    form.append("lang", lang);
+    form.append("description", description);
+
+    // 🔥 대표 이미지 (선택)
+    const coverFile = document.getElementById("cover").files[0];
+    if (coverFile) {
+      form.append("images", coverFile);
+    }
+
+    // 🔥 추가 이미지
+    const images = document.getElementById("images").files;
+    for (const img of images) {
+      form.append("images", img);
+    }
+
+    const token = localStorage.getItem("token");
+
+    const url = galleryId
+      ? `/api/gallery/edit/${galleryId}`
+      : `/api/gallery/create`;
+
+    const method = galleryId ? "PUT" : "POST";
+
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: { Authorization: "Bearer " + token },
+        body: form
+      });
+
+      const out = await res.json().catch(() => ({}));
+
+      if (res.ok) {
+        alert(galleryId ? "수정 완료" : "등록 완료");
+        location.href = "gallery-list.html";
+      } else {
+        alert("저장 실패: " + (out.message || "알 수 없는 오류"));
+      }
+    } catch (e) {
+      console.error("저장 중 오류:", e);
+      alert("서버 통신 오류가 발생했습니다.");
+    }
   }
-}
 
-
-  // 수정 모드일 경우 데이터 로드
+  // =====================================================
+  // 🚀 초기 실행
+  // =====================================================
   loadDetail();
 </script>
+
 
 </body>
 </html>
