@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>Notices | Fine Defense</title>
-</head>
 
   <!-- 공통 CSS -->
   <link rel="stylesheet" href="/css/style.css">
@@ -21,26 +20,22 @@
       border-radius: 14px;
       box-shadow: 0 3px 12px rgba(0,0,0,0.06);
     }
-
     .notice-title {
       font-size: 2rem;
       font-weight: 800;
       color: #0f2679;
       margin-bottom: 10px;
     }
-
     .notice-info {
       color: #555;
       font-size: 0.9rem;
       margin-bottom: 25px;
     }
-
     .attachment-section {
       margin-top: 40px;
       padding-top: 20px;
       border-top: 1px solid #ddd;
     }
-
     .file-item {
       padding: 10px;
       background: #f7f7f7;
@@ -50,23 +45,19 @@
       justify-content: space-between;
       align-items: center;
     }
-
     .file-left {
       display: flex;
       align-items: center;
       gap: 8px;
     }
-
     .file-icon {
       width: 22px;
       opacity: .8;
     }
-
     .file-size {
       font-size: 0.85rem;
       color: #777;
     }
-
     .download-btn {
       background: #0f2679;
       color: white;
@@ -75,7 +66,6 @@
       border-radius: 6px;
       cursor: pointer;
     }
-
     .back-btn {
       margin-top: 40px;
       display: inline-block;
@@ -133,131 +123,99 @@
     <a class="back-btn" href="/en/sub/pr/notice/notice.html">Back to List</a>
   </div>
 
+  <!-- Footer -->
+  <div data-include="/en/components/footer.html"></div>
 
-    <!-- 공통 푸터 -->
-    <div data-include="/en/components/footer.html"></div>
+  <!-- Toast UI Viewer JS -->
+  <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 
-<!-- Toast UI Viewer JS -->
-<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const noticeId = params.get("id");
 
-<script>
-  const params = new URLSearchParams(location.search);
-  const noticeId = params.get("id");
-
-  if (!noticeId) {
-    alert("잘못된 접근입니다.");
-    location.href = "/en/sub/pr/notice/notice.html";
-  }
-
-  loadNotice();
-  increaseViews();
-
-  /* ===========================================================
-        🔥 파일 크기 표시 포맷터
-  ============================================================ */
-  function formatSize(bytes) {
-    if (!bytes) return "0 B";
-    if (bytes < 1024) return bytes + " B";
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
-    return (bytes / 1024 / 1024).toFixed(1) + " MB";
-  }
-
-  /* ===========================================================
-        🔥 공지 상세 데이터 불러오기
-  ============================================================ */
-  async function loadNotice() {
-    const res = await fetch(`/api/posts/detail/${noticeId}`);
-    const data = await res.json();
-
-    document.getElementById("title").textContent = data.title;
-    document.getElementById("date").textContent =
-      new Date(data.created_at).toLocaleDateString();
-    document.getElementById("views").textContent = data.views || 0;
-
-    toastui.Editor.factory({
-      el: document.querySelector('#viewer'),
-      viewer: true,
-      initialValue: data.content || ""
-    });
-
-    // 첨부파일 렌더링
-    if (data.files?.length) {
-      document.getElementById("attachmentWrap").style.display = "block";
-
-      document.getElementById("attachmentList").innerHTML =
-        data.files.map(f => `
-          <div class="file-item">
-            <div class="file-left">
-              <img class="file-icon" src="${getFileIcon(f.original_name)}">
-              <span>${f.original_name}</span>
-              <span class="file-size">(${formatSize(f.file_size)})</span>
-            </div>
-
-            <button class="download-btn"
-              onclick="downloadFile(${noticeId}, '${f.file_path}', '${f.original_name}')">
-              다운로드
-            </button>
-          </div>
-        `).join("");
+    if (!noticeId) {
+      alert("Invalid access.");
+      location.href = "/en/sub/pr/notice/notice.html";
     }
-  }
 
-  /* ===========================================================
-        🔥 조회수 증가
-  ============================================================ */
-  function increaseViews() {
-    fetch(`/api/posts/view/${noticeId}`, { method: "POST" });
-  }
+    loadNotice();
+    increaseViews();
 
-  /* ===========================================================
-        🔥 다운로드 (자동 다운로드)
-  ============================================================ */
-  function downloadFile(noticeId, path, originalName) {
+    function formatSize(bytes) {
+      if (!bytes) return "0 B";
+      if (bytes < 1024) return bytes + " B";
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+      return (bytes / 1024 / 1024).toFixed(1) + " MB";
+    }
 
-    // ❗ prefix 반드시 /api/posts/notice 로 맞춰야 함
-    const url =
-      `/api/posts/notice/download-file?path=${encodeURIComponent(path)}&name=${encodeURIComponent(originalName)}`;
+    async function loadNotice() {
+      const res = await fetch(`/api/posts/detail/${noticeId}`);
+      const data = await res.json();
 
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = originalName;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
+      document.getElementById("title").textContent = data.title;
+      document.getElementById("date").textContent =
+        new Date(data.created_at).toLocaleDateString();
+      document.getElementById("views").textContent = data.views || 0;
 
-    // 다운로드 로그
-    fetch("/api/posts/notice/download", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        notice_id: noticeId,
-        file_path: path,
-        original_name: originalName
-      })
-    });
-  }
+      toastui.Editor.factory({
+        el: document.querySelector('#viewer'),
+        viewer: true,
+        initialValue: data.content || ""
+      });
 
-  /* ===========================================================
-        📌 파일 아이콘 자동 선택
-  ============================================================ */
-  function getFileIcon(name) {
-    const ext = name.split(".").pop().toLowerCase();
+      if (data.files?.length) {
+        document.getElementById("attachmentWrap").style.display = "block";
 
-    if (ext === "pdf") return "/img/icons/pdf.png";
-    if (["xls", "xlsx"].includes(ext)) return "/img/icons/excel.png";
-    if (["jpg", "jpeg", "png"].includes(ext)) return "/img/icons/image.png";
+        document.getElementById("attachmentList").innerHTML =
+          data.files.map(f => `
+            <div class="file-item">
+              <div class="file-left">
+                <img class="file-icon" src="${getFileIcon(f.original_name)}">
+                <span>${f.original_name}</span>
+                <span class="file-size">(${formatSize(f.file_size)})</span>
+              </div>
+              <button class="download-btn"
+                onclick="downloadFile(${noticeId}, ${f.id})">
+                Download
+              </button>
+            </div>
+          `).join("");
+      }
+    }
 
-    return "/img/icons/file.png";
-  }
-</script>
+    function increaseViews() {
+      fetch(`/api/posts/view/${noticeId}`, { method: "POST" });
+    }
 
+    function downloadFile(noticeId, fileId) {
+      const url = `/api/posts/notice/download-file?id=${fileId}`;
+      const link = document.createElement("a");
+      link.href = url;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
 
-    <!-- 공통 스크립트 -->
-    <script src="/js/include.js"></script>
-    <script src="/js/session_timer.js"></script>
-    <script src="/js/language.js"></script>
-    <script src="/js/nav.js"></script>
+      fetch("/api/posts/notice/download", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ notice_id: noticeId, file_id: fileId })
+      });
+    }
 
+    function getFileIcon(name) {
+      const ext = name.split(".").pop().toLowerCase();
+      if (ext === "pdf") return "/img/icons/pdf.png";
+      if (["xls", "xlsx"].includes(ext)) return "/img/icons/excel.png";
+      if (["jpg", "jpeg", "png"].includes(ext)) return "/img/icons/image.png";
+      return "/img/icons/file.png";
+    }
+  </script>
+
+  <!-- Common scripts -->
+  <script src="/js/include.js"></script>
+  <script src="/js/session_timer.js"></script>
+  <script src="/js/language.js"></script>
+  <script src="/js/nav.js"></script>
 
 </body>
 </html>
