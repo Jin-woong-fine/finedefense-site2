@@ -107,22 +107,28 @@
         font-weight: 900;
       }
 
+      /* 연혁 문구 강조용 */
+      .highlight-navy {
+        color: #0f2679;
+        font-weight: 700;
+      }
 
+      .highlight-navy-marker {
+        color: #0f2679;
+        font-weight: 700;
+        background: linear-gradient(
+          transparent 62%,
+          rgba(15, 38, 121, 0.18) 62%
+        );
+        padding: 0 2px;
+      } 
 
-      @media (max-width: 768px) {
-        .year-group {
-          flex-direction: column;
-        }
-        .group-year {
-          text-align: left;
-          border-right: none;
-          border-left: 3px solid #d0d8ff;
-          padding-left: 15px;
-          margin-bottom: 20px;
-        }
-        .group-events {
-          padding-left: 20px;
-        }
+      .highlight-navy-box {
+        color: #0f2679;
+        font-weight: 700;
+        background: rgba(15, 38, 121, 0.08);
+        padding: 3px 8px;
+        border-radius: 6px;
       }
     </style>
   </head>
