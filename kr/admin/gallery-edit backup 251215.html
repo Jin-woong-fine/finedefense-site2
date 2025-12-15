@@ -66,37 +66,6 @@
       justify-content:flex-end;
       gap:10px;
     }
-
-    /* ✅ 기존 이미지 삭제 버튼 + 드래그 표시 */
-    .preview-item{
-      position:relative;
-      user-select:none;
-    }
-    .img-delete-btn{
-      position:absolute;
-      top:6px;
-      right:6px;
-      width:22px;
-      height:22px;
-      border:none;
-      border-radius:50%;
-      background:rgba(0,0,0,0.65);
-      color:#fff;
-      cursor:pointer;
-      font-size:13px;
-      line-height:22px;
-      text-align:center;
-    }
-    .preview-item.dragging{
-      opacity:0.55;
-    }
-    .preview-item.drag-over{
-      outline:2px dashed #0f2679;
-      outline-offset:4px;
-    }
-
-
-
   </style>
 </head>
 
@@ -179,13 +148,7 @@
   });
 
   // =====================================================
-  // 🧠 상태값
-  // =====================================================
-  let existingImages = [];          // 현재 유지/정렬된 "기존 이미지" 배열
-  let originalExistingImages = [];  // 최초 로드된 이미지(삭제 판별용)
-
-  // =====================================================
-  // 🖼️ 새 업로드 이미지 미리보기(기존 방식 유지)
+  // 🖼️ 이미지 미리보기 공통
   // =====================================================
   function createPreview(containerId, files) {
     const box = document.getElementById(containerId);
@@ -213,124 +176,42 @@
   });
 
   document.getElementById("images").addEventListener("change", e => {
-    createPreview("imagesPreview_new", e.target.files);
+    createPreview("imagesPreview", e.target.files);
   });
-
-  // =====================================================
-  // ✅ 기존 이미지 렌더(삭제 + 드래그)
-  // =====================================================
-  function renderExistingImages() {
-    const box = document.getElementById("imagesPreview");
-    box.innerHTML = "";
-
-    existingImages.forEach((src, idx) => {
-      const div = document.createElement("div");
-      div.className = "preview-item";
-      div.draggable = true;
-      div.dataset.index = String(idx);
-      div.innerHTML = `
-        <img src="${src}" alt="">
-        <div class="preview-label">${idx === 0 ? "대표(기존)" : "기존 이미지"}</div>
-        <button type="button" class="img-delete-btn" data-idx="${idx}" title="삭제">✕</button>
-      `;
-      box.appendChild(div);
-    });
-
-    bindDeleteButtons();
-    enableDragSort();
-
-    // 대표 이미지 프리뷰(커버 파일을 새로 선택하지 않았을 때만) 업데이트
-    const coverSelected = document.getElementById("cover").files.length > 0;
-    if (!coverSelected) {
-      const main = existingImages[0];
-      if (main) {
-        document.getElementById("coverPreview").innerHTML = `
-          <div class="preview-item">
-            <img src="${main}" alt="">
-            <div class="preview-label">현재 대표 이미지</div>
-          </div>
-        `;
-      } else {
-        document.getElementById("coverPreview").innerHTML = "";
-      }
-    }
-  }
-
-  function bindDeleteButtons() {
-    document.querySelectorAll(".img-delete-btn").forEach(btn => {
-      btn.onclick = () => {
-        const idx = Number(btn.dataset.idx);
-        existingImages.splice(idx, 1);
-        renderExistingImages();
-      };
-    });
-  }
-
-  function enableDragSort() {
-    const items = Array.from(document.querySelectorAll("#imagesPreview .preview-item"));
-    let dragSrcIdx = null;
-
-    items.forEach(item => {
-      item.addEventListener("dragstart", () => {
-        dragSrcIdx = Number(item.dataset.index);
-        item.classList.add("dragging");
-      });
-
-      item.addEventListener("dragend", () => {
-        item.classList.remove("dragging");
-        items.forEach(x => x.classList.remove("drag-over"));
-      });
-
-      item.addEventListener("dragover", (e) => {
-        e.preventDefault();
-        item.classList.add("drag-over");
-      });
-
-      item.addEventListener("dragleave", () => {
-        item.classList.remove("drag-over");
-      });
-
-      item.addEventListener("drop", (e) => {
-        e.preventDefault();
-        item.classList.remove("drag-over");
-
-        const targetIdx = Number(item.dataset.index);
-        if (dragSrcIdx === null || dragSrcIdx === targetIdx) return;
-
-        const moved = existingImages.splice(dragSrcIdx, 1)[0];
-        existingImages.splice(targetIdx, 0, moved);
-        renderExistingImages();
-      });
-    });
-  }
 
   // =====================================================
   // 📥 수정 모드: 기존 데이터 불러오기
   // =====================================================
   async function loadDetail() {
-    if (!galleryId) return; // 작성 모드면 통과
+    if (!galleryId) return; // 🔥 작성 모드면 그냥 통과
 
     try {
-      const res = await fetch(`/api/gallery/detail/${galleryId}`, {
-        headers: { Authorization: "Bearer " + (localStorage.getItem("token") || "") }
-      });
-
-      if (!res.ok) {
-        const out = await res.json().catch(() => ({}));
-        throw new Error(out.message || `HTTP ${res.status}`);
-      }
-
+      const res = await fetch(`/api/gallery/detail/${galleryId}`);
       const data = await res.json();
 
       document.getElementById("lang").value = data.lang || "kr";
       document.getElementById("title").value = data.title || "";
       editor.setHTML(data.description || "");
 
-      existingImages = Array.isArray(data.images) ? [...data.images] : [];
-      originalExistingImages = [...existingImages];
+      // ✅ 대표 이미지 (main_image 기준)
+      if (data.main_image) {
+        document.getElementById("coverPreview").innerHTML = `
+          <div class="preview-item">
+            <img src="${data.main_image}" alt="">
+            <div class="preview-label">현재 대표 이미지</div>
+          </div>
+        `;
+      }
 
-      // 기존 이미지 영역 렌더
-      renderExistingImages();
+      // ✅ 추가 이미지
+      if (Array.isArray(data.images) && data.images.length) {
+        document.getElementById("imagesPreview").innerHTML = data.images.map(src => `
+          <div class="preview-item">
+            <img src="${src}" alt="">
+            <div class="preview-label">등록된 이미지</div>
+          </div>
+        `).join("");
+      }
 
     } catch (e) {
       console.error("갤러리 상세 로드 실패:", e);
@@ -352,33 +233,29 @@
       return;
     }
 
-    // ✅ 수정 모드에서: 기존/새 이미지 둘 다 없으면 막기
-    const coverFile = document.getElementById("cover").files[0];
-    const newImages = document.getElementById("images").files;
-    if (galleryId && existingImages.length === 0 && !coverFile && newImages.length === 0) {
-      alert("이미지는 최소 1개 필요합니다. (기존 이미지가 모두 삭제되었습니다.)");
-      return;
-    }
-
     const form = new FormData();
     form.append("title", title);
     form.append("lang", lang);
     form.append("description", description);
 
-    // ✅ 수정 모드에서만: 기존 이미지 상태 전달(삭제/정렬 반영)
-    if (galleryId) {
-      form.append("existingImages", JSON.stringify(existingImages));
-      form.append("originalImages", JSON.stringify(originalExistingImages));
+    // 🔥 대표 이미지 (선택)
+    const coverFile = document.getElementById("cover").files[0];
+    if (coverFile) {
+      form.append("images", coverFile);
     }
 
-    // ✅ 대표 이미지(선택): 서버에서는 새 업로드 이미지 중 첫번째로 취급 가능
-    if (coverFile) form.append("images", coverFile);
+    // 🔥 추가 이미지
+    const images = document.getElementById("images").files;
+    for (const img of images) {
+      form.append("images", img);
+    }
 
-    // ✅ 추가 이미지
-    for (const img of newImages) form.append("images", img);
+    const token = localStorage.getItem("token");
 
-    const token = localStorage.getItem("token") || "";
-    const url = galleryId ? `/api/gallery/edit/${galleryId}` : `/api/gallery/create`;
+    const url = galleryId
+      ? `/api/gallery/edit/${galleryId}`
+      : `/api/gallery/create`;
+
     const method = galleryId ? "PUT" : "POST";
 
     try {
@@ -405,22 +282,8 @@
   // =====================================================
   // 🚀 초기 실행
   // =====================================================
-  // ✅ 새 업로드 미리보기 영역을 기존/신규 분리 (구성은 유지하되 DOM만 1줄 추가)
-  (function ensureNewPreviewBox(){
-    const box = document.getElementById("imagesPreview");
-    if (!document.getElementById("imagesPreview_new")) {
-      const div = document.createElement("div");
-      div.id = "imagesPreview_new";
-      div.className = "preview-row";
-      div.style.marginTop = "12px";
-      // 기존 imagesPreview 아래에 신규 미리보기 박스만 하나 추가(레이아웃만)
-      box.insertAdjacentElement("afterend", div);
-    }
-  })();
-
   loadDetail();
 </script>
-
 
 
 </body>

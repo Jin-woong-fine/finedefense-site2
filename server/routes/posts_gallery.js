@@ -109,35 +109,66 @@ router.put(
 
       const { title, description, lang } = req.body;
       const files = req.files || [];
-      const coverImage = files.length ? toPublicPath(files[0].filename) : null;
 
+      // ✅ 프론트에서 기존 이미지 상태를 전달(수정 모드)
+      let keepImages = [];
+      let originalImages = [];
+
+      try {
+        keepImages = JSON.parse(req.body.existingImages || "[]");
+        originalImages = JSON.parse(req.body.originalImages || "[]");
+      } catch {
+        keepImages = [];
+        originalImages = [];
+      }
+
+      // DB에서 현재 이미지(신뢰 소스)
+      const [dbImages] = await db.execute(
+        `SELECT image_path FROM post_images WHERE post_id=?`,
+        [postId]
+      );
+      const dbImagePaths = dbImages.map(r => r.image_path);
+
+      // ✅ 제거할 이미지 = DB에 있던 것 중, keepImages에 없는 것
+      const keepSet = new Set(keepImages);
+      const toRemove = dbImagePaths.filter(p => !keepSet.has(p));
+
+      // ✅ 새 업로드 이미지 public path
+      const newUploadPaths = files.map(f => toPublicPath(f.filename));
+
+      // ✅ 최종 이미지 배열: (유지/정렬된 기존) + (새 업로드)
+      const finalImages = [...keepImages, ...newUploadPaths];
+
+      // 수정 시 이미지 0장 방지
+      if (!finalImages.length) {
+        return res.status(400).json({ message: "이미지는 최소 1개 필요합니다." });
+      }
+
+      // ✅ 대표 이미지: 최종 배열의 첫번째
+      const newMainImage = finalImages[0] || null;
+
+      // 1) posts 업데이트 (정렬 변경 시 main_image도 바뀌어야 해서 항상 세팅)
       await db.execute(
         `UPDATE posts
-           SET title=?, content=?, lang=?,
-               main_image = IFNULL(?, main_image)
+           SET title=?, content=?, lang=?, main_image=IFNULL(?, main_image)
          WHERE id=? AND category='gallery'`,
-        [title, description || "", lang || "kr", coverImage, postId]
+        [title, description || "", lang || "kr", newMainImage, postId]
       );
 
-      if (files.length) {
-        const [oldImages] = await db.execute(
-          `SELECT image_path FROM post_images WHERE post_id=?`,
-          [postId]
+      // 2) 제거된 파일 실제 삭제
+      for (const imgPath of toRemove) {
+        const diskPath = toDiskPath(imgPath);
+        try { if (diskPath) fs.unlinkSync(diskPath); } catch {}
+      }
+
+      // 3) post_images 재구성 (정렬 반영을 위해 전체 재삽입)
+      await db.execute(`DELETE FROM post_images WHERE post_id=?`, [postId]);
+
+      for (const p of finalImages) {
+        await db.execute(
+          `INSERT INTO post_images (post_id, image_path) VALUES (?, ?)`,
+          [postId, p]
         );
-
-        for (const img of oldImages) {
-          const diskPath = toDiskPath(img.image_path);
-          try { fs.unlinkSync(diskPath); } catch {}
-        }
-
-        await db.execute(`DELETE FROM post_images WHERE post_id=?`, [postId]);
-
-        for (const f of files) {
-          await db.execute(
-            `INSERT INTO post_images (post_id, image_path) VALUES (?, ?)`,
-            [postId, toPublicPath(f.filename)]
-          );
-        }
       }
 
       res.json({ message: "갤러리 수정 완료" });
@@ -148,6 +179,7 @@ router.put(
     }
   }
 );
+
 
 /* ===========================================================
    📌 갤러리 삭제
