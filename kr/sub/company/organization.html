@@ -78,6 +78,26 @@
         opacity: 0.9;
       }
 
+      /* 전무이사 */
+      .org-node.executive {
+        background: linear-gradient(135deg, #5a6fae, #7c8fd8);
+        color: #fff;
+        padding: 18px 50px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 1.15rem;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .org-node.executive i {
+        font-size: 1.6rem;
+        opacity: 0.9;
+      }
+
+
       /* 부서 */
       .org-branch {
         display: flex;
@@ -165,6 +185,12 @@
         <div class="org-node ceo">
           <i class="fas fa-user-tie"></i>
           대표이사
+        </div>
+
+        <!-- 전무이사 -->
+        <div class="org-node executive">
+          <i class="fas fa-user-gear"></i>
+          전무이사
         </div>
 
         <div class="org-branch">
