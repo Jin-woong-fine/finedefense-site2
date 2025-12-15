@@ -274,7 +274,9 @@
 
     function markFileForDelete(index) {
       const file = oldFileList[index];
-      removeOldFiles.push(file.file_path);
+
+      // 🔥 서버는 post_files.id 기준으로 삭제함
+      removeOldFiles.push(file.id);
 
       oldFileList.splice(index, 1);
       renderOldFiles();
@@ -300,7 +302,8 @@
       const sort = document.getElementById("sort_order").value || 9999;
       formData.append("sort_order", sort);
 
-      formData.append("removeFiles", JSON.stringify(removeOldFiles));
+      formData.append("removeFileIds", JSON.stringify(removeOldFiles));
+
 
       const newFiles = document.getElementById("newFiles").files;
       [...newFiles].forEach(f => formData.append("files", f));
