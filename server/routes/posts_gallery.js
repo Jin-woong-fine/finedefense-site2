@@ -213,4 +213,60 @@ router.get("/list", async (req, res) => {
   }
 });
 
+/* ===========================================================
+   📌 갤러리 상세 조회 (관리자 수정용)
+=========================================================== */
+router.get("/detail/:id", async (req, res) => {
+  try {
+    const postId = Number(req.params.id);
+    if (!postId) {
+      return res.status(400).json({ message: "잘못된 ID" });
+    }
+
+    // 1️⃣ 게시글 기본 정보
+    const [rows] = await db.execute(
+      `
+      SELECT id, title, content, lang, main_image, created_at
+        FROM posts
+       WHERE id = ? AND category = 'gallery'
+      `,
+      [postId]
+    );
+
+    if (!rows.length) {
+      return res.status(404).json({ message: "갤러리를 찾을 수 없습니다." });
+    }
+
+    const post = rows[0];
+
+    // 2️⃣ 이미지 목록
+    const [images] = await db.execute(
+      `
+      SELECT image_path
+        FROM post_images
+       WHERE post_id = ?
+       ORDER BY id ASC
+      `,
+      [postId]
+    );
+
+    res.json({
+      id: post.id,
+      title: post.title,
+      description: post.content,
+      lang: post.lang,
+      main_image: post.main_image,
+      images: images.map(i => i.image_path),
+      created_at: post.created_at
+    });
+
+  } catch (err) {
+    console.error("갤러리 상세 조회 오류:", err);
+    res.status(500).json({ message: "갤러리 상세 조회 오류" });
+  }
+});
+
+
+
+
 export default router;
