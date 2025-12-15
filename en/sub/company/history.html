@@ -38,7 +38,7 @@
       .timeline {
         display: flex;
         flex-direction: column;
-        gap: 100px; /* breathing space */
+        gap: 70px; 
         position: relative;
       }
 
@@ -83,8 +83,8 @@
       /* ===== Timeline Item ===== */
       .timeline-item {
         position: relative;
-        padding-bottom: 44px;
-        margin-bottom: 44px;
+        padding-bottom: 32px;
+        margin-bottom: 32px;
         border-bottom: 1px solid #f2f4fb;
       }
 
@@ -103,6 +103,8 @@
 
       /* Event Text */
       .events p {
+        position: relative;
+        padding-left: 18px;
         margin: 12px 0;
         font-size: 1.02rem;
         font-weight: 500;
@@ -113,6 +115,14 @@
       /* remove bullets */
       .events p::before {
         content: "";
+        position: absolute;
+        left: 0;
+        top: 0.75em;
+        width: 6px;
+        height: 6px;
+        background: #0f2679;
+        border-radius: 50%;
+        opacity: 0.85;
       }
 
       /* ===== Highlights ===== */
