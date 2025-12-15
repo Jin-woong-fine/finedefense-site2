@@ -18,7 +18,7 @@
   /* 🔥 세로 가운데 기준으로 잘림 (센터 크롭) */
   object-position: center center;
 
-  filter: brightness(100%);
+  filter: brightness(80%);
 }
 
 
