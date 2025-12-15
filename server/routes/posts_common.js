@@ -6,20 +6,21 @@ import jwt from "jsonwebtoken";
 const router = express.Router();
 
 /* =====================================================
-   📈 조회수 증가
+   📈 조회수 증가 (안전 수정 버전)
 ===================================================== */
 router.post("/view/:id", async (req, res) => {
   try {
     const postId = Number(req.params.id);
-    if (!postId) return res.status(400).json({ message: "invalid id" });
+    if (!postId) {
+      return res.status(400).json({ message: "invalid id" });
+    }
 
-    // 안전한 토큰 파싱
+    // 토큰 파싱 (관리자 제외용)
     let token = null;
     try {
       token = req.headers.authorization?.split(" ")[1] || null;
     } catch {}
 
-    // 관리자 제외
     if (token) {
       try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -29,27 +30,46 @@ router.post("/view/:id", async (req, res) => {
       } catch {}
     }
 
-    // 안전한 IP / UA 파싱
-    const rawIp = req.headers["x-forwarded-for"]?.split(",")[0] || req.ip || "0.0.0.0";
-    const ip = rawIp.substring(0, 100);
+    // IP / UA
+    const rawIp =
+      req.headers["x-forwarded-for"]?.split(",")[0] ||
+      req.ip ||
+      "0.0.0.0";
 
+    const ip = rawIp.substring(0, 100);
     const ua = (req.headers["user-agent"] || "unknown").substring(0, 255);
 
-    // 중복 체크
+    // 24시간 중복 체크
     const [exists] = await db.execute(
-      `SELECT id FROM post_view_logs 
-       WHERE post_id=? AND ip=? AND user_agent=? 
-         AND viewed_at > DATE_SUB(NOW(), INTERVAL 1 DAY)`,
+      `
+      SELECT id
+        FROM post_view_logs
+       WHERE post_id = ?
+         AND ip = ?
+         AND user_agent = ?
+         AND viewed_at > DATE_SUB(NOW(), INTERVAL 1 DAY)
+      `,
       [postId, ip, ua]
     );
 
-    if (exists.length) return res.json({ message: "중복 조회", added: false });
+    if (exists.length) {
+      return res.json({ message: "중복 조회", added: false });
+    }
 
-    // INSERT
+    // 🔥 핵심 수정: viewed_at 명시 + 변수명 수정
     await db.execute(
-      `INSERT IGNORE INTO post_view_logs (post_id, ip, user_agent)
-      VALUES (?, ?, ?)`,
-      [postId, ip, userAgent]
+      `
+      INSERT INTO post_view_logs
+        (post_id, ip, user_agent, viewed_at)
+      VALUES (?, ?, ?, NOW())
+      `,
+      [postId, ip, ua]
+    );
+
+    // posts.views 증가 (있다면)
+    await db.execute(
+      `UPDATE posts SET views = views + 1 WHERE id = ?`,
+      [postId]
     );
 
     res.json({ message: "조회수 +1", added: true });
@@ -59,6 +79,7 @@ router.post("/view/:id", async (req, res) => {
     res.status(500).json({ message: "조회 오류" });
   }
 });
+
 
 
 /* =====================================================
