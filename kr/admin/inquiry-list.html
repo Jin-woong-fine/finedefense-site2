@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <title>문의 관리 | Fine Defense Admin</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- 공통 관리자 CSS -->
   <link rel="stylesheet" href="/kr/admin/css/admin.css" />
@@ -82,12 +81,21 @@
 <!-- ⭐ 메인 -->
 <div class="main">
 
-  <!-- TOPBAR -->
+  <!-- 🔵 TOPBAR -->
   <div class="topbar">
-    <h2>문의 관리</h2>
-    <div>
-      <button class="btn btn-primary" onclick="location.href='../index.html'">홈으로</button>
-      <button id="logoutBtn" class="btn btn-danger">로그아웃</button>
+    <div class="title">자료실 관리</div>
+
+    <div style="display:flex; align-items:center; gap:12px;">
+
+      <!-- ⭐ 세션 타이머 -->
+      <span id="session-timer" class="session-timer">세션 계산중...</span>
+
+      <div class="topbar-user" id="topbarUser">
+        <span id="topbarUserName">관리자</span> ▾
+        <div class="user-dropdown" id="userDropdown"></div>
+      </div>
+
+      <button onclick="location.href='../index.html'">홈으로</button>
     </div>
   </div>
 
@@ -124,8 +132,8 @@
 </div>
 
 <!-- 공통 JS -->
-<script src="/kr/admin/js/common_auth.js"></script>
 <script src="/kr/admin/js/sidebar.js"></script>
+<script src="/kr/admin/js/common_auth.js"></script>
 
 <script>
   requireAdminOrEditor();
