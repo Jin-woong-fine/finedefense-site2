@@ -57,12 +57,13 @@ async function loadSidebar(activePage = "") {
       title: "게시물 관리",
       children: [
         { title: "공지사항", link: "/kr/admin/notice-list.html", key: "notice" },
-        { title: "뉴스룸", link: "/kr/admin/news-list.html", key: "news" }
+        { title: "뉴스룸", link: "/kr/admin/news-list.html", key: "news" },
+        { title: "제품 관리", link: "/kr/admin/products-list.html", key: "products" },
+        { title: "갤러리", link: "/kr/admin/gallery-list.html", key: "gallery" },        
+        { title: "자료실", link: "/kr/admin/downloads-list.html", key: "downloads" }
       ]
     },
 
-    { title: "자료실", link: "/kr/admin/downloads-list.html", key: "downloads" },
-    { title: "제품 관리", link: "/kr/admin/products-list.html", key: "products" },
     { title: "고객 문의", link: "/kr/admin/inquiry-list.html", key: "inquiry" }
   ];
 
