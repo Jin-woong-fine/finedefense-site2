@@ -3,239 +3,265 @@
 <head>
   <meta charset="UTF-8">
   <title>카탈로그 수정 | 관리자</title>
-
   <link rel="stylesheet" href="/kr/admin/css/admin.css">
 
   <style>
+    /* =========================
+      레이아웃
+    ========================= */
     .form-box {
-      max-width: 650px;
+      max-width: 820px;
       background: #fff;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-      margin: 30px;
+      padding: 36px 40px 42px;
+      border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      margin: 40px;
     }
 
     label {
       font-weight: 600;
       display: block;
-      margin-top: 18px;
+      margin-top: 22px;
+      font-size: 14px;
     }
 
     .form-box input,
     .form-box select {
       width: 100%;
-      padding: 10px;
+      padding: 11px 12px;
       margin-top: 8px;
       border: 1px solid #ccc;
-      border-radius: 6px;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    /* =========================
+      미리보기 섹션
+    ========================= */
+    .preview-section {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 22px;
+      margin-bottom: 36px;
+      padding-bottom: 30px;
+      border-bottom: 1px solid #e5e8f0;
+    }
+
+    .preview-card {
+      background: #fafbfe;
+      border: 1px solid #e2e5ec;
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .preview-card.wide {
+      min-height: 260px;
+    }
+
+    .preview-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0f2679;
+      margin-bottom: 10px;
+    }
+
+    .preview-body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+      border-radius: 10px;
+      min-height: 210px;
+      border: 1px dashed #d7dbea;
+      padding: 10px;
     }
 
     .thumb-preview {
-      width: 120px;
-      height: 170px;
+      width: 140px;
+      height: 190px;
       object-fit: contain;
       background: #f3f3f3;
-      margin-bottom: 12px;
-      border: 1px solid #ddd;
       border-radius: 6px;
-      display: block;
     }
 
-    .file-preview-box {
-      margin-top: 10px;
-      margin-bottom: 20px;
-    }
-
-    .file-preview-box iframe {
+    .preview-body iframe {
       width: 100%;
-      height: 420px;
-      border: 1px solid #ddd;
+      height: 220px;
+      border: none;
       border-radius: 8px;
     }
 
-    .file-preview-text {
+    .preview-empty {
       font-size: 13px;
-      color: #555;
+      color: #999;
       text-align: center;
-      margin-top: 6px;
     }
 
+    /* =========================
+      버튼
+    ========================= */
     .btn-blue {
-      margin-top: 24px;
-      padding: 10px 18px;
+      margin-top: 36px;
+      padding: 12px 22px;
       background: #0f2679;
       color: #fff;
-      border-radius: 8px;
+      border-radius: 10px;
       cursor: pointer;
       border: none;
+      font-size: 15px;
     }
   </style>
 </head>
 
 <body>
 
-  <div id="sidebar"></div>
+<div id="sidebar"></div>
 
-  <div class="main">
+<div class="main">
 
-    <!-- 🔵 TOPBAR -->
-    <div class="topbar">
-      <div class="title">카탈로그 수정</div>
-
-      <div style="display:flex; align-items:center; gap:12px;">
-        <span id="session-timer" class="session-timer">세션 계산중...</span>
-
-        <div class="topbar-user" id="topbarUser">
-          <span id="topbarUserName">관리자</span> ▾
-          <div class="user-dropdown" id="userDropdown"></div>
-        </div>
-
-        <button onclick="location.href='../index.html'">홈으로</button>
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="title">카탈로그 수정</div>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <span id="session-timer" class="session-timer">세션 계산중...</span>
+      <div class="topbar-user" id="topbarUser">
+        <span id="topbarUserName">관리자</span> ▾
+        <div class="user-dropdown" id="userDropdown"></div>
       </div>
+      <button onclick="location.href='../index.html'">홈으로</button>
     </div>
-
-    <div class="form-box">
-
-      <!-- 썸네일 미리보기 -->
-      <img id="thumbPreview" class="thumb-preview" style="display:none;">
-
-      <!-- 파일(PDF) 미리보기 -->
-      <div class="file-preview-box">
-        <iframe id="filePreviewPdf" style="display:none;"></iframe>
-        <div id="filePreviewText" class="file-preview-text" style="display:none;"></div>
-      </div>
-
-      <label>카테고리</label>
-      <select id="category">
-        <option value="kr_catalog">한국어 종합 카탈로그</option>
-        <option value="en_catalog">영어 종합 카탈로그</option>
-        <option value="company_intro">회사 소개서</option>
-        <option value="etc">기타</option>
-      </select>
-
-      <label>언어</label>
-      <select id="lang">
-        <option value="kr">한국어</option>
-        <option value="en">영어</option>
-      </select>
-
-      <label>제목</label>
-      <input type="text" id="title">
-
-      <label>새 썸네일 업로드 (선택)</label>
-      <input type="file" id="thumb" accept="image/*">
-
-      <label>새 PDF 업로드 (선택)</label>
-      <input type="file" id="file" accept="application/pdf">
-
-      <label>정렬</label>
-      <input type="number" id="sort">
-
-      <button class="btn-blue" onclick="save()">수정 완료</button>
-    </div>
-
   </div>
 
-  <script src="/kr/admin/js/sidebar.js"></script>
-  <script src="/kr/admin/js/common_auth.js"></script>
+  <div class="form-box">
 
-  <script>
-  loadSidebar("catalog");
+    <!-- 미리보기 -->
+    <div class="preview-section">
 
-  const params = new URLSearchParams(location.search);
-  const id = params.get("id");
+      <div class="preview-card">
+        <div class="preview-title">썸네일 미리보기</div>
+        <div class="preview-body">
+          <img id="thumbPreview" class="thumb-preview" style="display:none;">
+          <div id="thumbEmpty" class="preview-empty">등록된 썸네일이 없습니다</div>
+        </div>
+      </div>
 
-  const el = id => document.getElementById(id);
+      <div class="preview-card wide">
+        <div class="preview-title">PDF 미리보기</div>
+        <div class="preview-body">
+          <iframe id="filePreviewPdf" style="display:none;"></iframe>
+          <div id="filePreviewText" class="preview-empty">등록된 PDF가 없습니다</div>
+        </div>
+      </div>
 
-  /* =========================
-    상세 로딩
-  ========================= */
-  async function loadDetail(){
-    const res = await fetch(`/api/catalog/detail/${id}`);
-    const data = await res.json();
+    </div>
 
-    el("title").value = data.title;
-    el("category").value = data.category;
-    el("lang").value = data.lang;
-    el("sort").value = data.sort_order;
+    <!-- 폼 -->
+    <label>카테고리</label>
+    <select id="category">
+      <option value="kr_catalog">한국어 종합 카탈로그</option>
+      <option value="en_catalog">영어 종합 카탈로그</option>
+      <option value="company_intro">회사 소개서</option>
+      <option value="etc">기타</option>
+    </select>
 
-    if (data.thumb_url) {
-      el("thumbPreview").src = data.thumb_url;
-      el("thumbPreview").style.display = "block";
-    }
+    <label>언어</label>
+    <select id="lang">
+      <option value="kr">한국어</option>
+      <option value="en">영어</option>
+    </select>
 
-    if (data.file_url) {
-      if (data.file_url.endsWith(".pdf")) {
-        el("filePreviewPdf").src = data.file_url;
-        el("filePreviewPdf").style.display = "block";
-      } else {
-        el("filePreviewText").innerText = data.file_url.split("/").pop();
-        el("filePreviewText").style.display = "block";
-      }
-    }
+    <label>제목</label>
+    <input type="text" id="title">
+
+    <label>새 썸네일 업로드 (선택)</label>
+    <input type="file" id="thumb" accept="image/*">
+
+    <label>새 PDF 업로드 (선택)</label>
+    <input type="file" id="file" accept="application/pdf">
+
+    <label>정렬</label>
+    <input type="number" id="sort">
+
+    <button class="btn-blue" onclick="save()">수정 완료</button>
+  </div>
+
+</div>
+
+<script src="/kr/admin/js/sidebar.js"></script>
+<script src="/kr/admin/js/common_auth.js"></script>
+
+<script>
+loadSidebar("catalog");
+
+const el = id => document.getElementById(id);
+const id = new URLSearchParams(location.search).get("id");
+
+/* 상세 */
+async function loadDetail(){
+  const res = await fetch(`/api/catalog/detail/${id}`);
+  const d = await res.json();
+
+  el("title").value = d.title;
+  el("category").value = d.category;
+  el("lang").value = d.lang;
+  el("sort").value = d.sort_order;
+
+  if(d.thumb_url){
+    el("thumbPreview").src = d.thumb_url;
+    el("thumbPreview").style.display = "block";
+    el("thumbEmpty").style.display = "none";
   }
 
-  /* =========================
-    썸네일 미리보기
-  ========================= */
-  el("thumb").addEventListener("change", e => {
-    if (e.target.files.length) {
-      el("thumbPreview").src = URL.createObjectURL(e.target.files[0]);
-      el("thumbPreview").style.display = "block";
-    }
-  });
-
-  /* =========================
-    PDF 미리보기
-  ========================= */
-  el("file").addEventListener("change", e => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    if (file.type === "application/pdf") {
-      el("filePreviewPdf").src = URL.createObjectURL(file);
-      el("filePreviewPdf").style.display = "block";
-      el("filePreviewText").style.display = "none";
-    } else {
-      el("filePreviewPdf").style.display = "none";
-      el("filePreviewText").innerText = file.name;
-      el("filePreviewText").style.display = "block";
-    }
-  });
-
-  /* =========================
-    저장
-  ========================= */
-  async function save(){
-    const fd = new FormData();
-
-    fd.append("category", el("category").value);
-    fd.append("lang", el("lang").value);
-    fd.append("title", el("title").value);
-    fd.append("sort_order", el("sort").value);
-
-    if (el("thumb").files.length) fd.append("thumb", el("thumb").files[0]);
-    if (el("file").files.length) fd.append("file", el("file").files[0]);
-
-    const res = await fetch(`/api/catalog/update/${id}`, {
-      method: "PUT",
-      headers: { Authorization: "Bearer " + localStorage.getItem("token") },
-      body: fd
-    });
-
-    const out = await res.json();
-
-    if (res.ok) {
-      alert("수정 완료!");
-      location.href = "catalog-list.html";
-    } else {
-      alert(out.message);
-    }
+  if(d.file_url){
+    el("filePreviewPdf").src = d.file_url;
+    el("filePreviewPdf").style.display = "block";
+    el("filePreviewText").style.display = "none";
   }
+}
 
-  loadDetail();
-  </script>
+/* 미리보기 */
+el("thumb").addEventListener("change", e => {
+  const f = e.target.files[0];
+  if(!f) return;
+  el("thumbPreview").src = URL.createObjectURL(f);
+  el("thumbPreview").style.display = "block";
+  el("thumbEmpty").style.display = "none";
+});
+
+el("file").addEventListener("change", e => {
+  const f = e.target.files[0];
+  if(!f) return;
+  el("filePreviewPdf").src = URL.createObjectURL(f);
+  el("filePreviewPdf").style.display = "block";
+  el("filePreviewText").style.display = "none";
+});
+
+/* 저장 */
+async function save(){
+  const fd = new FormData();
+  fd.append("category", el("category").value);
+  fd.append("lang", el("lang").value);
+  fd.append("title", el("title").value);
+  fd.append("sort_order", el("sort").value);
+  if(el("thumb").files[0]) fd.append("thumb", el("thumb").files[0]);
+  if(el("file").files[0]) fd.append("file", el("file").files[0]);
+
+  const res = await fetch(`/api/catalog/update/${id}`, {
+    method:"PUT",
+    headers:{ Authorization:"Bearer "+localStorage.getItem("token") },
+    body: fd
+  });
+
+  if(res.ok){
+    alert("수정 완료!");
+    location.href="catalog-list.html";
+  } else {
+    alert("수정 실패");
+  }
+}
+
+loadDetail();
+</script>
 
 </body>
 </html>
