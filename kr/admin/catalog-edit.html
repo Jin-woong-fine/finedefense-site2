@@ -16,119 +16,167 @@
 
 <body>
 
-<div id="sidebar"></div>
+  <div id="sidebar"></div>
 
-<div class="main">
+  <div class="main">
 
-  <!-- 🔵 TOPBAR -->
-  <div class="topbar">
-    <div class="title">카탈로그 수정</div>
+    <!-- 🔵 TOPBAR -->
+    <div class="topbar">
+      <div class="title">카탈로그 수정</div>
 
-    <div style="display:flex; align-items:center; gap:12px;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <span id="session-timer" class="session-timer">세션 계산중...</span>
 
-      <!-- ⭐ 세션 타이머 -->
-      <span id="session-timer" class="session-timer">세션 계산중...</span>
+        <div class="topbar-user" id="topbarUser">
+          <span id="topbarUserName">관리자</span> ▾
+          <div class="user-dropdown" id="userDropdown"></div>
+        </div>
 
-      <div class="topbar-user" id="topbarUser">
-        <span id="topbarUserName">관리자</span> ▾
-        <div class="user-dropdown" id="userDropdown"></div>
+        <button onclick="location.href='../index.html'">홈으로</button>
+      </div>
+    </div>
+
+    <div class="form-box">
+
+      <!-- 썸네일 미리보기 -->
+      <img id="thumbPreview" class="thumb-preview" style="display:none;">
+
+      <!-- 파일(PDF) 미리보기 -->
+      <div class="file-preview-box">
+        <iframe id="filePreviewPdf" style="display:none;"></iframe>
+        <div id="filePreviewText" class="file-preview-text" style="display:none;"></div>
       </div>
 
-      <button onclick="location.href='../index.html'">홈으로</button>
+      <label>카테고리</label>
+      <select id="category">
+        <option value="kr_catalog">한국어 종합 카탈로그</option>
+        <option value="en_catalog">영어 종합 카탈로그</option>
+        <option value="company_intro">회사 소개서</option>
+        <option value="etc">기타</option>
+      </select>
+
+      <label>언어</label>
+      <select id="lang">
+        <option value="kr">한국어</option>
+        <option value="en">영어</option>
+      </select>
+
+      <label>제목</label>
+      <input type="text" id="title">
+
+      <label>새 썸네일 업로드 (선택)</label>
+      <input type="file" id="thumb" accept="image/*">
+
+      <label>새 PDF 업로드 (선택)</label>
+      <input type="file" id="file" accept="application/pdf">
+
+      <label>정렬</label>
+      <input type="number" id="sort">
+
+      <button class="btn-blue" onclick="save()">수정 완료</button>
     </div>
+
   </div>
 
-  <div class="form-box">
+  <script src="/kr/admin/js/sidebar.js"></script>
+  <script src="/kr/admin/js/common_auth.js"></script>
 
-    <img id="thumbPreview" class="thumb-preview">
+  <script>
+  loadSidebar("catalog");
 
-    <label>카테고리</label>
-    <select id="category">
-      <option value="kr_catalog">한국어 종합 카탈로그</option>
-      <option value="en_catalog">영어 종합 카탈로그</option>
-      <option value="company_intro">회사 소개서</option>
-      <option value="etc">기타</option>
-    </select>
+  const params = new URLSearchParams(location.search);
+  const id = params.get("id");
 
-    <label>언어</label>
-    <select id="lang">
-      <option value="kr">한국어</option>
-      <option value="en">영어</option>
-    </select>
+  const el = id => document.getElementById(id);
 
-    <label>제목</label>
-    <input type="text" id="title">
+  /* =========================
+    상세 로딩
+  ========================= */
+  async function loadDetail(){
+    const res = await fetch(`/api/catalog/detail/${id}`);
+    const data = await res.json();
 
-    <label>새 썸네일 업로드(선택)</label>
-    <input type="file" id="thumb" accept="image/*">
+    el("title").value = data.title;
+    el("category").value = data.category;
+    el("lang").value = data.lang;
+    el("sort").value = data.sort_order;
 
-    <label>새 PDF 업로드(선택)</label>
-    <input type="file" id="file" accept="application/pdf">
+    if (data.thumb_url) {
+      el("thumbPreview").src = data.thumb_url;
+      el("thumbPreview").style.display = "block";
+    }
 
-    <label>정렬</label>
-    <input type="number" id="sort">
-
-    <button class="btn-blue" onclick="save()">수정 완료</button>
-  </div>
-
-</div>
-
-<script src="/kr/admin/js/sidebar.js"></script>
-<script src="/kr/admin/js/common_auth.js"></script>
-
-<script>
-loadSidebar("catalog");
-
-const params = new URLSearchParams(location.search);
-const id = params.get("id");
-
-loadDetail();
-async function loadDetail(){
-  const res = await fetch(`/api/catalog/detail/${id}`);
-  const data = await res.json();
-
-  document.getElementById("title").value = data.title;
-  document.getElementById("category").value = data.category;
-  document.getElementById("lang").value = data.lang;
-  document.getElementById("sort").value = data.sort_order;
-
-  if(data.thumb_url){
-    document.getElementById("thumbPreview").src = data.thumb_url;
-  }
-}
-
-async function save(){
-  const fd = new FormData();
-
-  fd.append("category", document.getElementById("category").value);
-  fd.append("lang", document.getElementById("lang").value);
-  fd.append("title", document.getElementById("title").value);
-  fd.append("sort_order", document.getElementById("sort").value);
-
-  if (document.getElementById("thumb").files[0]) {
-    fd.append("thumb", document.getElementById("thumb").files[0]);
+    if (data.file_url) {
+      if (data.file_url.endsWith(".pdf")) {
+        el("filePreviewPdf").src = data.file_url;
+        el("filePreviewPdf").style.display = "block";
+      } else {
+        el("filePreviewText").innerText = data.file_url.split("/").pop();
+        el("filePreviewText").style.display = "block";
+      }
+    }
   }
 
-  if (document.getElementById("file").files[0]) {
-    fd.append("file", document.getElementById("file").files[0]);
-  }
-
-  const res = await fetch(`/api/catalog/update/${id}`, {
-    method:"PUT",
-    headers:{ Authorization:"Bearer " + localStorage.getItem("token") },
-    body: fd
+  /* =========================
+    썸네일 미리보기
+  ========================= */
+  el("thumb").addEventListener("change", e => {
+    if (e.target.files.length) {
+      el("thumbPreview").src = URL.createObjectURL(e.target.files[0]);
+      el("thumbPreview").style.display = "block";
+    }
   });
 
-  const out = await res.json();
+  /* =========================
+    PDF 미리보기
+  ========================= */
+  el("file").addEventListener("change", e => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-  if(res.ok){
-    alert("수정 완료!");
-    location.href="catalog-list.html";
-  } else {
-    alert(out.message);
+    if (file.type === "application/pdf") {
+      el("filePreviewPdf").src = URL.createObjectURL(file);
+      el("filePreviewPdf").style.display = "block";
+      el("filePreviewText").style.display = "none";
+    } else {
+      el("filePreviewPdf").style.display = "none";
+      el("filePreviewText").innerText = file.name;
+      el("filePreviewText").style.display = "block";
+    }
+  });
+
+  /* =========================
+    저장
+  ========================= */
+  async function save(){
+    const fd = new FormData();
+
+    fd.append("category", el("category").value);
+    fd.append("lang", el("lang").value);
+    fd.append("title", el("title").value);
+    fd.append("sort_order", el("sort").value);
+
+    if (el("thumb").files.length) fd.append("thumb", el("thumb").files[0]);
+    if (el("file").files.length) fd.append("file", el("file").files[0]);
+
+    const res = await fetch(`/api/catalog/update/${id}`, {
+      method: "PUT",
+      headers: { Authorization: "Bearer " + localStorage.getItem("token") },
+      body: fd
+    });
+
+    const out = await res.json();
+
+    if (res.ok) {
+      alert("수정 완료!");
+      location.href = "catalog-list.html";
+    } else {
+      alert(out.message);
+    }
   }
-}
-</script>
+
+  loadDetail();
+  </script>
 
 </body>
 </html>
