@@ -6,15 +6,118 @@
   <link rel="stylesheet" href="/kr/admin/css/admin.css">
 
   <style>
-    .filter-box { display:flex; gap:10px; margin:20px 0; }
-    select, input { padding:8px; border-radius:6px; border:1px solid #ccc; }
-    .thumb { width:70px; height:100px; object-fit:contain; background:#f3f3f3; border:1px solid #ddd; border-radius:6px; }
-    .btn-blue { background:#0f2679; color:#fff; padding:8px 14px; border-radius:6px; cursor:pointer; border:none; }
-    .btn-small { padding:6px 10px; border-radius:6px; border:none; cursor:pointer; background:#eee; }
-    .btn-delete { background:#d9534f; color:#fff; padding:6px 10px; border-radius:6px; cursor:pointer; border:none; }
-    table { width:100%; border-collapse: collapse; margin-top:20px; }
-    th,td { padding:12px 10px; border-bottom:1px solid #ddd; }
-    th { background:#f5f7fb; }
+    /* =========================
+      관리자 필터 영역
+    ========================= */
+    .filter-box {
+      display: flex;
+      gap: 10px;
+      margin: 20px 0;
+      align-items: center;
+    }
+
+    select,
+    input {
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 13px;
+    }
+
+    /* =========================
+      버튼 스타일
+    ========================= */
+    .btn-blue {
+      background: #0f2679;
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-small {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      background: #eee;
+    }
+
+    .btn-delete {
+      background: #d9534f;
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      border: none;
+    }
+
+    /* =========================
+      관리자 테이블
+    ========================= */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 24px;
+      font-size: 14px;
+    }
+
+    th {
+      background: #f5f7fb;
+      font-weight: 600;
+      color: #333;
+    }
+
+    th,
+    td {
+      padding: 12px 10px;
+      border-bottom: 1px solid #e2e5ec;
+      vertical-align: middle;
+    }
+
+    td {
+      color: #444;
+    }
+
+    /* =========================
+      썸네일
+    ========================= */
+    .thumb {
+      width: 70px;
+      height: 100px;
+      object-fit: contain;
+      background: #f8f8f8;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+    }
+
+    /* =========================
+      정렬 입력 (순번)
+    ========================= */
+    .sort-input {
+      width: 70px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      text-align: center;
+      font-size: 13px;
+    }
+
+    .sort-input:focus {
+      outline: none;
+      border-color: #0f2679;
+      box-shadow: 0 0 0 2px rgba(15, 38, 121, 0.1);
+    }
+
+    /* =========================
+      테이블 버튼 간격
+    ========================= */
+    td button {
+      margin-right: 4px;
+    }
+
+
   </style>
 </head>
 
@@ -102,7 +205,14 @@ async function loadItems() {
       <td>${i.title}</td>
       <td>${categoryName(i.category)}</td>
       <td>${i.lang.toUpperCase()}</td>
-      <td>${i.sort_order}</td>
+
+      <td>
+        <input type="number"
+              value="${i.sort_order}"
+              class="sort-input"
+              onblur="updateSortOrder(${i.id}, this.value)">
+      </td>
+
       <td>
         ${i.file_url
           ? `<a href="${i.file_url}" target="_blank">다운로드</a>`
@@ -141,6 +251,27 @@ async function deleteItem(id){
     alert(out.message);
   }
 }
+
+async function updateSortOrder(id, value) {
+  if (value === "" || isNaN(value)) return;
+
+  const res = await fetch(`/api/catalog/update-sort/${id}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + localStorage.getItem("token")
+    },
+    body: JSON.stringify({ sort_order: value })
+  });
+
+  if (!res.ok) {
+    const out = await res.json();
+    alert(out.message || "정렬 순서 수정 실패");
+  } else {
+    loadItems(); // 반영 후 재로딩
+  }
+}
+
 
 loadItems();
 </script>

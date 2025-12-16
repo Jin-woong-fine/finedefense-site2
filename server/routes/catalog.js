@@ -59,6 +59,7 @@ router.post(
   async (req, res) => {
     try {
       const { title, lang, category, sort_order } = req.body;
+      const safeSort = Number.isInteger(+sort_order) ? +sort_order : 9999;
 
       if (!title || !lang || !category) {
         return res.status(400).json({ message: "필수 값 누락" });
