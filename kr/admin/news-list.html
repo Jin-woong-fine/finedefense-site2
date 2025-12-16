@@ -168,6 +168,7 @@
      전역 변수
   =========================== */
   const PAGE_SIZE = 10;
+  const DEFAULT_NEWS_IMAGE = "/img/defaults/news-default.png";
   let allNews = [];
   let filteredNews = [];
   let currentLang = "kr";
@@ -214,34 +215,37 @@
      테이블 렌더링
   =========================== */
   function renderTable() {
-    const tbody = document.getElementById("newsTbody");
+  const tbody = document.getElementById("newsTbody");
 
-    if (!filteredNews.length) {
-      tbody.innerHTML =
-        `<tr><td colspan="6" style="text-align:center;color:#777;">뉴스 없음</td></tr>`;
-      return;
-    }
+  if (!filteredNews.length) {
+    tbody.innerHTML =
+      `<tr><td colspan="6" style="text-align:center;color:#777;">뉴스 없음</td></tr>`;
+    return;
+  }
 
-    const start = (currentPage - 1) * PAGE_SIZE;
-    const pageItems = filteredNews.slice(start, start + PAGE_SIZE);
-    const total = filteredNews.length;
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const pageItems = filteredNews.slice(start, start + PAGE_SIZE);
+  const total = filteredNews.length;
 
-    tbody.innerHTML = pageItems.map((n, i) => `
+  tbody.innerHTML = pageItems.map((n, i) => {
+    const imgSrc =
+      (n.main_image && typeof n.main_image === "string" && n.main_image.trim() !== "")
+        ? (n.main_image.startsWith("/") ? n.main_image : "/" + n.main_image)
+        : DEFAULT_NEWS_IMAGE;
+
+    return `
       <tr>
         <td>${total - (start + i)}</td>
+
         <td>
           <img
-            src="${
-              (n.main_image && typeof n.main_image === 'string')
-                ? (n.main_image.startsWith('/') ? n.main_image : '/' + n.main_image)
-                : DEFAULT_NEWS_IMAGE
-            }"
+            src="${imgSrc}"
             class="thumb"
-            onerror="this.src='${DEFAULT_NEWS_IMAGE}'"
+            alt="thumbnail"
+            onerror="this.onerror=null; this.src='${DEFAULT_NEWS_IMAGE}'"
           />
         </td>
 
-        <!-- 제목 -->
         <td onclick="openPublicView(event, ${n.id})" style="cursor:pointer;">
           ${n.title}
         </td>
@@ -251,24 +255,15 @@
 
         <td>
           <div class="actions">
-            <button
-              class="btn btn-small btn-gray"
-              onclick="editNews(event, ${n.id})"
-            >
-              수정
-            </button>
-
-            <button
-              class="btn btn-small btn-danger"
-              onclick="deleteNews(event, ${n.id})"
-            >
-              삭제
-            </button>
+            <button class="btn btn-small btn-gray" onclick="editNews(event, ${n.id})">수정</button>
+            <button class="btn btn-small btn-danger" onclick="deleteNews(event, ${n.id})">삭제</button>
           </div>
         </td>
       </tr>
-    `).join("");
-  }
+    `;
+  }).join("");
+}
+
 
   function renderPagination() {
     const pag = document.getElementById("pagination");
