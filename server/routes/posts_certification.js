@@ -5,7 +5,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
-import authMiddleware from "../middleware/auth.js";
+import { verifyToken } from "../middleware/auth.js";
 
 
 const router = express.Router();
@@ -184,27 +184,23 @@ router.get("/list", async (req, res) => {
    📌 리스트에서 순번 수정
 ============================================ */
 
-router.post("/update-sort/:id", authMiddleware, async (req, res) => {
+router.post("/update-sort/:id", verifyToken, async (req, res) => {
   const { id } = req.params;
   const { sort_order } = req.body;
 
-  // ⭐ 최소 방어 (여기!)
   const order = Number(sort_order);
   if (isNaN(order)) {
     return res.status(400).json({ message: "잘못된 순번 값" });
   }
 
-  try {
-    await db.execute(
-      "UPDATE cert_items SET sort_order=? WHERE id=?",
-      [order, id]
-    );
-    res.json({ success: true });
-  } catch (err) {
-    console.error("🔥 update-sort 오류:", err);
-    res.status(500).json({ message: "정렬 순서 업데이트 실패" });
-  }
+  await db.execute(
+    "UPDATE cert_items SET sort_order=? WHERE id=?",
+    [order, id]
+  );
+
+  res.json({ success: true });
 });
+
 
 
 
