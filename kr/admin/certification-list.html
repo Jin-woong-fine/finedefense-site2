@@ -181,7 +181,13 @@
           </td>
 
           <td>${i.lang.toUpperCase()}</td>
-          <td>${i.sort_order}</td>
+
+          <td>
+            <input type="number"
+                  value="${i.sort_order}"
+                  style="width:70px; padding:4px;"
+                  onblur="updateSortOrder(${i.id}, this.value); loadItems();">
+          </td>
 
           <td>
             <button class="btn-small"
@@ -228,6 +234,24 @@
       loadItems();
     } else {
       alert(out.message);
+    }
+  }
+
+  async function updateSortOrder(id, value){
+    if(value === "" || isNaN(value)) return;
+
+    const res = await fetch(`/api/cert-items/update-sort/${id}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token")
+      },
+      body: JSON.stringify({ sort_order: Number(value) })
+    });
+
+    if(!res.ok){
+      const out = await res.json();
+      alert(out.message || "정렬 순서 수정 실패");
     }
   }
 
