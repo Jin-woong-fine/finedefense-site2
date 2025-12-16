@@ -126,41 +126,68 @@
   <!-- Footer -->
   <div data-include="/en/components/footer.html"></div>
 
-  <!-- ===============================
-       DATA LOADING SCRIPT
-  ================================ -->
-  <script>
-    const categories = [
-      "kr_catalog",
-      "en_catalog",
-      "company_intro",
-      "etc"
-    ];
+<script>
+const categories = [
+  "kr_catalog",
+  "en_catalog",
+  "company_intro",
+  "etc"
+];
 
-    categories.forEach(cat => loadList(cat));
+// 페이지 로드 시 전체 로딩
+categories.forEach(category => loadCategory(category));
 
-    async function loadList(category) {
-      const res = await fetch(`/api/catalog/list?category=${category}`);
-      const data = await res.json();
+async function loadCategory(category) {
+  const container = document.getElementById(category);
+  const section = container.closest(".catalog-section");
 
-      const container = document.getElementById(category);
-      const section = container.closest(".catalog-section");
+  try {
+    const res = await fetch(`/api/catalog/list?category=${category}`);
+    if (!res.ok) throw new Error("API Error");
 
-      if (!data.length) {
-        section.style.display = "none";
-        return;
-      }
+    const data = await res.json();
 
-      container.innerHTML = data.map(i => `
-        <div class="card" onclick="openPdf('${i.file_url}', '${i.title}')">
-          <img src="${i.thumb_url}" class="thumb"
-               onerror="this.src='/img/common/pdf-placeholder.png'">
-          <div class="title">${i.title}</div>
-          <div class="btn-download">View PDF</div>
-        </div>
-      `).join("");
+    // 데이터 없으면 섹션 숨김
+    if (!data || data.length === 0) {
+      section.style.display = "none";
+      return;
     }
-  </script>
+
+    container.innerHTML = data.map(i => `
+      <div class="card" onclick="openPdf('${i.file_url}', '${escapeHtml(i.title)}')">
+        <img 
+          src="${i.thumb_url || '/img/common/pdf-placeholder.png'}"
+          class="thumb"
+          onerror="this.src='/img/common/pdf-placeholder.png'"
+        >
+        <div class="title">${escapeHtml(i.title)}</div>
+
+        ${i.file_url
+          ? `<a class="btn-download" 
+               href="${i.file_url}" 
+               download 
+               onclick="event.stopPropagation()">다운로드</a>`
+          : `<span style="color:#777;">파일 없음</span>`}
+      </div>
+    `).join("");
+
+  } catch (err) {
+    console.error(err);
+    section.style.display = "none"; // 오류 시도 노출 안 함
+  }
+}
+
+// XSS / 특수문자 방지 (관리자 입력 대비)
+function escapeHtml(text = "") {
+  return text.replace(/[&<>"']/g, m => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  }[m]));
+}
+</script>
 
 <!-- ===============================
      PDF VIEWER MODAL (업그레이드 완전체)
@@ -275,10 +302,15 @@ document.addEventListener("fullscreenchange", () => {
 </script>
 
 
-  <script src="/js/include.js"></script>
-  <script src="/js/session_timer.js"></script>
-  <script src="/js/language.js"></script>
-  <script src="/js/nav.js"></script>
+
+
+    <!-- 공통 스크립트 -->
+    <script src="/js/include.js"></script>
+    <script src="/js/session_timer.js"></script>
+    <script src="/js/language.js"></script>
+    <script src="/js/nav.js"></script>
+
+
 
 </body>
 </html>
