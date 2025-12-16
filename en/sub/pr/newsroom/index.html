@@ -155,12 +155,25 @@
 
     box.innerHTML = sliced
       .map((v) => {
-        const img = v.main_image || "/img/no-image.jpg";
+        let imgSrc = "/img/default_img/default-news.png"; // ✅ EN 기본 썸네일
+
+        if (v.main_image && typeof v.main_image === "string") {
+          // 상대경로면 / 붙이기
+          imgSrc = v.main_image.startsWith("/")
+            ? v.main_image
+            : `/${v.main_image}`;
+        }
+
         const date = v.created_at?.substring(0, 10) || "";
 
         return `
           <div class="news-card" onclick="openNews(${v.id})">
-            <img src="${img}" class="news-thumb">
+            <img 
+              src="${imgSrc}" 
+              class="news-thumb"
+              alt="News thumbnail"
+              onerror="this.src='/img/default_img/default-news.png'"
+            >
             <div class="news-content">
               <div class="news-title">${v.title}</div>
               <div class="news-date">${date}</div>
@@ -169,6 +182,7 @@
         `;
       })
       .join("");
+
 
     renderPagination(totalPages, currentPage);
   }

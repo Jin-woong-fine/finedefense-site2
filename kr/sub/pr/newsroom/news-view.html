@@ -184,18 +184,16 @@
       const safeContent = data.content.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "");
       document.getElementById("content").innerHTML = safeContent;
 
-      // 이미지들 표시 (없으면 기본 이미지)
+      // 이미지들 표시 (KR: 기본 이미지 사용 안 함)
       const box = document.getElementById("images");
-      const defaultImage = "/img/default_img/default-news.png";
 
-      if (data.images && data.images.length > 0) {
+      if (Array.isArray(data.images) && data.images.length > 0) {
         box.innerHTML = data.images
           .map(img => `<img src="/${img.replace(/^\/+/, '')}" alt="뉴스 이미지">`)
           .join("");
       } else {
-        box.innerHTML = `
-          <img src="${defaultImage}" alt="기본 뉴스 이미지" class="default-news-image">
-        `;
+        // 🔥 KR 페이지: 아무것도 표시하지 않음
+        box.innerHTML = "";
       }
 
     }
