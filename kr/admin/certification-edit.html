@@ -7,14 +7,56 @@
 
   <style>
     .form-box {
-      background:#fff; padding:30px; border-radius:12px;
-      width:600px; margin:40px auto;
+      background:#fff;
+      padding:30px;
+      border-radius:12px;
+      width:600px;
+      margin:40px auto;
       box-shadow:0 4px 12px rgba(0,0,0,0.1);
     }
-    label { font-weight:600; display:block; margin-top:18px; }
-    input, select { width:100%; padding:10px; margin-top:6px; }
-    .btn { margin-top:25px; padding:10px 18px; background:#0f2679; color:#fff; border-radius:8px; cursor:pointer; }
+    label {
+      font-weight:600;
+      display:block;
+      margin-top:18px;
+    }
+    input, select {
+      width:100%;
+      padding:10px;
+      margin-top:6px;
+    }
+    .btn {
+      margin-top:25px;
+      padding:10px 18px;
+      background:#0f2679;
+      color:#fff;
+      border-radius:8px;
+      cursor:pointer;
+    }
+
+    /* ⭐ 미리보기 */
+    .preview-box {
+      margin-top:10px;
+      padding:12px;
+      border:1px dashed #ccc;
+      border-radius:8px;
+      text-align:center;
+      background:#fafafa;
+    }
+    .preview-box img {
+      max-width:160px;
+      max-height:220px;
+      object-fit:contain;
+      border:1px solid #ddd;
+      border-radius:6px;
+      background:#fff;
+    }
+    .file-name {
+      margin-top:6px;
+      font-size:13px;
+      color:#555;
+    }
   </style>
+
 </head>
 
 <body>
@@ -64,80 +106,141 @@
     <label>정렬 순서</label>
     <input type="number" id="sort_order">
 
+    <label>현재 썸네일</label>
+    <div class="preview-box">
+      <img id="thumbPreview" src="" alt="썸네일 미리보기">
+    </div>
+
     <label>썸네일 변경 (선택)</label>
     <input type="file" id="thumb" accept="image/*">
 
+    <label>현재 원본 파일</label>
+    <div class="preview-box">
+      <img id="filePreviewImg" style="display:none;">
+      <div id="filePreviewText" class="file-name">파일 없음</div>
+    </div>
+
     <label>원본 파일 변경 (선택)</label>
     <input type="file" id="file">
+
 
     <button class="btn" onclick="updateForm()">수정 완료</button>
   </div>
 </div>
 
+
 <script src="/kr/admin/js/sidebar.js"></script>
 <script src="/kr/admin/js/common_auth.js"></script>
 
 <script>
-  loadSidebar("certifications");  /* ⭐ 추가해야 함 */
-  loadItems();
-</script>
+document.addEventListener("DOMContentLoaded", () => {
 
+  const params = new URLSearchParams(location.search);
+  const id = params.get("id");
 
+  loadSidebar("certifications");
 
-<script>
-const params = new URLSearchParams(location.search);
-const id = params.get("id");
+  const el = id => document.getElementById(id);
 
-async function loadDetail(){
-  const res = await fetch(`/api/cert-items/detail/${id}`);
-  const d = await res.json();
+  /* =========================
+     상세 불러오기
+  ========================= */
+  async function loadDetail(){
+    const res = await fetch(`/api/cert-items/detail/${id}`);
+    const d = await res.json();
 
-  document.getElementById("id").value = d.id;
+    el("id").value = d.id;
 
-  document.getElementById("type").innerHTML = `
-    <option value="cert" ${d.type==='cert'?'selected':''}>인증</option>
-    <option value="patent" ${d.type==='patent'?'selected':''}>특허</option>
-  `;
+    el("type").innerHTML = `
+      <option value="cert" ${d.type === "cert" ? "selected" : ""}>인증</option>
+      <option value="patent" ${d.type === "patent" ? "selected" : ""}>특허</option>
+    `;
 
-  document.getElementById("title_kr").value = d.title_kr;
-  document.getElementById("title_en").value = d.title_en;
-  document.getElementById("lang").value = d.lang;
-  document.getElementById("sort_order").value = d.sort_order;
-}
+    el("title_kr").value = d.title_kr || "";
+    el("title_en").value = d.title_en || "";
+    el("lang").value = d.lang;
+    el("sort_order").value = d.sort_order;
 
-async function updateForm(){
-  const fd = new FormData();
-  fd.append("type", document.getElementById("type").value);
-  fd.append("title_kr", document.getElementById("title_kr").value);
-  fd.append("title_en", document.getElementById("title_en").value);
-  fd.append("lang", document.getElementById("lang").value);
-  fd.append("sort_order", document.getElementById("sort_order").value);
+    if(d.thumb_url){
+      el("thumbPreview").src = d.thumb_url;
+    }
 
-  if(document.getElementById("thumb").files.length > 0){
-    fd.append("thumb", document.getElementById("thumb").files[0]);
+    if(d.file_url){
+      if(d.file_url.match(/\.(jpg|jpeg|png|webp)$/i)){
+        el("filePreviewImg").src = d.file_url;
+        el("filePreviewImg").style.display = "block";
+        el("filePreviewText").style.display = "none";
+      } else {
+        el("filePreviewText").innerText = d.file_url.split("/").pop();
+        el("filePreviewText").style.display = "block";
+        el("filePreviewImg").style.display = "none";
+      }
+    }
   }
-  if(document.getElementById("file").files.length > 0){
-    fd.append("file", document.getElementById("file").files[0]);
-  }
 
-  const res = await fetch(`/api/cert-items/update/${id}`, {
-    method:"POST",
-    headers:{ Authorization:"Bearer "+localStorage.getItem("token") },
-    body: fd
+  /* =========================
+     미리보기
+  ========================= */
+  el("thumb").addEventListener("change", e => {
+    if(e.target.files.length){
+      el("thumbPreview").src = URL.createObjectURL(e.target.files[0]);
+    }
   });
 
-  const out = await res.json();
+  el("file").addEventListener("change", e => {
+    const file = e.target.files[0];
+    if(!file) return;
 
-  if(res.ok){
-    alert("수정 완료");
-    location.href = "certification-list.html";
-  } else {
-    alert(out.message);
-  }
-}
+    if(file.type.startsWith("image/")){
+      el("filePreviewImg").src = URL.createObjectURL(file);
+      el("filePreviewImg").style.display = "block";
+      el("filePreviewText").style.display = "none";
+    } else {
+      el("filePreviewImg").style.display = "none";
+      el("filePreviewText").style.display = "block";
+      el("filePreviewText").innerText = file.name;
+    }
+  });
 
-loadDetail();
+  /* =========================
+     수정 제출
+  ========================= */
+  window.updateForm = async function(){
+    const fd = new FormData();
+
+    fd.append("type", el("type").value);
+    fd.append("title_kr", el("title_kr").value);
+    fd.append("title_en", el("title_en").value);
+    fd.append("lang", el("lang").value);
+    fd.append("sort_order", el("sort_order").value);
+
+    if(el("thumb").files.length) fd.append("thumb", el("thumb").files[0]);
+    if(el("file").files.length) fd.append("file", el("file").files[0]);
+
+    const res = await fetch(`/api/cert-items/update/${id}`, {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token")
+      },
+      body: fd
+    });
+
+    const out = await res.json();
+
+    if(res.ok){
+      alert("수정 완료");
+      location.href = "certification-list.html";
+    } else {
+      alert(out.message);
+    }
+  };
+
+  loadDetail();
+});
 </script>
+
+
+
 
 </body>
 </html>
