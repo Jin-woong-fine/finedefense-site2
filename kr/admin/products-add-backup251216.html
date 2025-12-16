@@ -14,13 +14,6 @@
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
   <style>
-    .field-guide {
-      font-size: 0.85rem;
-      color: #6b7280;
-      margin: -6px 0 14px;
-      line-height: 1.4;
-    }
-
     .thumb-preview {
       display: flex;
       gap: 10px;
@@ -131,24 +124,6 @@
   <form id="productForm" enctype="multipart/form-data">
 
     <section class="panel">
-      <h2>기존 제품 불러오기 (선택)</h2>
-
-      <select id="copyFromProduct" class="input">
-        <option value="">기존 제품 선택 (선택사항)</option>
-      </select>
-
-      <div class="field-guide">
-        선택한 제품의 내용을 불러와 신규 제품으로 등록할 수 있습니다.<br>
-        (영문 페이지 생성, 유사 케이블 등록 시 유용)
-      </div>
-
-      <button type="button" class="btn btn-secondary" onclick="loadFromExisting()">
-        불러오기
-      </button>
-    </section>
-
-
-    <section class="panel">
       <h2>제품 기본 정보</h2>
 
       <input id="title" class="input" placeholder="제품명 입력" required />
@@ -213,64 +188,6 @@ const editor = new toastui.Editor({
   initialEditType: 'wysiwyg',
   previewStyle: 'vertical',
 });
-
-/* ============================================================
-   🔥 기존 제품 목록 불러오기
-============================================================ */
-async function loadProductList() {
-  const res = await fetch("/api/products", {
-    headers: authHeaders()
-  });
-  const out = await res.json();
-
-  const select = document.getElementById("copyFromProduct");
-
-  out.products.forEach(p => {
-    const opt = document.createElement("option");
-    opt.value = p.id;
-    opt.textContent = `[${p.lang.toUpperCase()}] ${p.title}`;
-    select.appendChild(opt);
-  });
-}
-
-loadProductList();
-
-/* ============================================================
-   🔥 선택한 제품 내용 → 신규 폼에 채우기 (핵심)
-============================================================ */
-
-async function loadFromExisting() {
-  const id = document.getElementById("copyFromProduct").value;
-  if (!id) return;
-
-  if (!confirm("선택한 제품의 내용을 불러오시겠습니까?\n(현재 입력 내용은 덮어씌워집니다)")) {
-    return;
-  }
-
-  const res = await fetch(`/api/products/${id}`, {
-    headers: authHeaders()
-  });
-  const out = await res.json();
-
-  const p = out.product;
-
-  // 텍스트 필드 채우기
-  document.getElementById("title").value = p.title;
-  document.getElementById("summary").value = p.summary;
-  document.getElementById("category").value = p.category;
-  document.getElementById("lang").value = p.lang;
-  document.getElementById("sort_order").value = p.sort_order;
-
-  // 에디터 내용
-  editor.setHTML(p.description_html || "");
-
-  // 🔹 기존 업로드된 신규 이미지 초기화
-  imageFiles = [];
-  renderPreviews();
-
-  alert("제품 내용이 불러와졌습니다.\n필요한 부분을 수정 후 등록하세요.");
-}
-
 
 /* ============================================================
    🔥 이미지 프리뷰 + 삭제 + 정렬
@@ -361,9 +278,6 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
     alert("서버 오류 발생");
   }
 });
-
-
-
 </script>
 
 </body>
