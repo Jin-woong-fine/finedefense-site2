@@ -218,22 +218,46 @@ const editor = new toastui.Editor({
    🔥 기존 제품 목록 불러오기
 ============================================================ */
 async function loadProductList() {
-  const res = await fetch("/api/products", {
-    headers: authHeaders()
-  });
-  const out = await res.json();
+  try {
+    const res = await fetch("/api/products", {
+      headers: authHeaders()
+    });
 
-  const select = document.getElementById("copyFromProduct");
+    if (!res.ok) {
+      console.error("제품 목록 요청 실패", res.status);
+      return;
+    }
 
-  out.products.forEach(p => {
-    const opt = document.createElement("option");
-    opt.value = p.id;
-    opt.textContent = `[${p.lang.toUpperCase()}] ${p.title}`;
-    select.appendChild(opt);
-  });
+    const out = await res.json();
+
+    const select = document.getElementById("copyFromProduct");
+
+    // 🔥 서버 응답 형태 방어
+    const list = Array.isArray(out)
+      ? out
+      : (out.products || out.data || []);
+
+    if (!Array.isArray(list) || !list.length) {
+      console.warn("제품 목록이 비어있거나 응답 구조가 다릅니다.", out);
+      return;
+    }
+
+    list.forEach(p => {
+      if (!p?.id || !p?.title) return; // 방어
+
+      const opt = document.createElement("option");
+      opt.value = p.id;
+      opt.textContent = `[${(p.lang || "kr").toUpperCase()}] ${p.title}`;
+      select.appendChild(opt);
+    });
+
+  } catch (err) {
+    console.error("제품 목록 로딩 중 오류", err);
+  }
 }
 
 loadProductList();
+
 
 /* ============================================================
    🔥 선택한 제품 내용 → 신규 폼에 채우기 (핵심)
