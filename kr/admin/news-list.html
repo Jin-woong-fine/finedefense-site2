@@ -235,13 +235,30 @@
             class="thumb"
           />
         </td>
-        <td onclick="openPublicView(${n.id})">${n.title}</td>
+
+        <!-- 제목 -->
+        <td onclick="openPublicView(event, ${n.id})" style="cursor:pointer;">
+          ${n.title}
+        </td>
+
         <td>${formatDate(n.created_at)}</td>
         <td>${n.views ?? "-"}</td>
+
         <td>
           <div class="actions">
-            <button class="btn btn-small btn-gray" onclick="editNews(${n.id})">수정</button>
-            <button class="btn btn-small btn-danger" onclick="deleteNews(${n.id})">삭제</button>
+            <button
+              class="btn btn-small btn-gray"
+              onclick="editNews(event, ${n.id})"
+            >
+              수정
+            </button>
+
+            <button
+              class="btn btn-small btn-danger"
+              onclick="deleteNews(event, ${n.id})"
+            >
+              삭제
+            </button>
           </div>
         </td>
       </tr>
@@ -271,9 +288,21 @@
   /* ===========================
      CRUD
   =========================== */
-    async function deleteNews(id) {
-      if (!confirm("삭제하시겠습니까?")) return;
+  function openPublicView(e, id) {
+    e.stopPropagation();
+    window.open(`/kr/sub/pr/news/news-view.html?id=${id}`, "_blank");
+  }
 
+  function editNews(e, id) {
+    e.stopPropagation();
+    location.href = `/kr/admin/news-edit.html?id=${id}`;
+  }
+
+  async function deleteNews(e, id) {
+    e.stopPropagation();
+    if (!confirm("삭제하시겠습니까?")) return;
+
+    try {
       const res = await fetch(`/api/news/delete/${id}`, {
         method: "DELETE",
         headers: {
@@ -289,7 +318,11 @@
       } else {
         alert("삭제 실패: " + (out.message || "알 수 없는 오류"));
       }
+    } catch (err) {
+      console.error(err);
+      alert("서버 통신 오류");
     }
+  }
 
   /* ===========================
      뉴스 데이터 로드
