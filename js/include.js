@@ -15,7 +15,8 @@ document.addEventListener("DOMContentLoaded", () => {
         el.innerHTML = html;
 
         // admin bar가 로드되었음을 body에 표시 → padding-top 등 조정
-        document.body.classList.add("has-admin-bar");
+        // ❌ include.js에서는 절대 body 상태를 건드리지 않는다
+        // document.body.classList.add("has-admin-bar");
         return; // 아래 일반 include 로직 실행 안함
       }
 
@@ -43,9 +44,6 @@ document.addEventListener("DOMContentLoaded", () => {
     document.dispatchEvent(new Event("includeLoaded"));
   }, 20);
 });
-
-
-
 
 
 document.addEventListener("includeLoaded", () => {
