@@ -1,10 +1,6 @@
 /****************************************************
  * 🔐 Fine Defense Admin — Common Auth (2025 완전체)
  ****************************************************/
-
-const IS_ADMIN_PAGE = location.pathname.startsWith("/kr/admin/");
-
-
 console.log("%c[auth] common_auth.js 로드됨", "color:#ff9800;font-weight:bold;");
 
 /****************************************************
@@ -66,17 +62,11 @@ function requireSuperadminStrict() {
 /****************************************************
  * 3) 로그아웃
  ****************************************************/
-function logout(force = false) {
-  if (!IS_ADMIN_PAGE && !force) {
-    console.warn("[auth] 홈페이지에서는 로그아웃 차단");
-    return;
-  }
-
+function logout() {
   localStorage.clear();
   sessionStorage.setItem("logoutNotice", "1");
   location.href = "/kr/admin/login.html";
 }
-
 
 
 /****************************************************
@@ -198,14 +188,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 🔥 관리자 페이지에서만 세션 제어
-  if (IS_ADMIN_PAGE) {
-    startSessionWatcher();
-    startSessionCountdown();
-  } else {
-    // 홈페이지: 표시만 (카운트다운 OK)
-    startSessionCountdown();
-  }
+  startSessionWatcher();
+  startSessionCountdown();
 });
 
 /****************************************************
@@ -227,7 +211,6 @@ function showToast(message, duration = 1500) {
     setTimeout(() => toast.remove(), 500);
   }, duration);
 }
-
 
 
 
