@@ -1,12 +1,12 @@
 // server/routes/traffic.js
 import express from "express";
 import db from "../config/db.js";
-import geoip from "geoip-lite";  // ⭐ 추가
+import geoip from "geoip-lite";
 
 const router = express.Router();
 
 /* ================================
-   🟦 공통 함수: 디바이스 식별
+   🟦 공통 함수
 ================================ */
 function parseDevice(ua = "") {
   ua = ua.toLowerCase();
@@ -15,33 +15,44 @@ function parseDevice(ua = "") {
   return "pc";
 }
 
+function getClientIp(req) {
+  const raw =
+    req.headers["x-forwarded-for"]?.split(",")[0]?.trim() ||
+    req.socket?.remoteAddress ||
+    req.ip;
+
+  if (!raw) return null;
+  if (raw === "::1") return null;
+
+  // IPv4-mapped IPv6
+  if (raw.startsWith("::ffff:")) {
+    return raw.replace("::ffff:", "");
+  }
+
+  return raw;
+}
+
 /* ================================
    🟦 1) 방문 기록 저장
-   POST /api/traffic/visit
 ================================ */
 router.post("/visit", async (req, res) => {
   try {
-    // 🔥 1) IP 가져오기 (Proxy 대비)
-    const ip =
-      req.headers["x-forwarded-for"]?.split(",")[0] ||
-      req.ip ||
-      "unknown";
-
+    const ip = getClientIp(req);
     const ua = req.headers["user-agent"] || "";
     const device = parseDevice(ua);
-
     const { page = "", referrer = "" } = req.body;
 
-    // 🔥 2) 국가 자동 감지
-    const geo = geoip.lookup(ip);
-    const country = geo?.country || "UNKNOWN";
+    let country = "UNKNOWN";
+    if (ip) {
+      const geo = geoip.lookup(ip);
+      if (geo?.country) country = geo.country;
+    }
 
-    // 🔥 3) DB 저장
     await db.execute(
       `INSERT INTO traffic_logs
        (ip, user_agent, device_type, referrer, page, country)
        VALUES (?, ?, ?, ?, ?, ?)`,
-      [ip, ua, device, referrer, page, country]
+      [ip || "unknown", ua, device, referrer, page, country]
     );
 
     res.json({ message: "logged", ip, country });
@@ -64,7 +75,6 @@ router.get("/daily", async (req, res) => {
     ORDER BY day DESC
     LIMIT 30
   `);
-
   res.json(rows);
 });
 
@@ -82,7 +92,6 @@ router.get("/monthly", async (req, res) => {
     ORDER BY year DESC, month DESC
     LIMIT 12
   `);
-
   res.json(rows);
 });
 
@@ -100,7 +109,6 @@ router.get("/page-view", async (req, res) => {
     ORDER BY views DESC
     LIMIT 50
   `);
-
   res.json(rows);
 });
 
@@ -118,7 +126,6 @@ router.get("/referrer", async (req, res) => {
     ORDER BY cnt DESC
     LIMIT 50
   `);
-
   res.json(rows);
 });
 
@@ -133,7 +140,6 @@ router.get("/device", async (req, res) => {
     FROM traffic_logs
     GROUP BY device_type
   `);
-
   res.json(rows);
 });
 
@@ -149,8 +155,27 @@ router.get("/country", async (req, res) => {
     GROUP BY country
     ORDER BY cnt DESC
   `);
-
   res.json(rows);
+});
+
+/* ================================
+   🟦 8) 오래된 로그 정리 (🔥 중요)
+   기본: 180일 초과 삭제
+================================ */
+router.delete("/cleanup", async (req, res) => {
+  const days = Number(req.query.days || 180);
+
+  const [result] = await db.execute(
+    `DELETE FROM traffic_logs
+     WHERE created_at < DATE_SUB(NOW(), INTERVAL ? DAY)`,
+    [days]
+  );
+
+  res.json({
+    message: "cleanup done",
+    deleted: result.affectedRows,
+    days
+  });
 });
 
 export default router;
