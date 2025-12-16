@@ -69,6 +69,7 @@ async function loadSidebar(activePage = "") {
 
   if (role === "admin" || role === "superadmin") {
     menu.push({ title: "사용자 관리", link: "/kr/admin/users.html", key: "users" });
+    menu.push({ title: "로그인 로그", link: "/kr/admin/login_logs.html", key: "logs" });
   }
 
   // -------------------------------------------------------------
