@@ -64,17 +64,16 @@
 
     /* 모달 */
     .modal-bg {
-      display: none;
+      display: none;          /* ⭐ 기본은 무조건 숨김 */
       position: fixed;
       inset: 0;
       background: rgba(0,0,0,0.65);
       z-index: 9999;
 
-      display: flex;
       align-items: center;
       justify-content: center;
 
-      padding: 60px;   /* ⭐ 여기! 모달 사이 간격 */
+      padding: 60px;
       box-sizing: border-box;
     }
 
