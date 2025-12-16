@@ -39,8 +39,12 @@
       padding:12px;
       border:1px dashed #ccc;
       border-radius:8px;
-      text-align:center;
       background:#fafafa;
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;   /* ⭐ 가로 중앙 */
+      justify-content: center;
     }
     .preview-box img {
       max-width:160px;
@@ -54,6 +58,8 @@
       margin-top:6px;
       font-size:13px;
       color:#555;
+      text-align: center;   /* ⭐ 혹시 모를 예외 방지 */
+      word-break: break-all;
     }
   </style>
 
