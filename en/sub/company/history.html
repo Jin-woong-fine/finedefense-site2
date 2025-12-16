@@ -149,6 +149,41 @@
         border-radius: 8px;
       }
 
+      /* =========================================
+        ⬆ Scroll To Top Button
+      ========================================= */
+      #scrollTopBtn {
+        position: fixed;
+        right: 28px;        /* ← 왼쪽으로 하고 싶으면 left:28px */
+        bottom: 32px;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        border: none;
+        background: #0f2679;
+        color: #fff;
+        font-size: 16px;
+        cursor: pointer;
+        box-shadow: 0 6px 18px rgba(15,38,121,0.35);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        z-index: 999;
+      }
+
+      #scrollTopBtn:hover {
+        transform: translateY(-4px);
+        background: #081a55;
+      }
+
+      #scrollTopBtn.show {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+
+
+
     </style>
   </head>
 
@@ -515,6 +550,12 @@
   </section>
 
 
+    <!-- ⬆ Scroll to Top Button -->
+    <button id="scrollTopBtn" aria-label="Scroll to top">
+      <i class="fas fa-chevron-up"></i>
+    </button>
+
+
     <!-- 공통 푸터 -->
     <div data-include="/en/components/footer.html"></div>
 
@@ -523,6 +564,27 @@
     <script src="/js/session_timer.js"></script>
     <script src="/js/language.js"></script>
     <script src="/js/nav.js"></script>
+
+
+    <script>
+      const scrollBtn = document.getElementById("scrollTopBtn");
+
+      window.addEventListener("scroll", () => {
+        if (window.scrollY > 300) {
+          scrollBtn.classList.add("show");
+        } else {
+          scrollBtn.classList.remove("show");
+        }
+      });
+
+      scrollBtn.addEventListener("click", () => {
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth"
+        });
+      });
+    </script>
+
 
   </body>
 </html>
