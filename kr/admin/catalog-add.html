@@ -4,10 +4,108 @@
   <meta charset="UTF-8">
   <title>카탈로그 추가 | 관리자</title>
   <link rel="stylesheet" href="/kr/admin/css/admin.css">
+
   <style>
-    .form-box { max-width:650px; background:#fff; padding:30px; border-radius:12px; box-shadow:0 4px 14px rgba(0,0,0,0.08); margin:30px; }
-    .form-box input, select { width:100%; padding:10px; margin-top:8px; margin-bottom:20px; border:1px solid #ccc; border-radius:6px; }
-    .btn-blue { padding:10px 16px; background:#0f2679; color:#fff; border-radius:6px; cursor:pointer; border:none; }
+    .form-box{
+      max-width: 820px;
+      background:#fff;
+      padding: 36px 40px 42px;
+      border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      margin: 40px;
+    }
+
+    label{ font-weight:600; display:block; margin-top:22px; font-size:14px; }
+
+    .form-box input, .form-box select{
+      width:100%;
+      padding: 11px 12px;
+      margin-top: 8px;
+      border:1px solid #ccc;
+      border-radius:8px;
+      font-size:14px;
+      box-sizing:border-box;
+    }
+
+    .btn-blue{
+      margin-top: 30px;
+      padding: 12px 22px;
+      background:#0f2679;
+      color:#fff;
+      border-radius:10px;
+      cursor:pointer;
+      border:none;
+      font-size:15px;
+    }
+    .btn-blue[disabled]{
+      opacity: .6;
+      cursor: not-allowed;
+    }
+
+    /* 미리보기 */
+    .preview-section{
+      display:grid;
+      grid-template-columns: 180px 1fr;
+      gap: 22px;
+      margin-bottom: 34px;
+      padding-bottom: 28px;
+      border-bottom: 1px solid #e5e8f0;
+    }
+    .preview-card{
+      background:#fafbfe;
+      border:1px solid #e2e5ec;
+      border-radius:12px;
+      padding:14px;
+    }
+    .preview-title{
+      font-size:13px;
+      font-weight:700;
+      color:#0f2679;
+      margin-bottom:10px;
+    }
+    .preview-body{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#fff;
+      border-radius:10px;
+      min-height:210px;
+      border:1px dashed #d7dbea;
+      padding:10px;
+    }
+    .thumb-preview{
+      width: 140px;
+      height: 190px;
+      object-fit: contain;
+      background:#f3f3f3;
+      border-radius:6px;
+    }
+    .preview-body iframe{
+      width:100%;
+      height: 220px;
+      border:none;
+      border-radius:8px;
+    }
+    .preview-empty{
+      font-size:13px;
+      color:#999;
+      text-align:center;
+      word-break: break-all;
+    }
+
+    /* 상태 메시지 */
+    .hint{
+      margin-top: 10px;
+      font-size: 13px;
+      color: #666;
+    }
+    .error{
+      margin-top: 10px;
+      font-size: 13px;
+      color: #d9534f;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
   </style>
 </head>
 
@@ -16,26 +114,39 @@
 <div id="sidebar"></div>
 
 <div class="main">
-
-  <!-- 🔵 TOPBAR -->
+  <!-- TOPBAR -->
   <div class="topbar">
     <div class="title">카탈로그 추가</div>
-
     <div style="display:flex; align-items:center; gap:12px;">
-
-      <!-- ⭐ 세션 타이머 -->
       <span id="session-timer" class="session-timer">세션 계산중...</span>
-
       <div class="topbar-user" id="topbarUser">
         <span id="topbarUserName">관리자</span> ▾
         <div class="user-dropdown" id="userDropdown"></div>
       </div>
-
       <button onclick="location.href='../index.html'">홈으로</button>
     </div>
   </div>
 
   <div class="form-box">
+
+    <!-- 미리보기 -->
+    <div class="preview-section">
+      <div class="preview-card">
+        <div class="preview-title">썸네일 미리보기</div>
+        <div class="preview-body">
+          <img id="thumbPreview" class="thumb-preview" style="display:none;">
+          <div id="thumbEmpty" class="preview-empty">썸네일을 선택하세요</div>
+        </div>
+      </div>
+
+      <div class="preview-card">
+        <div class="preview-title">PDF 미리보기</div>
+        <div class="preview-body">
+          <iframe id="filePreviewPdf" style="display:none;"></iframe>
+          <div id="filePreviewText" class="preview-empty">PDF를 선택하세요</div>
+        </div>
+      </div>
+    </div>
 
     <label>카테고리</label>
     <select id="category">
@@ -52,7 +163,7 @@
     </select>
 
     <label>제목</label>
-    <input type="text" id="title">
+    <input type="text" id="title" placeholder="예) Fine Defense Catalog 2025">
 
     <label>썸네일 이미지</label>
     <input type="file" id="thumb" accept="image/*">
@@ -60,12 +171,14 @@
     <label>PDF 파일</label>
     <input type="file" id="file" accept="application/pdf">
 
-    <label>정렬(작을수록 위)</label>
+    <label>정렬 (작을수록 위)</label>
     <input type="number" id="sort" value="9999">
 
-    <button class="btn-blue" onclick="save()">등록</button>
-  </div>
+    <button id="saveBtn" class="btn-blue" onclick="save()">등록</button>
 
+    <div class="hint">※ 업로드가 안 되면 아래 에러 메시지가 뜹니다. 그대로 복붙해줘도 됨.</div>
+    <div id="errBox" class="error" style="display:none;"></div>
+  </div>
 </div>
 
 <script src="/kr/admin/js/sidebar.js"></script>
@@ -73,36 +186,93 @@
 
 <script>
 loadSidebar("catalog");
+const el = (id) => document.getElementById(id);
+
+function showError(msg){
+  el("errBox").style.display = "block";
+  el("errBox").textContent = msg;
+}
+function clearError(){
+  el("errBox").style.display = "none";
+  el("errBox").textContent = "";
+}
+
+/* 미리보기 */
+el("thumb").addEventListener("change", (e) => {
+  const f = e.target.files[0];
+  if(!f) return;
+  el("thumbPreview").src = URL.createObjectURL(f);
+  el("thumbPreview").style.display = "block";
+  el("thumbEmpty").style.display = "none";
+});
+
+el("file").addEventListener("change", (e) => {
+  const f = e.target.files[0];
+  if(!f) return;
+  el("filePreviewPdf").src = URL.createObjectURL(f);
+  el("filePreviewPdf").style.display = "block";
+  el("filePreviewText").style.display = "none";
+});
 
 async function save(){
+  clearError();
+
+  const title = el("title").value.trim();
+  if(!title){
+    showError("제목은 필수입니다.");
+    el("title").focus();
+    return;
+  }
+  if(!el("file").files[0]){
+    showError("PDF 파일은 필수입니다.");
+    el("file").focus();
+    return;
+  }
+
   const fd = new FormData();
+  fd.append("category", el("category").value);
+  fd.append("lang", el("lang").value);
+  fd.append("title", title);
+  fd.append("sort_order", el("sort").value || "9999");
 
-  fd.append("category", document.getElementById("category").value);
-  fd.append("lang", document.getElementById("lang").value);
-  fd.append("title", document.getElementById("title").value);
-  fd.append("sort_order", document.getElementById("sort").value);
+  if(el("thumb").files[0]) fd.append("thumb", el("thumb").files[0]);
+  if(el("file").files[0]) fd.append("file", el("file").files[0]);
 
-  if (document.getElementById("thumb").files[0]) {
-    fd.append("thumb", document.getElementById("thumb").files[0]);
-  }
+  const btn = el("saveBtn");
+  btn.disabled = true;
+  btn.textContent = "업로드 중...";
 
-  if (document.getElementById("file").files[0]) {
-    fd.append("file", document.getElementById("file").files[0]);
-  }
+  try{
+    const res = await fetch("/api/catalog/create", {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token")
+      },
+      body: fd
+    });
 
-  const res = await fetch("/api/catalog/create", {
-    method:"POST",
-    headers:{ Authorization:"Bearer " + localStorage.getItem("token") },
-    body: fd
-  });
+    // ✅ 여기 중요: 서버가 HTML(502/500) 주면 json()에서 터짐 → 안전 처리
+    const ct = res.headers.get("content-type") || "";
+    let payload = null;
 
-  const out = await res.json();
+    if(ct.includes("application/json")){
+      payload = await res.json();
+    }else{
+      const text = await res.text();
+      payload = { message: text?.slice(0, 500) || "서버 응답이 JSON이 아님" };
+    }
 
-  if(res.ok){
-    alert("등록 완료!");
-    location.href="catalog-list.html";
-  } else {
-    alert(out.message);
+    if(res.ok){
+      alert("등록 완료!");
+      location.href = "catalog-list.html";
+    }else{
+      showError(payload.message || "등록 실패");
+    }
+  }catch(err){
+    showError("네트워크/서버 오류:\n" + (err?.message || err));
+  }finally{
+    btn.disabled = false;
+    btn.textContent = "등록";
   }
 }
 </script>
