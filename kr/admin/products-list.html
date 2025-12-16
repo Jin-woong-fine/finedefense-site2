@@ -91,6 +91,30 @@
       color:#fff;
       font-weight:600;
     }
+
+
+    /* ============================================================
+      📦 카테고리별 제품 섹션
+    ============================================================ */
+    .category-section {
+      margin-bottom: 40px;
+    }
+
+    .category-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+      color: #0f2679;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .category-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
   </style>
 </head>
 
@@ -136,7 +160,7 @@
         </div>
         </div>
 
-        <div id="productList" class="product-grid"></div>
+        <div id="productList"></div>
     </section>
 
     </div>  <!-- ✅ main을 여기서 닫아야 함 -->
@@ -182,7 +206,7 @@
             const kr = await krRes.json();
             const en = await enRes.json();
 
-            allProducts = [...kr, ...en].sort((a, b) => a.sort_order - b.sort_order);
+            allProducts = [...kr, ...en];
 
             } else {
             const res = await fetch(`/api/products?lang=${currentLang}`);
@@ -198,38 +222,72 @@
 
         /* 목록 출력 */
         function renderList() {
-        const list = document.getElementById("productList");
-        list.innerHTML = "";
+          const wrap = document.getElementById("productList");
+          wrap.innerHTML = "";
 
-        if (!Array.isArray(allProducts)) {
-            list.innerHTML = "<p>데이터 오류</p>";
+          if (!Array.isArray(allProducts) || allProducts.length === 0) {
+            wrap.innerHTML = "<p>등록된 제품이 없습니다.</p>";
             return;
-        }
+          }
 
-        if (allProducts.length === 0) {
-            list.innerHTML = "<p>등록된 제품이 없습니다.</p>";
-            return;
-        }
+          // 1️⃣ 카테고리 그룹핑 (방어 포함)
+          const grouped = {};
+          allProducts.forEach(p => {
+            if (!p.category) return;   // ← 이 줄이 핵심
+            if (!grouped[p.category]) grouped[p.category] = [];
+            grouped[p.category].push(p);
+          });
 
-        allProducts.forEach(item => {
-            const thumb = item.thumbnail
-            ? item.thumbnail
-            : "/kr/admin/img/noimage.png";
+          // 2️⃣ 카테고리 표시 순서 정의
+          const categoryOrder = [
+            "towed",
+            "fixed",
+            "connector",
+            "custom"
+          ];
 
-            const card = document.createElement("div");
-            card.className = "product-card";
-            card.style.cursor = "pointer";
+          categoryOrder.forEach(category => {
+            const items = grouped[category];
+            if (!items || items.length === 0) return;
 
-            // 클릭 → 실제 제품 페이지로 이동
-            card.addEventListener("click", e => {
-            if (!e.target.closest(".card-buttons")) {
-                location.href = `/kr/sub/products/product-view.html?id=${item.id}`;
-            }
-            });
+            // 3️⃣ sort_order 기준 정렬
+            items.sort((a, b) => a.sort_order - b.sort_order);
 
-            card.innerHTML = `
-              <img src="${thumb}" alt="">
-              <div class="card-body">
+            // 4️⃣ 카테고리 섹션 생성
+            const section = document.createElement("div");
+            section.className = "category-section";
+
+            const titleMap = {
+              towed: "수중이동형 케이블",
+              fixed: "수중고정형 케이블",
+              connector: "수중 커넥터",
+              custom: "커스텀 케이블"
+            };
+
+            section.innerHTML = `
+              <div class="category-title">${titleMap[category]}</div>
+              <div class="category-grid"></div>
+            `;
+
+            const grid = section.querySelector(".category-grid");
+
+            // 5️⃣ 카드 생성 (기존 로직 거의 그대로)
+            items.forEach(item => {
+              const thumb = item.thumbnail || "/kr/admin/img/noimage.png";
+
+              const card = document.createElement("div");
+              card.className = "product-card";
+              card.style.cursor = "pointer";
+
+              card.addEventListener("click", e => {
+                if (!e.target.closest(".card-buttons")) {
+                  location.href = `/kr/sub/products/product-view.html?id=${item.id}`;
+                }
+              });
+
+              card.innerHTML = `
+                <img src="${thumb}" alt="">
+                <div class="card-body">
                   <div class="title">${item.title}</div>
 
                   <div class="category">
@@ -241,15 +299,21 @@
                   </div>
 
                   <div class="card-buttons">
-                    <button class="btn btn-primary" onclick="location.href='products-edit.html?id=${item.id}'">수정</button>
-                    <button class="btn btn-danger" onclick="deleteProduct(${item.id})">삭제</button>
+                    <button class="btn btn-primary"
+                      onclick="location.href='products-edit.html?id=${item.id}'">수정</button>
+                    <button class="btn btn-danger"
+                      onclick="deleteProduct(${item.id})">삭제</button>
                   </div>
-              </div>
-            `;
+                </div>
+              `;
 
-            list.appendChild(card);
-        });
+              grid.appendChild(card);
+            });
+
+            wrap.appendChild(section);
+          });
         }
+
 
         /* 삭제 */
         async function deleteProduct(id) {
