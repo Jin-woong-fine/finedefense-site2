@@ -290,9 +290,7 @@
   =========================== */
   function openPublicView(e, id) {
     e.stopPropagation();
-
-    const url = `${location.origin}/kr/sub/pr/news/news-view.html?id=${id}`;
-    window.open(url, "_blank");
+    location.href = `/kr/sub/pr/news/news-view.html?id=${id}`;
   }
 
   function editNews(e, id) {
