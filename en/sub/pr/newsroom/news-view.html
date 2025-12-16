@@ -178,12 +178,18 @@
       const safeContent = data.content.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "");
       document.getElementById("content").innerHTML = safeContent;
 
-      // 이미지들 표시
+      // 이미지들 표시 (없으면 기본 이미지)
       const box = document.getElementById("images");
-      if (data.images && data.images.length) {
+      const defaultImage = "/img/news_default.png";
+
+      if (data.images && data.images.length > 0) {
         box.innerHTML = data.images
-          .map(img => `<img src="/${img.replace(/^\/+/, '')}">`)
+          .map(img => `<img src="/${img.replace(/^\/+/, '')}" alt="뉴스 이미지">`)
           .join("");
+      } else {
+        box.innerHTML = `
+          <img src="${defaultImage}" alt="기본 뉴스 이미지" class="default-news-image">
+        `;
       }
     }
   </script>
