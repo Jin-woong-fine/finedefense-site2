@@ -282,9 +282,11 @@
   async function deleteNews(id) {
     if (!confirm("삭제하시겠습니까?")) return;
 
-    const res = await fetch(`/api/posts/news/delete/${id}`, {
+    const res = await fetch(`/api/posts/delete/${id}`, {
       method: "DELETE",
-      headers: { Authorization: "Bearer " + localStorage.getItem("token") }
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token")
+      }
     });
 
     const out = await res.json();
@@ -293,7 +295,7 @@
       alert("삭제 완료");
       loadNews();
     } else {
-      alert("삭제 실패: " + out.message);
+      alert("삭제 실패: " + (out.message || "알 수 없는 오류"));
     }
   }
 
