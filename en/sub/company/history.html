@@ -149,13 +149,17 @@
         border-radius: 8px;
       }
 
+
       /* =========================================
-        ⬆ Scroll To Top Button
+        ⬆⬇ Scroll Control Buttons
+        - Top / Bottom Vertical Stack
       ========================================= */
+
+      /* ⬆ Scroll To Top */
       #scrollTopBtn {
         position: fixed;
-        right: 28px;        /* ← 왼쪽으로 하고 싶으면 left:28px */
-        bottom: 32px;
+        right: 28px;
+        bottom: 92px;                 /* 위쪽 버튼 */
         width: 48px;
         height: 48px;
         border-radius: 50%;
@@ -164,10 +168,10 @@
         color: #fff;
         font-size: 16px;
         cursor: pointer;
-        box-shadow: 0 6px 18px rgba(15,38,121,0.35);
+        box-shadow: 0 6px 18px rgba(15, 38, 121, 0.35);
         opacity: 0;
         pointer-events: none;
-        transition: opacity 0.3s ease, transform 0.3s ease;
+        transition: opacity 0.3s ease, transform 0.3s ease, background 0.3s ease;
         z-index: 999;
       }
 
@@ -176,15 +180,11 @@
         background: #081a55;
       }
 
-      #scrollTopBtn.show {
-        opacity: 1;
-        pointer-events: auto;
-      }
-
+      /* ⬇ Scroll To Bottom */
       #scrollBottomBtn {
         position: fixed;
         right: 28px;
-        top: 96px; /* Top 버튼이랑 겹치지 않게 */
+        bottom: 32px;                 /* 아래 버튼 */
         width: 48px;
         height: 48px;
         border-radius: 50%;
@@ -193,10 +193,10 @@
         color: #fff;
         font-size: 16px;
         cursor: pointer;
-        box-shadow: 0 6px 18px rgba(15,38,121,0.35);
+        box-shadow: 0 6px 18px rgba(15, 38, 121, 0.35);
         opacity: 0;
         pointer-events: none;
-        transition: opacity 0.3s ease, transform 0.3s ease;
+        transition: opacity 0.3s ease, transform 0.3s ease, background 0.3s ease;
         z-index: 999;
       }
 
@@ -205,15 +205,12 @@
         background: #081a55;
       }
 
+      /* 공통 표시 상태 */
+      #scrollTopBtn.show,
       #scrollBottomBtn.show {
         opacity: 1;
         pointer-events: auto;
       }
-
-
-
-
-
 
 
     </style>
