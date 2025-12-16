@@ -15,26 +15,6 @@
       padding: 0 20px;
     }
 
-    .tabs {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 30px;
-      flex-wrap: wrap;
-    }
-
-    .tab {
-      padding: 10px 16px;
-      background: #f0f2f7;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-      color: #333;
-    }
-    .tab.active {
-      background: #0f2679;
-      color: #fff;
-    }
-
     .card-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -82,171 +62,105 @@
       margin-top: 10px;
     }
 
-    /* ==========================
-       PDF VIEWER MODAL
-    ========================== */
-    .modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.65);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-      z-index: 9999;
+    .catalog-section-title {
+      margin: 60px 0 20px;
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #0f2679;
+      border-left: 6px solid #0f2679;
+      padding-left: 14px;
     }
-    .modal-content {
-      background: #fff;
-      width: 90%;
-      height: 90%;
-      border-radius: 10px;
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
-    .modal-header {
-      background:#0f2679;
-      color:white;
-      padding: 10px 16px;
-      font-size:1rem;
-      font-weight:600;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-    }
-    .modal-close {
-      cursor:pointer;
-      font-size:1.4rem;
-      font-weight:bold;
-    }
-    .modal-body {
-      flex:1;
-      overflow:hidden;
-    }
-    .pdf-frame {
-      width: 100%;
-      height: calc(100% - 50px); /* 헤더 높이 제외 */
-    }
-
-    .modal-footer {
-      padding:10px;
-      text-align:right;
-      background:#f5f5f5;
-    }
-
-    .viewer-btn {
-      cursor: pointer;
-      font-size: 1.2rem;
-      padding: 4px 8px;
-      border-radius: 6px;
-      transition: 0.2s;
-      color:white;
-    }
-    .viewer-btn:hover {
-      background: rgba(255,255,255,0.2);
-    }
-
-    /* === 모달 창 크기 조절 가능하도록 설정 === */
-    .modal-content {
-      resize: both;        /* 가로나 세로 둘 다 조절 가능 */
-      overflow: auto;      /* 내부 컨텐츠가 넘칠 때 스크롤 */
-      max-width: 95vw;     /* 창이 너무 커지는 것 방지 */
-      max-height: 95vh;
-      min-width: 400px;    /* 최소 크기 */
-      min-height: 300px;
-    }
-
-
-
   </style>
 </head>
 
-  <body>
+<body>
 
-    <!-- Admin Session Bar -->
-    <div id="adminBarContainer" data-include="/en/components/admin-session-bar.html"></div>
+  <!-- Admin Session Bar -->
+  <div id="adminBarContainer" data-include="/en/components/admin-session-bar.html"></div>
 
-    <!-- Common Header -->
-    <div id="headerContainer" data-include="/en/components/header.html"></div>
+  <!-- Common Header -->
+  <div id="headerContainer" data-include="/en/components/header.html"></div>
 
-    <!-- Sub Banner -->
-    <section class="sub-banner">
-      <img src="/img/sub-banners/subbanner_pr.png" alt="Catalog">
-      <div class="banner-text">
-          <h1>Media Center</h1>
-          <p>Explore the latest news and promotional materials from Fine Defense.</p>
-      </div>
-    </section>
+  <!-- Sub Banner -->
+  <section class="sub-banner">
+    <img src="/img/sub-banners/subbanner_pr.png" alt="Catalog">
+    <div class="banner-text">
+      <h1>Media Center</h1>
+      <p>Explore the latest news and promotional materials from Fine Defense.</p>
+    </div>
+  </section>
 
-    <!-- Breadcrumb -->
-    <div class="breadcrumb">
-      <a href="/en/index.html">Home</a> &gt;
-      <span class="crumb crumb-level1">Media Center</span> &gt;
-      <span class="crumb crumb-level2">Catalog</span>
-      <div id="side-tabs"></div>
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="/en/index.html">Home</a> &gt;
+    <span class="crumb crumb-level1">Media Center</span> &gt;
+    <span class="crumb crumb-level2">Catalog</span>
+    <div id="side-tabs"></div>
+  </div>
+
+  <!-- Catalog -->
+  <div class="catalog-container">
+
+    <div class="catalog-section">
+      <div class="catalog-section-title">Korean General Catalog</div>
+      <div id="kr_catalog" class="card-grid"></div>
     </div>
 
-    <!-- Catalog Section -->
-    <div class="catalog-container">
-
-      <div class="tabs">
-        <div class="tab" data-cat="kr_catalog">Korean Catalog</div>
-        <div class="tab active" data-cat="en_catalog">English Catalog</div>
-        <div class="tab" data-cat="company_intro">Company Brochure</div>
-        <div class="tab" data-cat="etc">Others</div>
-      </div>
-
-      <div id="catalogList" class="card-grid"></div>
-
+    <div class="catalog-section">
+      <div class="catalog-section-title">English General Catalog</div>
+      <div id="en_catalog" class="card-grid"></div>
     </div>
 
+    <div class="catalog-section">
+      <div class="catalog-section-title">Company Brochure</div>
+      <div id="company_intro" class="card-grid"></div>
+    </div>
 
-    <!-- 공통 푸터 -->
-    <div data-include="/en/components/footer.html"></div>
+    <div class="catalog-section">
+      <div class="catalog-section-title">Others</div>
+      <div id="etc" class="card-grid"></div>
+    </div>
 
+  </div>
 
-<script>
+  <!-- Footer -->
+  <div data-include="/en/components/footer.html"></div>
 
-  // 현재 카테고리
-  let currentCategory = "en_catalog";
+  <!-- ===============================
+       DATA LOADING SCRIPT
+  ================================ -->
+  <script>
+    const categories = [
+      "kr_catalog",
+      "en_catalog",
+      "company_intro",
+      "etc"
+    ];
 
-  // 🔥 페이지 로드 시 기본 탭(en_catalog) 활성화
-  window.addEventListener("DOMContentLoaded", () => {
-    const defaultTab = document.querySelector(`.tab[data-cat="${currentCategory}"]`);
-    if (defaultTab) {
-      defaultTab.classList.add("active");
-    }
-    loadList();
-  });
+    categories.forEach(cat => loadList(cat));
 
-  // 탭 클릭
-  document.querySelectorAll(".tab").forEach(tab => {
-    tab.addEventListener("click", () => {
-      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-      tab.classList.add("active");
+    async function loadList(category) {
+      const res = await fetch(`/api/catalog/list?category=${category}`);
+      const data = await res.json();
 
-      currentCategory = tab.dataset.cat;
-      loadList();
-    });
-  });
+      const container = document.getElementById(category);
+      const section = container.closest(".catalog-section");
 
-  // API 호출 후 리스트 생성
-  async function loadList() {
-    const res = await fetch(`/api/catalog/list?category=${currentCategory}`);
-    const data = await res.json();
+      if (!data.length) {
+        section.style.display = "none";
+        return;
+      }
 
-    document.getElementById("catalogList").innerHTML =
-      data.map(i => `
+      container.innerHTML = data.map(i => `
         <div class="card" onclick="openPdf('${i.file_url}', '${i.title}')">
-          <img src="${i.thumb_url}" class="thumb">
+          <img src="${i.thumb_url}" class="thumb"
+               onerror="this.src='/img/common/pdf-placeholder.png'">
           <div class="title">${i.title}</div>
-          ${i.file_url ? `<div class="btn-download">PDF 보기</div>` : '<span style="color:#777;">파일 없음</span>'}
+          <div class="btn-download">View PDF</div>
         </div>
       `).join("");
-  }
-
-</script>
+    }
+  </script>
 
 <!-- ===============================
      PDF VIEWER MODAL (업그레이드 완전체)
@@ -361,15 +275,10 @@ document.addEventListener("fullscreenchange", () => {
 </script>
 
 
-
-
-    <!-- 공통 스크립트 -->
-    <script src="/js/include.js"></script>
-    <script src="/js/session_timer.js"></script>
-    <script src="/js/language.js"></script>
-    <script src="/js/nav.js"></script>
-
-
+  <script src="/js/include.js"></script>
+  <script src="/js/session_timer.js"></script>
+  <script src="/js/language.js"></script>
+  <script src="/js/nav.js"></script>
 
 </body>
 </html>

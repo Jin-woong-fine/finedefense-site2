@@ -14,26 +14,6 @@
       padding: 0 20px;
     }
 
-    .tabs {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 30px;
-      flex-wrap: wrap;
-    }
-
-    .tab {
-      padding: 10px 16px;
-      background: #f0f2f7;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-      color: #333;
-    }
-    .tab.active {
-      background: #0f2679;
-      color: #fff;
-    }
-
     .card-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -157,6 +137,16 @@
     }
 
 
+    .catalog-section-title {
+      margin: 60px 0 20px;
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #0f2679;
+      border-left: 6px solid #0f2679;
+      padding-left: 14px;
+    }
+
+
 
   </style>
 </head>
@@ -186,14 +176,25 @@
 
 <div class="catalog-container">
 
-  <div class="tabs">
-    <div class="tab active" data-cat="kr_catalog">한국어 종합 카탈로그</div>
-    <div class="tab" data-cat="en_catalog">영어 종합 카탈로그</div>
-    <div class="tab" data-cat="company_intro">회사 소개서</div>
-    <div class="tab" data-cat="etc">기타</div>
+  <div class="catalog-section">
+    <div class="catalog-section-title">한국어 종합 카탈로그</div>
+    <div id="kr_catalog" class="card-grid"></div>
   </div>
 
-  <div id="catalogList" class="card-grid"></div>
+  <div class="catalog-section">
+    <div class="catalog-section-title">영어 종합 카탈로그</div>
+    <div id="en_catalog" class="card-grid"></div>
+  </div>
+
+  <div class="catalog-section">
+    <div class="catalog-section-title">회사 소개서</div>
+    <div id="company_intro" class="card-grid"></div>
+  </div>
+
+  <div class="catalog-section">
+    <div class="catalog-section-title">기타</div>
+    <div id="etc" class="card-grid"></div>
+  </div>
 
 </div>
 
@@ -201,39 +202,69 @@
     <div data-include="/kr/components/footer.html"></div>
 
 
+
+
 <script>
+const categories = [
+  "kr_catalog",
+  "en_catalog",
+  "company_intro",
+  "etc"
+];
 
-// 현재 카테고리
-let currentCategory = "kr_catalog";
+// 페이지 로드 시 전체 로딩
+categories.forEach(category => loadCategory(category));
 
-// 탭 클릭
-document.querySelectorAll(".tab").forEach(tab => {
-  tab.addEventListener("click", () => {
-    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-    tab.classList.add("active");
+async function loadCategory(category) {
+  const container = document.getElementById(category);
+  const section = container.closest(".catalog-section");
 
-    currentCategory = tab.dataset.cat;
-    loadList();
-  });
-});
+  try {
+    const res = await fetch(`/api/catalog/list?category=${category}`);
+    if (!res.ok) throw new Error("API Error");
 
-loadList();
+    const data = await res.json();
 
-// API 호출 후 리스트 생성
-async function loadList() {
-  const res = await fetch(`/api/catalog/list?category=${currentCategory}`);
-  const data = await res.json();
+    // 데이터 없으면 섹션 숨김
+    if (!data || data.length === 0) {
+      section.style.display = "none";
+      return;
+    }
 
-  document.getElementById("catalogList").innerHTML =
-    data.map(i => `
-      <div class="card" onclick="openPdf('${i.file_url}', '${i.title}')">
-        <img src="${i.thumb_url}" class="thumb">
-        <div class="title">${i.title}</div>
-        ${i.file_url ? `<div class="btn-download">PDF 보기</div>` : '<span style="color:#777;">파일 없음</span>'}
+    container.innerHTML = data.map(i => `
+      <div class="card" onclick="openPdf('${i.file_url}', '${escapeHtml(i.title)}')">
+        <img 
+          src="${i.thumb_url || '/img/common/pdf-placeholder.png'}"
+          class="thumb"
+          onerror="this.src='/img/common/pdf-placeholder.png'"
+        >
+        <div class="title">${escapeHtml(i.title)}</div>
+
+        ${i.file_url
+          ? `<a class="btn-download" 
+               href="${i.file_url}" 
+               download 
+               onclick="event.stopPropagation()">다운로드</a>`
+          : `<span style="color:#777;">파일 없음</span>`}
       </div>
     `).join("");
+
+  } catch (err) {
+    console.error(err);
+    section.style.display = "none"; // 오류 시도 노출 안 함
+  }
 }
 
+// XSS / 특수문자 방지 (관리자 입력 대비)
+function escapeHtml(text = "") {
+  return text.replace(/[&<>"']/g, m => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  }[m]));
+}
 </script>
 
 <!-- ===============================
