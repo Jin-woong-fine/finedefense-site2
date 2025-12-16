@@ -214,7 +214,7 @@ function initBreadcrumbTabs() {
         { name: "고객지원", link: `${base}/support/inquiry/index.html` },
       ]
     : [
-        { name: "Company", link: `${base}/company/overview.html` },
+        { name: "About Us", link: `${base}/company/overview.html` },
         { name: "Products", link: `${base}/products/sub-towed.html` },
         { name: "PR Center", link: `${base}/pr/newsroom/index.html` },
         { name: "Support", link: `${base}/support/inquiry/index.html` },
