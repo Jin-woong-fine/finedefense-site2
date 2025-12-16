@@ -83,7 +83,7 @@ router.post(
           thumbUrl,
           fileUrl,
           fileSize,
-          Number(sort_order) || 9999
+          safeSort
         ]
       );
 
@@ -107,6 +107,7 @@ router.put(
     try {
       const id = req.params.id;
       const { title, lang, category, sort_order } = req.body;
+      const safeSort = Number.isInteger(+sort_order) ? +sort_order : 9999;
 
       // 기존 정보
       const [rows] = await db.execute(
@@ -155,7 +156,7 @@ router.put(
           thumbUrl,
           fileUrl,
           fileSize,
-          Number(sort_order) || 9999,
+          safeSort,
           id
         ]
       );
@@ -340,6 +341,34 @@ router.get("/top-downloads", async (req, res) => {
   }
 });
 
+/* ======================================================
+   📌 순번(sort_order) 단독 수정
+====================================================== */
+router.post("/update-sort/:id", verifyToken, async (req, res) => {
+  const { id } = req.params;
+  const { sort_order } = req.body;
+
+  // 🔒 최소 방어
+  const safeSort = Number.isInteger(+sort_order) ? +sort_order : 9999;
+
+  try {
+    const [result] = await db.execute(
+      `UPDATE catalog_items
+         SET sort_order = ?
+       WHERE id = ?`,
+      [safeSort, id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "항목을 찾을 수 없음" });
+    }
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error("[catalog update-sort] 오류:", err);
+    res.status(500).json({ message: "순번 수정 실패" });
+  }
+});
 
 
 export default router; 
