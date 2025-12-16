@@ -24,7 +24,7 @@ async function loadLoginLogs() {
           ${l.status}
         </span>
       </td>
-      <td>${l.created_at}</td>
+      <td>${formatKST(l.created_at)}</td>
     </tr>
   `).join("");
 }
