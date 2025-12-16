@@ -11,70 +11,94 @@
   <link rel="stylesheet" href="/css/sub-banner.css">
 
   <style>
-    /* ===============================
-      뉴스 상세 가독성 개선 (기업형)
-    =============================== */
+  /* ===============================
+    뉴스 상세 — 고밀도 기업형 (방산/보도자료)
+  =============================== */
 
-    .view-container {
-      max-width: 900px;
-      margin: 50px auto;       /* ⬅ 위아래 살짝 줄임 */
-      padding: 20px 24px;     /* ⬅ 좌우는 유지 */
-    }
+  .view-container {
+    max-width: 900px;
+    margin: 46px auto;        /* ⬅ 상하 여백 더 조밀 */
+    padding: 18px 24px;
+  }
 
-    /* 제목 */
-    .view-title {
-      font-size: 1.9rem;
-      font-weight: 700;
-      margin-bottom: 8px;     /* ⬅ 제목 아래 간격 축소 */
-      line-height: 1.3;
-    }
+  /* 제목 */
+  .view-title {
+    font-size: 1.85rem;
+    font-weight: 700;
+    margin-bottom: 6px;      /* ⬅ 제목 아래 최소 */
+    line-height: 1.28;
+    color: #111;
+  }
 
-    /* 날짜 / 조회수 */
-    .view-meta {
-      color: #666;
-      font-size: 0.85rem;
-      margin-bottom: 28px;    /* ⬅ 기존 35px → 축소 */
-      padding-bottom: 12px;
-      border-bottom: 1px solid #e5e5e5;
-    }
+  /* 날짜 / 조회수 */
+  .view-meta {
+    color: #666;
+    font-size: 0.84rem;
+    margin-bottom: 22px;     /* ⬅ 본문과 더 밀착 */
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e3e3e3;
+  }
 
-    /* 본문 텍스트 */
-    .view-content {
-      font-size: 1rem;
-      line-height: 1.55;      /* ⬅ 기업 사이트 평균 */
-      color: #222;
-    }
+  /* ===============================
+    본문 텍스트 (핵심)
+  =============================== */
+  .view-content {
+    font-size: 1rem;
+    line-height: 1.42;       /* ⬅ 문장 간격 핵심 */
+    letter-spacing: -0.01em;
+    color: #222;
+  }
 
-    /* 본문 안 문단 간격 */
-    .view-content p {
-      margin: 0 0 14px 0;     /* ⬅ 핵심: 문단 간격 줄이기 */
-    }
+  /* 문단 */
+  .view-content p {
+    margin: 0 0 10px 0;      /* ⬅ 문단 간격 최소화 */
+  }
 
-    /* 리스트가 있을 경우 */
-    .view-content ul,
-    .view-content ol {
-      margin: 10px 0 16px 20px;
-    }
+  /* 연속 문단 */
+  .view-content p + p {
+    margin-top: 6px;
+  }
 
-    .view-content li {
-      margin-bottom: 6px;
-    }
+  /* 줄바꿈 */
+  .view-content br {
+    line-height: 1.2;
+  }
 
-    /* 이미지 */
-    .view-images img {
-      width: 100%;
-      margin: 18px 0;        /* ⬅ 기존보다 촘촘 */
-      border-radius: 8px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-    }
+  /* 리스트 */
+  .view-content ul,
+  .view-content ol {
+    margin: 8px 0 12px 18px;
+  }
 
-    /* 버튼 */
-    .back-btn {
-      margin-top: 32px;      /* ⬅ 버튼도 살짝 당김 */
-      padding: 9px 18px;
-      font-size: 0.9rem;
-    }
-              
+  .view-content li {
+    margin-bottom: 4px;
+    line-height: 1.4;
+  }
+
+  /* 강조 */
+  .view-content strong {
+    font-weight: 600;
+    color: #0f2679;
+  }
+
+  /* ===============================
+    이미지
+  =============================== */
+  .view-images img {
+    width: 100%;
+    margin: 14px 0;          /* ⬅ 이미지도 문단처럼 */
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+
+  /* ===============================
+    버튼
+  =============================== */
+  .back-btn {
+    margin-top: 28px;
+    padding: 8px 16px;
+    font-size: 0.88rem;
+  }
   </style>
 </head>
 
