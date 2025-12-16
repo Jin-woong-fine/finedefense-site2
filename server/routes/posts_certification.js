@@ -157,7 +157,7 @@ router.get("/list", async (req, res) => {
     }
 
     if (lang !== "all") {
-      sql += ` AND lang=? `;
+      sql += ` AND (lang=? OR lang='all') `;
       params.push(lang);
     }
 
