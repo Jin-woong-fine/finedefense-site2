@@ -1,6 +1,8 @@
 // /js/session_timer.js
 console.log("[session_timer] loaded");
 
+const ADMIN_BAR_ROLES = ["superadmin", "admin", "editor", "viewer"];
+
 // ========================================
 // 1) admin bar & header가 로드될 때까지 기다림
 // ========================================
@@ -64,8 +66,9 @@ async function initSessionTimer() {
     const role = localStorage.getItem("role");
     const name = localStorage.getItem("name");
 
-    // ----- 관리자 아닐 때 -----
-    if (role !== "admin" && role !== "superadmin") {
+
+    // session_timer.js — 관리자 탑바 표시 대상 viewer 포함
+    if (!ADMIN_BAR_ROLES.includes(role)) {
       bar.style.display = "none";
       document.body.classList.remove("has-admin-bar");
       return;
@@ -145,7 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const role = localStorage.getItem("role");
 
   if (body.id === "index-page") {
-    if (role === "admin" || role === "superadmin") {
+    if (ADMIN_BAR_ROLES.includes(role)) {
       body.classList.add("has-admin-bar");
     } else {
       body.classList.remove("has-admin-bar");
