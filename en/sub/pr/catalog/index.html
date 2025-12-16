@@ -134,7 +134,7 @@ const categories = [
   "etc"
 ];
 
-// 페이지 로드 시 전체 로딩
+// Load all categories on page load
 categories.forEach(category => loadCategory(category));
 
 async function loadCategory(category) {
@@ -147,7 +147,7 @@ async function loadCategory(category) {
 
     const data = await res.json();
 
-    // 데이터 없으면 섹션 숨김
+    // Hide section if no data
     if (!data || data.length === 0) {
       section.style.display = "none";
       return;
@@ -163,21 +163,21 @@ async function loadCategory(category) {
         <div class="title">${escapeHtml(i.title)}</div>
 
         ${i.file_url
-          ? `<a class="btn-download" 
-               href="${i.file_url}" 
-               download 
-               onclick="event.stopPropagation()">다운로드</a>`
-          : `<span style="color:#777;">파일 없음</span>`}
+          ? `<a class="btn-download"
+               href="${i.file_url}"
+               download
+               onclick="event.stopPropagation()">Download</a>`
+          : `<span style="color:#777;">No File</span>`}
       </div>
     `).join("");
 
   } catch (err) {
     console.error(err);
-    section.style.display = "none"; // 오류 시도 노출 안 함
+    section.style.display = "none"; // Hide section on error
   }
 }
 
-// XSS / 특수문자 방지 (관리자 입력 대비)
+// Escape HTML to prevent XSS (admin input safety)
 function escapeHtml(text = "") {
   return text.replace(/[&<>"']/g, m => ({
     "&": "&amp;",
@@ -188,6 +188,7 @@ function escapeHtml(text = "") {
   }[m]));
 }
 </script>
+
 
 <!-- ===============================
      PDF VIEWER MODAL (업그레이드 완전체)
