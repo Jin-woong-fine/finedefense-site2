@@ -63,10 +63,13 @@ router.post(
       const { title, content, lang } = req.body;
       const files = req.files || [];
 
-      if (!title) return res.status(400).json({ message: "제목은 필수입니다." });
-      if (!files.length) return res.status(400).json({ message: "이미지를 첨부하세요." });
+      if (!title)
+        return res.status(400).json({ message: "제목은 필수입니다." });
 
-      const mainImg = toPublicPath(files[0].filename);
+      // ✅ 이미지 없어도 OK
+      const mainImg = files.length
+        ? toPublicPath(files[0].filename)
+        : null;
 
       const [result] = await db.execute(
         `INSERT INTO posts (title, content, category, lang, author_id, main_image)
@@ -76,9 +79,11 @@ router.post(
 
       const postId = result.insertId;
 
+      // ✅ 이미지 있을 때만 post_images 저장
       for (const f of files) {
         await db.execute(
-          `INSERT INTO post_images (post_id, image_path) VALUES (?, ?)`,
+          `INSERT INTO post_images (post_id, image_path)
+           VALUES (?, ?)`,
           [postId, toPublicPath(f.filename)]
         );
       }
@@ -91,6 +96,7 @@ router.post(
     }
   }
 );
+
 
 /* ======================================================
    📌 뉴스 수정
