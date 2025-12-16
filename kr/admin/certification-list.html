@@ -80,8 +80,6 @@
     <div class="title">인증/특허 관리</div>
 
     <div style="display:flex; align-items:center; gap:12px;">
-
-      <!-- ⭐ 세션 타이머 -->
       <span id="session-timer" class="session-timer">세션 계산중...</span>
 
       <div class="topbar-user" id="topbarUser">
@@ -93,19 +91,13 @@
     </div>
   </div>
 
-  <!-- 새 항목 추가 버튼 -->
+  <!-- 새 항목 추가 -->
   <button class="btn-blue" onclick="location.href='certification-add.html'">
     + 새 항목 추가
   </button>
 
-  <!-- 필터 영역 -->
+  <!-- 🔍 필터 -->
   <div class="filter-box">
-    <select id="filterType">
-      <option value="all">전체</option>
-      <option value="cert">인증</option>
-      <option value="patent">특허</option>
-    </select>
-
     <select id="filterLang">
       <option value="all">전체 언어</option>
       <option value="kr">한국어</option>
@@ -116,12 +108,12 @@
     <button class="btn-small" onclick="loadItems()">검색</button>
   </div>
 
-  <!-- 테이블 -->
+  <!-- ===================== 인증 ===================== -->
+  <h3 style="margin-top:40px;">📌 인증</h3>
   <table>
     <thead>
       <tr>
         <th>썸네일</th>
-        <th>종류</th>
         <th>제목(KR)</th>
         <th>제목(EN)</th>
         <th>언어</th>
@@ -130,7 +122,24 @@
         <th>삭제</th>
       </tr>
     </thead>
-    <tbody id="tbody"></tbody>
+    <tbody id="tbody-cert"></tbody>
+  </table>
+
+  <!-- ===================== 특허 ===================== -->
+  <h3 style="margin-top:60px;">📌 특허</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>썸네일</th>
+        <th>제목(KR)</th>
+        <th>제목(EN)</th>
+        <th>언어</th>
+        <th>정렬</th>
+        <th>수정</th>
+        <th>삭제</th>
+      </tr>
+    </thead>
+    <tbody id="tbody-patent"></tbody>
   </table>
 
 </div>
@@ -142,52 +151,66 @@
   // 사이드바 로딩
   loadSidebar("certifications");
 
-  // 목록 불러오기
   async function loadItems(){
-    const type = document.getElementById("filterType").value;
     const lang = document.getElementById("filterLang").value;
     const search = document.getElementById("search").value;
 
-    const res = await fetch(`/api/cert-items/list?type=${type}&lang=${lang}&search=${search}`);
+    const res = await fetch(`/api/cert-items/list?type=all&lang=${lang}&search=${search}`);
     const data = await res.json();
 
-    document.getElementById("tbody").innerHTML = data.map(i => `
-      <tr>
-        <td><img src="${i.thumb_url}" class="thumb"></td>
-        <td>${i.type === 'cert' ? '인증' : '특허'}</td>
+    const certRows = [];
+    const patentRows = [];
 
-        <!-- 제목(KR) → KR 상세 -->
-        <td>
-          <a href="/kr/sub/pr/certification/index.html"
-            style="color:#0f2679; font-weight:600; text-decoration:none;">
-            ${i.title_kr}
-          </a>
-        </td>
+    data.forEach(i => {
+      const row = `
+        <tr>
+          <td><img src="${i.thumb_url}" class="thumb"></td>
 
-        <!-- 제목(EN) → EN 상세 -->
-        <td>
-          <a href="/en/sub/pr/certification/index.html"
-            style="color:#0f2679; text-decoration:none;">
-            ${i.title_en}
-          </a>
-        </td>
+          <td>
+            <a href="/kr/sub/pr/certification/index.html"
+               style="color:#0f2679; font-weight:600; text-decoration:none;">
+              ${i.title_kr || "-"}
+            </a>
+          </td>
 
-        <td>${i.lang.toUpperCase()}</td>
-        <td>${i.sort_order}</td>
+          <td>
+            <a href="/en/sub/pr/certification/index.html"
+               style="color:#0f2679; text-decoration:none;">
+              ${i.title_en || "-"}
+            </a>
+          </td>
 
-        <td>
-          <button class="btn-small"
-            onclick="location.href='certification-edit.html?id=${i.id}'">
-            수정
-          </button>
-        </td>
+          <td>${i.lang.toUpperCase()}</td>
+          <td>${i.sort_order}</td>
 
-        <td>
-          <button class="btn-delete" onclick="deleteItem(${i.id})">삭제</button>
-        </td>
-      </tr>
-    `).join("");
+          <td>
+            <button class="btn-small"
+              onclick="location.href='certification-edit.html?id=${i.id}'">
+              수정
+            </button>
+          </td>
 
+          <td>
+            <button class="btn-delete" onclick="deleteItem(${i.id})">
+              삭제
+            </button>
+          </td>
+        </tr>
+      `;
+
+      if(i.type === "cert") certRows.push(row);
+      if(i.type === "patent") patentRows.push(row);
+    });
+
+    document.getElementById("tbody-cert").innerHTML =
+      certRows.length
+        ? certRows.join("")
+        : `<tr><td colspan="7" style="text-align:center; color:#888;">등록된 인증 없음</td></tr>`;
+
+    document.getElementById("tbody-patent").innerHTML =
+      patentRows.length
+        ? patentRows.join("")
+        : `<tr><td colspan="7" style="text-align:center; color:#888;">등록된 특허 없음</td></tr>`;
   }
 
   async function deleteItem(id){
@@ -197,6 +220,7 @@
       method:"DELETE",
       headers:{ Authorization:"Bearer " + localStorage.getItem("token") }
     });
+
     const out = await res.json();
 
     if(res.ok){
@@ -207,10 +231,10 @@
     }
   }
 
-  // ⭐ 페이지 로드시 한 번 실행
+  // 초기 로딩
   loadItems();
 </script>
 
-
 </body>
+
 </html>
