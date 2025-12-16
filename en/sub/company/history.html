@@ -181,6 +181,38 @@
         pointer-events: auto;
       }
 
+      #scrollBottomBtn {
+        position: fixed;
+        right: 28px;
+        top: 96px; /* Top 버튼이랑 겹치지 않게 */
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        border: none;
+        background: #0f2679;
+        color: #fff;
+        font-size: 16px;
+        cursor: pointer;
+        box-shadow: 0 6px 18px rgba(15,38,121,0.35);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        z-index: 999;
+      }
+
+      #scrollBottomBtn:hover {
+        transform: translateY(4px);
+        background: #081a55;
+      }
+
+      #scrollBottomBtn.show {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+
+
+
 
 
 
@@ -555,6 +587,13 @@
       <i class="fas fa-chevron-up"></i>
     </button>
 
+    <!-- ⬇ Scroll to Bottom Button -->
+    <button id="scrollBottomBtn" aria-label="Scroll to bottom">
+      <i class="fas fa-chevron-down"></i>
+    </button>
+
+
+
 
     <!-- 공통 푸터 -->
     <div data-include="/en/components/footer.html"></div>
@@ -565,25 +604,35 @@
     <script src="/js/language.js"></script>
     <script src="/js/nav.js"></script>
 
-
     <script>
-      const scrollBtn = document.getElementById("scrollTopBtn");
+      const scrollTopBtn = document.getElementById("scrollTopBtn");
+      const scrollBottomBtn = document.getElementById("scrollBottomBtn");
 
       window.addEventListener("scroll", () => {
-        if (window.scrollY > 300) {
-          scrollBtn.classList.add("show");
-        } else {
-          scrollBtn.classList.remove("show");
-        }
+        const y = window.scrollY;
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+
+        // Top 버튼
+        if (y > 300) scrollTopBtn.classList.add("show");
+        else scrollTopBtn.classList.remove("show");
+
+        // Bottom 버튼 (아래 300px 남기고 숨김)
+        if (max - y > 300) scrollBottomBtn.classList.add("show");
+        else scrollBottomBtn.classList.remove("show");
       });
 
-      scrollBtn.addEventListener("click", () => {
+      scrollTopBtn.addEventListener("click", () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+
+      scrollBottomBtn.addEventListener("click", () => {
         window.scrollTo({
-          top: 0,
+          top: document.documentElement.scrollHeight,
           behavior: "smooth"
         });
       });
     </script>
+
 
 
   </body>
