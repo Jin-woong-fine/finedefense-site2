@@ -11,7 +11,7 @@
   // /kr/kr, /en/en 이런 반복 구간을 /kr, /en 하나로 줄이기
   // 예: /en/sub/support/inquiry/kr/kr/kr/index.html
   //  -> /en/sub/support/inquiry/kr/index.html
-  var collapsed = p.replace(/\/(kr|en)(\/\1)+/g, "/$1");
+  var collapsed = p.replace(/^\/(kr|en)(\/\1)+/g, "/$1");
 
   if (collapsed !== p) {
     // 완전히 새로 고침해서 꼬인 상태를 한 번에 정리
