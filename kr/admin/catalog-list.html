@@ -210,7 +210,14 @@ async function loadItems() {
   document.getElementById("tbody").innerHTML = data.map(i => `
     <tr>
       <td><img src="${i.thumb_url}" class="thumb"></td>
-      <td>${i.title}</td>
+    <td>
+      <a href="${i.lang === 'en'
+        ? '/en/sub/pr/catalog/index.html'
+        : '/kr/sub/pr/catalog/index.html'}"
+        style="color:#0f2679; font-weight:600; text-decoration:none;">
+        ${i.title}
+      </a>
+    </td>
       <td>${categoryName(i.category)}</td>
       <td>${i.lang.toUpperCase()}</td>
 
