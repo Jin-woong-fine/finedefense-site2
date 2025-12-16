@@ -231,8 +231,13 @@
         <td>${total - (start + i)}</td>
         <td>
           <img
-            src="${n.main_image || '/kr/admin/img/no-thumb.png'}"
+            src="${
+              (n.main_image && typeof n.main_image === 'string')
+                ? (n.main_image.startsWith('/') ? n.main_image : '/' + n.main_image)
+                : DEFAULT_NEWS_IMAGE
+            }"
             class="thumb"
+            onerror="this.src='${DEFAULT_NEWS_IMAGE}'"
           />
         </td>
 
