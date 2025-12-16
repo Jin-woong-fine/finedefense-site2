@@ -155,21 +155,39 @@
       <tr>
         <td><img src="${i.thumb_url}" class="thumb"></td>
         <td>${i.type === 'cert' ? '인증' : '특허'}</td>
-        <td>${i.title_kr}</td>
-        <td>${i.title_en}</td>
+
+        <!-- 제목(KR) → KR 상세 -->
+        <td>
+          <a href="/kr/sub/company/certification-view.html?id=${i.id}"
+            style="color:#0f2679; font-weight:600; text-decoration:none;">
+            ${i.title_kr}
+          </a>
+        </td>
+
+        <!-- 제목(EN) → EN 상세 -->
+        <td>
+          <a href="/en/sub/company/certification-view.html?id=${i.id}"
+            style="color:#0f2679; text-decoration:none;">
+            ${i.title_en}
+          </a>
+        </td>
+
         <td>${i.lang.toUpperCase()}</td>
         <td>${i.sort_order}</td>
+
         <td>
           <button class="btn-small"
             onclick="location.href='certification-edit.html?id=${i.id}'">
             수정
           </button>
         </td>
+
         <td>
           <button class="btn-delete" onclick="deleteItem(${i.id})">삭제</button>
         </td>
       </tr>
     `).join("");
+
   }
 
   async function deleteItem(id){
