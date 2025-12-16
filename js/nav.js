@@ -216,7 +216,7 @@ function initBreadcrumbTabs() {
     : [
         { name: "About Us", link: `${base}/company/overview.html` },
         { name: "Products", link: `${base}/products/sub-towed.html` },
-        { name: "PR Center", link: `${base}/pr/newsroom/index.html` },
+        { name: "Media Center", link: `${base}/pr/newsroom/index.html` },
         { name: "Support", link: `${base}/support/inquiry/index.html` },
       ];
 
