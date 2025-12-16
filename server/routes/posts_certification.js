@@ -5,7 +5,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
-import authMiddleware from "../middleware/authMiddleware.js";
+import authMiddleware from "../middleware/auth.js";
 
 
 const router = express.Router();
