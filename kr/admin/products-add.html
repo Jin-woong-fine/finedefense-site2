@@ -93,6 +93,24 @@
       width: 100%;
     }
 
+    /* ============================================================
+      ✏️ 입력 박스 높이 조정
+    ============================================================ */
+
+    /* 한 줄 input */
+    .main section.panel input.input {
+      height: 44px;
+      font-size: 0.95rem;
+    }
+
+    /* 여러 줄 textarea (요약 설명 등) */
+    .main section.panel textarea.input {
+      min-height: 120px;   /* ← 핵심 */
+      resize: vertical;    /* 사용자가 늘릴 수 있게 */
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
   </style>
 </head>
 
