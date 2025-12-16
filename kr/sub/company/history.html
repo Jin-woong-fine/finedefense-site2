@@ -132,6 +132,72 @@
         border-radius: 6px;
       }
 
+      /* =========================================
+        ⬆⬇ Scroll Control Buttons
+        - Top / Bottom Vertical Stack
+      ========================================= */
+
+      /* ⬆ Scroll To Top */
+      #scrollTopBtn {
+        position: fixed;
+        right: 28px;
+        bottom: 92px;                 /* 위쪽 버튼 */
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        border: none;
+        background: #0f2679;
+        color: #fff;
+        font-size: 16px;
+        cursor: pointer;
+        box-shadow: 0 6px 18px rgba(15, 38, 121, 0.35);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease, transform 0.3s ease, background 0.3s ease;
+        z-index: 999;
+      }
+
+      #scrollTopBtn:hover {
+        transform: translateY(-4px);
+        background: #081a55;
+      }
+
+      /* ⬇ Scroll To Bottom */
+      #scrollBottomBtn {
+        position: fixed;
+        right: 28px;
+        bottom: 32px;                 /* 아래 버튼 */
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        border: none;
+        background: #0f2679;
+        color: #fff;
+        font-size: 16px;
+        cursor: pointer;
+        box-shadow: 0 6px 18px rgba(15, 38, 121, 0.35);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease, transform 0.3s ease, background 0.3s ease;
+        z-index: 999;
+      }
+
+      #scrollBottomBtn:hover {
+        transform: translateY(4px);
+        background: #081a55;
+      }
+
+      /* 공통 표시 상태 */
+      #scrollTopBtn.show,
+      #scrollBottomBtn.show {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+
+
+
+
     </style>
   </head>
 
@@ -400,6 +466,38 @@
     <script src="/js/session_timer.js"></script>
     <script src="/js/language.js"></script>
     <script src="/js/nav.js"></script>
+    
+    <script>
+      const scrollTopBtn = document.getElementById("scrollTopBtn");
+      const scrollBottomBtn = document.getElementById("scrollBottomBtn");
+
+      window.addEventListener("scroll", () => {
+        const y = window.scrollY;
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+
+        // Top 버튼
+        if (y > 300) scrollTopBtn.classList.add("show");
+        else scrollTopBtn.classList.remove("show");
+
+        // Bottom 버튼 (아래 300px 남기고 숨김)
+        if (max - y > 300) scrollBottomBtn.classList.add("show");
+        else scrollBottomBtn.classList.remove("show");
+      });
+
+      scrollTopBtn.addEventListener("click", () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+
+      scrollBottomBtn.addEventListener("click", () => {
+        window.scrollTo({
+          top: document.documentElement.scrollHeight,
+          behavior: "smooth"
+        });
+      });
+    </script>
+
+
+
 
   </body>
 </html>
