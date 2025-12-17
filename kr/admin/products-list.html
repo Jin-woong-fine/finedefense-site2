@@ -8,337 +8,281 @@
   <link rel="stylesheet" href="./css/admin.css" />
 
   <style>
-    .product-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-    }
+  /* ===============================
+     TABLE (NOTICE STYLE)
+  =============================== */
+  .product-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 12px;
+    border-radius: 12px;
+    overflow: hidden;
+    font-size: 0.95rem;
+  }
 
-    .product-card {
-      width: 260px;
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    }
+  .product-table th,
+  .product-table td {
+    padding: 11px 14px;
+    border-bottom: 1px solid #e1e6f5;
+    text-align: left;
+  }
 
-    .product-card img {
-      width: 100%;
-      height: 180px;
-      object-fit: cover;
-    }
+  .product-table th {
+    background: #0f2679;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
 
-    .card-body {
-      padding: 15px;
-    }
+  .product-table tbody tr:hover td {
+    background: #f0f4ff;
+  }
 
-    .card-body .title {
-      font-size: 1.05rem;
-      font-weight: 600;
-      margin-bottom: 6px;
-    }
+  .product-table th:nth-child(1),
+  .product-table td:nth-child(1),
+  .product-table th:nth-child(2),
+  .product-table td:nth-child(2),
+  .product-table th:nth-child(3),
+  .product-table td:nth-child(3) {
+    text-align: center;
+  }
 
-    .card-body .category {
-      font-size: 0.9rem;
-      color: #555;
-    }
+  /* ===============================
+     SORT ORDER INPUT
+  =============================== */
+  .order-input {
+    width: 60px;
+    padding: 5px 6px;
+    border-radius: 6px;
+    border: 1px solid #ccd3f0;
+    font-size: 0.85rem;
+    text-align: center;
+  }
 
-    .card-buttons {
-      margin-top: 15px;
-      display: flex;
-      gap: 10px;
-    }
+  .order-input:focus {
+    outline: none;
+    border-color: #0f2679;
+    box-shadow: 0 0 0 2px rgba(15, 38, 121, 0.15);
+  }
 
-    .btn { padding:8px 14px; border:none; cursor:pointer; border-radius:6px; font-size:0.95rem; }
-    .btn-primary { background:#0f2679; color:#fff; }
-    .btn-danger { background:#d62828; color:#fff; }
+  /* ===============================
+     LANG FILTER
+  =============================== */
+  .lang-filter {
+    display: inline-flex;
+    gap: 6px;
+  }
 
-    .sort-order {
-      font-size: 0.85rem;
-      color: #777;
-      margin-top: 4px;
-      margin-bottom: 10px;
-    }
-    .sort-order strong {
-      color: #0f2679;
-    }
+  .lang-btn {
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: 1px solid #cfd6ee;
+    background: #ffffff;
+    cursor: pointer;
+    font-size: 0.85rem;
+  }
 
-
-
-    /* 언어 필터 */
-    .lang-filter {
-      display:inline-flex;
-      align-items:center;
-      gap:4px;
-      background:#f1f3f8;
-      padding:3px;
-      border-radius:999px;
-    }
-
-    .lang-filter button {
-      border:none;
-      background:transparent;
-      padding:5px 11px;
-      border-radius:999px;
-      font-size:0.85rem;
-      cursor:pointer;
-      color:#555;
-    }
-
-    .lang-filter button.active {
-      background:#0f2679;
-      color:#fff;
-      font-weight:600;
-    }
-
-
-    /* ============================================================
-      📦 카테고리별 제품 섹션
-    ============================================================ */
-    .category-section {
-      margin-bottom: 40px;
-    }
-
-    .category-title {
-      font-size: 1.15rem;
-      font-weight: 700;
-      margin-bottom: 14px;
-      color: #0f2679;
-      padding-bottom: 6px;
-      border-bottom: 1px solid #e5e7eb;
-    }
-
-    .category-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-    }
+  .lang-btn.active {
+    background: #0f2679;
+    color: #ffffff;
+    border-color: #0f2679;
+  }
 
   </style>
 </head>
 
 <body>
 
-  <!-- 🔵 사이드바 -->
-  <div id="sidebar"></div>
+<!-- 🔵 사이드바 -->
+<div id="sidebar"></div>
 
-    <div class="main">   <!-- ✅ main은 여기서 시작 -->
+<div class="main">
 
-    <!-- 🔵 TOPBAR -->
-    <div class="topbar">
-        <div class="title">제품 관리</div>
+  <!-- 🔵 TOPBAR (유지) -->
+  <div class="topbar">
+    <div class="title">제품 관리</div>
 
-        <div style="display:flex; align-items:center; gap:12px;">
-        <span id="session-timer" class="session-timer">세션 계산중...</span>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <span id="session-timer" class="session-timer">세션 계산중...</span>
 
-        <div class="topbar-user" id="topbarUser">
-            <span id="topbarUserName">관리자</span> ▾
-            <div class="user-dropdown" id="userDropdown"></div>
-        </div>
+      <div class="topbar-user" id="topbarUser">
+        <span id="topbarUserName">관리자</span> ▾
+        <div class="user-dropdown" id="userDropdown"></div>
+      </div>
 
-        <button onclick="location.href='../index.html'">홈으로</button>
-        </div>
+      <button onclick="location.href='../index.html'">홈으로</button>
+    </div>
+  </div>
+
+  <!-- 🔵 페이지 액션 -->
+  <div style="margin-bottom:20px;">
+    <button class="btn btn-primary" onclick="location.href='products-add.html'">+ 신규등록</button>
+  </div>
+
+  <!-- 🔵 목록 패널 -->
+  <section class="panel">
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+      <h2>등록된 제품</h2>
+
+      <div class="lang-filter">
+        <button class="lang-btn active" data-lang="all">ALL</button>
+        <button class="lang-btn" data-lang="kr">KR</button>
+        <button class="lang-btn" data-lang="en">EN</button>
+      </div>
     </div>
 
-    <!-- 🔵 버튼 영역 -->
-    <div style="margin-bottom:20px;">
-        <button class="btn btn-primary" onclick="location.href='products-add.html'">+ 신규등록</button>
-        <button class="btn btn-primary" onclick="location.href='../index.html'">홈으로</button>
-        <button id="logoutBtn" class="btn btn-danger">로그아웃</button>
-    </div>
+    <table class="product-table">
+      <thead>
+        <tr>
+          <th style="width:60px;">번호</th>
+          <th style="width:70px;">순번</th>
+          <th style="width:70px;">언어</th>
+          <th style="width:120px;">카테고리</th>
+          <th>제품명</th>
+          <th style="width:140px;">관리</th>
+        </tr>
+      </thead>
+      <tbody id="productTbody">
+        <tr><td colspan="6">불러오는 중...</td></tr>
+      </tbody>
+    </table>
 
-    <!-- 🔵 목록 패널 -->
-    <section class="panel">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-        <h2>등록된 제품</h2>
+  </section>
 
-        <div class="lang-filter">
-            <button type="button" class="lang-btn active" data-lang="kr">KR</button>
-            <button type="button" class="lang-btn" data-lang="en">EN</button>
-            <button type="button" class="lang-btn" data-lang="all">ALL</button>
-        </div>
-        </div>
+</div>
 
-        <div id="productList"></div>
-    </section>
+<!-- 공통 JS -->
+<script src="/kr/admin/js/common_auth.js"></script>
+<script src="/kr/admin/js/sidebar.js"></script>
 
-    </div>  <!-- ✅ main을 여기서 닫아야 함 -->
+<script>
+/* 🔐 권한 / 사이드바 */
+requireAdminOrEditor();
+loadSidebar("products");
 
-    <!-- 공통 JS -->
-    <script src="/kr/admin/js/common_auth.js"></script>
-    <script src="/kr/admin/js/sidebar.js"></script>
+/* 전역 */
+let allProducts = [];
+let currentLang = "all";
 
-    <script>
-        (function () {
-        requireAdminOrEditor();
-        loadSidebar("products");
-        document.getElementById("logoutBtn").addEventListener("click", logout);
-        })();
+/* 언어 필터 */
+document.querySelectorAll(".lang-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".lang-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    currentLang = btn.dataset.lang;
+    loadProducts();
+  });
+});
 
-        /* =================================================================
-        🔥 목록만 따로 분리한 전용 스크립트 (서버 API 완전 일치)
-        ================================================================= */
+/* 데이터 로드 */
+async function loadProducts() {
+  try {
+    if (currentLang === "all") {
+      const [krRes, enRes] = await Promise.all([
+        fetch("/api/products?lang=kr"),
+        fetch("/api/products?lang=en")
+      ]);
+      const kr = await krRes.json();
+      const en = await enRes.json();
+      allProducts = [...kr, ...en];
+    } else {
+      const res = await fetch(`/api/products?lang=${currentLang}`);
+      allProducts = await res.json();
+    }
 
-        let allProducts = [];
-        let currentLang = "kr";
+    renderTable();
 
-        /* 언어 필터 이벤트 */
-        document.querySelectorAll(".lang-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-            document.querySelectorAll(".lang-btn").forEach(b => b.classList.remove("active"));
-            btn.classList.add("active");
-            currentLang = btn.dataset.lang;
-            loadProducts(); // ← 필터 바꿀 때 다시 로딩!
-        });
-        });
+  } catch (e) {
+    console.error(e);
+  }
+}
 
-        /* 🚀 데이터 불러오기 */
-        async function loadProducts() {
-        try {
+/* 테이블 렌더 */
+function renderTable() {
+  const tbody = document.getElementById("productTbody");
 
-            if (currentLang === "all") {
-            const [krRes, enRes] = await Promise.all([
-                fetch(`/api/products?lang=kr`),
-                fetch(`/api/products?lang=en`)
-            ]);
+  if (!allProducts.length) {
+    tbody.innerHTML = `<tr><td colspan="6">제품 없음</td></tr>`;
+    return;
+  }
 
-            const kr = await krRes.json();
-            const en = await enRes.json();
+  allProducts.sort((a,b) => a.sort_order - b.sort_order);
 
-            allProducts = [...kr, ...en];
+  tbody.innerHTML = allProducts.map((p, i) => `
+    <tr>
+      <td>${allProducts.length - i}</td>
 
-            } else {
-            const res = await fetch(`/api/products?lang=${currentLang}`);
-            allProducts = await res.json();
-            }
+      <td>
+        <input class="order-input"
+          type="number"
+          value="${p.sort_order ?? 9999}"
+          data-id="${p.id}"
+          onchange="saveSortOrder(this)">
+      </td>
 
-            renderList();
+      <td>${p.lang.toUpperCase()}</td>
+      <td>${p.category}</td>
 
-        } catch (err) {
-            console.error("🔥 제품 로드 실패:", err);
-        }
-        }
+      <td onclick="openProduct(${p.id})" style="cursor:pointer;">
+        ${p.title}
+      </td>
 
-        /* 목록 출력 */
-        function renderList() {
-          const wrap = document.getElementById("productList");
-          wrap.innerHTML = "";
+      <td>
+        <button class="btn btn-primary"
+          onclick="location.href='products-edit.html?id=${p.id}'">수정</button>
+        <button class="btn btn-danger"
+          onclick="deleteProduct(${p.id})">삭제</button>
+      </td>
+    </tr>
+  `).join("");
+}
 
-          if (!Array.isArray(allProducts) || allProducts.length === 0) {
-            wrap.innerHTML = "<p>등록된 제품이 없습니다.</p>";
-            return;
-          }
+/* 순번 저장 */
+async function saveSortOrder(input) {
+  const id = input.dataset.id;
+  const sort_order = Number(input.value);
 
-          // 1️⃣ 카테고리 그룹핑 (방어 포함)
-          const grouped = {};
-          allProducts.forEach(p => {
-            if (!p.category) return;   // ← 이 줄이 핵심
-            if (!grouped[p.category]) grouped[p.category] = [];
-            grouped[p.category].push(p);
-          });
+  if (!id || sort_order < 1) return;
 
-          // 2️⃣ 카테고리 표시 순서 정의
-          const categoryOrder = [
-            "towed",
-            "fixed",
-            "connector",
-            "custom"
-          ];
+  await fetch("/api/products/sort-order", {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...authHeaders()
+    },
+    body: JSON.stringify({
+      orders: [{ id, sort_order }]
+    })
+  });
 
-          categoryOrder.forEach(category => {
-            const items = grouped[category];
-            if (!items || items.length === 0) return;
+  input.style.background = "#e7f7ec";
+  setTimeout(() => input.style.background = "", 500);
 
-            // 3️⃣ sort_order 기준 정렬
-            items.sort((a, b) => a.sort_order - b.sort_order);
+  loadProducts();
+}
 
-            // 4️⃣ 카테고리 섹션 생성
-            const section = document.createElement("div");
-            section.className = "category-section";
+/* 삭제 */
+async function deleteProduct(id) {
+  if (!confirm("삭제하시겠습니까?")) return;
 
-            const titleMap = {
-              towed: "수중이동형 케이블",
-              fixed: "수중고정형 케이블",
-              connector: "수중 커넥터",
-              custom: "커스텀 케이블"
-            };
+  await fetch(`/api/products/${id}`, {
+    method: "DELETE",
+    headers: authHeaders()
+  });
 
-            section.innerHTML = `
-              <div class="category-title">${titleMap[category]}</div>
-              <div class="category-grid"></div>
-            `;
+  loadProducts();
+}
 
-            const grid = section.querySelector(".category-grid");
+/* 공개 페이지 */
+function openProduct(id) {
+  window.open(`/kr/sub/products/product-view.html?id=${id}`, "_blank");
+}
 
-            // 5️⃣ 카드 생성 (기존 로직 거의 그대로)
-            items.forEach(item => {
-              const thumb = item.thumbnail || "/kr/admin/img/noimage.png";
-
-              const card = document.createElement("div");
-              card.className = "product-card";
-              card.style.cursor = "pointer";
-
-              card.addEventListener("click", e => {
-                if (!e.target.closest(".card-buttons")) {
-                  location.href = `/kr/sub/products/product-view.html?id=${item.id}`;
-                }
-              });
-
-              card.innerHTML = `
-                <img src="${thumb}" alt="">
-                <div class="card-body">
-                  <div class="title">${item.title}</div>
-
-                  <div class="category">
-                    ${item.category.toUpperCase()} | ${item.lang.toUpperCase()}
-                  </div>
-
-                  <div class="sort-order">
-                    순번: <strong>${item.sort_order}</strong>
-                  </div>
-
-                  <div class="card-buttons">
-                    <button class="btn btn-primary"
-                      onclick="location.href='products-edit.html?id=${item.id}'">수정</button>
-                    <button class="btn btn-danger"
-                      onclick="deleteProduct(${item.id})">삭제</button>
-                  </div>
-                </div>
-              `;
-
-              grid.appendChild(card);
-            });
-
-            wrap.appendChild(section);
-          });
-        }
-
-
-        /* 삭제 */
-        async function deleteProduct(id) {
-        if (!confirm("삭제하시겠습니까?")) return;
-
-        const res = await fetch(`/api/products/${id}`, {
-            method: "DELETE",
-            headers: authHeaders(),
-        });
-
-        const out = await res.json();
-
-        if (res.ok) {
-            alert("삭제되었습니다.");
-            loadProducts();
-        } else {
-            alert("삭제 실패: " + out.message);
-        }
-        }
-
-        /* 시작 */
-        loadProducts();
-
-    </script>
-
+/* 시작 */
+loadProducts();
+</script>
 
 </body>
 </html>

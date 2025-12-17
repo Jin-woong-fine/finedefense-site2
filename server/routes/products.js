@@ -341,6 +341,42 @@ router.delete("/:id", verifyToken, verifyEditor, async (req, res) => {
   }
 });
 
+/* ==========================================================
+   🔢 제품 순번 일괄 수정 (리스트 관리용)
+========================================================== */
+router.put(
+  "/sort-order",
+  verifyToken,
+  verifyEditor,
+  async (req, res) => {
+    try {
+      const { orders } = req.body;
+      // orders = [{ id: 1, sort_order: 10 }, { id: 2, sort_order: 20 }]
+
+      if (!Array.isArray(orders)) {
+        return res.status(400).json({ message: "Invalid orders format" });
+      }
+
+      await Promise.all(
+        orders.map(o =>
+          db.execute(
+            `UPDATE products SET sort_order = ? WHERE id = ?`,
+            [o.sort_order ?? 9999, o.id]
+          )
+        )
+      );
+
+      res.json({ message: "sort_order updated" });
+
+    } catch (err) {
+      console.error("sort-order error:", err);
+      res.status(500).json({ message: "server error" });
+    }
+  }
+);
+
+
+
 
 
 export default router;
