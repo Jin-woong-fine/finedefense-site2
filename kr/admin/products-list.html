@@ -140,12 +140,13 @@
           <th style="width:70px;">순번</th>
           <th style="width:70px;">언어</th>
           <th style="width:120px;">카테고리</th>
+          <th style="width:100px;">이미지</th>
           <th>제품명</th>
           <th style="width:140px;">관리</th>
         </tr>
       </thead>
       <tbody id="productTbody">
-        <tr><td colspan="6">불러오는 중...</td></tr>
+        <tr><td colspan="7">불러오는 중...</td></tr>
       </tbody>
     </table>
 
@@ -158,6 +159,17 @@
 <script src="/kr/admin/js/sidebar.js"></script>
 
 <script>
+
+
+  /* 카테고리 표시용 한글 매핑 */
+  const categoryMap = {
+    towed: "수중이동형",
+    fixed: "수중고정형",
+    connector: "수중 커넥터",
+    custom: "커스텀"
+  };
+
+
 /* 🔐 권한 / 사이드바 */
 requireAdminOrEditor();
 loadSidebar("products");
@@ -204,26 +216,44 @@ function renderTable() {
   const tbody = document.getElementById("productTbody");
 
   if (!allProducts.length) {
-    tbody.innerHTML = `<tr><td colspan="6">제품 없음</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7">제품 없음</td></tr>`;
     return;
   }
-
-  allProducts.sort((a,b) => a.sort_order - b.sort_order);
+  
+  allProducts.sort((a, b) => {
+    const aOrder = Number.isFinite(a.sort_order) ? a.sort_order : 9999;
+    const bOrder = Number.isFinite(b.sort_order) ? b.sort_order : 9999;
+    return aOrder - bOrder;
+  });
 
   tbody.innerHTML = allProducts.map((p, i) => `
     <tr>
-      <td>${allProducts.length - i}</td>
+      <td>${i + 1}</td>
 
       <td>
         <input class="order-input"
           type="number"
-          value="${p.sort_order ?? 9999}"
+          min="1"
+          value="${Number.isFinite(p.sort_order) ? p.sort_order : 9999}"
           data-id="${p.id}"
           onchange="saveSortOrder(this)">
       </td>
 
       <td>${p.lang.toUpperCase()}</td>
-      <td>${p.category}</td>
+      <td>${categoryMap[p.category] || p.category}</td>
+
+      <td>
+        <img
+          src="${p.thumbnail || '/kr/admin/img/noimage.png'}"
+          style="
+            width:80px;
+            height:50px;
+            object-fit:cover;
+            border-radius:6px;
+            border:1px solid #e1e6f5;
+          "
+        />
+      </td>
 
       <td onclick="openProduct(${p.id})" style="cursor:pointer;">
         ${p.title}
@@ -241,10 +271,16 @@ function renderTable() {
 
 /* 순번 저장 */
 async function saveSortOrder(input) {
-  const id = input.dataset.id;
-  const sort_order = Number(input.value);
+  const id = Number(input.dataset.id);
+  let sort_order = Number(input.value);
 
-  if (!id || sort_order < 1) return;
+  // 🔒 방어 로직
+  if (!id) return;
+
+  if (!Number.isFinite(sort_order) || sort_order < 1) {
+    sort_order = 9999;
+    input.value = 9999;
+  }
 
   await fetch("/api/products/sort-order", {
     method: "PUT",
@@ -257,11 +293,14 @@ async function saveSortOrder(input) {
     })
   });
 
+  // 시각적 피드백
   input.style.background = "#e7f7ec";
   setTimeout(() => input.style.background = "", 500);
 
   loadProducts();
 }
+
+
 
 /* 삭제 */
 async function deleteProduct(id) {
