@@ -275,4 +275,39 @@ router.post("/download", async (req, res) => {
   }
 });
 
+
+// 공지사항 단건 조회 (관리자용)
+router.get("/notice/:id", verifyToken, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const [rows] = await db.query(
+      `
+      SELECT
+        id,
+        title,
+        content,
+        lang,
+        sort_order,
+        created_at
+      FROM posts
+      WHERE id = ?
+        AND category = 'notice'
+      `,
+      [id]
+    );
+
+    if (!rows.length) {
+      return res.status(404).json({ message: "공지사항 없음" });
+    }
+
+    res.json({ notice: rows[0] });
+
+  } catch (err) {
+    console.error("공지 단건 조회 오류:", err);
+    res.status(500).json({ message: "서버 오류" });
+  }
+});
+
+
 export default router;
