@@ -196,31 +196,36 @@
       right: -60px;
     }
 
-    /* -----------------------------
-      목록으로 버튼
-    ------------------------------ */
-    .product-back {
-      margin-bottom: 16px;
-    }
+/* -----------------------------
+   설명 하단 "목록으로" 버튼
+------------------------------ */
+.product-back {
+  margin-top: 36px;          /* 설명과 충분한 간격 */
+  text-align: center;        /* 중앙 정렬 */
+}
 
-    .btn-back {
-      background: #f5f5f7;
-      border: 1px solid #d2d2d7;
-      border-radius: 999px;
-      padding: 8px 18px;
-      font-size: 0.9rem;
-      color: #0f2679;
-      cursor: pointer;
-      transition: background 0.15s ease, transform 0.12s ease;
-    }
+.btn-back {
+  background: #f5f5f7;
+  border: 1px solid #d2d2d7;
+  border-radius: 999px;
+  padding: 10px 22px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #0f2679;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.12s ease, box-shadow 0.12s ease;
+}
 
-    .btn-back:hover {
-      background: #e5e5ea;
-    }
+.btn-back:hover {
+  background: #e5e5ea;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
 
-    .btn-back:active {
-      transform: scale(0.96);
-    }
+.btn-back:active {
+  transform: scale(0.96);
+  box-shadow: none;
+}
+
 
 
 
@@ -251,14 +256,6 @@
 </div>
 
 
-  <!-- 목록으로 버튼 -->
-  <div class="product-back">
-    <button class="btn-back" type="button" onclick="goProductList()">
-      ← 목록으로
-    </button>
-  </div>
-
-
 
 <section class="product-detail">
   <h1 id="productTitle" class="product-title">제품명</h1>
@@ -275,6 +272,16 @@
     <!-- description_html이 여기 들어감 -->
     <div id="productDesc" class="product-desc"></div>
   </div>
+
+  <!-- 목록으로 버튼 -->
+  <div class="product-back">
+    <button class="btn-back" type="button" onclick="goProductList()">
+      ← 목록으로
+    </button>
+  </div>
+
+
+
 </section>
 
     <!-- 공통 푸터 -->
