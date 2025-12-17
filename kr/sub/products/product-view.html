@@ -197,11 +197,12 @@
     }
 
 /* -----------------------------
-   설명 하단 "목록으로" 버튼
+   설명 하단 우측 "목록으로" 버튼
 ------------------------------ */
-.product-back {
-  margin-top: 36px;          /* 설명과 충분한 간격 */
-  text-align: center;        /* 중앙 정렬 */
+.product-back.bottom {
+  margin-top: 36px;              /* 설명과 간격 */
+  display: flex;
+  justify-content: flex-end;     /* 👉 오른쪽 정렬 */
 }
 
 .btn-back {
@@ -225,9 +226,6 @@
   transform: scale(0.96);
   box-shadow: none;
 }
-
-
-
 
   </style>
 </head>
@@ -494,10 +492,18 @@ function goProductList() {
   const params = new URLSearchParams(window.location.search);
   const category = params.get("category");
 
-  if (category) {
-    location.href = `/kr/sub/pr/products.html?category=${category}`;
+  const map = {
+    towed: "/kr/sub/pr/sub-towed.html",
+    fixed: "/kr/sub/pr/sub-fixed.html",
+    connector: "/kr/sub/pr/sub-connector.html",
+    custom: "/kr/sub/pr/sub-custom.html",
+  };
+
+  if (category && map[category]) {
+    location.href = map[category];
   } else {
-    location.href = `/kr/sub/pr/products.html`;
+    // 카테고리 정보 없으면 기본 페이지 (원하는 걸로)
+    location.href = "/kr/sub/pr/sub-towed.html";
   }
 }
 

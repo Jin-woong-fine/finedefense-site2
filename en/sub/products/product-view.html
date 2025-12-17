@@ -199,11 +199,12 @@
     }
 
 /* -----------------------------
-   설명 하단 "목록으로" 버튼
+   설명 하단 우측 "목록으로" 버튼
 ------------------------------ */
-.product-back {
-  margin-top: 36px;          /* 설명과 충분한 간격 */
-  text-align: center;        /* 중앙 정렬 */
+.product-back.bottom {
+  margin-top: 36px;              /* 설명과 간격 */
+  display: flex;
+  justify-content: flex-end;     /* 👉 오른쪽 정렬 */
 }
 
 .btn-back {
@@ -491,6 +492,28 @@ function showNextImage() {
   currentIndex = (currentIndex + 1) % galleryImages.length;
   overlayImgEl.src = galleryImages[currentIndex];
 }
+
+function goProductList() {
+  const params = new URLSearchParams(window.location.search);
+  const category = params.get("category");
+
+  const map = {
+    towed: "/en/sub/pr/sub-towed.html",
+    fixed: "/en/sub/pr/sub-fixed.html",
+    connector: "/en/sub/pr/sub-connector.html",
+    custom: "/en/sub/pr/sub-custom.html",
+  };
+
+  if (category && map[category]) {
+    location.href = map[category];
+  } else {
+    // 카테고리 정보 없으면 기본 페이지 (원하는 걸로)
+    location.href = "/en/sub/pr/sub-towed.html";
+  }
+}
+
+
+
 </script>
 
     <!-- 공통 스크립트 -->
