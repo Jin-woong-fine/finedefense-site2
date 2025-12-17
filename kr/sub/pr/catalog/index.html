@@ -241,6 +241,9 @@
 
 const categories = ["kr_catalog", "en_catalog", "company_intro", "etc"];
 
+// 🔒 세션 내 조회수 중복 방지
+const viewedCatalog = new Set();
+
 // 초기 로딩
 document.addEventListener("DOMContentLoaded", () => {
   categories.forEach(loadCategory);
@@ -334,8 +337,13 @@ function openPdf(id, url, title) {
     return;
   }
 
-  // 조회수 증가
-  fetch(`/api/catalog/view/${id}`, { method: "POST" }).catch(() => {});
+// ✅ 조회수 증가 — 세션 내 1회만
+if (!viewedCatalog.has(id)) {
+  viewedCatalog.add(id);
+  fetch(`/api/catalog/view/${id}`, { method: "POST" })
+    .catch(() => {});
+}
+
 
   frame.src = url;
   document.getElementById("pdfTitle").textContent = title;

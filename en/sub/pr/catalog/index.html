@@ -127,12 +127,14 @@
   <div data-include="/en/components/footer.html"></div>
 
 <script>
-const categories = [
-  "kr_catalog",
-  "en_catalog",
-  "company_intro",
-  "etc"
-];
+/* =====================================================
+   📦 CATALOG LIST + PDF VIEWER
+===================================================== */
+
+const categories = ["kr_catalog", "en_catalog", "company_intro", "etc"];
+
+// 🔒 세션 내 조회수 중복 방지
+const viewedCatalog = new Set();
 
 // Load all categories
 document.addEventListener("DOMContentLoaded", () => {
@@ -250,15 +252,28 @@ let currentZoom = 1;
 let currentRotate = 0;
 
 function openPdf(id, url, title) {
+  const modal = document.getElementById("pdfModal");
+  const frame = document.getElementById("pdfFrame");
+
+  if (!modal || !frame) {
+    console.error("PDF modal DOM not found");
+    return;
+  }
+
   if (!url) {
     alert("File not available.");
     return;
   }
 
-  // 🔥 increase view count
-  fetch(`/api/catalog/view/${id}`, { method: "POST" }).catch(() => {});
+// ✅ 조회수 증가 — 세션 내 1회만
+if (!viewedCatalog.has(id)) {
+  viewedCatalog.add(id);
+  fetch(`/api/catalog/view/${id}`, { method: "POST" })
+    .catch(() => {});
+}
 
-  document.getElementById("pdfFrame").src = url;
+
+  frame.src = url;
   document.getElementById("pdfTitle").textContent = title;
   document.getElementById("pdfDownload").href = url;
 
@@ -266,8 +281,9 @@ function openPdf(id, url, title) {
   currentRotate = 0;
   applyTransform();
 
-  document.getElementById("pdfModal").style.display = "flex";
+  modal.style.display = "flex";
 }
+
 
 function closePdf() {
   document.getElementById("pdfModal").style.display = "none";
