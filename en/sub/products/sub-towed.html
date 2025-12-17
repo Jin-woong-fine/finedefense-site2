@@ -200,7 +200,7 @@
 
       container.innerHTML = products.map(p => {
         const img = p.thumbnail || "/img/products/Image-placeholder.png";
-        const link = `/kr/sub/products/product-view.html?id=${p.id}`;
+        const link = `/en/sub/products/product-view.html?id=${p.id}`;
 
         // 🔥 summary → description_html 순서로 사용
         const plainSummary = stripHtml(p.summary || "");
