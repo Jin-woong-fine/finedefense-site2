@@ -279,6 +279,19 @@
   gap: 14px;
 }
 
+
+.badge-main {
+  position: absolute;
+  bottom: 6px;
+  left: 6px;
+  background: #0f2679;
+  color: #fff;
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+
 </style>
 
 </head>
@@ -416,7 +429,9 @@
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 
 <script>
-/* 초기 설정 */
+/* ============================================================
+   초기 설정
+============================================================ */
 (function () {
   requireAdminOrEditor();
   loadSidebar("products");
@@ -424,87 +439,82 @@
 
 const urlParams = new URLSearchParams(location.search);
 const productId = urlParams.get("id");
+
 if (!productId) {
   alert("잘못된 접근입니다.");
   location.href = "products-list.html";
 }
 
-/* Editor */
-let editor = new toastui.Editor({
-  el: document.querySelector('#editor'),
-  height: '500px',
-  initialEditType: 'wysiwyg',
-  previewStyle: 'vertical',
+/* ============================================================
+   Toast UI Editor
+============================================================ */
+const editor = new toastui.Editor({
+  el: document.querySelector("#editor"),
+  height: "500px",
+  initialEditType: "wysiwyg",
+  previewStyle: "vertical",
 });
 
 /* ============================================================
-   ✏️ Summary 255자 제한 + 카운트
+   Summary 255자 제한 + 카운트
 ============================================================ */
 const summaryInput = document.getElementById("summary");
 const summaryCount = document.getElementById("summaryCount");
 
-if (summaryInput && summaryCount) {
-  summaryCount.textContent = `${summaryInput.value.length} / 255`;
-
-  summaryInput.addEventListener("input", () => {
-    const len = summaryInput.value.length;
-    summaryCount.textContent = `${len} / 255`;
-    summaryCount.style.color = len >= 255 ? "#ff3b30" : "#6b7280";
-  });
+function updateSummaryCount() {
+  const len = summaryInput.value.length;
+  summaryCount.textContent = `${len} / 255`;
+  summaryCount.style.color = len >= 255 ? "#ff3b30" : "#6b7280";
 }
 
+summaryInput.addEventListener("input", updateSummaryCount);
 
-/* 기존 데이터 */
-let oldImages = [];
-let newImages = [];
+/* ============================================================
+   이미지 상태
+============================================================ */
+let oldImages = [];   // string[]
+let newImages = [];   // File[]
 
-/* 제품 불러오기 */
+/* ============================================================
+   제품 불러오기
+============================================================ */
 async function loadProduct() {
   try {
     const res = await fetch(`/api/products/${productId}`, {
-      headers: authHeaders()
+      headers: authHeaders(),
     });
 
     const out = await res.json();
-
-    if (!res.ok) {
-      alert("제품 정보를 불러오지 못했습니다.");
-      return;
-    }
+    if (!res.ok) throw new Error(out.message);
 
     const p = out.product;
 
-    // 텍스트 정보 넣기
     document.getElementById("title").value = p.title;
-
-    const summaryText = p.summary || "";
-    document.getElementById("summary").value = summaryText;
-
-    summaryCount.textContent = `${summaryText.length} / 255`;
-    summaryCount.style.color =
-      summaryText.length >= 255 ? "#ff3b30" : "#6b7280";
+    summaryInput.value = p.summary || "";
+    updateSummaryCount();
 
     document.getElementById("category").value = p.category;
     document.getElementById("lang").value = p.lang;
     document.getElementById("sort_order").value = p.sort_order;
 
-    // 내용 넣기
     editor.setHTML(p.description_html || "");
 
-    // 이미지(파일명만 추출)
-    oldImages = out.images.map(img => img.url.replace("/uploads/products/", ""));
+    oldImages = out.images.map(img =>
+      img.url.replace("/uploads/products/", "")
+    );
 
     renderOldImages();
-
   } catch (err) {
     console.error(err);
-    alert("서버 오류 발생");
+    alert("제품 정보를 불러오지 못했습니다.");
   }
 }
 
 loadProduct();
 
-/* 기존 이미지 렌더링 + 삭제 + 드래그 정렬 */
+/* ============================================================
+   기존 이미지 렌더링 + 정렬
+============================================================ */
 function renderOldImages() {
   const wrap = document.getElementById("previewOld");
   wrap.innerHTML = "";
@@ -515,34 +525,33 @@ function renderOldImages() {
 
     div.innerHTML = `
       <img src="/uploads/products/${name}">
-      <button class="remove-btn" onclick="removeOldImage(${index})">×</button>
+      <button class="remove-btn">×</button>
     `;
+
+    div.querySelector("button").onclick = () => {
+      oldImages.splice(index, 1);
+      renderOldImages();
+    };
 
     wrap.appendChild(div);
   });
 
-  new Sortable(wrap, {
+  if (wrap._sortable) wrap._sortable.destroy();
+
+  wrap._sortable = new Sortable(wrap, {
     animation: 150,
     onEnd: () => {
-      const newOrder = [];
-      document.querySelectorAll("#previewOld img").forEach(el => {
-        const filename = el.src.split("/uploads/products/")[1];
-        newOrder.push(filename);
-      });
-      oldImages = newOrder;
-    }
+      oldImages = [...wrap.querySelectorAll("img")]
+        .map(img => img.src.split("/uploads/products/")[1]);
+    },
   });
 }
 
-function removeOldImage(i) {
-  oldImages.splice(i, 1);
-  renderOldImages();
-}
-
-/* 신규 이미지 프리뷰 */
+/* ============================================================
+   신규 이미지 프리뷰
+============================================================ */
 document.getElementById("images").addEventListener("change", (e) => {
-  const files = [...e.target.files];
-  newImages.push(...files);
+  newImages = Array.from(e.target.files);
   renderNewImages();
 });
 
@@ -556,69 +565,78 @@ function renderNewImages() {
     const div = document.createElement("div");
     div.className = "img-item";
 
-    div.innerHTML = `
-      <img src="${url}">
-      <button class="remove-btn" onclick="removeNewImage(${index})">×</button>
-    `;
+    const img = document.createElement("img");
+    img.src = url;
+    img.onload = () => URL.revokeObjectURL(url);
 
+    const btn = document.createElement("button");
+    btn.className = "remove-btn";
+    btn.textContent = "×";
+    btn.onclick = () => {
+      newImages.splice(index, 1);
+      renderNewImages();
+    };
+
+    div.appendChild(img);
+
+    if (index === 0) {
+      const badge = document.createElement("span");
+      badge.className = "badge-main";
+      badge.textContent = "대표";
+      div.appendChild(badge);
+    }
+
+    div.appendChild(btn);
     wrap.appendChild(div);
   });
 }
 
-function removeNewImage(i) {
-  newImages.splice(i, 1);
-  renderNewImages();
-}
-
-/* 수정 API 요청 */
+/* ============================================================
+   수정 API 요청
+============================================================ */
 document.getElementById("productForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const summary = document.getElementById("summary").value.trim();
-
-  if (summary.length > 255) {
+  if (summaryInput.value.trim().length > 255) {
     alert("요약(summary)은 최대 255자까지 입력 가능합니다.");
-    document.getElementById("summary").focus();
+    summaryInput.focus();
     return;
+  }
+
+  if (oldImages.length === 0 && newImages.length === 0) {
+    if (!confirm("이미지가 하나도 없습니다. 그대로 저장할까요?")) return;
   }
 
   const form = new FormData();
   form.append("title", document.getElementById("title").value.trim());
-  form.append("summary", document.getElementById("summary").value.trim());
+  form.append("summary", summaryInput.value.trim());
   form.append("category", document.getElementById("category").value);
   form.append("lang", document.getElementById("lang").value);
   form.append("sort_order", document.getElementById("sort_order").value);
   form.append("description_html", editor.getHTML());
-
-  // 기존 이미지 순서
   form.append("old_images", JSON.stringify(oldImages));
 
-  // 신규 이미지
-  newImages.forEach(f => form.append("images", f));
+  newImages.forEach(file => form.append("images", file));
 
   try {
     const res = await fetch(`/api/products/${productId}`, {
       method: "PUT",
       headers: authHeaders(),
-      body: form
+      body: form,
     });
 
     const out = await res.json();
-
-    if (!res.ok) {
-      alert("수정 실패: " + out.message);
-      return;
-    }
+    if (!res.ok) throw new Error(out.message);
 
     alert("수정이 완료되었습니다!");
     location.href = "products-list.html";
-
   } catch (err) {
     console.error(err);
-    alert("서버 오류 발생");
+    alert("수정 중 오류가 발생했습니다.");
   }
 });
 </script>
+
 
 </body>
 </html>
