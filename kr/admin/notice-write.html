@@ -116,25 +116,56 @@
   <!-- ⭐ 메인 -->
   <div class="main">
 
-  <!-- TOPBAR -->
-  <div class="topbar">
-    <div class="title">공지사항 작성</div>
+    <!-- =======================
+         TOPBAR
+    ======================== -->
+    <div class="topbar">
+      <div class="title">공지사항 작성</div>
 
-    <div style="display:flex; align-items:center; gap:12px;">
-      <span id="session-timer" class="session-timer">세션 계산중...</span>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <span id="session-timer" class="session-timer">세션 계산중...</span>
 
-      <div class="topbar-user" id="topbarUser">
-        <span id="topbarUserName">관리자</span> ▾
-        <div class="user-dropdown" id="userDropdown"></div>
+        <div class="topbar-user" id="topbarUser">
+          <span id="topbarUserName">관리자</span> ▾
+          <div class="user-dropdown" id="userDropdown"></div>
+        </div>
+
+        <button onclick="location.href='../index.html'">홈으로</button>
       </div>
-
-      <button onclick="location.href='../index.html'">홈으로</button>
     </div>
-  </div>
 
+    <!-- =======================
+         FORM
+    ======================== -->
     <form id="noticeForm" enctype="multipart/form-data">
 
-      <!-- 공지 정보 -->
+      <!-- 🔹 기존 공지 불러오기 -->
+      <section class="panel">
+        <h2>기존 공지 불러오기 (선택)</h2>
+
+        <select id="copyFromNotice" class="input">
+          <option value="">기존 공지 선택 (선택사항)</option>
+        </select>
+
+        <div class="help-text">
+          선택한 공지의 내용을 불러와 신규 공지로 등록할 수 있습니다.<br>
+          (영문 공지 작성 시 한글 공지를 불러와 번역하는 용도로 활용)<br>
+          *정렬 순번은 <b>기본값 9999</b>로 두는 것을 권장합니다.<br>
+          *메인에 노출이 필요한 공지사항만 <b>1, 2, 3</b> 등 작은 숫자로 설정하세요.
+        </div>
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          onclick="loadFromExistingNotice()"
+        >
+          불러오기
+        </button>
+      </section>
+
+      <!-- =======================
+           공지 정보 입력
+      ======================== -->
       <section class="panel">
         <h2>공지 정보 입력</h2>
 
@@ -156,17 +187,17 @@
         </div>
 
         <div class="help-text">
-          *메인공지처럼 상단 고정하고 싶은 경우 낮은 숫자(예: 1,2,3)를 입력하세요.<br>
-          *미입력 시 기본값 = 9999
+          *상단에 고정하고 싶은 공지는 <b>1, 2, 3</b>처럼 작은 숫자를 입력하세요.<br>
+          *미입력 시 기본값은 <b>9999</b>입니다.
         </div>
 
         <h3 style="margin-top:20px;">공지 내용</h3>
         <div id="editor" style="border:1px solid #ccc;border-radius:6px;"></div>
       </section>
 
-      <!-- ============================ -->
-      <!-- 📎 첨부파일 업로드 -->
-      <!-- ============================ -->
+      <!-- =======================
+           첨부파일 업로드
+      ======================== -->
       <section class="panel">
         <h3>첨부파일 업로드 (여러 개 가능)</h3>
 
@@ -182,7 +213,9 @@
 
   </div>
 
-  <!-- 공통 JS -->
+  <!-- =======================
+       공통 JS
+  ======================== -->
   <script src="/kr/admin/js/common_auth.js"></script>
   <script src="/kr/admin/js/sidebar.js"></script>
   <script src="./js/topbar_user_menu.js"></script>
@@ -191,13 +224,15 @@
   <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 
   <script>
-    /* 권한 체크 */
+    /* =========================
+       권한 / 사이드바
+    ========================= */
     requireAdminOrEditor();
-
-    /* 사이드바 로드 */
     loadSidebar("notice");
 
-    /* Editor 초기화 */
+    /* =========================
+       Editor 초기화
+    ========================= */
     const editor = new toastui.Editor({
       el: document.querySelector('#editor'),
       height: '500px',
@@ -213,7 +248,70 @@
       ]
     });
 
-    /* 파일 미리보기 */
+    /* =========================
+       기존 공지 목록 로드
+    ========================= */
+    async function loadNoticeList() {
+      try {
+        const res = await fetch("/api/posts/list/notice?lang=all", {
+          headers: { Authorization: "Bearer " + localStorage.getItem("token") }
+        });
+
+        const out = await res.json();
+        const list = Array.isArray(out) ? out : (out.list || []);
+
+        const select = document.getElementById("copyFromNotice");
+
+        list.forEach(n => {
+          if (!n?.id || !n?.title) return;
+
+          const opt = document.createElement("option");
+          opt.value = n.id;
+          opt.textContent = `[${(n.lang || "kr").toUpperCase()}] ${n.title}`;
+          select.appendChild(opt);
+        });
+
+      } catch (e) {
+        console.error("공지 목록 로드 실패", e);
+      }
+    }
+
+    loadNoticeList();
+
+    /* =========================
+       기존 공지 불러오기
+    ========================= */
+    async function loadFromExistingNotice() {
+      const id = document.getElementById("copyFromNotice").value;
+      if (!id) return;
+
+      if (!confirm("선택한 공지 내용을 불러오시겠습니까?\n현재 입력 내용은 덮어씌워집니다.")) {
+        return;
+      }
+
+      const res = await fetch(`/api/posts/notice/${id}`, {
+        headers: { Authorization: "Bearer " + localStorage.getItem("token") }
+      });
+
+      const out = await res.json();
+      const n = out.notice || out.post;
+
+      if (!n) {
+        alert("공지 데이터를 불러오지 못했습니다.");
+        return;
+      }
+
+      document.getElementById("title").value = n.title || "";
+      document.getElementById("sort_order").value = 9999;
+
+      editor.setHTML(n.content || n.content_html || "");
+
+      alert("공지 내용이 불러와졌습니다.\n번역 후 저장하세요.");
+    }
+
+    /* =========================
+       파일 미리보기
+    ========================= */
     document.getElementById("files").addEventListener("change", (e) => {
       const list = [...e.target.files]
         .map(f => `<div class="file-item">${f.name}</div>`)
@@ -221,7 +319,9 @@
       document.getElementById("filePreview").innerHTML = list;
     });
 
-    /* 공지 등록 */
+    /* =========================
+       공지 등록
+    ========================= */
     document.getElementById("noticeForm").addEventListener("submit", async (e) => {
       e.preventDefault();
 
@@ -256,5 +356,6 @@
   </script>
 
 </body>
+
 
 </html>
