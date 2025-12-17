@@ -13,150 +13,199 @@
   <!-- SortableJS -->
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
-<style>
-  /* ============================================================
-    ✅ 제품 수정 페이지 전용: admin.css panel 충돌 강제 보정 + 폼 정리
-    - 대시보드 panel(grid/flex) 영향 제거
-    - 입력폼/에디터/이미지 섹션 폭/간격 안정화
-  ============================================================ */
+  <style>
+    /* ============================================================
+      ✅ 제품 수정 페이지 전용 CSS (Toast UI Editor 안전)
+    ============================================================ */
 
-  /* 1) admin.css의 panel 레이아웃 영향(대시보드용 grid/flex 등) 제거 */
-  .main > .panel,
-  .main section.panel {
-    all: unset;
-    display: block;
-  }
+    /* -------------------------------
+      Main Layout
+    -------------------------------- */
+    .main {
+      padding: 40px 24px 60px;
+    }
 
-  /* 2) main 레이아웃: 가운데 고정 + 여백 */
-  .main {
-    padding: 28px 24px 60px;
-  }
+    /* -------------------------------
+      Panel (Apple Card Style)
+    -------------------------------- */
+    .main section.panel {
+      background: #ffffff;
+      padding: 40px 44px;
+      border-radius: 20px;
+      margin: 0 auto 44px;
+      max-width: 960px;
+      border: 1px solid #e5e5ea;
+      box-shadow:
+        0 20px 40px rgba(0,0,0,0.08),
+        0 4px 10px rgba(0,0,0,0.05);
+    }
 
-  /* 3) 패널: 너비 고정 + 카드 스타일 */
-  .main section.panel {
-    background: #ffffff;
-    padding: 28px 32px;
-    border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    margin: 0 auto 26px;
-    max-width: 980px;
-  }
+    /* -------------------------------
+      Headings
+    -------------------------------- */
+    .main section.panel h2 {
+      margin: 0 0 18px;
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
 
-  /* 4) 타이포/제목 간격 */
-  .main section.panel h2 {
-    margin: 0 0 16px;
-    font-size: 1.25rem;
-  }
-  .main section.panel h3 {
-    margin: 18px 0 10px;
-    font-size: 1.05rem;
-  }
+    .main section.panel h3 {
+      margin: 28px 0 12px;
+      font-size: 1.15rem;
+      font-weight: 600;
+    }
 
-  /* 5) 입력 요소: 폭/간격/박스모델 통일 */
-  .main section.panel .input,
-  .main section.panel textarea,
-  .main section.panel select,
-  .main section.panel input[type="text"],
-  .main section.panel input[type="number"],
-  .main section.panel input[type="file"] {
-    width: 100%;
-    box-sizing: border-box;
-    margin: 0 0 14px;
-  }
+    /* -------------------------------
+      Inputs / Select / Textarea
+    -------------------------------- */
+    .main section.panel .input,
+    .main section.panel textarea,
+    .main section.panel select,
+    .main section.panel input[type="text"],
+    .main section.panel input[type="number"],
+    .main section.panel input[type="file"] {
+      width: 100%;
+      box-sizing: border-box;
+      margin-bottom: 14px;
+    }
 
-  /* textarea 높이 조금 확보 */
-  #summary {
-    min-height: 96px;
-    resize: vertical;
-  }
+    /* Summary textarea */
+    #summary {
+      min-height: 110px;
+      resize: vertical;
+    }
 
-  /* 6) Toast UI Editor: 폭/높이/라운드 정리 */
-  #editor {
-    width: 100%;
-    border-radius: 10px;
-    overflow: hidden; /* 에디터 내부 라운드 깨짐 방지 */
-  }
-  /* 에디터 바깥 래퍼(네가 inline으로 준 border)는 유지되지만,
-     혹시 더 깔끔하게 하고 싶으면 inline border 제거하고 여기서만 관리해도 됨 */
-  .toastui-editor-defaultUI {
-    border-radius: 10px;
-  }
+    /* -------------------------------
+      Guide Text
+    -------------------------------- */
+    .field-guide {
+      font-size: 0.85rem;
+      color: #6b7280;
+      margin: -6px 0 14px;
+      line-height: 1.45;
+    }
 
-  /* 7) 이미지 프리뷰 공통 */
-  .thumb-preview {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 10px;
-  }
-  .thumb-preview .img-item {
-    width: 88px;
-    height: 88px;
-    position: relative;
-  }
-  .thumb-preview img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 10px;
-    border: 1px solid #e3e3e3;
-    background: #f6f7fb;
-  }
-  .thumb-preview .remove-btn {
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    width: 22px;
-    height: 22px;
-    border-radius: 999px;
-    background: crimson;
-    color: #fff;
-    border: none;
-    font-size: 14px;
-    cursor: pointer;
-    line-height: 22px;
-    display: grid;
-    place-items: center;
-  }
+    .editor-guide {
+      background: #f8f9fc;
+      border-left: 4px solid #0f2679;
+      padding: 14px 16px;
+      margin: 0 0 14px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      color: #333;
+    }
 
-  /* 8) 구분선 정리 */
-  .main section.panel hr {
-    border: none;
-    height: 1px;
-    background: #eee;
-    margin: 18px 0;
-  }
+    .editor-guide strong {
+      color: #0f2679;
+    }
 
-  /* 9) 버튼 줄: 너무 위로 붙는 느낌 방지 */
-  .main > div[style*="margin-bottom:20px;"] {
-    max-width: 980px;
-    margin: 0 auto 18px !important;
-  }
+    /* ============================================================
+      🍎 Toast UI Editor — 절대 안전 영역
+      (공식 DOM 구조만 스타일링)
+    ============================================================ */
 
+    /* Editor wrapper */
+    #editor {
+      min-height: 500px;
+      border-radius: 16px;
+      border: 1px solid #d2d2d7;
+      background: #ffffff;
+      overflow: hidden;
+    }
 
-  /* ============================================================
-    📝 입력 가이드 텍스트
-  ============================================================ */
-  .field-guide {
-    font-size: 0.85rem;
-    color: #6b7280;            /* 차분한 회색 */
-    margin: -6px 0 10px;
-    line-height: 1.4;
-  }
+    /* Default UI */
+    .toastui-editor-defaultUI {
+      border: none;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
 
-  .editor-guide {
-    background: #f8f9fc;
-    border-left: 4px solid #0f2679;
-    padding: 12px 14px;
-    margin: 0 0 12px;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    color: #333;
-  }
-  .editor-guide strong {
-    color: #0f2679;
-  }
+    /* Toolbar */
+    .toastui-editor-toolbar {
+      background: #f5f5f7;
+      border-bottom: 1px solid #e5e5ea;
+    }
 
+    /* Main editor area */
+    .toastui-editor-main {
+      flex: 1;
+      min-height: 0;
+      background: #ffffff;
+    }
+
+    /* Contents */
+    .toastui-editor-contents {
+      padding: 24px 28px;
+      font-size: 1.05rem;
+      line-height: 1.8;
+      color: #111;
+    }
+
+    /* Headings inside editor */
+    .toastui-editor-contents h1 {
+      font-size: 1.7rem;
+      font-weight: 700;
+    }
+
+    .toastui-editor-contents h2 {
+      font-size: 1.4rem;
+      font-weight: 600;
+    }
+
+    .toastui-editor-contents h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    /* -------------------------------
+      Image Preview
+    -------------------------------- */
+    .thumb-preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .thumb-preview .img-item {
+      width: 92px;
+      height: 92px;
+      position: relative;
+    }
+
+    .thumb-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 14px;
+      border: 1px solid #e3e3e3;
+      background: #f6f7fb;
+    }
+
+    .thumb-preview .remove-btn {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #ff3b30;
+      color: #fff;
+      border: none;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    /* -------------------------------
+      Divider
+    -------------------------------- */
+    .main section.panel hr {
+      border: none;
+      height: 1px;
+      background: #eee;
+      margin: 24px 0;
+    }
 </style>
 
 </head>
