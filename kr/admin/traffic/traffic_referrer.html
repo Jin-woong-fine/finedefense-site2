@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>유입경로 분석 | Fine Defense Admin</title>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- 공통 관리자 CSS -->
+  <link rel="stylesheet" href="./css/admin.css">
+
+  <!-- 세션 -->
+  <script type="module" src="/js/session_manager.js"></script>
+  <script type="module" src="./js/dashboard_session_timer.js"></script>
+
+  <style>
+    .panel { padding: 28px; }
+
+    .ref-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .ref-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      border-bottom: 1px solid #e5e7eb;
+      font-size: 0.95rem;
+    }
+
+    .ref-item span {
+      color: #374151;
+    }
+
+    .ref-count {
+      font-weight: 600;
+      color: #0f2679;
+    }
+  </style>
+</head>
+
+<body data-admin-page="traffic_referrer">
+
+<script>requireAnyUser();</script>
+
+<div id="sidebar"></div>
+
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="title">유입경로 분석</div>
+
+    <div style="display:flex; align-items:center; gap:12px;">
+      <span id="session-timer" class="session-timer"></span>
+
+      <div class="topbar-user" id="topbarUser">
+        <span id="topbarUserName">관리자</span> ▾
+        <div class="user-dropdown" id="userDropdown"></div>
+      </div>
+
+      <button onclick="location.href='../index.html'">홈으로</button>
+    </div>
+  </div>
+
+  <!-- 📊 TOP Referrer Chart -->
+  <section class="panel">
+    <h2>유입경로 TOP 10</h2>
+    <canvas id="referrerChart" height="120"></canvas>
+  </section>
+
+  <!-- 📄 Referrer List -->
+  <section class="panel">
+    <h2>상세 유입경로 목록</h2>
+    <ul id="referrerList" class="ref-list"></ul>
+  </section>
+
+</div>
+
+<script src="./js/sidebar.js"></script>
+<script src="./js/topbar_user_menu.js"></script>
+
+<script>
+/* =====================================================
+   🔹 유입경로 데이터 로드
+===================================================== */
+async function loadReferrers() {
+  const res = await fetch("/api/traffic/referrer?limit=10", {
+    headers: { Authorization: "Bearer " + localStorage.getItem("token") }
+  });
+
+  const data = await res.json();
+
+  const labels = data.map(d => d.referrer || "Direct");
+  const counts = data.map(d => d.count);
+
+  renderChart(labels, counts);
+  renderList(data);
+}
+
+/* =====================================================
+   📊 차트
+===================================================== */
+function renderChart(labels, counts) {
+  new Chart(document.getElementById("referrerChart"), {
+    type: "bar",
+    data: {
+      labels,
+      datasets: [{
+        data: counts,
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
+}
+
+/* =====================================================
+   📄 리스트
+===================================================== */
+function renderList(data) {
+  const ul = document.getElementById("referrerList");
+  ul.innerHTML = "";
+
+  data.forEach(d => {
+    const li = document.createElement("li");
+    li.className = "ref-item";
+    li.innerHTML = `
+      <span>${d.referrer || "Direct / Unknown"}</span>
+      <span class="ref-count">${d.count}</span>
+    `;
+    ul.appendChild(li);
+  });
+}
+
+/* =====================================================
+   초기 실행
+===================================================== */
+loadSidebar("traffic_referrer");
+loadReferrers();
+</script>
+
+</body>
+</html>

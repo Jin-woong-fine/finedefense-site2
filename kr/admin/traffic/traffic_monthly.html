@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>월별 트래픽 분석 | Fine Defense Admin</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="./css/admin.css">
+
+  <script type="module" src="/js/session_manager.js"></script>
+  <script type="module" src="./js/dashboard_session_timer.js"></script>
+
+  <style>
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 18px 20px;
+      box-shadow: 0 4px 14px rgba(15,38,121,0.08);
+    }
+
+    .kpi-card span {
+      font-size: 0.85rem;
+      color: #6b7280;
+    }
+
+    .kpi-card strong {
+      display: block;
+      margin-top: 6px;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #0f2679;
+    }
+  </style>
+</head>
+
+<body data-admin-page="traffic_monthly">
+
+<script>requireAnyUser();</script>
+
+<div id="sidebar"></div>
+
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="title">월별 트래픽 분석</div>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <span id="session-timer" class="session-timer"></span>
+      <div class="topbar-user" id="topbarUser">
+        <span id="topbarUserName">관리자</span> ▾
+        <div class="user-dropdown" id="userDropdown"></div>
+      </div>
+      <button onclick="location.href='../index.html'">홈으로</button>
+    </div>
+  </div>
+
+  <!-- KPI -->
+  <section class="kpi-row">
+    <div class="kpi-card">
+      <span>이번 달 방문자</span>
+      <strong id="kpiCurrent">0</strong>
+    </div>
+    <div class="kpi-card">
+      <span>전월 대비</span>
+      <strong id="kpiDelta">0%</strong>
+    </div>
+    <div class="kpi-card">
+      <span>최근 12개월 누적</span>
+      <strong id="kpiTotal">0</strong>
+    </div>
+    <div class="kpi-card">
+      <span>월 평균 방문자</span>
+      <strong id="kpiAvg">0</strong>
+    </div>
+  </section>
+
+  <!-- Chart -->
+  <section class="panel">
+    <h2>최근 12개월 방문자</h2>
+    <canvas id="monthlyChart"></canvas>
+  </section>
+
+</div>
+
+<script src="./js/sidebar.js"></script>
+<script src="./js/topbar_user_menu.js"></script>
+
+<script>
+/* =========================================================
+   🔵 MONTHLY TRAFFIC SCRIPT (INLINE)
+========================================================= */
+
+let chart;
+
+async function loadMonthlyTraffic() {
+  const res = await fetch("/api/traffic/monthly");
+  const data = await res.json();
+
+  const labels = data.map(d => d.month);
+  const values = data.map(d => d.count);
+
+  updateKPI(values);
+  renderChart(labels, values);
+}
+
+function updateKPI(values) {
+  const current = values.at(-1) || 0;
+  const prev = values.at(-2) || 0;
+
+  document.getElementById("kpiCurrent").textContent = current;
+  document.getElementById("kpiTotal").textContent =
+    values.reduce((a,b)=>a+b,0);
+  document.getElementById("kpiAvg").textContent =
+    Math.round(values.reduce((a,b)=>a+b,0) / values.length);
+
+  const delta = prev ? (((current - prev) / prev) * 100).toFixed(1) : 0;
+  document.getElementById("kpiDelta").textContent =
+    (delta >= 0 ? "+" : "") + delta + "%";
+}
+
+function renderChart(labels, values) {
+  const ctx = document.getElementById("monthlyChart");
+
+  if (chart) chart.destroy();
+
+  chart = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels,
+      datasets: [{
+        label: "월 방문자",
+        data: values,
+        backgroundColor: "rgba(15,38,121,0.25)",
+        borderColor: "#0f2679",
+        borderWidth: 1,
+        borderRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
+}
+
+/* 초기 실행 */
+loadSidebar("traffic_monthly");
+loadMonthlyTraffic();
+</script>
+
+</body>
+</html>

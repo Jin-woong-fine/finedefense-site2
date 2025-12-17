@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>국가 / 디바이스 분석 | Fine Defense Admin</title>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- 공통 관리자 CSS -->
+  <link rel="stylesheet" href="./css/admin.css">
+
+  <!-- 세션 -->
+  <script type="module" src="/js/session_manager.js"></script>
+  <script type="module" src="./js/dashboard_session_timer.js"></script>
+
+  <style>
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .panel {
+      padding: 28px;
+    }
+
+    .rank-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .rank-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border-bottom: 1px solid #e5e7eb;
+      font-size: 0.95rem;
+    }
+
+    .rank-item span:first-child {
+      color: #111;
+    }
+
+    .rank-item span:last-child {
+      font-weight: 600;
+      color: #0f2679;
+    }
+  </style>
+</head>
+
+<body data-admin-page="traffic_device_country">
+
+<script>requireAnyUser();</script>
+
+<div id="sidebar"></div>
+
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="title">국가 / 디바이스 분석</div>
+
+    <div style="display:flex; align-items:center; gap:12px;">
+      <span id="session-timer" class="session-timer"></span>
+
+      <div class="topbar-user" id="topbarUser">
+        <span id="topbarUserName">관리자</span> ▾
+        <div class="user-dropdown" id="userDropdown"></div>
+      </div>
+
+      <button onclick="location.href='../index.html'">홈으로</button>
+    </div>
+  </div>
+
+  <!-- 📊 Charts -->
+  <section class="grid-2">
+    <div class="panel">
+      <h2>국가별 방문자 비율</h2>
+      <canvas id="countryChart"></canvas>
+    </div>
+
+    <div class="panel">
+      <h2>디바이스 비율</h2>
+      <canvas id="deviceChart"></canvas>
+    </div>
+  </section>
+
+  <!-- 📄 Ranking -->
+  <section class="grid-2">
+    <div class="panel">
+      <h2>국가별 방문 TOP 10</h2>
+      <ul id="countryList" class="rank-list"></ul>
+    </div>
+
+    <div class="panel">
+      <h2>디바이스 상세</h2>
+      <ul id="deviceList" class="rank-list"></ul>
+    </div>
+  </section>
+
+</div>
+
+<script src="./js/sidebar.js"></script>
+<script src="./js/topbar_user_menu.js"></script>
+
+<script>
+/* =====================================================
+   🔹 데이터 로드
+===================================================== */
+async function loadTrafficData() {
+  const headers = {
+    Authorization: "Bearer " + localStorage.getItem("token")
+  };
+
+  const [countryRes, deviceRes] = await Promise.all([
+    fetch("/api/traffic/country", { headers }),
+    fetch("/api/traffic/device", { headers })
+  ]);
+
+  const countryData = await countryRes.json();
+  const deviceData = await deviceRes.json();
+
+  renderCountry(countryData);
+  renderDevice(deviceData);
+}
+
+/* =====================================================
+   🌍 국가
+===================================================== */
+function renderCountry(data) {
+  const labels = data.map(d => d.country || "Unknown");
+  const counts = data.map(d => d.count);
+
+  new Chart(document.getElementById("countryChart"), {
+    type: "doughnut",
+    data: {
+      labels,
+      datasets: [{ data: counts }]
+    },
+    options: {
+      plugins: {
+        legend: { position: "bottom" }
+      }
+    }
+  });
+
+  const ul = document.getElementById("countryList");
+  ul.innerHTML = "";
+  data.forEach(d => {
+    const li = document.createElement("li");
+    li.className = "rank-item";
+    li.innerHTML = `
+      <span>${d.country || "Unknown"}</span>
+      <span>${d.count}</span>
+    `;
+    ul.appendChild(li);
+  });
+}
+
+/* =====================================================
+   📱 디바이스
+===================================================== */
+function renderDevice(data) {
+  const labels = data.map(d => d.device_type.toUpperCase());
+  const counts = data.map(d => d.count);
+
+  new Chart(document.getElementById("deviceChart"), {
+    type: "pie",
+    data: {
+      labels,
+      datasets: [{ data: counts }]
+    },
+    options: {
+      plugins: {
+        legend: { position: "bottom" }
+      }
+    }
+  });
+
+  const ul = document.getElementById("deviceList");
+  ul.innerHTML = "";
+  data.forEach(d => {
+    const li = document.createElement("li");
+    li.className = "rank-item";
+    li.innerHTML = `
+      <span>${d.device_type.toUpperCase()}</span>
+      <span>${d.count}</span>
+    `;
+    ul.appendChild(li);
+  });
+}
+
+/* =====================================================
+   초기 실행
+===================================================== */
+loadSidebar("traffic_device_country");
+loadTrafficData();
+</script>
+
+</body>
+</html>

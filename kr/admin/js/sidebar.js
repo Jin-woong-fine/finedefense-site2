@@ -45,11 +45,11 @@ async function loadSidebar(activePage = "") {
     {
       title: "트래픽 분석",
       children: [
-        { title: "일별 통계", link: "/kr/admin/traffic_daily.html", key: "traffic_daily" },
-        { title: "월별 통계", link: "/kr/admin/traffic_monthly.html", key: "traffic_monthly" },
-        { title: "유입경로", link: "/kr/admin/traffic_referrer.html", key: "traffic_referrer" },
-        { title: "페이지 조회", link: "/kr/admin/traffic_pages.html", key: "traffic_pages" },
-        { title: "국가/디바이스", link: "/kr/admin/traffic_device_country.html", key: "traffic_device_country" }
+        { title: "일별 통계", link: "/kr/admin/traffic/traffic_daily.html", key: "traffic_daily" },
+        { title: "월별 통계", link: "/kr/admin/traffic/traffic_monthly.html", key: "traffic_monthly" },
+        { title: "유입경로", link: "/kr/admin/traffic/traffic_referrer.html", key: "traffic_referrer" },
+        { title: "페이지 조회", link: "/kr/admin/traffic/traffic_pages.html", key: "traffic_pages" },
+        { title: "국가/디바이스", link: "/kr/admin/traffic/traffic_device_country.html", key: "traffic_device_country" }
       ]
     },
 
