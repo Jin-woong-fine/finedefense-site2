@@ -54,7 +54,11 @@
 
 <body data-admin-page="traffic_pages">
 
-<script>requireAnyUser();</script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  requireAnyUser();
+});
+</script>
 
 <div id="sidebar"></div>
 
