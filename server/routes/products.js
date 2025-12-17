@@ -512,5 +512,30 @@ router.post("/:id/translate", verifyToken, verifyEditor, async (req, res) => {
 });
 
 
+/* ==========================================================
+   🌐 공개용 제품 목록 (프론트)
+========================================================== */
+router.get("/public", async (req, res) => {
+  try {
+    const lang = req.query.lang || "kr";
+
+    const [rows] = await db.execute(
+      `SELECT id, title, summary, category, thumbnail, description_html
+       FROM products
+       WHERE lang = ?
+       ORDER BY sort_order ASC, created_at DESC`,
+      [lang]
+    );
+
+    res.json(rows);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ message: "server error" });
+  }
+});
+
+
+
+
 
 export default router;
