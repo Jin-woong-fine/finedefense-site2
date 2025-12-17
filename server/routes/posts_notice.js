@@ -277,7 +277,7 @@ router.post("/download", async (req, res) => {
 
 
 // 공지사항 단건 조회 (관리자용)
-router.get("/notice/:id", verifyToken, async (req, res) => {
+router.get("/:id", verifyToken, async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -308,6 +308,7 @@ router.get("/notice/:id", verifyToken, async (req, res) => {
     res.status(500).json({ message: "서버 오류" });
   }
 });
+
 
 
 export default router;
