@@ -22,6 +22,9 @@ router.get(
           ip,
           ua,
           status,
+          fail_reason,
+          is_admin,
+          country_code,
           created_at
         FROM login_logs
         ORDER BY id DESC
