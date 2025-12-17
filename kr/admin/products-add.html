@@ -19,7 +19,7 @@
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
                   "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
       color: #111;
-      background: #f5f5f7;
+      background: linear-gradient(to bottom, #f5f5f7 0%, #f2f2f5 100%);
     }
 
     /* -------------------------------
@@ -32,15 +32,17 @@
       margin: 0 auto 44px;
       max-width: 960px;
       border: 1px solid #e5e5ea;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.06);
+      box-shadow:
+        0 20px 40px rgba(0,0,0,0.08),
+        0 4px 10px rgba(0,0,0,0.05);
     }
 
     /* 타이틀 */
     .main section.panel h2 {
-      font-size: 1.45rem;
+      font-size: 1.6rem;
       font-weight: 700;
       margin-bottom: 22px;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.025em;
     }
 
     .main section.panel h3 {
@@ -65,7 +67,7 @@
     -------------------------------- */
     .main section.panel .input {
       width: 100%;
-      height: 50px;
+      height: 52px;
       padding: 12px 16px;
       font-size: 1rem;
       border-radius: 12px;
@@ -158,40 +160,54 @@
     }
 
     /* -------------------------------
-      Buttons
+      Buttons (Apple aligned)
     -------------------------------- */
     .btn {
       border-radius: 999px;
-      padding: 10px 22px;
+      padding: 11px 24px;
       font-size: 0.95rem;
       font-weight: 500;
+      transition: background 0.15s ease, transform 0.12s ease;
     }
 
+    /* Primary */
     .btn-primary {
       background: #0071e3;
       border: none;
+      color: #fff;
     }
 
     .btn-primary:hover {
       background: #005bb5;
     }
 
+    .btn-primary:active {
+      transform: scale(0.97);
+    }
+
+    /* Secondary */
     .btn-secondary {
       background: #f5f5f7;
       border: 1px solid #d2d2d7;
-      color: #111;
+      color: #0071e3;
     }
 
     .btn-secondary:hover {
       background: #e5e5ea;
     }
 
-    /* 상단 버튼 정렬 */
+    /* -------------------------------
+      Top Action Row (정렬 핵심)
+    -------------------------------- */
     .main > div:first-of-type {
       max-width: 960px;
-      margin: 0 auto 28px;
+      margin: 0 auto 32px;
+      padding-left: 44px;   /* 🔥 카드 padding과 맞춤 */
+      padding-right: 44px;
       display: flex;
-      gap: 12px;
+      justify-content: flex-start; /* 기본 왼쪽 */
+      align-items: center;
+      gap: 14px;
     }
   </style>
 </head>
@@ -218,11 +234,11 @@
     </div>
   </div>
 
-  <!-- 🔵 버튼 영역 -->
+  <!-- 🔵 버튼 영역 : 페이지 컨텍스트 액션만 -->
   <div style="margin-bottom:20px;">
-      <button class="btn btn-primary" onclick="location.href='products-list.html'">목록으로</button>
-      <button class="btn btn-primary" onclick="location.href='../index.html'">홈으로</button>
-      <button id="logoutBtn" class="btn btn-danger">로그아웃</button>
+    <button class="btn btn-primary" onclick="location.href='products-list.html'">
+      ← 목록으로
+    </button>
   </div>
 
   <!-- ==========================
