@@ -49,11 +49,24 @@ async function loadBasicStats() {
     document.getElementById("visitThisMonth").textContent = thisMonth.toLocaleString();
 
     // 증가율
-    let growth = 0;
-    if (lastMonth > 0) {
-      growth = (((thisMonth - lastMonth) / lastMonth) * 100).toFixed(1);
+    let growthText = "0%";
+    let growthValue = 0;
+
+    if (lastMonth === 0 && thisMonth > 0) {
+      growthText = "NEW";
+    } else if (lastMonth > 0) {
+      growthValue = ((thisMonth - lastMonth) / lastMonth) * 100;
+      growthText = growthValue.toFixed(1) + "%";
     }
-    document.getElementById("visitGrowth").textContent = growth + "%";
+
+    const growthEl = document.getElementById("visitGrowth");
+    growthEl.textContent = growthText;
+
+    // 색상 처리 (선택)
+    growthEl.style.color =
+      growthValue > 0 ? "#2e7d32" :
+      growthValue < 0 ? "#c62828" :
+      "#6b7280";
 
     // 게시물 수
     const postRes = await apiGet("/api/admin/dashboard");
