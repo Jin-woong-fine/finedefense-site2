@@ -493,17 +493,17 @@ function goProductList() {
   const category = params.get("category");
 
   const map = {
-    towed: "/kr/sub/pr/sub-towed.html",
-    fixed: "/kr/sub/pr/sub-fixed.html",
-    connector: "/kr/sub/pr/sub-connector.html",
-    custom: "/kr/sub/pr/sub-custom.html",
+    towed: "/kr/sub/products/sub-towed.html",
+    fixed: "/kr/sub/products/sub-fixed.html",
+    connector: "/kr/sub/products/sub-connector.html",
+    custom: "/kr/sub/products/sub-custom.html",
   };
 
   if (category && map[category]) {
     location.href = map[category];
   } else {
     // 카테고리 정보 없으면 기본 페이지 (원하는 걸로)
-    location.href = "/kr/sub/pr/sub-towed.html";
+    location.href = "/kr/sub/products/sub-towed.html";
   }
 }
 
