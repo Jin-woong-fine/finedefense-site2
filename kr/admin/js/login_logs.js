@@ -21,24 +21,22 @@ function formatKST(dateString) {
 // 국가 코드 → 플래그
 // ===============================
 function countryFlag(code) {
-  if (!code) return "🏳️";
-
-  // ❗ UNK는 그대로 하얀 깃발
-  if (code === "UNK") return "🏳️";
-
-  // 내부망은 한국으로 취급
-  if (code === "LOCAL") code = "KR";
-
-  // 정상 ISO 국가코드만 국기 변환
-  if (code.length === 2) {
-    return String.fromCodePoint(
-      ...[...code.toUpperCase()].map(c => 0x1F1E6 + c.charCodeAt(0) - 65)
-    );
+  if (!code || code === "UNK") {
+    return "🏳️";
   }
 
-  return "🏳️";
-}
+  if (code === "LOCAL") code = "KR";
 
+  const cc = code.toLowerCase();
+
+  return `
+    <img
+      class="flag-img"
+      src="https://flagcdn.com/w20/${cc}.png"
+      alt="${code}"
+    />
+  `;
+}
 
 // ===============================
 // UA 간단화
