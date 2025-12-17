@@ -10,16 +10,43 @@
   <!-- 공통 관리자 CSS -->
   <link rel="stylesheet" href="./css/admin.css">
 
-  <!-- 1. 인증 / 공통 함수 -->
+  <!-- 인증 -->
   <script src="./js/common_auth.js"></script>
 
-  <!-- 2. 세션 -->
+  <!-- 세션 -->
   <script type="module" src="/js/session_manager.js"></script>
   <script type="module" src="./js/dashboard_session_timer.js"></script>
 
-
   <style>
     .panel { padding: 28px; }
+
+    .filter-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .range-buttons {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .range-btn {
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1px solid #cfd6ee;
+      background: #fff;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+
+    .range-btn.active {
+      background: #0f2679;
+      color: #fff;
+      border-color: #0f2679;
+    }
 
     .ref-list {
       list-style: none;
@@ -36,8 +63,12 @@
       font-size: 0.95rem;
     }
 
-    .ref-item span {
+    .ref-item span:first-child {
       color: #374151;
+      max-width: 75%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .ref-count {
@@ -58,18 +89,30 @@
   <!-- TOPBAR -->
   <div class="topbar">
     <div class="title">유입경로 분석</div>
-
     <div style="display:flex; align-items:center; gap:12px;">
       <span id="session-timer" class="session-timer"></span>
-
       <div class="topbar-user" id="topbarUser">
         <span id="topbarUserName">관리자</span> ▾
         <div class="user-dropdown" id="userDropdown"></div>
       </div>
-
       <button onclick="location.href='../index.html'">홈으로</button>
     </div>
   </div>
+
+  <!-- 기간 필터 -->
+  <section class="panel">
+    <div class="filter-bar">
+      <h2 style="margin:0;">기간 선택</h2>
+      <div class="range-buttons">
+        <button class="range-btn" data-days="1">오늘</button>
+        <button class="range-btn" data-days="7">7일</button>
+        <button class="range-btn active" data-days="30">30일</button>
+        <button class="range-btn" data-days="365">1년</button>
+        <button class="range-btn" data-days="1095">3년</button>
+        <button class="range-btn" data-days="0">전체</button>
+      </div>
+    </div>
+  </section>
 
   <!-- 📊 TOP Referrer Chart -->
   <section class="panel">
@@ -85,25 +128,32 @@
 
 </div>
 
-
 <script src="./js/sidebar.js"></script>
 <script src="./js/topbar_user_menu.js"></script>
 
 <script>
 /* =====================================================
-   🔗 REFERRER TRAFFIC SCRIPT (INLINE)
-   - server route: /api/traffic/referrer
-   - server response: { referrer, cnt }
+   🔗 REFERRER ANALYSIS
 ===================================================== */
 
 let referrerChart;
+let currentDays = 30;
 
-/* =====================================================
-   🔹 유입경로 데이터 로드
-===================================================== */
+/* 기간 버튼 */
+document.querySelectorAll(".range-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".range-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    currentDays = Number(btn.dataset.days);
+    loadReferrers();
+  });
+});
+
+/* 데이터 로드 */
 async function loadReferrers() {
   try {
-    const res = await fetch("/api/traffic/referrer");
+    const query = currentDays > 0 ? `?days=${currentDays}` : "";
+    const res = await fetch(`/api/traffic/referrer${query}`);
     const data = await res.json();
 
     if (!Array.isArray(data)) {
@@ -111,10 +161,9 @@ async function loadReferrers() {
       return;
     }
 
-    const labels = data.map(d => d.referrer || "Direct / Unknown");
-    const counts = data.map(d => d.cnt);
+    const top10 = data.slice(0, 10);
 
-    renderChart(labels, counts);
+    renderChart(top10);
     renderList(data);
 
   } catch (err) {
@@ -122,10 +171,8 @@ async function loadReferrers() {
   }
 }
 
-/* =====================================================
-   📊 차트
-===================================================== */
-function renderChart(labels, counts) {
+/* ================= 차트 ================= */
+function renderChart(data) {
   const ctx = document.getElementById("referrerChart");
 
   if (referrerChart) referrerChart.destroy();
@@ -133,10 +180,9 @@ function renderChart(labels, counts) {
   referrerChart = new Chart(ctx, {
     type: "bar",
     data: {
-      labels,
+      labels: data.map(d => d.referrer || "Direct / Unknown"),
       datasets: [{
-        label: "유입 수",
-        data: counts,
+        data: data.map(d => d.cnt),
         backgroundColor: "rgba(15,38,121,0.25)",
         borderColor: "#0f2679",
         borderWidth: 1,
@@ -146,7 +192,12 @@ function renderChart(labels, counts) {
     options: {
       responsive: true,
       plugins: {
-        legend: { display: false }
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => `유입 ${ctx.raw}`
+          }
+        }
       },
       scales: {
         y: { beginAtZero: true }
@@ -155,31 +206,27 @@ function renderChart(labels, counts) {
   });
 }
 
-/* =====================================================
-   📄 리스트
-===================================================== */
+/* ================= 리스트 ================= */
 function renderList(data) {
   const ul = document.getElementById("referrerList");
   ul.innerHTML = "";
 
   data.forEach(d => {
-    const li = document.createElement("li");
-    li.className = "ref-item";
-    li.innerHTML = `
-      <span>${d.referrer || "Direct / Unknown"}</span>
-      <span class="ref-count">${d.cnt}</span>
+    ul.innerHTML += `
+      <li class="ref-item">
+        <span title="${d.referrer || "Direct / Unknown"}">
+          ${d.referrer || "Direct / Unknown"}
+        </span>
+        <span class="ref-count">${d.cnt}</span>
+      </li>
     `;
-    ul.appendChild(li);
   });
 }
 
-/* =====================================================
-   초기 실행
-===================================================== */
+/* 초기 */
 loadSidebar("traffic_referrer");
 loadReferrers();
 </script>
-
 
 </body>
 </html>

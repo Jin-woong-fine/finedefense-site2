@@ -121,8 +121,11 @@ router.get("/summary", async (req, res) => {
 
 /* ================================
    🟦 2) 일별 통계
+   /api/traffic/daily?days=90
 ================================ */
 router.get("/daily", async (req, res) => {
+  const days = Number(req.query.days || 30);
+
   const [rows] = await db.execute(`
     SELECT 
       DATE(created_at) AS day,
@@ -130,44 +133,85 @@ router.get("/daily", async (req, res) => {
     FROM traffic_logs
     GROUP BY DATE(created_at)
     ORDER BY day DESC
-    LIMIT 30
-  `);
+    LIMIT ?
+  `, [days]);
+
   res.json(rows);
 });
 
+
 /* ================================
-   🟦 3) 월별 통계
+   🟦 연도 목록
+   GET /api/traffic/years
+================================ */
+router.get("/years", async (req, res) => {
+  const [rows] = await db.execute(`
+    SELECT DISTINCT YEAR(created_at) AS year
+    FROM traffic_logs
+    ORDER BY year DESC
+  `);
+
+  res.json(rows.map(r => r.year));
+});
+
+
+/* ================================
+   🟦 3) 월별 통계 (연도 선택 가능)
+   /api/traffic/monthly?year=2024
 ================================ */
 router.get("/monthly", async (req, res) => {
-  const [rows] = await db.execute(`
+  const { year } = req.query;
+
+  let sql = `
     SELECT
       YEAR(created_at) AS year,
       MONTH(created_at) AS month,
       COUNT(*) AS visits
     FROM traffic_logs
+  `;
+
+  const params = [];
+
+  if (year && year !== "all") {
+    sql += ` WHERE YEAR(created_at) = ? `;
+    params.push(year);
+  }
+
+  sql += `
     GROUP BY year, month
     ORDER BY year DESC, month DESC
-    LIMIT 12
-  `);
+  `;
+
+  const [rows] = await db.execute(sql, params);
   res.json(rows);
 });
+
+
 
 /* ================================
    🟦 4) 페이지별 방문 수
 ================================ */
 router.get("/page-view", async (req, res) => {
+  const days = Number(req.query.days || 0);
+
+  let where = `WHERE page IS NOT NULL AND page != ''`;
+
+  if (days > 0) {
+    where += ` AND created_at >= DATE_SUB(NOW(), INTERVAL ${days} DAY)`;
+  }
+
   const [rows] = await db.execute(`
-    SELECT
-      page,
-      COUNT(*) AS views
+    SELECT page, COUNT(*) AS views
     FROM traffic_logs
-    WHERE page IS NOT NULL AND page != ''
+    ${where}
     GROUP BY page
     ORDER BY views DESC
     LIMIT 50
   `);
+
   res.json(rows);
 });
+
 
 /* ================================
    🟦 5) referrer 통계
@@ -200,20 +244,36 @@ router.get("/device", async (req, res) => {
   res.json(rows);
 });
 
+
 /* ================================
-   🟦 7) 국가별 통계
+   🟦 7) 국가별 통계 (기간 선택)
+   ?days=30
 ================================ */
 router.get("/country", async (req, res) => {
-  const [rows] = await db.execute(`
+  const days = Number(req.query.days || 0);
+
+  let sql = `
     SELECT
       country,
       COUNT(*) AS cnt
     FROM traffic_logs
+  `;
+  const params = [];
+
+  if (days > 0) {
+    sql += " WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL ? DAY)";
+    params.push(days);
+  }
+
+  sql += `
     GROUP BY country
     ORDER BY cnt DESC
-  `);
+  `;
+
+  const [rows] = await db.execute(sql, params);
   res.json(rows);
 });
+
 
 /* ================================
    🟦 8) 오래된 로그 정리 (🔥 중요)

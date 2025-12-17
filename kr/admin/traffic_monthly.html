@@ -66,6 +66,12 @@
     </div>
   </div>
 
+  <div style="margin-bottom:20px;">
+    <select id="yearSelect" class="input">
+      <option value="all">전체 연도</option>
+    </select>
+  </div>
+
   <!-- KPI -->
   <section class="kpi-row">
     <div class="kpi-card">
@@ -105,35 +111,49 @@
 ========================================================= */
 
 let chart;
+let selectedYear = "all";
+
+async function loadYearOptions() {
+  const res = await fetch("/api/traffic/years");
+  const years = await res.json();
+
+  const select = document.getElementById("yearSelect");
+
+  years.forEach(y => {
+    const opt = document.createElement("option");
+    opt.value = y;
+    opt.textContent = `${y}년`;
+    select.appendChild(opt);
+  });
+}
+
+document.getElementById("yearSelect").addEventListener("change", e => {
+  selectedYear = e.target.value;
+  loadMonthlyTraffic();
+});
+
+
 
 async function loadMonthlyTraffic() {
-  try {
-    const res = await fetch("/api/traffic/monthly");
-    const data = await res.json();
+  const query =
+    selectedYear === "all" ? "" : `?year=${selectedYear}`;
 
-    if (!Array.isArray(data)) {
-      console.error("Monthly traffic API invalid response:", data);
-      return;
-    }
+  const res = await fetch(`/api/traffic/monthly${query}`);
+  const data = await res.json();
 
-    // 🔥 서버: 최신 → 과거 (DESC)
-    // → 프론트: 과거 → 최신 (ASC)
-    const sorted = [...data].reverse();
+  if (!Array.isArray(data)) return;
 
-    // 라벨: YYYY-MM
-    const labels = sorted.map(d =>
-      `${d.year}-${String(d.month).padStart(2, "0")}`
-    );
+  const sorted = [...data].reverse();
 
-    const values = sorted.map(d => d.visits);
+  const labels = sorted.map(d =>
+    `${d.year}-${String(d.month).padStart(2, "0")}`
+  );
+  const values = sorted.map(d => d.visits);
 
-    updateKPI(values);
-    renderChart(labels, values);
-
-  } catch (err) {
-    console.error("Failed to load monthly traffic:", err);
-  }
+  updateKPI(values);
+  renderChart(labels, values);
 }
+
 
 function updateKPI(values) {
   const current = values.at(-1) || 0;
@@ -187,7 +207,9 @@ function renderChart(labels, values) {
 
 /* 초기 실행 */
 loadSidebar("traffic_monthly");
-loadMonthlyTraffic();
+loadYearOptions();     
+loadMonthlyTraffic();  
+
 </script>
 
 
