@@ -78,6 +78,41 @@ router.post("/visit", async (req, res) => {
 });
 
 
+/* ================================
+   🟦 0) UV / PV 요약 (대시보드용)
+================================ */
+router.get("/summary", async (req, res) => {
+  try {
+    const [[today]] = await db.execute(`
+      SELECT
+        COUNT(*) AS pvToday,
+        COUNT(DISTINCT ip) AS uvToday
+      FROM traffic_logs
+      WHERE DATE(created_at) = CURDATE()
+    `);
+
+    const [[month]] = await db.execute(`
+      SELECT
+        COUNT(DISTINCT ip) AS uvMonth
+      FROM traffic_logs
+      WHERE YEAR(created_at) = YEAR(CURDATE())
+        AND MONTH(created_at) = MONTH(CURDATE())
+    `);
+
+    res.json({
+      pvToday: today.pvToday || 0,
+      uvToday: today.uvToday || 0,
+      uvMonth: month.uvMonth || 0
+    });
+
+  } catch (err) {
+    console.error("traffic summary error:", err);
+    res.status(500).json({ message: "error" });
+  }
+});
+
+
+
 
 /* ================================
    🟦 2) 일별 통계

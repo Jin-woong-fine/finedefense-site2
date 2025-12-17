@@ -34,43 +34,21 @@ function apiGet(url) {
 ----------------------------------------------------- */
 async function loadBasicStats() {
   try {
-    // 오늘 방문자
-    const todayRes = await apiGet("/api/traffic/daily");
-    const todayData = await todayRes.json();
-    const todayVisits = todayData?.[0]?.visits || 0;
-    document.getElementById("visitToday").textContent = todayVisits.toLocaleString();
+    const res = await apiGet("/api/traffic/summary");
+    const data = await res.json();
 
-    // 이번달 방문자
-    const monthRes = await apiGet("/api/traffic/monthly");
-    const monthData = await monthRes.json();
-    const thisMonth = monthData?.[0]?.visits || 0;
-    const lastMonth = monthData?.[1]?.visits || 0;
+    document.getElementById("uvToday").textContent =
+      data.uvToday.toLocaleString();
 
-    document.getElementById("visitThisMonth").textContent = thisMonth.toLocaleString();
+    document.getElementById("pvToday").textContent =
+      data.pvToday.toLocaleString();
 
-    // 증가율
-    let growthText = "0%";
-    let growthValue = 0;
+    document.getElementById("uvMonth").textContent =
+      data.uvMonth.toLocaleString();
 
-    if (lastMonth === 0 && thisMonth > 0) {
-      growthText = "NEW";
-    } else if (lastMonth > 0) {
-      growthValue = ((thisMonth - lastMonth) / lastMonth) * 100;
-      growthText = growthValue.toFixed(1) + "%";
-    }
-
-    const growthEl = document.getElementById("visitGrowth");
-    growthEl.textContent = growthText;
-
-    // 색상 처리 (선택)
-    growthEl.style.color =
-      growthValue > 0 ? "#2e7d32" :
-      growthValue < 0 ? "#c62828" :
-      "#6b7280";
-
-    // 게시물 수
     const postRes = await apiGet("/api/admin/dashboard");
     const postData = await postRes.json();
+
     document.getElementById("totalPosts").textContent =
       (postData.postCount || 0).toLocaleString();
 
@@ -78,6 +56,7 @@ async function loadBasicStats() {
     console.error("KPI Error:", err);
   }
 }
+
 
 /* -----------------------------------------------------
    2) 최근 30일 방문자 그래프
