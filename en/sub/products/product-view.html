@@ -1,3 +1,4 @@
+<!-- /en/sub/products/product-view -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -315,11 +316,18 @@ async function loadProductDetail() {
   if (!productId) return;
 
   try {
-    const res = await fetch(`/api/products/${productId}`);
-    if (!res.ok) throw new Error("서버 오류");
+    const res = await fetch(`/api/products/${productId}?lang=en`);
 
-    const data = await res.json();   // { product, images }
+    // 🔥 여기
+    if (!res.ok) {
+      alert("English version is not available yet.");
+      location.href = "/en/sub/pr/sub-towed.html";
+      return;
+    }
+
+    const data = await res.json();
     renderProduct(data);
+
   } catch (err) {
     console.error("loadProductDetail Error:", err);
   }
