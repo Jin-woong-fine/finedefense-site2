@@ -21,7 +21,13 @@ function formatKST(dateString) {
 // 국가 코드 → 플래그
 // ===============================
 function countryFlag(code) {
-  if (!code || code.length !== 2) return "🏳️";
+  if (!code) return "🏳️";
+
+  if (code === "LOCAL") return "🇰🇷";
+  if (code === "UNK") return "🇰🇷";   // ⭐ 핵심
+
+  if (code.length !== 2) return "🏳️";
+
   return String.fromCodePoint(
     ...[...code.toUpperCase()].map(c => 0x1F1E6 + c.charCodeAt(0) - 65)
   );
