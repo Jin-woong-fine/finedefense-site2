@@ -1,5 +1,6 @@
 // server/app.js
 import express from "express";
+import rateLimit from "express-rate-limit";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -32,6 +33,8 @@ import uploadsEditorRouter from "./routes/uploads_editor.js";
 
 import trafficRouter from "./routes/traffic.js";
 
+import helmet from "helmet";
+
 
 
 const app = express();
@@ -43,22 +46,16 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // 미들웨어
-app.use(cors());
+app.use(cors({
+  origin: [
+    "http://52.79.83.18",
+    "https://www.finedefense.co.kr"
+  ],
+  credentials: true
+}));
 app.use(express.json({ limit: "30mb" }));
 app.use(express.urlencoded({ extended: true, limit: "30mb" }));
-
-// ======================================================
-// 🔍 트래픽 IP 디버그 (임시 확인용)
-// ======================================================
-app.use((req, res, next) => {
-  console.log("🌍 TRAFFIC DEBUG:", {
-    ip: req.ip,
-    forwarded: req.headers["x-forwarded-for"],
-    real: req.headers["x-real-ip"],
-    remote: req.socket.remoteAddress
-  });
-  next();
-});
+app.use(helmet());
 
 
 
@@ -74,15 +71,45 @@ app.use(
   })
 );
 
+// 🔐 관리자 IP 화이트리스트
+const ADMIN_IPS = [
+
+  "1.220.123.2", // 회사 공인 IP
+  "125.251.61.201", // 공장 공인 IP
+  "111.111.111.111",  // 개발자 집 IP
+];
+
+function adminIpGuard(req, res, next) {
+  const ip = req.ip;
+
+  if (!ADMIN_IPS.includes(ip)) {
+    // 404로 위장 (관리자 API 존재 숨김)
+    return res.status(404).json({ message: "Not Found" });
+  }
+  next();
+}
+
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15분
+  max: 10,                 // 10회 제한
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+
+
+
 // ------------------------------------------------------
 // 📌 라우터 등록
 // ------------------------------------------------------
+app.use("/api/auth/login", loginLimiter);
 app.use("/api/auth", authRouter);
 
 app.use("/api/cert-items", postsCertificationRouter);
 
-app.use("/api/admin", adminDashboardRouter);
-app.use("/api/admin", adminRouter);
+app.use("/api/admin", adminIpGuard, adminDashboardRouter);
+app.use("/api/admin", adminIpGuard, adminRouter);
 
 app.use("/api/news", postsNewsRouter);
 app.use("/api/gallery", postsGalleryRouter);
