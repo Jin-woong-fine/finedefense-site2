@@ -296,9 +296,18 @@ function openPdf(id, url, title) {
     return;
   }
 
-  // 🔥 조회수 증가 (실패해도 UX 영향 없음)
-  fetch(`/api/catalog/view/${id}`, { method: "POST" }).catch(() => {});
+  // ✅ 조회수 증가 — 모달 열릴 때 단 1회
+  fetch(`/api/catalog/view/${id}`, {
+    method: "POST"
+  }).then(res => {
+    if (!res.ok) {
+      console.error("조회수 증가 실패:", id);
+    }
+  }).catch(err => {
+    console.error("조회수 fetch 오류:", err);
+  });
 
+  // ✅ PDF 표시
   document.getElementById("pdfFrame").src = url;
   document.getElementById("pdfTitle").textContent = title;
   document.getElementById("pdfDownload").href = url;
