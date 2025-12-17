@@ -55,10 +55,17 @@ router.post("/", verifyToken, verifyEditor, (req, res) => {
       if (req.files?.length > 0)
         thumbnail = "/uploads/products/" + req.files[0].filename;
 
+      const [[g]] = await db.execute(
+        `SELECT IFNULL(MAX(group_id), 0) + 1 AS gid FROM products`
+      );
+      const group_id = g.gid;
+
       const [insert] = await db.execute(
-        `INSERT INTO products (title, summary, category, thumbnail, description_html, sort_order, lang)
-         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO products
+        (group_id, title, summary, category, thumbnail, description_html, sort_order, lang)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
         [
+          group_id,
           title,
           summary || "",
           category,
@@ -152,29 +159,44 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
+    const lang = req.query.lang || "kr";
 
-    const [[product]] = await db.execute(
-      `SELECT * FROM products WHERE id = ?`,
+    // 1️⃣ group_id 찾기
+    const [[base]] = await db.execute(
+      `SELECT group_id FROM products WHERE id = ?`,
       [id]
     );
 
-    if (!product) return res.status(404).json({ message: "not found" });
+    if (!base) {
+      return res.status(404).json({ message: "not found" });
+    }
 
+    // 2️⃣ 같은 group_id + lang 제품 조회
+    const [[product]] = await db.execute(
+      `SELECT * FROM products WHERE group_id = ? AND lang = ?`,
+      [base.group_id, lang]
+    );
+
+    if (!product) {
+      return res.status(404).json({ message: "not found for this language" });
+    }
+
+    // 3️⃣ 이미지도 group 기준
     const [images] = await db.execute(
       `SELECT id, url, sort_order
        FROM product_images
        WHERE product_id = ?
        ORDER BY sort_order ASC`,
-      [id]
+      [product.id]
     );
 
     res.json({ product, images });
 
   } catch (e) {
+    console.error(e);
     res.status(500).json({ message: "server error" });
   }
 });
-
 
 /* ==========================================================
    ✏ 제품 수정 (모든 필드 + 이미지 완전 지원)
@@ -225,21 +247,20 @@ router.put("/:id", verifyToken, verifyEditor, (req, res) => {
       /* 1) 텍스트 업데이트 */
       await db.execute(
         `UPDATE products
-         SET title = ?,
-             summary = ?,
-             category = ?,
-             lang = ?,
-             sort_order = ?,
-             description_html = ?
-         WHERE id = ?`,
+        SET title = ?,
+            summary = ?,
+            category = ?,
+            sort_order = ?,
+            description_html = ?
+        WHERE id = ? AND lang = ?`,
         [
           title,
           summary || "",
           category,
-          lang,
           sort_order || 999,
           description_html || "",
-          id
+          id,
+          lang   // 🔥 조건으로만 사용
         ]
       );
 
@@ -384,6 +405,72 @@ router.delete("/:id", verifyToken, verifyEditor, async (req, res) => {
 
   } catch (err) {
     console.error("DELETE product error:", err);
+    res.status(500).json({ message: "server error" });
+  }
+});
+
+
+
+/* ==========================================================
+   🌐 제품 언어 버전 추가 (Translate)
+   - 기존 제품(group_id 기준)에 다른 언어 row 생성
+========================================================== */
+router.post("/:id/translate", verifyToken, verifyEditor, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { lang } = req.body;
+
+    if (!lang) {
+      return res.status(400).json({ message: "lang is required" });
+    }
+
+    // 1️⃣ 기준 제품 조회
+    const [[base]] = await db.execute(
+      `SELECT * FROM products WHERE id = ?`,
+      [id]
+    );
+
+    if (!base) {
+      return res.status(404).json({ message: "base product not found" });
+    }
+
+    // 2️⃣ 같은 group_id + lang 이미 존재하는지 체크
+    const [[exists]] = await db.execute(
+      `SELECT id FROM products WHERE group_id = ? AND lang = ?`,
+      [base.group_id, lang]
+    );
+
+    if (exists) {
+      return res.status(409).json({
+        message: "This language version already exists",
+        id: exists.id
+      });
+    }
+
+    // 3️⃣ 신규 언어 버전 INSERT (group_id 그대로)
+    const [insert] = await db.execute(
+      `INSERT INTO products
+        (group_id, title, summary, category, thumbnail, description_html, sort_order, lang)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        base.group_id,
+        base.title,
+        base.summary,
+        base.category,
+        base.thumbnail,
+        base.description_html,
+        base.sort_order,
+        lang
+      ]
+    );
+
+    res.status(201).json({
+      message: "translated",
+      id: insert.insertId
+    });
+
+  } catch (e) {
+    console.error("TRANSLATE error:", e);
     res.status(500).json({ message: "server error" });
   }
 });
