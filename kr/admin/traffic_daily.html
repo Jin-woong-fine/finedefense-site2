@@ -15,18 +15,15 @@
   <script type="module" src="./js/dashboard_session_timer.js"></script>
 
   <style>
+    /* KPI */
     .kpi-row{
       display:grid;
       grid-template-columns: repeat(6, 1fr);
       gap:16px;
       margin-bottom:24px;
     }
-    @media (max-width: 1100px){
-      .kpi-row{ grid-template-columns: repeat(3, 1fr); }
-    }
-    @media (max-width: 640px){
-      .kpi-row{ grid-template-columns: repeat(2, 1fr); }
-    }
+    @media (max-width:1100px){ .kpi-row{grid-template-columns:repeat(3,1fr);} }
+    @media (max-width:640px){ .kpi-row{grid-template-columns:repeat(2,1fr);} }
 
     .kpi-card{
       background:#fff;
@@ -46,254 +43,138 @@
       color:#0f2679;
       letter-spacing:-0.02em;
     }
-
-    .filter-bar{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      margin-bottom:14px;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-
-    .range-buttons, .metric-buttons{
-      display:flex;
-      gap:6px;
-      flex-wrap:wrap;
-    }
-
-    .pill-btn{
-      padding:6px 14px;
-      border-radius:999px;
-      border:1px solid #cfd6ee;
-      background:#fff;
-      font-size:0.8rem;
-      cursor:pointer;
-      user-select:none;
-    }
-    .pill-btn.active{
-      background:#0f2679;
-      color:#fff;
-      border-color:#0f2679;
-    }
-
-    .subtle{
-      font-size:0.85rem;
-      color:#6b7280;
-    }
   </style>
 </head>
 
 <body data-admin-page="traffic_daily">
-  <script>requireAnyUser();</script>
+<script>requireAnyUser();</script>
 
-  <div id="sidebar"></div>
+<div id="sidebar"></div>
 
-  <div class="main">
-    <!-- TOPBAR -->
-    <div class="topbar">
-      <div class="title">일별 트래픽 분석</div>
-      <div style="display:flex; align-items:center; gap:12px;">
-        <span id="session-timer" class="session-timer"></span>
-        <div class="topbar-user" id="topbarUser">
-          <span id="topbarUserName">관리자</span> ▾
-          <div class="user-dropdown" id="userDropdown"></div>
-        </div>
-        <button onclick="location.href='../index.html'">홈으로</button>
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="title">일별 트래픽 분석</div>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <span id="session-timer" class="session-timer"></span>
+      <div class="topbar-user" id="topbarUser">
+        <span id="topbarUserName">관리자</span> ▾
+        <div class="user-dropdown" id="userDropdown"></div>
       </div>
+      <button onclick="location.href='../index.html'">홈으로</button>
     </div>
-
-    <!-- KPI 6칸 -->
-    <section class="kpi-row">
-      <!-- UV -->
-      <div class="kpi-card"><span>오늘 방문자 (UV)</span><strong id="kpiUvToday">0</strong></div>
-      <div class="kpi-card"><span>7일 평균 UV</span><strong id="kpiUvAvg7">0</strong></div>
-      <div class="kpi-card"><span>30일 UV 누적</span><strong id="kpiUvSum30">0</strong></div>
-
-      <!-- PV -->
-      <div class="kpi-card"><span>오늘 페이지뷰 (PV)</span><strong id="kpiPvToday">0</strong></div>
-      <div class="kpi-card"><span>7일 평균 PV</span><strong id="kpiPvAvg7">0</strong></div>
-      <div class="kpi-card"><span>30일 PV 누적</span><strong id="kpiPvSum30">0</strong></div>
-    </section>
-
-    <!-- Chart -->
-    <section class="panel">
-      <div class="filter-bar">
-        <div>
-          <h2 style="margin:0;">추이</h2>
-          <div class="subtle" id="rangeHint">최근 30일 기준</div>
-        </div>
-
-        <div class="metric-buttons" aria-label="metric toggle">
-          <button class="pill-btn active" data-metric="uv">UV</button>
-          <button class="pill-btn" data-metric="pv">PV</button>
-        </div>
-
-        <div class="range-buttons" aria-label="range">
-          <button class="pill-btn" data-days="7">7일</button>
-          <button class="pill-btn active" data-days="30">30일</button>
-          <button class="pill-btn" data-days="90">90일</button>
-        </div>
-      </div>
-
-      <canvas id="dailyChart"></canvas>
-    </section>
   </div>
 
-  <script src="./js/sidebar.js"></script>
-  <script src="./js/topbar_user_menu.js"></script>
+  <!-- KPI -->
+  <section class="kpi-row">
+    <!-- UV -->
+    <div class="kpi-card"><span>오늘 방문자 (UV)</span><strong id="kpiUvToday">0</strong></div>
+    <div class="kpi-card"><span>7일 평균 UV</span><strong id="kpiUvAvg7">0</strong></div>
+    <div class="kpi-card"><span>30일 UV 누적</span><strong id="kpiUvSum30">0</strong></div>
 
-  <script>
-    /* =========================================================
-       DAILY TRAFFIC (UV/PV) - COMPLETE
-       API: GET /api/traffic/daily?days=30
-       -> [{ day, uv, pv }] (DESC)
-    ========================================================= */
+    <!-- PV -->
+    <div class="kpi-card"><span>오늘 페이지뷰 (PV)</span><strong id="kpiPvToday">0</strong></div>
+    <div class="kpi-card"><span>7일 평균 PV</span><strong id="kpiPvAvg7">0</strong></div>
+    <div class="kpi-card"><span>30일 PV 누적</span><strong id="kpiPvSum30">0</strong></div>
+  </section>
 
-    let chart;
-    let currentDays = 30;
-    let currentMetric = "uv"; // 'uv' | 'pv'
-    let cachedRows = [];      // latest loaded data (ASC)
+  <!-- UV Chart -->
+  <section class="panel">
+    <h2 style="margin-bottom:12px;">방문자 추이 (UV)</h2>
+    <canvas id="uvChart"></canvas>
+  </section>
 
-    // 기간 버튼
-    document.querySelectorAll(".range-buttons .pill-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll(".range-buttons .pill-btn").forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        currentDays = Number(btn.dataset.days);
-        document.getElementById("rangeHint").textContent = `최근 ${currentDays}일 기준`;
-        loadTraffic();
-      });
-    });
+  <!-- PV Chart -->
+  <section class="panel">
+    <h2 style="margin-bottom:12px;">페이지뷰 추이 (PV)</h2>
+    <canvas id="pvChart"></canvas>
+  </section>
 
-    // UV/PV 토글
-    document.querySelectorAll(".metric-buttons .pill-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll(".metric-buttons .pill-btn").forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        currentMetric = btn.dataset.metric;
-        // 데이터 재요청 없이 차트만 갱신
-        renderAllFromCache();
-      });
-    });
+</div>
 
-    async function loadTraffic() {
-      try {
-        const res = await fetch(`/api/traffic/daily?days=${currentDays}`);
-        const data = await res.json();
+<script src="./js/sidebar.js"></script>
+<script src="./js/topbar_user_menu.js"></script>
 
-        if (!Array.isArray(data)) {
-          console.error("Traffic API invalid response:", data);
-          return;
-        }
+<script>
+/* =========================================================
+   DAILY TRAFFIC — UV / PV
+   API: /api/traffic/daily?days=30
+   response: { day, uv, pv }
+========================================================= */
 
-        // 서버: DESC -> 프론트: ASC
-        cachedRows = [...data].reverse();
+let uvChart, pvChart;
+const DAYS = 30;
 
-        renderAllFromCache();
-      } catch (err) {
-        console.error("Failed to load traffic:", err);
-      }
+async function loadTraffic(){
+  try{
+    const res = await fetch(`/api/traffic/daily?days=${DAYS}`);
+    const data = await res.json();
+    if(!Array.isArray(data)) return;
+
+    const rows = [...data].reverse(); // ASC
+    const labels = rows.map(r => r.day);
+    const uv = rows.map(r => Number(r.uv||0));
+    const pv = rows.map(r => Number(r.pv||0));
+
+    updateKPI(uv, pv);
+    renderUv(labels, uv);
+    renderPv(labels, pv);
+
+  }catch(e){
+    console.error(e);
+  }
+}
+
+/* KPI */
+function updateKPI(uv, pv){
+  set("kpiUvToday", uv.at(-1));
+  set("kpiPvToday", pv.at(-1));
+  set("kpiUvAvg7", avg(uv,7));
+  set("kpiPvAvg7", avg(pv,7));
+  set("kpiUvSum30", sum(uv,30));
+  set("kpiPvSum30", sum(pv,30));
+}
+
+function set(id,v){ document.getElementById(id).textContent=(v||0).toLocaleString(); }
+function sum(a,n){ return a.slice(-n).reduce((x,y)=>x+y,0); }
+function avg(a,n){
+  const s=a.slice(-Math.min(n,a.length));
+  return s.length?Math.round(s.reduce((x,y)=>x+y,0)/s.length):0;
+}
+
+/* Charts */
+function renderUv(labels, values){
+  if(uvChart) uvChart.destroy();
+  uvChart=new Chart(uvChartEl(), lineCfg(labels, values, "방문자 수", "#0f2679"));
+}
+function renderPv(labels, values){
+  if(pvChart) pvChart.destroy();
+  pvChart=new Chart(pvChartEl(), lineCfg(labels, values, "페이지뷰 수", "#2563eb"));
+}
+function uvChartEl(){ return document.getElementById("uvChart"); }
+function pvChartEl(){ return document.getElementById("pvChart"); }
+
+function lineCfg(labels, values, title, color){
+  return {
+    type:"line",
+    data:{ labels,
+      datasets:[{ data:values, borderColor:color,
+        backgroundColor:color+"14", fill:true, tension:.3, pointRadius:2 }]
+    },
+    options:{
+      plugins:{ legend:{display:false},
+        tooltip:{callbacks:{label:c=>`${title}: ${c.raw.toLocaleString()}`}}
+      },
+      scales:{ y:{beginAtZero:true} }
     }
+  };
+}
 
-    function renderAllFromCache() {
-      if (!cachedRows.length) {
-        updateKPI([], []);
-        renderChart([], []);
-        return;
-      }
+/* init */
+loadSidebar("traffic_daily");
+loadTraffic();
+</script>
 
-      const labels = cachedRows.map(r => r.day);
-      const uvValues = cachedRows.map(r => Number(r.uv || 0));
-      const pvValues = cachedRows.map(r => Number(r.pv || 0));
-
-      updateKPI(uvValues, pvValues);
-
-      const values = currentMetric === "uv" ? uvValues : pvValues;
-      renderChart(labels, values, currentMetric);
-    }
-
-    function updateKPI(uvValues, pvValues) {
-      // 오늘 = 배열 마지막 값
-      const uvToday = uvValues.at(-1) || 0;
-      const pvToday = pvValues.at(-1) || 0;
-
-      document.getElementById("kpiUvToday").textContent = uvToday.toLocaleString();
-      document.getElementById("kpiPvToday").textContent = pvToday.toLocaleString();
-
-      // 7일 평균 (데이터가 7일 미만이면 있는 만큼)
-      const uvAvg7 = avgLastN(uvValues, 7);
-      const pvAvg7 = avgLastN(pvValues, 7);
-
-      document.getElementById("kpiUvAvg7").textContent = uvAvg7.toLocaleString();
-      document.getElementById("kpiPvAvg7").textContent = pvAvg7.toLocaleString();
-
-      // 30일 누적 (데이터가 30일 미만이면 있는 만큼)
-      const uvSum30 = sumLastN(uvValues, 30);
-      const pvSum30 = sumLastN(pvValues, 30);
-
-      document.getElementById("kpiUvSum30").textContent = uvSum30.toLocaleString();
-      document.getElementById("kpiPvSum30").textContent = pvSum30.toLocaleString();
-    }
-
-    function sumLastN(arr, n) {
-      const slice = arr.slice(-Math.min(n, arr.length));
-      return slice.reduce((a, b) => a + b, 0);
-    }
-
-    function avgLastN(arr, n) {
-      if (!arr.length) return 0;
-      const m = Math.min(n, arr.length);
-      const s = arr.slice(-m).reduce((a, b) => a + b, 0);
-      return Math.round(s / m);
-    }
-
-    function renderChart(labels, values, metric) {
-      const ctx = document.getElementById("dailyChart");
-
-      if (chart) chart.destroy();
-
-      const isUV = metric === "uv";
-      const label = isUV ? "방문자 (UV)" : "페이지뷰 (PV)";
-      const fillColor = isUV ? "rgba(15,38,121,0.08)" : "rgba(37,99,235,0.08)";
-      const lineColor = isUV ? "#0f2679" : "#2563eb";
-
-      chart = new Chart(ctx, {
-        type: "line",
-        data: {
-          labels,
-          datasets: [{
-            label,
-            data: values,
-            borderWidth: 2,
-            tension: 0.3,
-            fill: true,
-            backgroundColor: fillColor,
-            borderColor: lineColor,
-            pointRadius: 2
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label: (c) => `${label}: ${Number(c.raw || 0).toLocaleString()}`
-              }
-            }
-          },
-          scales: {
-            y: { beginAtZero: true }
-          }
-        }
-      });
-    }
-
-    // 초기
-    loadSidebar("traffic_daily");
-    document.getElementById("rangeHint").textContent = `최근 ${currentDays}일 기준`;
-    loadTraffic();
-  </script>
 </body>
 </html>
