@@ -43,45 +43,21 @@ router.post("/visit", async (req, res) => {
     const { page = "", referrer = "" } = req.body;
 
     if (!ip || !page) {
-      return res.json({ message: "skipped", reason: "no_ip_or_page" });
+      return res.json({ skipped: true });
     }
 
-    // 🚫 개발자 IP 제외 (⭐ 여기!)
-    const DEV_IPS = [
-      "119.195.161.193",
-      "1.220.123.2",
-      "125.251.61.201"
-    ];
-
-    function isPrivateIP(ip) {
-      return (
-        ip.startsWith("10.") ||
-        ip.startsWith("192.168.") ||
-        ip.startsWith("172.")
-      );
-    }
-
-    if (DEV_IPS.includes(ip) || isPrivateIP(ip)) {
-      return res.json({
-        message: "internal skip",
-        counted: false
-      });
-    }
-
-
-    // 🇰🇷 국가 판별
+    // 국가
     let country = "UNKNOWN";
     const geo = geoip.lookup(ip);
     if (geo?.country) country = geo.country;
 
-    // 1️⃣ 오늘 이미 기록됐는지 체크 (INSERT 시도)
+    // 🔑 하루 1회 중복 방지
     const [dedupe] = await db.execute(
       `INSERT IGNORE INTO traffic_dedupe (ip, page, view_date)
        VALUES (?, ?, CURDATE())`,
       [ip, page]
     );
 
-    // 2️⃣ 오늘 처음이면 → 실제 방문 기록
     if (dedupe.affectedRows === 1) {
       await db.execute(
         `INSERT INTO traffic_logs
@@ -92,17 +68,15 @@ router.post("/visit", async (req, res) => {
     }
 
     res.json({
-      message: "ok",
-      counted: dedupe.affectedRows === 1,
-      ip,
-      country
+      counted: dedupe.affectedRows === 1
     });
 
   } catch (err) {
     console.error("traffic visit error:", err);
-    res.status(500).json({ message: "error" });
+    res.status(500).json({ error: true });
   }
 });
+
 
 
 /* ================================
