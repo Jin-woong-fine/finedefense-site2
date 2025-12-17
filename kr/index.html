@@ -634,7 +634,8 @@
   <script>
   async function loadLatestPosts() {
     try {
-      const res = await fetch(`/api/posts/latest?lang=en&limit=4`);
+      // ✅ KR 메인이므로 lang=kr
+      const res = await fetch(`/api/posts/latest?lang=kr&limit=4`);
       const list = await res.json();
 
       const grid = document.getElementById("newsGrid");
@@ -652,30 +653,30 @@
           ? `<span class="badge notice">공지</span>`
           : `<span class="badge news">뉴스</span>`;
 
-        // ✅ 디폴트 이미지 정의
+        // ✅ 디폴트 이미지
         const fallbackImg = isNotice
           ? "/img/default_img/default-notice.png"
           : "/img/default_img/default-news.png";
 
-        // ✅ 메인이미지 없으면 디폴트
         const imgURL = isNotice
           ? fallbackImg
           : (item.main_image || fallbackImg);
 
-        const dateStr = new Date(item.created_at).toLocaleDateString("en-US", {
+        const dateStr = new Date(item.created_at).toLocaleDateString("ko-KR", {
           year: "numeric",
-          month: "short",
-          day: "numeric"
+          month: "2-digit",
+          day: "2-digit"
         });
 
+        // ✅ KR 페이지 경로로 수정
         const viewURL = isNotice
-          ? `/en/sub/pr/notice/notice-view.html?id=${item.id}`
-          : `/en/sub/pr/newsroom/news-view.html?id=${item.id}`;
+          ? `/kr/sub/pr/notice/notice-view.html?id=${item.id}`
+          : `/kr/sub/pr/newsroom/news-view.html?id=${item.id}`;
 
         const card = `
           <div class="news-card" onclick="location.href='${viewURL}'">
-            <img 
-              src="${imgURL}" 
+            <img
+              src="${imgURL}"
               alt="${item.title}"
               onerror="this.onerror=null; this.src='${fallbackImg}';"
             >
@@ -695,18 +696,6 @@
 
   window.addEventListener("load", loadLatestPosts);
   </script>
-
-<script>
-document.addEventListener("scroll", () => {
-  const body = document.body;
-
-  if (window.scrollY > 40) {
-    body.classList.add("scrolled");
-  } else {
-    body.classList.remove("scrolled");
-  }
-});
-</script>
 
 
 
