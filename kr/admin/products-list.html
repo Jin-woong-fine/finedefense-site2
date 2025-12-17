@@ -91,10 +91,10 @@
 
 
 
-  .no-en {
-      color: #ff3b30;
-      font-size: 0.85rem;
-    }
+  .en-missing {
+    color: #ff3b30;
+    font-size: 0.85rem;
+  }
   </style>
 </head>
 
@@ -183,7 +183,7 @@ let allProducts = [];
 ================================ */
 async function loadProducts() {
   try {
-    const res = await fetch("/api/admin/products", {
+    const res = await fetch("/api/products?lang=kr", {
       headers: authHeaders()
     });
 
