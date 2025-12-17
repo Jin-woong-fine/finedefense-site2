@@ -120,24 +120,36 @@ router.get("/summary", async (req, res) => {
 
 
 /* ================================
-   🟦 2) 일별 통계
-   /api/traffic/daily?days=90
+   🟦 2) 일별 통계 (UV / PV, 기간 선택)
+   GET /api/traffic/daily?days=30
+   - PV: COUNT(*)
+   - UV: COUNT(DISTINCT ip)
 ================================ */
 router.get("/daily", async (req, res) => {
-  const days = Number(req.query.days || 30);
+  try {
+    const days = Math.max(1, Number(req.query.days || 30));
 
-  const [rows] = await db.execute(`
-    SELECT 
-      DATE(created_at) AS day,
-      COUNT(*) AS visits
-    FROM traffic_logs
-    GROUP BY DATE(created_at)
-    ORDER BY day DESC
-    LIMIT ?
-  `, [days]);
+    const [rows] = await db.execute(
+      `
+      SELECT
+        DATE(created_at) AS day,
+        COUNT(*) AS pv,
+        COUNT(DISTINCT ip) AS uv
+      FROM traffic_logs
+      WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
+      GROUP BY DATE(created_at)
+      ORDER BY day DESC
+      `,
+      [days]
+    );
 
-  res.json(rows);
+    res.json(rows);
+  } catch (err) {
+    console.error("traffic daily error:", err);
+    res.status(500).json({ message: "error" });
+  }
 });
+
 
 
 /* ================================
