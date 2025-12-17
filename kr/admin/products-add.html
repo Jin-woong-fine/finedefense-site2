@@ -14,108 +14,185 @@
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
   <style>
-    .field-guide {
-      font-size: 0.85rem;
-      color: #6b7280;
-      margin: -6px 0 14px;
-      line-height: 1.4;
+    /* 기본 레이아웃 */
+    .main {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
+                  "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+      color: #111;
+      background: #f5f5f7;
     }
 
+    /* -------------------------------
+      Panel (Apple Card)
+    -------------------------------- */
+    .main section.panel {
+      background: #ffffff;
+      padding: 40px 44px;
+      border-radius: 20px;
+      margin: 0 auto 44px;
+      max-width: 960px;
+      border: 1px solid #e5e5ea;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.06);
+    }
+
+    /* 타이틀 */
+    .main section.panel h2 {
+      font-size: 1.45rem;
+      font-weight: 700;
+      margin-bottom: 22px;
+      letter-spacing: -0.02em;
+    }
+
+    .main section.panel h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin: 34px 0 14px;
+      letter-spacing: -0.01em;
+    }
+
+    /* -------------------------------
+      가이드 문구
+    -------------------------------- */
+    .field-guide {
+      font-size: 0.9rem;
+      color: #6e6e73;
+      margin: -6px 0 22px;
+      line-height: 1.6;
+    }
+
+    /* -------------------------------
+      Input / Select / Textarea
+    -------------------------------- */
+    .main section.panel .input {
+      width: 100%;
+      height: 50px;
+      padding: 12px 16px;
+      font-size: 1rem;
+      border-radius: 12px;
+      border: 1px solid #d2d2d7;
+      background: #fff;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .main section.panel textarea.input {
+      min-height: 140px;
+      font-size: 1rem;
+      line-height: 1.65;
+      resize: vertical;
+    }
+
+    /* focus */
+    .main section.panel .input:focus {
+      outline: none;
+      border-color: #0071e3;
+      box-shadow: 0 0 0 4px rgba(0,113,227,0.18);
+    }
+
+    /* -------------------------------
+      Toast UI Editor (Typography 강화)
+    -------------------------------- */
+    #editor {
+      border-radius: 16px;
+      border: 1px solid #d2d2d7;
+      overflow: hidden;
+    }
+
+    .toastui-editor-defaultUI {
+      border: none;
+    }
+
+    .toastui-editor-toolbar {
+      background: #f5f5f7;
+      border-bottom: 1px solid #e5e5ea;
+    }
+
+    /* ✨ 에디터 본문 글씨 키움 */
+    .toastui-editor-contents {
+      font-size: 1.05rem;
+      line-height: 1.8;
+      color: #111;
+    }
+
+    .toastui-editor-contents p {
+      margin-bottom: 1.2em;
+    }
+
+    /* -------------------------------
+      이미지 업로드
+    -------------------------------- */
     .thumb-preview {
       display: flex;
-      gap: 10px;
+      gap: 14px;
       flex-wrap: wrap;
-      margin-top: 10px;
+      margin-top: 18px;
     }
+
     .thumb-preview .img-item {
-      width: 80px;
-      height: 80px;
+      width: 92px;
+      height: 92px;
       position: relative;
     }
+
     .thumb-preview img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      border-radius: 8px;
-      border: 1px solid #ddd;
+      border-radius: 16px;
+      border: 1px solid #e5e5ea;
+      background: #fafafa;
     }
+
+    /* 삭제 버튼 (미니멀) */
     .thumb-preview .remove-btn {
       position: absolute;
       top: -6px;
       right: -6px;
-      width: 20px;
-      height: 20px;
+      width: 22px;
+      height: 22px;
       border-radius: 50%;
-      background: crimson;
+      background: #ff3b30;
       color: white;
       border: none;
+      font-size: 14px;
       cursor: pointer;
-      font-size: 13px;
     }
 
-    /* ============================================================
-      🚑 admin.css panel 충돌 강제 보정 (이 페이지 전용)
-    ============================================================ */
-
-    /* 대시보드용 panel flex / grid 영향 제거 */
-    .main > .panel,
-    .main section.panel {
-      all: unset;
-      display: block;
-    }
-
-    /* 신규 등록 페이지 전용 panel 스타일 재정의 */
-    .main section.panel {
-      background: #ffffff;
-      padding: 28px 32px;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      margin: 0 auto 35px;
-      max-width: 980px;
-    }
-
-    /* panel 내부 요소 정렬 안정화 */
-    .main section.panel h2,
-    .main section.panel h3 {
-      margin-top: 0;
-    }
-
-    .main section.panel .input,
-    .main section.panel textarea,
-    .main section.panel select {
-      width: 100%;
-      box-sizing: border-box;
-      margin-bottom: 14px;
-    }
-
-    /* editor 영역 폭 고정 */
-    #editor {
-      width: 100%;
-    }
-
-    /* ============================================================
-      ✏️ 입력 박스 높이 조정
-    ============================================================ */
-    .main section.panel input.input,
-    .main section.panel select.input {
-      height: 44px;          /* ← select 높이 */
+    /* -------------------------------
+      Buttons
+    -------------------------------- */
+    .btn {
+      border-radius: 999px;
+      padding: 10px 22px;
       font-size: 0.95rem;
+      font-weight: 500;
     }
 
-    /* 한 줄 input */
-    .main section.panel input.input {
-      height: 44px;
-      font-size: 0.95rem;
+    .btn-primary {
+      background: #0071e3;
+      border: none;
     }
 
-    /* 여러 줄 textarea (요약 설명 등) */
-    .main section.panel textarea.input {
-      min-height: 120px;   /* ← 핵심 */
-      resize: vertical;    /* 사용자가 늘릴 수 있게 */
-      font-size: 0.95rem;
-      line-height: 1.5;
+    .btn-primary:hover {
+      background: #005bb5;
     }
 
+    .btn-secondary {
+      background: #f5f5f7;
+      border: 1px solid #d2d2d7;
+      color: #111;
+    }
+
+    .btn-secondary:hover {
+      background: #e5e5ea;
+    }
+
+    /* 상단 버튼 정렬 */
+    .main > div:first-of-type {
+      max-width: 960px;
+      margin: 0 auto 28px;
+      display: flex;
+      gap: 12px;
+    }
   </style>
 </head>
 
