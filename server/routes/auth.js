@@ -7,31 +7,11 @@ import dotenv from "dotenv";
 import requestIp from "request-ip";
 import { verifyToken, verifyRole } from "../middleware/auth.js";
 
+import { getGeoInfo } from "../utils/geoip.js";
+import { logLogin } from "../utils/logLogin.js";
+
 dotenv.config();
 const router = express.Router();
-
-/* ============================================================
-   🔥 로그인 기록 함수
-============================================================ */
-async function logLogin(user, status, req) {
-  try {
-    const ip = requestIp.getClientIp(req);
-    const ua = req.headers["user-agent"] || "";
-
-    await db.query(`
-      INSERT INTO login_logs (user_id, username, ip, ua, status)
-      VALUES (?, ?, ?, ?, ?)
-    `, [
-      user?.id || null,
-      user?.username || req.body.username,
-      ip,
-      ua,
-      status
-    ]);
-  } catch (err) {
-    console.error("Login log error:", err);
-  }
-}
 
 /* ============================================================
    🔐 로그인
@@ -44,25 +24,48 @@ router.post("/login", async (req, res) => {
   }
 
   try {
+    // ✅ 공통 정보 (한 번만)
+    const ip = requestIp.getClientIp(req);
+    const ua = req.headers["user-agent"] || "";
+    const geo = getGeoInfo(ip);
+
     const [rows] = await db.query(
       "SELECT * FROM users WHERE username = ?",
       [username]
     );
 
+    /* 🔴 사용자 없음 */
     if (rows.length === 0) {
-      await logLogin(null, "fail", req);
+      await logLogin({
+        username,
+        ip,
+        ua,
+        status: "fail",
+        fail_reason: "user_not_found",
+        ...geo
+      });
       return res.status(404).json({ message: "User not found" });
     }
 
     const user = rows[0];
 
+    /* 🔴 비밀번호 틀림 */
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) {
-      await logLogin(null, "fail", req);
+      await logLogin({
+        user_id: user.id,
+        username: user.username,
+        ip,
+        ua,
+        status: "fail",
+        fail_reason: "wrong_password",
+        is_admin: ["admin", "superadmin"].includes(user.role) ? 1 : 0,
+        ...geo
+      });
       return res.status(401).json({ message: "Invalid password" });
     }
 
-    // 🔥 JWT 발급 (2시간)
+    /* 🟢 로그인 성공 */
     const token = jwt.sign(
       { id: user.id, role: user.role, name: user.name },
       process.env.JWT_SECRET,
@@ -70,9 +73,18 @@ router.post("/login", async (req, res) => {
     );
 
     const decoded = jwt.decode(token);
-    await logLogin(user, "success", req);
 
-    res.json({
+    await logLogin({
+      user_id: user.id,
+      username: user.username,
+      ip,
+      ua,
+      status: "success",
+      is_admin: ["admin", "superadmin"].includes(user.role) ? 1 : 0,
+      ...geo
+    });
+
+    return res.json({
       message: "login success",
       token,
       exp: decoded.exp,
@@ -83,9 +95,10 @@ router.post("/login", async (req, res) => {
 
   } catch (err) {
     console.error("❌ Login Error:", err);
-    res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: "Server error" });
   }
 });
+
 
 /* ============================================================
    🔄 세션 Refresh (토큰 재발급)
