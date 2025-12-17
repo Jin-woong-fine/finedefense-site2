@@ -196,6 +196,34 @@
       right: -60px;
     }
 
+    /* -----------------------------
+      목록으로 버튼
+    ------------------------------ */
+    .product-back {
+      margin-bottom: 16px;
+    }
+
+    .btn-back {
+      background: #f5f5f7;
+      border: 1px solid #d2d2d7;
+      border-radius: 999px;
+      padding: 8px 18px;
+      font-size: 0.9rem;
+      color: #0f2679;
+      cursor: pointer;
+      transition: background 0.15s ease, transform 0.12s ease;
+    }
+
+    .btn-back:hover {
+      background: #e5e5ea;
+    }
+
+    .btn-back:active {
+      transform: scale(0.96);
+    }
+
+
+
   </style>
 </head>
 
@@ -221,6 +249,16 @@
   <span id="crumbProduct" class="crumb crumb-level2">제품 상세</span>
   <div id="side-tabs" class="side-tabs"></div>
 </div>
+
+
+  <!-- 목록으로 버튼 -->
+  <div class="product-back">
+    <button class="btn-back" type="button" onclick="goProductList()">
+      ← 목록으로
+    </button>
+  </div>
+
+
 
 <section class="product-detail">
   <h1 id="productTitle" class="product-title">제품명</h1>
@@ -444,6 +482,22 @@ function showNextImage() {
   currentIndex = (currentIndex + 1) % galleryImages.length;
   overlayImgEl.src = galleryImages[currentIndex];
 }
+
+function goProductList() {
+  const params = new URLSearchParams(window.location.search);
+  const category = params.get("category");
+
+  if (category) {
+    location.href = `/kr/sub/pr/products.html?category=${category}`;
+  } else {
+    location.href = `/kr/sub/pr/products.html`;
+  }
+}
+
+
+
+
+
 </script>
 
     <!-- 공통 스크립트 -->
