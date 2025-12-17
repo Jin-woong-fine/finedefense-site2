@@ -45,6 +45,12 @@ router.post("/", verifyToken, verifyEditor, (req, res) => {
       if (!title || !category || !lang)
         return res.status(400).json({ message: "Missing required fields" });
 
+      if (summary && summary.length > 255) {
+        return res.status(400).json({
+          message: "Summary is too long (max 255 characters)"
+        });
+      }
+
       let thumbnail = null;
       if (req.files?.length > 0)
         thumbnail = "/uploads/products/" + req.files[0].filename;
@@ -194,6 +200,13 @@ router.put("/:id", verifyToken, verifyEditor, (req, res) => {
 
       if (!title || !category || !lang)
         return res.status(400).json({ message: "Missing required fields" });
+
+      // 🔒 summary 길이 서버 방어 (VARCHAR(255))
+      if (summary && summary.length > 255) {
+        return res.status(400).json({
+          message: "요약(summary)은 최대 255자까지 입력 가능합니다."
+        });
+      }
 
       // 🔥 old_images 파싱
       const oldList = JSON.parse(old_images || "[]");

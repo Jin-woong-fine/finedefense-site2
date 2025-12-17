@@ -201,10 +201,25 @@
         웹사이트와 관리자 목록에 표시될 공식 제품명입니다.
       </div>
 
-      <textarea id="summary" class="input" placeholder="카드 요약 설명" required></textarea>
+      <textarea
+        id="summary"
+        class="input"
+        placeholder="카드 요약 설명 (최대 255자)"
+        maxlength="255"
+        required
+      ></textarea>
+
+      <div
+        id="summaryCount"
+        style="margin-top:-6px; margin-bottom:10px; font-size:0.85rem; color:#6b7280;"
+      >
+        0 / 255
+      </div>
+
       <div class="field-guide">
         제품 목록 카드에 표시되는 짧은 설명입니다 (2~3줄 권장).
       </div>
+
 
       <select id="category" class="input" required>
         <option value="">카테고리 선택</option>
@@ -301,6 +316,23 @@ let editor = new toastui.Editor({
   previewStyle: 'vertical',
 });
 
+/* ============================================================
+   ✏️ Summary 255자 제한 + 카운트
+============================================================ */
+const summaryInput = document.getElementById("summary");
+const summaryCount = document.getElementById("summaryCount");
+
+if (summaryInput && summaryCount) {
+  summaryCount.textContent = `${summaryInput.value.length} / 255`;
+
+  summaryInput.addEventListener("input", () => {
+    const len = summaryInput.value.length;
+    summaryCount.textContent = `${len} / 255`;
+    summaryCount.style.color = len >= 255 ? "#ff3b30" : "#6b7280";
+  });
+}
+
+
 /* 기존 데이터 */
 let oldImages = [];
 let newImages = [];
@@ -323,7 +355,14 @@ async function loadProduct() {
 
     // 텍스트 정보 넣기
     document.getElementById("title").value = p.title;
-    document.getElementById("summary").value = p.summary;
+
+    const summaryText = p.summary || "";
+    document.getElementById("summary").value = summaryText;
+
+    summaryCount.textContent = `${summaryText.length} / 255`;
+    summaryCount.style.color =
+      summaryText.length >= 255 ? "#ff3b30" : "#6b7280";
+
     document.getElementById("category").value = p.category;
     document.getElementById("lang").value = p.lang;
     document.getElementById("sort_order").value = p.sort_order;
@@ -413,6 +452,14 @@ function removeNewImage(i) {
 /* 수정 API 요청 */
 document.getElementById("productForm").addEventListener("submit", async (e) => {
   e.preventDefault();
+
+  const summary = document.getElementById("summary").value.trim();
+
+  if (summary.length > 255) {
+    alert("요약(summary)은 최대 255자까지 입력 가능합니다.");
+    document.getElementById("summary").focus();
+    return;
+  }
 
   const form = new FormData();
   form.append("title", document.getElementById("title").value.trim());

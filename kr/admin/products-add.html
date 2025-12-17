@@ -332,7 +332,21 @@
 
       <input id="title" class="input" placeholder="제품명 입력" required />
 
-      <textarea id="summary" class="input" placeholder="카드 요약 설명 (짧은 설명)" required></textarea>
+      <textarea
+        id="summary"
+        class="input"
+        placeholder="카드 요약 설명 (최대 255자)"
+        maxlength="255"
+        required
+      ></textarea>
+
+      <div
+        id="summaryCount"
+        style="margin-top:6px; font-size:0.85rem; color:#6e6e73;"
+      >
+        0 / 255
+      </div>
+
 
       <select id="category" class="input" required>
         <option value="">카테고리 선택</option>
@@ -396,6 +410,28 @@ const editor = new toastui.Editor({
   initialEditType: 'wysiwyg',
   previewStyle: 'vertical',
 });
+
+/* ============================================================
+   ✏️ Summary 255자 제한 + 카운트
+============================================================ */
+const summaryInput = document.getElementById("summary");
+const summaryCount = document.getElementById("summaryCount");
+
+if (summaryInput && summaryCount) {
+  // 초기 표시
+  summaryCount.textContent = `${summaryInput.value.length} / 255`;
+
+  summaryInput.addEventListener("input", () => {
+    const len = summaryInput.value.length;
+    summaryCount.textContent = `${len} / 255`;
+    summaryCount.style.color =
+      len > 255 ? "#ff3b30"
+      : len === 255 ? "#ff9500"
+      : "#6e6e73";
+      });
+}
+
+
 
 /* ============================================================
    🔥 기존 제품 목록 불러오기
@@ -464,6 +500,10 @@ async function loadFromExisting() {
   // 텍스트 필드 채우기
   document.getElementById("title").value = p.title;
   document.getElementById("summary").value = p.summary;
+    summaryCount.textContent = `${p.summary.length} / 255`;
+    summaryCount.style.color =
+      p.summary.length >= 255 ? "#ff3b30" : "#6e6e73";
+
   document.getElementById("category").value = p.category;
   document.getElementById("lang").value = p.lang;
   document.getElementById("sort_order").value = p.sort_order;
@@ -534,6 +574,15 @@ new Sortable(document.getElementById("preview"), {
 ============================================================ */
 document.getElementById("productForm").addEventListener("submit", async (e) => {
   e.preventDefault();
+
+
+  const summary = document.getElementById("summary").value.trim();
+
+  if (summary.length > 255) {
+    alert("요약(summary)은 최대 255자까지 입력 가능합니다.");
+    document.getElementById("summary").focus();
+    return;
+  }
 
   const formData = new FormData();
   formData.append("title", document.getElementById("title").value.trim());
