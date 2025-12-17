@@ -426,29 +426,6 @@ footer {
   border-top: 1px solid #444;
 }
 
-@media (max-width: 1300px) {
-  .footer-container {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-
-  .footer-left,
-  .footer-info,
-  .footer-right {
-    min-width: 100%;
-  }
-
-  .footer-right {
-    text-align: center;
-  }
-
-  .footer-right .family-links {
-    right: 50%;
-    transform: translateX(50%);
-  }
-}
-
 
 /* ============================================== */
 /*               ADMIN SESSION BAR                */

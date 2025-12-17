@@ -552,64 +552,71 @@
   <script src="/js/language.js"></script>
 
 
-<script>
-async function loadLatestPosts() {
-  try {
-    const res = await fetch(`/api/posts/latest?lang=en&limit=4`);
-    const list = await res.json();
+  <script>
+  async function loadLatestPosts() {
+    try {
+      const res = await fetch(`/api/posts/latest?lang=en&limit=4`);
+      const list = await res.json();
 
-    const grid = document.getElementById("newsGrid");
-    grid.innerHTML = "";
+      const grid = document.getElementById("newsGrid");
+      grid.innerHTML = "";
 
-    if (!Array.isArray(list) || list.length === 0) {
-      grid.innerHTML = "<p>등록된 소식이 없습니다.</p>";
-      return;
-    }
+      if (!Array.isArray(list) || list.length === 0) {
+        grid.innerHTML = "<p>등록된 소식이 없습니다.</p>";
+        return;
+      }
 
-    list.forEach(item => {
-      const label =
-        item.category === "notice"
+      list.forEach(item => {
+        const isNotice = item.category === "notice";
+
+        const label = isNotice
           ? `<span class="badge notice">공지</span>`
           : `<span class="badge news">뉴스</span>`;
 
-      let imgURL;
-      if (item.category === "notice") {
-        imgURL = "/img/default_img/default-notice.png";   // 공지는 무조건 이거!
-      } else {
-        imgURL = item.main_image || "/img/default_img/default-news.png";
-      }
+        // ✅ 디폴트 이미지 정의
+        const fallbackImg = isNotice
+          ? "/img/default_img/default-notice.png"
+          : "/img/default_img/default-news.png";
 
-      const dateStr = new Date(item.created_at).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "short",
-        day: "numeric"
-      });
+        // ✅ 메인이미지 없으면 디폴트
+        const imgURL = isNotice
+          ? fallbackImg
+          : (item.main_image || fallbackImg);
 
-      const viewURL =
-        item.category === "notice"
+        const dateStr = new Date(item.created_at).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric"
+        });
+
+        const viewURL = isNotice
           ? `/en/sub/pr/notice/notice-view.html?id=${item.id}`
           : `/en/sub/pr/newsroom/news-view.html?id=${item.id}`;
 
-      const card = `
-        <div class="news-card" onclick="location.href='${viewURL}'">
-          <img src="${imgURL}" alt="${item.title}">
-          ${label}
-          <h3>${item.title}</h3>
-          <span class="date">${dateStr}</span>
-        </div>
-      `;
+        const card = `
+          <div class="news-card" onclick="location.href='${viewURL}'">
+            <img 
+              src="${imgURL}" 
+              alt="${item.title}"
+              onerror="this.onerror=null; this.src='${fallbackImg}';"
+            >
+            ${label}
+            <h3>${item.title}</h3>
+            <span class="date">${dateStr}</span>
+          </div>
+        `;
 
-      grid.innerHTML += card;
-    });
+        grid.innerHTML += card;
+      });
 
-
-  } catch (err) {
-    console.error("최신글 불러오기 오류:", err);
+    } catch (err) {
+      console.error("최신글 불러오기 오류:", err);
+    }
   }
-}
 
-window.addEventListener("load", loadLatestPosts);
-</script>
+  window.addEventListener("load", loadLatestPosts);
+  </script>
+
 
 <script>
 document.addEventListener("scroll", () => {
