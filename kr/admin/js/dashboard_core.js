@@ -35,27 +35,47 @@ function apiGet(url) {
 async function loadBasicStats() {
   try {
     const res = await apiGet("/api/traffic/summary");
-    const data = await res.json();
+    const d = await res.json();
 
-    document.getElementById("uvToday").textContent =
-      data.uvToday.toLocaleString();
+    // UV
+    document.getElementById("uvToday").textContent = d.uv_today.toLocaleString();
+    document.getElementById("uvMonth").textContent = d.uv_month.toLocaleString();
 
-    document.getElementById("pvToday").textContent =
-      data.pvToday.toLocaleString();
+    const uvGrowthEl = document.getElementById("uvGrowth");
+    const uvGrowth =
+      d.uv_last_month > 0
+        ? ((d.uv_month - d.uv_last_month) / d.uv_last_month) * 100
+        : null;
 
-    document.getElementById("uvMonth").textContent =
-      data.uvMonth.toLocaleString();
+    uvGrowthEl.textContent =
+      uvGrowth === null ? "NEW" : uvGrowth.toFixed(1) + "%";
+    uvGrowthEl.style.color =
+      uvGrowth > 0 ? "#2e7d32" :
+      uvGrowth < 0 ? "#c62828" :
+      "#6b7280";
 
-    const postRes = await apiGet("/api/admin/dashboard");
-    const postData = await postRes.json();
+    // PV
+    document.getElementById("pvToday").textContent = d.pv_today.toLocaleString();
+    document.getElementById("pvMonth").textContent = d.pv_month.toLocaleString();
 
-    document.getElementById("totalPosts").textContent =
-      (postData.postCount || 0).toLocaleString();
+    const pvGrowthEl = document.getElementById("pvGrowth");
+    const pvGrowth =
+      d.pv_last_month > 0
+        ? ((d.pv_month - d.pv_last_month) / d.pv_last_month) * 100
+        : null;
+
+    pvGrowthEl.textContent =
+      pvGrowth === null ? "NEW" : pvGrowth.toFixed(1) + "%";
+    pvGrowthEl.style.color =
+      pvGrowth > 0 ? "#2e7d32" :
+      pvGrowth < 0 ? "#c62828" :
+      "#6b7280";
 
   } catch (err) {
     console.error("KPI Error:", err);
   }
 }
+
 
 
 /* -----------------------------------------------------

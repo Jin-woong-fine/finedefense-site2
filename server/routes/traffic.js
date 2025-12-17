@@ -43,7 +43,7 @@ router.post("/visit", async (req, res) => {
     const { page = "", referrer = "" } = req.body;
 
     if (!ip || !page) {
-      return res.json({ skipped: true });
+      return res.json({ message: "skipped", reason: "no_ip_or_page" });
     }
 
     // 국가
@@ -51,13 +51,14 @@ router.post("/visit", async (req, res) => {
     const geo = geoip.lookup(ip);
     if (geo?.country) country = geo.country;
 
-    // 🔑 하루 1회 중복 방지
+    // ✅ 하루 1회 (IP + page 기준)
     const [dedupe] = await db.execute(
       `INSERT IGNORE INTO traffic_dedupe (ip, page, view_date)
        VALUES (?, ?, CURDATE())`,
       [ip, page]
     );
 
+    // 처음 방문이면 실제 로그 기록
     if (dedupe.affectedRows === 1) {
       await db.execute(
         `INSERT INTO traffic_logs
@@ -67,48 +68,52 @@ router.post("/visit", async (req, res) => {
       );
     }
 
-    res.json({
+    return res.json({
+      ok: true,
       counted: dedupe.affectedRows === 1
     });
 
   } catch (err) {
     console.error("traffic visit error:", err);
-    res.status(500).json({ error: true });
+    return res.status(500).json({ message: "error" });
   }
 });
+
 
 
 /* ================================
    🟦 0) UV / PV 요약 (대시보드용)
 ================================ */
 router.get("/summary", async (req, res) => {
-  try {
-    const [[today]] = await db.execute(`
-      SELECT
-        COUNT(*) AS pvToday,
-        COUNT(DISTINCT ip) AS uvToday
-      FROM traffic_logs
-      WHERE DATE(created_at) = CURDATE()
-    `);
+  const [rows] = await db.execute(`
+    SELECT
+      -- UV
+      COUNT(DISTINCT CASE WHEN DATE(created_at)=CURDATE() THEN ip END) AS uv_today,
+      COUNT(DISTINCT CASE
+        WHEN YEAR(created_at)=YEAR(CURDATE())
+         AND MONTH(created_at)=MONTH(CURDATE())
+        THEN ip END) AS uv_month,
 
-    const [[month]] = await db.execute(`
-      SELECT
-        COUNT(DISTINCT ip) AS uvMonth
-      FROM traffic_logs
-      WHERE YEAR(created_at) = YEAR(CURDATE())
-        AND MONTH(created_at) = MONTH(CURDATE())
-    `);
+      COUNT(DISTINCT CASE
+        WHEN YEAR(created_at)=YEAR(CURDATE() - INTERVAL 1 MONTH)
+         AND MONTH(created_at)=MONTH(CURDATE() - INTERVAL 1 MONTH)
+        THEN ip END) AS uv_last_month,
 
-    res.json({
-      pvToday: today.pvToday || 0,
-      uvToday: today.uvToday || 0,
-      uvMonth: month.uvMonth || 0
-    });
+      -- PV
+      COUNT(CASE WHEN DATE(created_at)=CURDATE() THEN 1 END) AS pv_today,
+      COUNT(CASE
+        WHEN YEAR(created_at)=YEAR(CURDATE())
+         AND MONTH(created_at)=MONTH(CURDATE())
+        THEN 1 END) AS pv_month,
 
-  } catch (err) {
-    console.error("traffic summary error:", err);
-    res.status(500).json({ message: "error" });
-  }
+      COUNT(CASE
+        WHEN YEAR(created_at)=YEAR(CURDATE() - INTERVAL 1 MONTH)
+         AND MONTH(created_at)=MONTH(CURDATE() - INTERVAL 1 MONTH)
+        THEN 1 END) AS pv_last_month
+    FROM traffic_logs
+  `);
+
+  res.json(rows[0]);
 });
 
 
