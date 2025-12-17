@@ -184,6 +184,33 @@
     color: #ffffff;
     border-color: #0f2679;
   }
+
+  /* ===============================
+    LANGUAGE BADGE
+  =============================== */
+  .lang-badge {
+    display: inline-block;
+    min-width: 38px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .lang-badge.kr {
+    background: #e7f0ff;
+    color: #0f2679;
+    border: 1px solid #c8d8ff;
+  }
+
+  .lang-badge.en {
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fde68a;
+  }
+
+
   </style>
 
 </head>
@@ -247,6 +274,7 @@
         <tr>
           <th style="width:70px;">번호</th>
           <th style="width:70px;">정렬</th>
+          <th style="width:70px;">언어</th>
           <th>제목</th>
           <th style="width:120px;">작성일</th>
           <th style="width:80px;">조회수</th>
@@ -338,7 +366,7 @@
     const total = filteredNotices.length;
 
     tbody.innerHTML = pageItems.map((n, i) => `
-      <tr>
+      <tr class="${n.sort_order <= 10 ? 'pinned' : ''}">
         <td>${total - (start + i)}</td>
 
         <td>
@@ -348,15 +376,21 @@
             value="${n.sort_order ?? 9999}"
             data-id="${n.id}"
             min="1"
-            style="width:60px; padding:4px; text-align:center;"
-            title="기본값 9999 / 숫자가 작을수록 상단 노출"
             onchange="autoSaveSortOrder(this)"
           />
+        </td>
+
+        <!-- ✅ 언어 컬럼 -->
+        <td>
+          <span class="lang-badge ${n.lang}">
+            ${n.lang.toUpperCase()}
+          </span>
         </td>
 
         <td onclick="openPublicView(${n.id})">${n.title}</td>
         <td>${formatDate(n.created_at)}</td>
         <td>${n.views ?? "-"}</td>
+
         <td>
           <div class="actions">
             <button class="btn btn-small btn-gray" onclick="editNotice(${n.id})">수정</button>
@@ -365,6 +399,7 @@
         </td>
       </tr>
     `).join("");
+
   }
 
   /* ===========================
