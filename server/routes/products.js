@@ -414,6 +414,7 @@ router.delete("/:id", verifyToken, verifyEditor, async (req, res) => {
 /* ==========================================================
    🌐 제품 언어 버전 추가 (Translate)
    - 기존 제품(group_id 기준)에 다른 언어 row 생성
+   - 이미지(product_images)까지 함께 복제
 ========================================================== */
 router.post("/:id/translate", verifyToken, verifyEditor, async (req, res) => {
   try {
@@ -447,7 +448,7 @@ router.post("/:id/translate", verifyToken, verifyEditor, async (req, res) => {
       });
     }
 
-    // 3️⃣ 신규 언어 버전 INSERT (group_id 그대로)
+    // 3️⃣ 신규 언어 버전 INSERT
     const [insert] = await db.execute(
       `INSERT INTO products
         (group_id, title, summary, category, thumbnail, description_html, sort_order, lang)
@@ -464,9 +465,32 @@ router.post("/:id/translate", verifyToken, verifyEditor, async (req, res) => {
       ]
     );
 
+    const newId = insert.insertId;
+
+    // 4️⃣ 🔥 이미지(product_images) 복제
+    const [images] = await db.execute(
+      `SELECT url, sort_order FROM product_images WHERE product_id = ?`,
+      [base.id]
+    );
+
+    if (images.length > 0) {
+      const values = images.map(img => [
+        newId,
+        img.url,
+        img.sort_order
+      ]);
+
+      await db.query(
+        `INSERT INTO product_images (product_id, url, sort_order)
+         VALUES ?`,
+        [values]
+      );
+    }
+
+    // 5️⃣ 응답
     res.status(201).json({
       message: "translated",
-      id: insert.insertId
+      id: newId
     });
 
   } catch (e) {
@@ -474,9 +498,6 @@ router.post("/:id/translate", verifyToken, verifyEditor, async (req, res) => {
     res.status(500).json({ message: "server error" });
   }
 });
-
-
-
 
 
 
