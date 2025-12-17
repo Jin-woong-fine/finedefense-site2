@@ -55,28 +55,28 @@ router.post("/", verifyToken, verifyEditor, (req, res) => {
       if (req.files?.length > 0)
         thumbnail = "/uploads/products/" + req.files[0].filename;
 
-      const [[g]] = await db.execute(
-        `SELECT IFNULL(MAX(group_id), 0) + 1 AS gid FROM products`
-      );
-      const group_id = g.gid;
+        const [insert] = await db.execute(
+          `INSERT INTO products
+          (title, summary, category, thumbnail, description_html, sort_order, lang)
+          VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          [
+            title,
+            summary || "",
+            category,
+            thumbnail,
+            description_html || "",
+            sort_order || 999,
+            lang
+          ]
+        );
 
-      const [insert] = await db.execute(
-        `INSERT INTO products
-        (group_id, title, summary, category, thumbnail, description_html, sort_order, lang)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-        [
-          group_id,
-          title,
-          summary || "",
-          category,
-          thumbnail,
-          description_html || "",
-          sort_order || 999,
-          lang
-        ]
-      );
+        const productId = insert.insertId;
 
-      const productId = insert.insertId;
+        await db.execute(
+          `UPDATE products SET group_id = ? WHERE id = ?`,
+          [productId, productId]
+        );
+
 
       if (req.files?.length > 0) {
         const values = req.files.map((f, idx) => [
@@ -134,23 +134,35 @@ router.put("/sort-order", verifyToken, verifyEditor, async (req, res) => {
 /* ==========================================================
    📥 목록 조회 (언어별)
 ========================================================== */
-router.get("/", async (req, res) => {
+router.get("/", verifyToken, verifyEditor, async (req, res) => {
   try {
-    const lang = req.query.lang || "kr";
+    const [rows] = await db.execute(`
+      SELECT
+        p.*,
 
-    const [rows] = await db.execute(
-      `SELECT id, title, summary, category, thumbnail, lang, sort_order, created_at
-       FROM products
-       WHERE lang = ?
-       ORDER BY sort_order ASC, created_at DESC`,
-      [lang]
-    );
+        EXISTS (
+          SELECT 1 FROM products e
+          WHERE e.group_id = p.group_id AND e.lang = 'en'
+        ) AS has_en,
+
+        (
+          SELECT e.id FROM products e
+          WHERE e.group_id = p.group_id AND e.lang = 'en'
+          LIMIT 1
+        ) AS en_id
+
+      FROM products p
+      WHERE p.lang = 'kr'
+      ORDER BY p.sort_order ASC, p.created_at DESC
+    `);
 
     res.json(rows);
   } catch (e) {
+    console.error(e);
     res.status(500).json({ message: "server error" });
   }
 });
+
 
 
 /* ==========================================================

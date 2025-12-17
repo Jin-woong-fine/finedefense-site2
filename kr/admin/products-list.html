@@ -334,7 +334,8 @@ async function addTranslate(id) {
   }
 
   alert("영문 버전이 생성되었습니다.");
-  loadProducts();
+  location.href = `products-edit.html?id=${out.id}&lang=en`;
+
 }
 
 /* ===============================
