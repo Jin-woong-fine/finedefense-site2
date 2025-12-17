@@ -76,7 +76,7 @@ const ADMIN_IPS = [
 
   "1.220.123.2", // 회사 공인 IP
   "125.251.61.201", // 공장 공인 IP
-  "111.111.111.111",  // 개발자 집 IP
+  "119.195.161.193",  // 개발자 집 IP
 ];
 
 function adminIpGuard(req, res, next) {
