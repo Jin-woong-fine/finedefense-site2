@@ -46,7 +46,7 @@ async function loadLoginLogs() {
   const table = document.getElementById("logTable");
 
   try {
-    const res = await fetch("/api/login-logs", {
+    const res = await fetch("/api/logs/login", {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`
       }
