@@ -253,7 +253,7 @@
     ">
       <b>정렬 안내</b><br>
       기본값은 <b>9999</b>이며, 숫자가 작을수록 상단에 노출됩니다.<br>
-      중요 공지사항만 <b>1</b>로 설정하세요.
+      “<b>1~10</b>은 중요 공지로 표시됩니다”.
     </div>
 
 
@@ -261,9 +261,9 @@
       <input type="text" id="searchInput" class="search-input" placeholder="제목 검색" />
 
       <div class="lang-filter">
-        <button class="lang-btn active" data-lang="kr">KR</button>
+        <button class="lang-btn active" data-lang="all">ALL</button>
+        <button class="lang-btn" data-lang="kr">KR</button>
         <button class="lang-btn" data-lang="en">EN</button>
-        <button class="lang-btn" data-lang="all">ALL</button>
       </div>
 
       <button class="btn btn-primary" onclick="goWrite()">공지 작성하기</button>
@@ -282,7 +282,7 @@
         </tr>
       </thead>
       <tbody id="noticeTbody">
-        <tr><td colspan="6">불러오는 중...</td></tr>
+        <tr><td colspan="7">불러오는 중...</td></tr>
       </tbody>
     </table>
 
@@ -306,7 +306,7 @@
   const PAGE_SIZE = 10;
   let allNotices = [];
   let filteredNotices = [];
-  let currentLang = "kr";
+  let currentLang = "all";
   let currentPage = 1;
 
   function goWrite() {
@@ -365,40 +365,43 @@
     const pageItems = filteredNotices.slice(start, start + PAGE_SIZE);
     const total = filteredNotices.length;
 
-    tbody.innerHTML = pageItems.map((n, i) => `
-      <tr class="${n.sort_order <= 10 ? 'pinned' : ''}">
-        <td>${total - (start + i)}</td>
+    tbody.innerHTML = pageItems.map((n, i) => {
+      const lang = (n.lang || "kr").toLowerCase();
 
-        <td>
-          <input
-            type="number"
-            class="order-input"
-            value="${n.sort_order ?? 9999}"
-            data-id="${n.id}"
-            min="1"
-            onchange="autoSaveSortOrder(this)"
-          />
-        </td>
+      return `
+        <tr class="${n.sort_order <= 10 ? 'pinned' : ''}">
+          <td>${total - (start + i)}</td>
 
-        <!-- ✅ 언어 컬럼 -->
-        <td>
-          <span class="lang-badge ${n.lang}">
-            ${n.lang.toUpperCase()}
-          </span>
-        </td>
+          <td>
+            <input
+              type="number"
+              class="order-input"
+              value="${n.sort_order ?? 9999}"
+              data-id="${n.id}"
+              min="1"
+              onchange="autoSaveSortOrder(this)"
+            />
+          </td>
 
-        <td onclick="openPublicView(${n.id})">${n.title}</td>
-        <td>${formatDate(n.created_at)}</td>
-        <td>${n.views ?? "-"}</td>
+          <td>
+            <span class="lang-badge ${lang}">
+              ${lang.toUpperCase()}
+            </span>
+          </td>
 
-        <td>
-          <div class="actions">
-            <button class="btn btn-small btn-gray" onclick="editNotice(${n.id})">수정</button>
-            <button class="btn btn-small btn-danger" onclick="deleteNotice(${n.id})">삭제</button>
-          </div>
-        </td>
-      </tr>
-    `).join("");
+          <td onclick="openPublicView(${n.id})">${n.title}</td>
+          <td>${formatDate(n.created_at)}</td>
+          <td>${n.views ?? "-"}</td>
+
+          <td>
+            <div class="actions">
+              <button class="btn btn-small btn-gray" onclick="editNotice(${n.id})">수정</button>
+              <button class="btn btn-small btn-danger" onclick="deleteNotice(${n.id})">삭제</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join("");
 
   }
 
@@ -478,8 +481,16 @@
     applyFilter();
   }
 
+
+  currentLang = "all";
+
+  // 초기 언어 필터 상태 보정
+  document.querySelectorAll(".lang-btn").forEach(b => b.classList.remove("active"));
+  document.querySelector('.lang-btn[data-lang="all"]').classList.add("active");
+
   /* 초기 실행 */
   loadNotices();
+
 
   /* 사이드바 활성화 */
   loadSidebar("notice");
