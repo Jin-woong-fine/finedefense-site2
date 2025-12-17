@@ -14,56 +14,178 @@
   <script type="module" src="./js/dashboard_session_timer.js"></script>
 
   <style>
-    .panel {
-      background:#fff;
-      padding:25px;
-      border-radius:10px;
-      box-shadow:0 2px 8px rgba(0,0,0,0.06);
-      margin-bottom:35px;
-    }
+  /* ===============================
+    PANEL
+  =============================== */
+  .panel {
+    background: #ffffff;
+    padding: 26px 28px;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(15, 38, 121, 0.08);
+    margin-bottom: 36px;
+  }
 
-    .search-input {
-      width: 240px;
-      padding: 8px 12px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 0.95rem;
-    }
+  /* ===============================
+    SEARCH / FILTER
+  =============================== */
+  .search-input {
+    width: 240px;
+    padding: 9px 12px;
+    border: 1px solid #ccd3f0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
 
-    .lang-filter { display:flex; gap:6px; align-items:center; }
+  .search-input:focus {
+    outline: none;
+    border-color: #0f2679;
+    box-shadow: 0 0 0 2px rgba(15, 38, 121, 0.12);
+  }
 
-    .lang-btn {
-      padding:7px 14px;
-      border-radius:6px;
-      border:1px solid #ccc;
-      background:white;
-      cursor:pointer;
-      font-size:0.85rem;
-    }
-    .lang-btn.active {
-      background:#0f2679; color:white; border-color:#0f2679;
-    }
+  .lang-filter {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
 
-    .notice-table { width:100%; border-collapse:collapse; margin-top:10px; }
-    .notice-table th, .notice-table td {
-      padding:10px 12px; border-bottom:1px solid #ddd; text-align:left;
-    }
-    .notice-table th { background:#0f2679; color:#fff; }
-    .notice-table tr:hover td { background:#f3f6ff; cursor:pointer; }
+  .lang-btn {
+    padding: 7px 14px;
+    border-radius: 6px;
+    border: 1px solid #cfd6ee;
+    background: #ffffff;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: #333;
+    transition: all 0.15s ease;
+  }
 
-    .actions { display:flex; gap:6px; }
+  .lang-btn:hover {
+    background: #f3f6ff;
+  }
 
-    .pagination {
-      display:flex; justify-content:center; gap:4px; margin-top:18px;
-    }
-    .pagination button {
-      min-width:32px; padding:6px 10px; border-radius:4px;
-      border:1px solid #ccc; background:#fff; cursor:pointer;
-    }
-    .pagination button.active {
-      background:#0f2679; color:white; border-color:#0f2679;
-    }
+  .lang-btn.active {
+    background: #0f2679;
+    color: #ffffff;
+    border-color: #0f2679;
+  }
+
+  /* ===============================
+    TABLE
+  =============================== */
+  .notice-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 12px;
+    border-radius: 12px;
+    overflow: hidden;
+    font-size: 0.95rem;
+  }
+
+  .notice-table th,
+  .notice-table td {
+    padding: 11px 14px;
+    border-bottom: 1px solid #e1e6f5;
+    text-align: left;
+  }
+
+  .notice-table th {
+    background: #0f2679;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-bottom: 2px solid #0b1f5a;
+  }
+
+  .notice-table tbody tr:hover td {
+    background: #f0f4ff;
+  }
+
+  /* 번호 / 정렬 중앙 정렬 */
+  .notice-table th:nth-child(1),
+  .notice-table td:nth-child(1),
+  .notice-table th:nth-child(2),
+  .notice-table td:nth-child(2) {
+    text-align: center;
+  }
+
+  /* 제목 강조 */
+  .notice-table td:nth-child(3) {
+    font-weight: 500;
+    color: #111;
+  }
+
+  /* ===============================
+    SORT ORDER INPUT
+  =============================== */
+  .order-input {
+    width: 60px;
+    padding: 5px 6px;
+    border-radius: 6px;
+    border: 1px solid #ccd3f0;
+    font-size: 0.85rem;
+    text-align: center;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .order-input:focus {
+    outline: none;
+    border-color: #0f2679;
+    box-shadow: 0 0 0 2px rgba(15, 38, 121, 0.15);
+  }
+
+  /* ===============================
+    ACTION BUTTONS
+  =============================== */
+  .actions {
+    display: flex;
+    gap: 6px;
+  }
+
+  /* ===============================
+    PINNED (IMPORTANT NOTICE)
+  =============================== */
+  .notice-table tr.pinned td {
+    background: #fff9e6;
+  }
+
+  .notice-table tr.pinned:hover td {
+    background: #fff3cc;
+  }
+
+  /* ===============================
+    PAGINATION
+  =============================== */
+  .pagination {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 20px;
+  }
+
+  .pagination button {
+    min-width: 34px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid #cfd6ee;
+    background: #ffffff;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.15s ease;
+  }
+
+  .pagination button:hover {
+    background: #f3f6ff;
+  }
+
+  .pagination button.active {
+    background: #0f2679;
+    color: #ffffff;
+    border-color: #0f2679;
+  }
   </style>
+
 </head>
 
 
