@@ -198,9 +198,39 @@
 
 </div>
 
-    <!-- 공통 푸터 -->
-    <div data-include="/kr/components/footer.html"></div>
 
+
+<!-- ===============================
+     PDF VIEWER MODAL
+================================ -->
+<div class="modal" id="pdfModal">
+  <div class="modal-content">
+
+    <div class="modal-header">
+      <span id="pdfTitle">PDF 보기</span>
+
+      <div style="display:flex; gap:14px; align-items:center;">
+        <span class="viewer-btn" onclick="zoomOut()">－</span>
+        <span class="viewer-btn" onclick="zoomIn()">＋</span>
+        <span class="viewer-btn" onclick="rotatePdf()">⟳</span>
+        <span class="viewer-btn" onclick="toggleFullScreen()">⛶</span>
+        <span class="modal-close" onclick="closePdf()">×</span>
+      </div>
+    </div>
+
+    <div class="modal-body">
+      <iframe id="pdfFrame" class="pdf-frame"></iframe>
+    </div>
+
+    <div class="modal-footer">
+      <a id="pdfDownload" class="btn-download" download>다운로드</a>
+    </div>
+
+  </div>
+</div>
+
+<!-- 공통 푸터 -->
+<div data-include="/kr/components/footer.html"></div>
 
 
 
@@ -291,24 +321,23 @@ let currentZoom = 1;
 let currentRotate = 0;
 
 function openPdf(id, url, title) {
+  const modal = document.getElementById("pdfModal");
+  const frame = document.getElementById("pdfFrame");
+
+  if (!modal || !frame) {
+    console.error("PDF 모달 DOM 없음");
+    return;
+  }
+
   if (!url) {
     alert("파일이 없습니다.");
     return;
   }
 
-  // ✅ 조회수 증가 — 모달 열릴 때 단 1회
-  fetch(`/api/catalog/view/${id}`, {
-    method: "POST"
-  }).then(res => {
-    if (!res.ok) {
-      console.error("조회수 증가 실패:", id);
-    }
-  }).catch(err => {
-    console.error("조회수 fetch 오류:", err);
-  });
+  // 조회수 증가
+  fetch(`/api/catalog/view/${id}`, { method: "POST" }).catch(() => {});
 
-  // ✅ PDF 표시
-  document.getElementById("pdfFrame").src = url;
+  frame.src = url;
   document.getElementById("pdfTitle").textContent = title;
   document.getElementById("pdfDownload").href = url;
 
@@ -316,8 +345,9 @@ function openPdf(id, url, title) {
   currentRotate = 0;
   applyTransform();
 
-  document.getElementById("pdfModal").style.display = "flex";
+  modal.style.display = "flex";
 }
+
 
 function closePdf() {
   document.getElementById("pdfModal").style.display = "none";
