@@ -14,198 +14,271 @@
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
   <style>
-    /* ============================================================
-      ✅ 제품 수정 페이지 전용 CSS (Toast UI Editor 안전)
-    ============================================================ */
+/* ============================================================
+   🍎 Products Form (Add / Edit) — Unified Apple Style
+   - Toast UI Editor Safe
+   - admin.css 영향 최소화
+============================================================ */
 
-    /* -------------------------------
-      Main Layout
-    -------------------------------- */
-    .main {
-      padding: 40px 24px 60px;
-    }
+/* -------------------------------
+   Base Layout
+-------------------------------- */
+.main {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
+               "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  color: #111;
+  background: linear-gradient(to bottom, #f5f5f7 0%, #f2f2f5 100%);
+  padding: 40px 24px 60px;
+}
 
-    /* -------------------------------
-      Panel (Apple Card Style)
-    -------------------------------- */
-    .main section.panel {
-      background: #ffffff;
-      padding: 40px 44px;
-      border-radius: 20px;
-      margin: 0 auto 44px;
-      max-width: 960px;
-      border: 1px solid #e5e5ea;
-      box-shadow:
-        0 20px 40px rgba(0,0,0,0.08),
-        0 4px 10px rgba(0,0,0,0.05);
-    }
+/* -------------------------------
+   Panel (Apple Card)
+-------------------------------- */
+.main section.panel {
+  background: #ffffff;
+  padding: 40px 44px;
+  border-radius: 20px;
+  margin: 0 auto 44px;
+  max-width: 960px;
+  border: 1px solid #e5e5ea;
+  box-shadow:
+    0 20px 40px rgba(0,0,0,0.08),
+    0 4px 10px rgba(0,0,0,0.05);
+}
 
-    /* -------------------------------
-      Headings
-    -------------------------------- */
-    .main section.panel h2 {
-      margin: 0 0 18px;
-      font-size: 1.4rem;
-      font-weight: 700;
-    }
+/* -------------------------------
+   Headings
+-------------------------------- */
+.main section.panel h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 22px;
+  letter-spacing: -0.025em;
+}
 
-    .main section.panel h3 {
-      margin: 28px 0 12px;
-      font-size: 1.15rem;
-      font-weight: 600;
-    }
+.main section.panel h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 34px 0 14px;
+  letter-spacing: -0.01em;
+}
 
-    /* -------------------------------
-      Inputs / Select / Textarea
-    -------------------------------- */
-    .main section.panel .input,
-    .main section.panel textarea,
-    .main section.panel select,
-    .main section.panel input[type="text"],
-    .main section.panel input[type="number"],
-    .main section.panel input[type="file"] {
-      width: 100%;
-      box-sizing: border-box;
-      margin-bottom: 14px;
-    }
+/* -------------------------------
+   Guide Text
+-------------------------------- */
+.field-guide {
+  font-size: 0.9rem;
+  color: #6e6e73;
+  margin: -6px 0 22px;
+  line-height: 1.6;
+}
 
-    /* Summary textarea */
-    #summary {
-      min-height: 110px;
-      resize: vertical;
-    }
+.editor-guide {
+  background: #f8f9fc;
+  border-left: 4px solid #0f2679;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  color: #333;
+}
 
-    /* -------------------------------
-      Guide Text
-    -------------------------------- */
-    .field-guide {
-      font-size: 0.85rem;
-      color: #6b7280;
-      margin: -6px 0 14px;
-      line-height: 1.45;
-    }
+.editor-guide strong {
+  color: #0f2679;
+}
 
-    .editor-guide {
-      background: #f8f9fc;
-      border-left: 4px solid #0f2679;
-      padding: 14px 16px;
-      margin: 0 0 14px;
-      border-radius: 10px;
-      font-size: 0.9rem;
-      color: #333;
-    }
+/* -------------------------------
+   Input / Select / Textarea
+-------------------------------- */
+.main section.panel .input {
+  width: 100%;
+  height: 52px;
+  padding: 12px 16px;
+  font-size: 1rem;
+  border-radius: 12px;
+  border: 1px solid #d2d2d7;
+  background: #ffffff;
+  box-sizing: border-box;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
 
-    .editor-guide strong {
-      color: #0f2679;
-    }
+.main section.panel textarea.input {
+  min-height: 140px;
+  line-height: 1.65;
+  resize: vertical;
+}
 
-    /* ============================================================
-      🍎 Toast UI Editor — 절대 안전 영역
-      (공식 DOM 구조만 스타일링)
-    ============================================================ */
+.main section.panel .input:focus {
+  outline: none;
+  border-color: #0071e3;
+  box-shadow: 0 0 0 4px rgba(0,113,227,0.18);
+}
 
-    /* Editor wrapper */
-    #editor {
-      min-height: 500px;
-      border-radius: 16px;
-      border: 1px solid #d2d2d7;
-      background: #ffffff;
-      overflow: hidden;
-    }
+/* ============================================================
+   🍎 Toast UI Editor — SAFE ZONE
+   (공식 DOM만 건드림)
+============================================================ */
 
-    /* Default UI */
-    .toastui-editor-defaultUI {
-      border: none;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-    }
+/* Editor wrapper */
+#editor {
+  min-height: 500px;
+  border-radius: 16px;
+  border: 1px solid #d2d2d7;
+  background: #ffffff;
+  overflow: hidden;
+}
 
-    /* Toolbar */
-    .toastui-editor-toolbar {
-      background: #f5f5f7;
-      border-bottom: 1px solid #e5e5ea;
-    }
+/* Default UI */
+.toastui-editor-defaultUI {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border: none;
+}
 
-    /* Main editor area */
-    .toastui-editor-main {
-      flex: 1;
-      min-height: 0;
-      background: #ffffff;
-    }
+/* Toolbar */
+.toastui-editor-toolbar {
+  background: #f5f5f7;
+  border-bottom: 1px solid #e5e5ea;
+}
 
-    /* Contents */
-    .toastui-editor-contents {
-      padding: 24px 28px;
-      font-size: 1.05rem;
-      line-height: 1.8;
-      color: #111;
-    }
+/* Main editor area */
+.toastui-editor-main {
+  flex: 1;
+  min-height: 0;
+  background: #ffffff;
+}
 
-    /* Headings inside editor */
-    .toastui-editor-contents h1 {
-      font-size: 1.7rem;
-      font-weight: 700;
-    }
+/* Contents */
+.toastui-editor-contents {
+  padding: 24px 28px;
+  font-size: 1.08rem;
+  line-height: 1.85;
+  letter-spacing: -0.01em;
+  color: #111111;
+}
 
-    .toastui-editor-contents h2 {
-      font-size: 1.4rem;
-      font-weight: 600;
-    }
+.toastui-editor-contents p {
+  margin: 0 0 1.25em;
+}
 
-    .toastui-editor-contents h3 {
-      font-size: 1.2rem;
-      font-weight: 600;
-    }
+.toastui-editor-contents h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+}
 
-    /* -------------------------------
-      Image Preview
-    -------------------------------- */
-    .thumb-preview {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 12px;
-    }
+.toastui-editor-contents h2 {
+  font-size: 1.45rem;
+  font-weight: 600;
+}
 
-    .thumb-preview .img-item {
-      width: 92px;
-      height: 92px;
-      position: relative;
-    }
+.toastui-editor-contents h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
 
-    .thumb-preview img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 14px;
-      border: 1px solid #e3e3e3;
-      background: #f6f7fb;
-    }
+.toastui-editor-contents pre {
+  background: #f5f5f7;
+  border-radius: 10px;
+  padding: 16px 18px;
+  font-size: 0.92rem;
+  overflow-x: auto;
+}
 
-    .thumb-preview .remove-btn {
-      position: absolute;
-      top: -6px;
-      right: -6px;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: #ff3b30;
-      color: #fff;
-      border: none;
-      font-size: 14px;
-      cursor: pointer;
-    }
+.toastui-editor-contents blockquote {
+  margin: 1.4em 0;
+  padding-left: 16px;
+  border-left: 3px solid #d2d2d7;
+  color: #555;
+}
 
-    /* -------------------------------
-      Divider
-    -------------------------------- */
-    .main section.panel hr {
-      border: none;
-      height: 1px;
-      background: #eee;
-      margin: 24px 0;
-    }
+/* -------------------------------
+   Image Preview
+-------------------------------- */
+.thumb-preview {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.thumb-preview .img-item {
+  width: 92px;
+  height: 92px;
+  position: relative;
+}
+
+.thumb-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 16px;
+  border: 1px solid #e5e5ea;
+  background: #fafafa;
+}
+
+.thumb-preview .remove-btn {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #ff3b30;
+  color: #ffffff;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* -------------------------------
+   Buttons
+-------------------------------- */
+.btn {
+  border-radius: 999px;
+  padding: 11px 24px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: background .15s ease, transform .12s ease;
+}
+
+.btn-primary {
+  background: #0071e3;
+  border: none;
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background: #005bb5;
+}
+
+.btn-primary:active {
+  transform: scale(0.97);
+}
+
+.btn-secondary {
+  background: #f5f5f7;
+  border: 1px solid #d2d2d7;
+  color: #0071e3;
+}
+
+.btn-secondary:hover {
+  background: #e5e5ea;
+}
+
+/* -------------------------------
+   Top Action Row
+-------------------------------- */
+.main > div:first-of-type {
+  max-width: 960px;
+  margin: 0 auto 32px;
+  padding-left: 44px;
+  padding-right: 44px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
 </style>
 
 </head>
@@ -234,9 +307,9 @@
 
   <!-- 버튼 -->
   <div style="margin-bottom:20px;">
-    <button class="btn btn-primary" onclick="location.href='products-list.html'">목록으로</button>
-    <button class="btn btn-primary" onclick="location.href='../index.html'">홈으로</button>
-    <button id="logoutBtn" class="btn btn-danger">로그아웃</button>
+    <button class="btn btn-primary" onclick="location.href='products-list.html'">
+      ← 목록으로
+    </button>
   </div>
 
   <!-- FORM -->
@@ -347,7 +420,6 @@
 (function () {
   requireAdminOrEditor();
   loadSidebar("products");
-  document.getElementById("logoutBtn").addEventListener("click", logout);
 })();
 
 const urlParams = new URLSearchParams(location.search);
