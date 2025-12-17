@@ -134,11 +134,15 @@ const categories = [
   "etc"
 ];
 
-// Load all categories on page load
-categories.forEach(category => loadCategory(category));
+// Load all categories
+document.addEventListener("DOMContentLoaded", () => {
+  categories.forEach(loadCategory);
+});
 
 async function loadCategory(category) {
   const container = document.getElementById(category);
+  if (!container) return;
+
   const section = container.closest(".catalog-section");
 
   try {
@@ -147,37 +151,60 @@ async function loadCategory(category) {
 
     const data = await res.json();
 
-    // Hide section if no data
-    if (!data || data.length === 0) {
+    if (!Array.isArray(data) || data.length === 0) {
       section.style.display = "none";
       return;
     }
 
-    container.innerHTML = data.map(i => `
-      <div class="card" onclick="openPdf('${i.file_url}', '${escapeHtml(i.title)}')">
-        <img 
-          src="${i.thumb_url || '/img/common/pdf-placeholder.png'}"
+    container.innerHTML = "";
+
+    data.forEach(item => {
+      const card = document.createElement("div");
+      card.className = "card";
+
+      card.addEventListener("click", () => {
+        openPdf(item.id, item.file_url, item.title);
+      });
+
+      card.innerHTML = `
+        <img
+          src="${item.thumb_url || "/img/common/pdf-placeholder.png"}"
           class="thumb"
           onerror="this.src='/img/common/pdf-placeholder.png'"
         >
-        <div class="title">${escapeHtml(i.title)}</div>
+        <div class="title">${escapeHtml(item.title)}</div>
+      `;
 
-        ${i.file_url
-          ? `<a class="btn-download"
-               href="${i.file_url}"
-               download
-               onclick="event.stopPropagation()">Download</a>`
-          : `<span style="color:#777;">No File</span>`}
-      </div>
-    `).join("");
+      if (item.file_url) {
+        const btn = document.createElement("a");
+        btn.className = "btn-download";
+        btn.textContent = "Download";
+        btn.href = item.file_url;
+        btn.download = "";
+
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          increaseDownload(item.id);
+        });
+
+        card.appendChild(btn);
+      } else {
+        const span = document.createElement("span");
+        span.style.color = "#777";
+        span.textContent = "No File";
+        card.appendChild(span);
+      }
+
+      container.appendChild(card);
+    });
 
   } catch (err) {
-    console.error(err);
-    section.style.display = "none"; // Hide section on error
+    console.error("[catalog-en]", err);
+    section.style.display = "none";
   }
 }
 
-// Escape HTML to prevent XSS (admin input safety)
+// XSS safe
 function escapeHtml(text = "") {
   return text.replace(/[&<>"']/g, m => ({
     "&": "&amp;",
@@ -189,27 +216,20 @@ function escapeHtml(text = "") {
 }
 </script>
 
-
 <!-- ===============================
-     PDF VIEWER MODAL (업그레이드 완전체)
+     PDF VIEWER MODAL
 ================================= -->
 <div class="modal" id="pdfModal">
   <div class="modal-content">
 
     <div class="modal-header">
-      <span id="pdfTitle">PDF 보기</span>
+      <span id="pdfTitle">PDF Viewer</span>
 
       <div style="display:flex; gap:14px; align-items:center;">
-
-        <!-- 확대/축소/회전 -->
-        <span class="viewer-btn" onclick="zoomOut()" title="축소">－</span>
-        <span class="viewer-btn" onclick="zoomIn()" title="확대">＋</span>
-        <span class="viewer-btn" onclick="rotatePdf()" title="회전">⟳</span>
-
-        <!-- 전체화면 -->
-        <span class="viewer-btn" onclick="toggleFullScreen()" title="전체화면">⛶</span>
-
-        <!-- 닫기 -->
+        <span class="viewer-btn" onclick="zoomOut()" title="Zoom Out">－</span>
+        <span class="viewer-btn" onclick="zoomIn()" title="Zoom In">＋</span>
+        <span class="viewer-btn" onclick="rotatePdf()" title="Rotate">⟳</span>
+        <span class="viewer-btn" onclick="toggleFullScreen()" title="Fullscreen">⛶</span>
         <span class="modal-close" onclick="closePdf()">×</span>
       </div>
     </div>
@@ -219,26 +239,29 @@ function escapeHtml(text = "") {
     </div>
 
     <div class="modal-footer">
-      <a id="pdfDownload" class="btn-download" download>다운로드</a>
+      <a id="pdfDownload" class="btn-download" download>Download</a>
     </div>
 
   </div>
 </div>
 
-
 <script>
-
 let currentZoom = 1;
 let currentRotate = 0;
 
-function openPdf(url, title){
-  if(!url){ alert("파일이 없습니다."); return; }
+function openPdf(id, url, title) {
+  if (!url) {
+    alert("File not available.");
+    return;
+  }
+
+  // 🔥 increase view count
+  fetch(`/api/catalog/view/${id}`, { method: "POST" }).catch(() => {});
 
   document.getElementById("pdfFrame").src = url;
   document.getElementById("pdfTitle").textContent = title;
   document.getElementById("pdfDownload").href = url;
 
-  // 초기화
   currentZoom = 1;
   currentRotate = 0;
   applyTransform();
@@ -246,63 +269,36 @@ function openPdf(url, title){
   document.getElementById("pdfModal").style.display = "flex";
 }
 
-function closePdf(){
+function closePdf() {
   document.getElementById("pdfModal").style.display = "none";
-  document.getElementById("pdfFrame").src = ""; // 메모리 정리
+  document.getElementById("pdfFrame").src = "";
 }
 
-/* =============================
-      확대 / 축소
-============================= */
-function zoomIn(){
-  currentZoom += 0.1;
-  applyTransform();
-}
-function zoomOut(){
-  if(currentZoom > 0.3){
-    currentZoom -= 0.1;
-    applyTransform();
-  }
+function increaseDownload(id) {
+  fetch(`/api/catalog/download/${id}`, { method: "POST" }).catch(() => {});
 }
 
-/* =============================
-      회전
-============================= */
-function rotatePdf(){
-  currentRotate = (currentRotate + 90) % 360;
-  applyTransform();
-}
+/* Zoom / Rotate */
+function zoomIn() { currentZoom += 0.1; applyTransform(); }
+function zoomOut() { if (currentZoom > 0.3) { currentZoom -= 0.1; applyTransform(); } }
+function rotatePdf() { currentRotate = (currentRotate + 90) % 360; applyTransform(); }
 
-function applyTransform(){
+function applyTransform() {
   const frame = document.getElementById("pdfFrame");
-
-  // iframe 내부 PDF는 transform 적용이 안되므로 전체 iframe을 scale+rotate 처리
   frame.style.transform = `scale(${currentZoom}) rotate(${currentRotate}deg)`;
   frame.style.transformOrigin = "center center";
 }
 
-/* =============================
-      전체화면
-============================= */
+/* Fullscreen */
 function toggleFullScreen() {
   const frame = document.getElementById("pdfFrame");
-
   if (!document.fullscreenElement) {
-    frame.requestFullscreen().catch(err => {
-      console.error("전체화면 실패:", err);
-    });
+    frame.requestFullscreen().catch(() => {});
   } else {
     document.exitFullscreen();
   }
 }
-
-document.addEventListener("fullscreenchange", () => {
-  // 전체화면 종료 시 필요한 조치를 넣을 수 있음 (옵션)
-});
-
 </script>
-
-
 
 
     <!-- 공통 스크립트 -->
