@@ -100,19 +100,39 @@
 <script>
 /* =========================================================
    🔵 MONTHLY TRAFFIC SCRIPT (INLINE)
+   - server response: { year, month, visits }
+   - server order: DESC
 ========================================================= */
 
 let chart;
 
 async function loadMonthlyTraffic() {
-  const res = await fetch("/api/traffic/monthly");
-  const data = await res.json();
+  try {
+    const res = await fetch("/api/traffic/monthly");
+    const data = await res.json();
 
-  const labels = data.map(d => d.month);
-  const values = data.map(d => d.count);
+    if (!Array.isArray(data)) {
+      console.error("Monthly traffic API invalid response:", data);
+      return;
+    }
 
-  updateKPI(values);
-  renderChart(labels, values);
+    // 🔥 서버: 최신 → 과거 (DESC)
+    // → 프론트: 과거 → 최신 (ASC)
+    const sorted = [...data].reverse();
+
+    // 라벨: YYYY-MM
+    const labels = sorted.map(d =>
+      `${d.year}-${String(d.month).padStart(2, "0")}`
+    );
+
+    const values = sorted.map(d => d.visits);
+
+    updateKPI(values);
+    renderChart(labels, values);
+
+  } catch (err) {
+    console.error("Failed to load monthly traffic:", err);
+  }
 }
 
 function updateKPI(values) {
@@ -120,12 +140,17 @@ function updateKPI(values) {
   const prev = values.at(-2) || 0;
 
   document.getElementById("kpiCurrent").textContent = current;
-  document.getElementById("kpiTotal").textContent =
-    values.reduce((a,b)=>a+b,0);
-  document.getElementById("kpiAvg").textContent =
-    Math.round(values.reduce((a,b)=>a+b,0) / values.length);
 
-  const delta = prev ? (((current - prev) / prev) * 100).toFixed(1) : 0;
+  const total = values.reduce((a, b) => a + b, 0);
+  document.getElementById("kpiTotal").textContent = total;
+
+  const avg = values.length ? Math.round(total / values.length) : 0;
+  document.getElementById("kpiAvg").textContent = avg;
+
+  const delta = prev
+    ? (((current - prev) / prev) * 100).toFixed(1)
+    : 0;
+
   document.getElementById("kpiDelta").textContent =
     (delta >= 0 ? "+" : "") + delta + "%";
 }
@@ -164,6 +189,7 @@ function renderChart(labels, values) {
 loadSidebar("traffic_monthly");
 loadMonthlyTraffic();
 </script>
+
 
 </body>
 </html>

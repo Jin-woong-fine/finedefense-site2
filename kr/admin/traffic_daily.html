@@ -121,6 +121,9 @@
 <script>
 /* =========================================================
    🔥 DAILY TRAFFIC SCRIPT (INLINE)
+   - server response: { day, visits }
+   - server order: DESC
+   - server limit: 30
 ========================================================= */
 
 let chart;
@@ -137,14 +140,31 @@ document.querySelectorAll(".range-btn").forEach(btn => {
 });
 
 async function loadTraffic() {
-  const res = await fetch(`/api/traffic/daily?days=${currentDays}`);
-  const data = await res.json();
+  try {
+    const res = await fetch(`/api/traffic/daily?days=${currentDays}`);
+    const data = await res.json();
 
-  const labels = data.map(d => d.date);
-  const values = data.map(d => d.count);
+    if (!Array.isArray(data)) {
+      console.error("Traffic API invalid response:", data);
+      return;
+    }
 
-  updateKPI(values);
-  renderChart(labels, values);
+    // 🔥 서버: 최신 → 과거 (DESC)
+    // → 프론트: 과거 → 최신 (ASC)
+    const sorted = [...data].reverse();
+
+    // 🔥 서버 LIMIT 30 대응 (프론트에서 기간 컷)
+    const sliced = sorted.slice(-currentDays);
+
+    const labels = sliced.map(d => d.day);
+    const values = sliced.map(d => d.visits);
+
+    updateKPI(values);
+    renderChart(labels, values);
+
+  } catch (err) {
+    console.error("Failed to load traffic:", err);
+  }
 }
 
 function updateKPI(values) {
@@ -152,12 +172,24 @@ function updateKPI(values) {
   const yesterday = values.at(-2) || 0;
 
   document.getElementById("kpiToday").textContent = today;
-  document.getElementById("kpiAvg7").textContent =
-    Math.round(values.slice(-7).reduce((a,b)=>a+b,0) / Math.min(7, values.length));
-  document.getElementById("kpiSum30").textContent =
-    values.slice(-30).reduce((a,b)=>a+b,0);
 
-  const delta = yesterday ? (((today - yesterday) / yesterday) * 100).toFixed(1) : 0;
+  const avg7 =
+    values.length
+      ? Math.round(
+          values.slice(-7).reduce((a, b) => a + b, 0) /
+          Math.min(7, values.length)
+        )
+      : 0;
+
+  document.getElementById("kpiAvg7").textContent = avg7;
+
+  document.getElementById("kpiSum30").textContent =
+    values.slice(-30).reduce((a, b) => a + b, 0);
+
+  const delta = yesterday
+    ? (((today - yesterday) / yesterday) * 100).toFixed(1)
+    : 0;
+
   document.getElementById("kpiDelta").textContent =
     (delta >= 0 ? "+" : "") + delta + "%";
 }
@@ -198,6 +230,7 @@ function renderChart(labels, values) {
 loadSidebar("traffic_daily");
 loadTraffic();
 </script>
+
 
 </body>
 </html>

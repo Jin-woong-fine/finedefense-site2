@@ -91,33 +91,56 @@
 
 <script>
 /* =====================================================
+   🔗 REFERRER TRAFFIC SCRIPT (INLINE)
+   - server route: /api/traffic/referrer
+   - server response: { referrer, cnt }
+===================================================== */
+
+let referrerChart;
+
+/* =====================================================
    🔹 유입경로 데이터 로드
 ===================================================== */
 async function loadReferrers() {
-  const res = await fetch("/api/traffic/referrer?limit=10", {
-    headers: { Authorization: "Bearer " + localStorage.getItem("token") }
-  });
+  try {
+    const res = await fetch("/api/traffic/referrer");
+    const data = await res.json();
 
-  const data = await res.json();
+    if (!Array.isArray(data)) {
+      console.error("Referrer API invalid response:", data);
+      return;
+    }
 
-  const labels = data.map(d => d.referrer || "Direct");
-  const counts = data.map(d => d.count);
+    const labels = data.map(d => d.referrer || "Direct / Unknown");
+    const counts = data.map(d => d.cnt);
 
-  renderChart(labels, counts);
-  renderList(data);
+    renderChart(labels, counts);
+    renderList(data);
+
+  } catch (err) {
+    console.error("Failed to load referrer data:", err);
+  }
 }
 
 /* =====================================================
    📊 차트
 ===================================================== */
 function renderChart(labels, counts) {
-  new Chart(document.getElementById("referrerChart"), {
+  const ctx = document.getElementById("referrerChart");
+
+  if (referrerChart) referrerChart.destroy();
+
+  referrerChart = new Chart(ctx, {
     type: "bar",
     data: {
       labels,
       datasets: [{
+        label: "유입 수",
         data: counts,
-        borderWidth: 1
+        backgroundColor: "rgba(15,38,121,0.25)",
+        borderColor: "#0f2679",
+        borderWidth: 1,
+        borderRadius: 6
       }]
     },
     options: {
@@ -144,7 +167,7 @@ function renderList(data) {
     li.className = "ref-item";
     li.innerHTML = `
       <span>${d.referrer || "Direct / Unknown"}</span>
-      <span class="ref-count">${d.count}</span>
+      <span class="ref-count">${d.cnt}</span>
     `;
     ul.appendChild(li);
   });
@@ -156,6 +179,7 @@ function renderList(data) {
 loadSidebar("traffic_referrer");
 loadReferrers();
 </script>
+
 
 </body>
 </html>

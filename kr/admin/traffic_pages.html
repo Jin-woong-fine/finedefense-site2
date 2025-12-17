@@ -97,33 +97,53 @@
 
 <script>
 /* =====================================================
-   🔹 페이지 조회 데이터 로드
+   🔹 PAGE VIEW TRAFFIC SCRIPT (INLINE)
+   - server route: /api/traffic/page-view
+   - server response: { page, views }
 ===================================================== */
+
+let pageChart;
+
 async function loadPages() {
-  const res = await fetch("/api/traffic/pages?limit=10", {
-    headers: { Authorization: "Bearer " + localStorage.getItem("token") }
-  });
+  try {
+    const res = await fetch("/api/traffic/page-view");
+    const data = await res.json();
 
-  const data = await res.json();
+    if (!Array.isArray(data)) {
+      console.error("Page-view API invalid response:", data);
+      return;
+    }
 
-  const labels = data.map(d => shorten(d.page));
-  const counts = data.map(d => d.count);
+    const labels = data.map(d => shorten(d.page));
+    const counts = data.map(d => d.views);
 
-  renderChart(labels, counts);
-  renderList(data);
+    renderChart(labels, counts);
+    renderList(data);
+
+  } catch (err) {
+    console.error("Failed to load page-view data:", err);
+  }
 }
 
 /* =====================================================
    📊 차트
 ===================================================== */
 function renderChart(labels, counts) {
-  new Chart(document.getElementById("pageChart"), {
+  const ctx = document.getElementById("pageChart");
+
+  if (pageChart) pageChart.destroy();
+
+  pageChart = new Chart(ctx, {
     type: "bar",
     data: {
       labels,
       datasets: [{
+        label: "페이지 조회수",
         data: counts,
-        borderWidth: 1
+        backgroundColor: "rgba(15,38,121,0.25)",
+        borderColor: "#0f2679",
+        borderWidth: 1,
+        borderRadius: 6
       }]
     },
     options: {
@@ -155,9 +175,9 @@ function renderList(data) {
     li.className = "page-item";
     li.innerHTML = `
       <span class="page-path" title="${d.page}">
-        ${d.page}
+        ${d.page || "-"}
       </span>
-      <span class="page-count">${d.count}</span>
+      <span class="page-count">${d.views}</span>
     `;
     ul.appendChild(li);
   });
@@ -168,7 +188,7 @@ function renderList(data) {
 ===================================================== */
 function shorten(path) {
   if (!path) return "-";
-  return path.length > 24 ? path.slice(0, 22) + "…" : path;
+  return path.length > 26 ? path.slice(0, 24) + "…" : path;
 }
 
 /* =====================================================
@@ -177,6 +197,7 @@ function shorten(path) {
 loadSidebar("traffic_pages");
 loadPages();
 </script>
+
 
 </body>
 </html>

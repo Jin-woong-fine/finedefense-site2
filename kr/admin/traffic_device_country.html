@@ -112,37 +112,62 @@
 
 <script>
 /* =====================================================
+   🌍 + 📱 COUNTRY / DEVICE TRAFFIC SCRIPT (INLINE)
+   - server routes:
+     GET /api/traffic/country   -> { country, cnt }
+     GET /api/traffic/device    -> { device_type, cnt }
+===================================================== */
+
+let countryChart;
+let deviceChart;
+
+/* =====================================================
    🔹 데이터 로드
 ===================================================== */
 async function loadTrafficData() {
-  const headers = {
-    Authorization: "Bearer " + localStorage.getItem("token")
-  };
+  try {
+    const [countryRes, deviceRes] = await Promise.all([
+      fetch("/api/traffic/country"),
+      fetch("/api/traffic/device")
+    ]);
 
-  const [countryRes, deviceRes] = await Promise.all([
-    fetch("/api/traffic/country", { headers }),
-    fetch("/api/traffic/device", { headers })
-  ]);
+    const countryData = await countryRes.json();
+    const deviceData = await deviceRes.json();
 
-  const countryData = await countryRes.json();
-  const deviceData = await deviceRes.json();
+    if (Array.isArray(countryData)) renderCountry(countryData);
+    if (Array.isArray(deviceData)) renderDevice(deviceData);
 
-  renderCountry(countryData);
-  renderDevice(deviceData);
+  } catch (err) {
+    console.error("Failed to load country/device traffic:", err);
+  }
 }
 
 /* =====================================================
    🌍 국가
 ===================================================== */
 function renderCountry(data) {
-  const labels = data.map(d => d.country || "Unknown");
-  const counts = data.map(d => d.count);
+  const labels = data.map(d => d.country || "UNKNOWN");
+  const counts = data.map(d => d.cnt);
 
-  new Chart(document.getElementById("countryChart"), {
+  const ctx = document.getElementById("countryChart");
+
+  if (countryChart) countryChart.destroy();
+
+  countryChart = new Chart(ctx, {
     type: "doughnut",
     data: {
       labels,
-      datasets: [{ data: counts }]
+      datasets: [{
+        data: counts,
+        backgroundColor: [
+          "#0f2679",
+          "#3b82f6",
+          "#60a5fa",
+          "#93c5fd",
+          "#c7d2fe",
+          "#e0e7ff"
+        ]
+      }]
     },
     options: {
       plugins: {
@@ -153,12 +178,13 @@ function renderCountry(data) {
 
   const ul = document.getElementById("countryList");
   ul.innerHTML = "";
+
   data.forEach(d => {
     const li = document.createElement("li");
     li.className = "rank-item";
     li.innerHTML = `
-      <span>${d.country || "Unknown"}</span>
-      <span>${d.count}</span>
+      <span>${d.country || "UNKNOWN"}</span>
+      <span>${d.cnt}</span>
     `;
     ul.appendChild(li);
   });
@@ -169,13 +195,24 @@ function renderCountry(data) {
 ===================================================== */
 function renderDevice(data) {
   const labels = data.map(d => d.device_type.toUpperCase());
-  const counts = data.map(d => d.count);
+  const counts = data.map(d => d.cnt);
 
-  new Chart(document.getElementById("deviceChart"), {
+  const ctx = document.getElementById("deviceChart");
+
+  if (deviceChart) deviceChart.destroy();
+
+  deviceChart = new Chart(ctx, {
     type: "pie",
     data: {
       labels,
-      datasets: [{ data: counts }]
+      datasets: [{
+        data: counts,
+        backgroundColor: [
+          "#0f2679",
+          "#2563eb",
+          "#60a5fa"
+        ]
+      }]
     },
     options: {
       plugins: {
@@ -186,12 +223,13 @@ function renderDevice(data) {
 
   const ul = document.getElementById("deviceList");
   ul.innerHTML = "";
+
   data.forEach(d => {
     const li = document.createElement("li");
     li.className = "rank-item";
     li.innerHTML = `
       <span>${d.device_type.toUpperCase()}</span>
-      <span>${d.count}</span>
+      <span>${d.cnt}</span>
     `;
     ul.appendChild(li);
   });
@@ -203,6 +241,7 @@ function renderDevice(data) {
 loadSidebar("traffic_device_country");
 loadTrafficData();
 </script>
+
 
 </body>
 </html>
