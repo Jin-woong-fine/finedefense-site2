@@ -1,6 +1,26 @@
 // kr/admin/js/dashboard_core.js
 
-console.log("%c[dashboard_core] 로드 완료", "color:#4caf50;font-weight:bold;");
+//console.log("%c[dashboard_core] 로드 완료", "color:#4caf50;font-weight:bold;");
+
+// ===============================
+// 🎨 Dashboard Chart Color Palette
+// ===============================
+const CHART_COLORS = {
+  navy: "#0f2679",
+  green: "#2e7d32",
+  amber: "#f9a825",
+  purple: "#6a5acd",
+  red: "#c62828",
+  gray: "#9ca3af"
+};
+
+const CHART_BG = [
+  CHART_COLORS.navy,
+  CHART_COLORS.green,
+  CHART_COLORS.purple,
+  CHART_COLORS.amber,
+  CHART_COLORS.red
+];
 
 /* -----------------------------------------------------
    공통 GET 요청
@@ -61,19 +81,24 @@ async function loadDailyChart() {
       type: "line",
       data: {
         labels,
-        datasets: [
-          {
-            label: "일별 방문자",
-            data: values,
-            borderColor: "#0f2679",
-            tension: 0.3,
-            borderWidth: 2,
-            pointRadius: 2,
-          },
-        ],
+        datasets: [{
+          label: "일별 방문자",
+          data: values,
+          borderColor: CHART_COLORS.navy,
+          backgroundColor: "rgba(15,38,121,0.12)",
+          fill: true,
+          tension: 0.35,
+          pointRadius: 3,
+          pointBackgroundColor: CHART_COLORS.navy
+        }]
       },
-      options: { responsive: true, scales: { y: { beginAtZero: true } } },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
+      }
     });
+
   } catch (err) {
     console.error("loadDailyChart Error:", err);
   }
@@ -94,15 +119,26 @@ async function loadDeviceChart() {
       type: "doughnut",
       data: {
         labels,
-        datasets: [
-          {
-            data: values,
-            backgroundColor: ["#0f2679", "#4a6bb0", "#93a9d1"],
-          },
-        ],
+        datasets: [{
+          data: values,
+          backgroundColor: CHART_BG,
+          borderWidth: 0
+        }]
       },
-      options: { responsive: true },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: {
+              boxWidth: 14,
+              color: "#374151"
+            }
+          }
+        }
+      }
     });
+
   } catch (err) {
     console.error("loadDeviceChart Error:", err);
   }
@@ -123,16 +159,23 @@ async function loadCountryChart() {
       type: "bar",
       data: {
         labels,
-        datasets: [
-          {
-            label: "국가별 트래픽",
-            data: values,
-            backgroundColor: "#0f2679",
-          },
-        ],
+        datasets: [{
+          label: "국가별 트래픽",
+          data: values,
+          backgroundColor: CHART_COLORS.navy,
+          borderRadius: 6
+        }]
       },
-      options: { responsive: true, scales: { y: { beginAtZero: true } } },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false } },
+          y: { beginAtZero: true, grid: { color: "#e5e7eb" } }
+        }
+      }
     });
+
   } catch (err) {
     console.error("loadCountryChart Error:", err);
   }
