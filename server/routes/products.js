@@ -266,7 +266,16 @@ router.put("/:id", verifyToken, verifyEditor, (req, res) => {
       }
 
       // ✅ old_images 파싱 (유지할 이미지 목록)
-      const oldList = JSON.parse(old_images || "[]");
+      let oldList = [];
+      try {
+        oldList = old_images
+          ? JSON.parse(old_images)
+          : [];
+      } catch (e) {
+        console.error("old_images parse error:", old_images);
+        oldList = [];
+      }
+
 
       // ✅ DB 이미지 목록
       const [dbImages] = await db.execute(
@@ -301,17 +310,25 @@ router.put("/:id", verifyToken, verifyEditor, (req, res) => {
 
       /* 2) 삭제된 이미지 DB 제거 + 파일 삭제 */
       if (removed.length > 0) {
+        const urls = removed.map(f => "/uploads/products/" + f);
+        const placeholders = urls.map(() => "?").join(",");
+
+        // 1️⃣ DB에서 삭제
         await db.query(
           `DELETE FROM product_images
-           WHERE product_id = ? AND url IN (?)`,
-          [id, removed.map(f => "/uploads/products/" + f)]
+          WHERE product_id = ? AND url IN (${placeholders})`,
+          [id, ...urls]
         );
 
+        // 2️⃣ 실제 파일 삭제
         removed.forEach(name => {
           const filePath = path.join(uploadDir, name);
-          if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+          if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+          }
         });
       }
+
 
       /* 3) 신규 업로드 이미지 기록 */
       if (req.files?.length > 0) {
@@ -350,8 +367,8 @@ router.put("/:id", verifyToken, verifyEditor, (req, res) => {
       }
 
       await db.execute(
-        `UPDATE products SET thumbnail = ? WHERE id = ?`,
-        [newThumbnail, id]
+        `UPDATE products SET thumbnail = ? WHERE id = ? AND lang = ?`,
+        [newThumbnail, id, lang]
       );
 
       // ✅ 응답은 단 한번, 맨 마지막
