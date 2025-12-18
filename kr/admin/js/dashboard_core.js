@@ -86,8 +86,13 @@ async function loadDailyChart() {
     const res = await apiGet("/api/traffic/daily");
     const data = await res.json();
 
-    const labels = data.map((d) => d.day).reverse();
-    const values = data.map((d) => d.visits).reverse();
+    const labels = data
+      .map((d) => d.day.slice(0, 10))
+      .reverse();
+
+    const values = data
+      .map((d) => d.uv)
+      .reverse();
 
     new Chart(document.getElementById("dailyChart"), {
       type: "line",
