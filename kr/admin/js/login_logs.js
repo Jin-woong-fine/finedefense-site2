@@ -18,7 +18,39 @@ function formatKST(dateString) {
 }
 
 // ===============================
-// 로그인 로그 로드
+// 국가 코드 → 플래그
+// ===============================
+function countryFlag(code) {
+  if (!code || code === "UNK") {
+    return "🏳️";
+  }
+
+  if (code === "LOCAL") code = "KR";
+
+  const cc = code.toLowerCase();
+
+  return `
+    <img
+      class="flag-img"
+      src="https://flagcdn.com/w20/${cc}.png"
+      alt="${code}"
+    />
+  `;
+}
+
+// ===============================
+// UA 간단화
+// ===============================
+function shortUA(ua = "") {
+  if (ua.includes("Chrome")) return "Chrome";
+  if (ua.includes("Firefox")) return "Firefox";
+  if (ua.includes("Safari") && !ua.includes("Chrome")) return "Safari";
+  if (ua.includes("Edg")) return "Edge";
+  return "Other";
+}
+
+// ===============================
+// 로그인 로그 로드 (확장판)
 // ===============================
 async function loadLoginLogs() {
   const search = document.getElementById("searchInput").value.trim();
@@ -42,7 +74,7 @@ async function loadLoginLogs() {
     if (filtered.length === 0) {
       table.innerHTML = `
         <tr>
-          <td colspan="7" style="text-align:center; padding:20px;">
+          <td colspan="9" style="text-align:center; padding:20px;">
             로그인 기록이 없습니다.
           </td>
         </tr>
@@ -51,18 +83,29 @@ async function loadLoginLogs() {
     }
 
     table.innerHTML = filtered.map(l => `
-      <tr>
+      <tr class="${
+        l.country_code && l.country_code !== "KR" && l.country_code !== "LOCAL"
+          ? "foreign-login"
+          : ""
+      }">
         <td>${l.id}</td>
-        <td>${l.user_id || "-"}</td>
         <td>${l.username || "-"}</td>
-        <td>${l.ip || "-"}</td>
-        <td title="${l.ua || ""}">
-          ${(l.ua || "").slice(0, 40)}
+        <td class="${l.is_admin ? "role-admin" : ""}">
+          ${l.is_admin ? "ADMIN" : "USER"}
         </td>
+        <td>${l.ip || "-"}</td>
         <td>
-          <span class="${l.status === "success" ? "status-success" : "status-fail"}">
-            ${l.status}
-          </span>
+          <span class="flag">${countryFlag(l.country_code)}</span>
+          ${l.country_code || "-"}
+        </td>
+        <td title="${l.ua || ""}">
+          ${shortUA(l.ua)}
+        </td>
+        <td class="status-${l.status}">
+          ${l.status.toUpperCase()}
+        </td>
+        <td class="fail-reason">
+          ${l.fail_reason || "-"}
         </td>
         <td>${formatKST(l.created_at)}</td>
       </tr>
@@ -72,7 +115,7 @@ async function loadLoginLogs() {
     console.error(err);
     table.innerHTML = `
       <tr>
-        <td colspan="7" style="text-align:center; color:red;">
+        <td colspan="9" style="text-align:center; color:red;">
           로그를 불러오지 못했습니다.
         </td>
       </tr>

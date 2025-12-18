@@ -1,3 +1,4 @@
+<!-- /en/sub/products/product-view -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -315,11 +316,18 @@ async function loadProductDetail() {
   if (!productId) return;
 
   try {
-    const res = await fetch(`/api/products/${productId}`);
-    if (!res.ok) throw new Error("서버 오류");
+    const res = await fetch(`/api/products/${productId}?lang=en`);
 
-    const data = await res.json();   // { product, images }
+    // 🔥 여기
+    if (!res.ok) {
+      alert("English version is not available yet.");
+      location.href = "/en/sub/pr/sub-towed.html";
+      return;
+    }
+
+    const data = await res.json();
     renderProduct(data);
+
   } catch (err) {
     console.error("loadProductDetail Error:", err);
   }
@@ -498,17 +506,17 @@ function goProductList() {
   const category = params.get("category");
 
   const map = {
-    towed: "/en/sub/pr/sub-towed.html",
-    fixed: "/en/sub/pr/sub-fixed.html",
-    connector: "/en/sub/pr/sub-connector.html",
-    custom: "/en/sub/pr/sub-custom.html",
+    towed: "/en/sub/products/sub-towed.html",
+    fixed: "/en/sub/products/sub-fixed.html",
+    connector: "/en/sub/products/sub-connector.html",
+    custom: "/en/sub/products/sub-custom.html",
   };
 
   if (category && map[category]) {
     location.href = map[category];
   } else {
     // 카테고리 정보 없으면 기본 페이지 (원하는 걸로)
-    location.href = "/en/sub/pr/sub-towed.html";
+    location.href = "/en/sub/products/sub-towed.html";
   }
 }
 

@@ -89,6 +89,12 @@
     border-color: #0f2679;
   }
 
+
+
+  .en-missing {
+    color: #ff3b30;
+    font-size: 0.85rem;
+  }
   </style>
 </head>
 
@@ -117,7 +123,9 @@
 
   <!-- 🔵 페이지 액션 -->
   <div style="margin-bottom:20px;">
-    <button class="btn btn-primary" onclick="location.href='products-add.html'">+ 신규등록</button>
+    <button class="btn btn-primary" onclick="location.href='products-add.html'">
+      + 신규등록 (KR)
+    </button>
   </div>
 
   <!-- 🔵 목록 패널 -->
@@ -125,12 +133,6 @@
 
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
       <h2>등록된 제품</h2>
-
-      <div class="lang-filter">
-        <button class="lang-btn active" data-lang="all">ALL</button>
-        <button class="lang-btn" data-lang="kr">KR</button>
-        <button class="lang-btn" data-lang="en">EN</button>
-      </div>
     </div>
 
     <table class="product-table">
@@ -138,7 +140,7 @@
         <tr>
           <th style="width:60px;">번호</th>
           <th style="width:70px;">순번</th>
-          <th style="width:70px;">언어</th>
+          <th style="width:90px;">언어 버전</th>
           <th style="width:120px;">카테고리</th>
           <th style="width:100px;">이미지</th>
           <th>제품명</th>
@@ -159,16 +161,15 @@
 <script src="/kr/admin/js/sidebar.js"></script>
 
 <script>
-
-
-  /* 카테고리 표시용 한글 매핑 */
-  const categoryMap = {
-    towed: "수중이동형",
-    fixed: "수중고정형",
-    connector: "수중 커넥터",
-    custom: "커스텀"
-  };
-
+/* ===============================
+   카테고리 표시용 한글 매핑
+================================ */
+const categoryMap = {
+  towed: "수중이동형",
+  fixed: "수중고정형",
+  connector: "수중 커넥터",
+  custom: "커스텀"
+};
 
 /* 🔐 권한 / 사이드바 */
 requireAdminOrEditor();
@@ -176,42 +177,26 @@ loadSidebar("products");
 
 /* 전역 */
 let allProducts = [];
-let currentLang = "all";
 
-/* 언어 필터 */
-document.querySelectorAll(".lang-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".lang-btn").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    currentLang = btn.dataset.lang;
-    loadProducts();
-  });
-});
-
-/* 데이터 로드 */
+/* ===============================
+   데이터 로드 (관리자 전용)
+================================ */
 async function loadProducts() {
   try {
-    if (currentLang === "all") {
-      const [krRes, enRes] = await Promise.all([
-        fetch("/api/products?lang=kr"),
-        fetch("/api/products?lang=en")
-      ]);
-      const kr = await krRes.json();
-      const en = await enRes.json();
-      allProducts = [...kr, ...en];
-    } else {
-      const res = await fetch(`/api/products?lang=${currentLang}`);
-      allProducts = await res.json();
-    }
+    const res = await fetch("/api/products?lang=kr", {
+      headers: authHeaders()
+    });
 
+    allProducts = await res.json();
     renderTable();
-
   } catch (e) {
     console.error(e);
   }
 }
 
-/* 테이블 렌더 */
+/* ===============================
+   테이블 렌더
+================================ */
 function renderTable() {
   const tbody = document.getElementById("productTbody");
 
@@ -219,7 +204,7 @@ function renderTable() {
     tbody.innerHTML = `<tr><td colspan="7">제품 없음</td></tr>`;
     return;
   }
-  
+
   allProducts.sort((a, b) => {
     const aOrder = Number.isFinite(a.sort_order) ? a.sort_order : 9999;
     const bOrder = Number.isFinite(b.sort_order) ? b.sort_order : 9999;
@@ -239,7 +224,16 @@ function renderTable() {
           onchange="saveSortOrder(this)">
       </td>
 
-      <td>${p.lang.toUpperCase()}</td>
+      <td>
+        KR
+        ${
+          p.has_en
+            ? '<span style="color:#0f2679;"> / EN</span>'
+            : '<span class="en-missing"> (EN 없음)</span>'
+        }
+      </td>
+
+
       <td>${categoryMap[p.category] || p.category}</td>
 
       <td>
@@ -261,20 +255,38 @@ function renderTable() {
 
       <td>
         <button class="btn btn-primary"
-          onclick="location.href='products-edit.html?id=${p.id}'">수정</button>
+          onclick="location.href='products-edit.html?id=${p.id}&lang=kr'">
+          KR 수정
+        </button>
+
+        ${
+          p.has_en
+            ? `<button class="btn btn-secondary"
+                onclick="location.href='products-edit.html?id=${p.en_id}&lang=en'">
+                EN 수정
+              </button>`
+            : `<button class="btn btn-secondary"
+                onclick="addTranslate(${p.id})">
+                EN 추가
+              </button>`
+        }
+
         <button class="btn btn-danger"
-          onclick="deleteProduct(${p.id})">삭제</button>
+          onclick="deleteProduct(${p.id})">
+          삭제
+        </button>
       </td>
     </tr>
   `).join("");
 }
 
-/* 순번 저장 */
+/* ===============================
+   순번 저장
+================================ */
 async function saveSortOrder(input) {
   const id = Number(input.dataset.id);
   let sort_order = Number(input.value);
 
-  // 🔒 방어 로직
   if (!id) return;
 
   if (!Number.isFinite(sort_order) || sort_order < 1) {
@@ -293,16 +305,42 @@ async function saveSortOrder(input) {
     })
   });
 
-  // 시각적 피드백
   input.style.background = "#e7f7ec";
   setTimeout(() => input.style.background = "", 500);
 
   loadProducts();
 }
 
+/* ===============================
+   영문 버전 생성
+================================ */
+async function addTranslate(id) {
+  if (!confirm("이 제품의 영문 버전을 생성하시겠습니까?")) return;
 
+  const res = await fetch(`/api/products/${id}/translate`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...authHeaders()
+    },
+    body: JSON.stringify({ lang: "en" })
+  });
 
-/* 삭제 */
+  const out = await res.json();
+
+  if (!res.ok) {
+    alert(out.message || "영문 버전 생성 실패");
+    return;
+  }
+
+  alert("영문 버전이 생성되었습니다.");
+  location.href = `products-edit.html?id=${out.id}&lang=en`;
+
+}
+
+/* ===============================
+   삭제
+================================ */
 async function deleteProduct(id) {
   if (!confirm("삭제하시겠습니까?")) return;
 
@@ -314,14 +352,20 @@ async function deleteProduct(id) {
   loadProducts();
 }
 
-/* 공개 페이지 */
+/* ===============================
+   공개 페이지 (KR 기준)
+================================ */
 function openProduct(id) {
-  window.open(`/kr/sub/products/product-view.html?id=${id}`, "_blank");
+  window.open(
+    `/kr/sub/products/product-view.html?id=${id}&lang=kr`,
+    "_blank"
+  );
 }
 
 /* 시작 */
 loadProducts();
 </script>
+
 
 </body>
 </html>

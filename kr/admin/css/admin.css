@@ -1,4 +1,7 @@
 /* ===========================================================
+   /kr/admin/css/admin.css
+=========================================================== */
+/* ===========================================================
    GLOBAL LAYOUT
 =========================================================== */
 body {
@@ -391,4 +394,103 @@ body {
 
   max-width: 1300px;     /* 전체 패널 영역 폭 제한 */
   margin: 0 auto;        /* 가운데 정렬 */
+}
+
+
+
+/* ===========================================================
+   🎨 Fine Defense Admin Color Palette
+=========================================================== */
+:root {
+  --brand-navy: #0f2679;
+
+  --success-green: #2e7d32;
+  --danger-red: #c62828;
+  --warning-amber: #f9a825;
+  --accent-purple: #6a5acd;
+
+  --neutral-dark: #374151;
+  --neutral-gray: #6b7280;
+  --neutral-light: #e5e7eb;
+
+  --panel-bg: #ffffff;
+  --page-bg: #f3f5fa;
+}
+
+/* KPI 카드 기본 */
+.stat-card {
+  border-left: 6px solid var(--brand-navy);
+}
+
+/* 1: 오늘 방문자 */
+.stat-card:nth-child(1) {
+  border-left-color: var(--brand-navy);
+}
+.stat-card:nth-child(1) .stat-value {
+  color: var(--brand-navy);
+}
+
+/* 2: 이번달 방문자 */
+.stat-card:nth-child(2) {
+  border-left-color: var(--success-green);
+}
+.stat-card:nth-child(2) .stat-value {
+  color: var(--success-green);
+}
+
+/* 3: 증가율 */
+.stat-card:nth-child(3) {
+  border-left-color: var(--warning-amber);
+}
+.stat-card:nth-child(3) .stat-value {
+  color: var(--warning-amber);
+}
+
+/* 4: 전체 게시물 */
+.stat-card:nth-child(4) {
+  border-left-color: var(--accent-purple);
+}
+.stat-card:nth-child(4) .stat-value {
+  color: var(--accent-purple);
+}
+
+body {
+  background: var(--page-bg);
+  color: var(--neutral-dark);
+}
+
+.panel {
+  background: var(--panel-bg);
+}
+
+.panel h2,
+.panel h3 {
+  color: var(--brand-navy);
+}
+
+.stat-card h3 {
+  color: var(--neutral-gray);
+}
+
+.status-success {
+  color: var(--success-green);
+  font-weight: 600;
+}
+
+.status-fail {
+  color: var(--danger-red);
+  font-weight: 600;
+}
+
+.role-admin {
+  color: var(--brand-navy);
+  font-weight: 700;
+}
+
+.topbar button {
+  background: var(--brand-navy);
+}
+
+.topbar button:hover {
+  background: #1a358a;
 }

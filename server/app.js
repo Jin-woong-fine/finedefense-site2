@@ -59,6 +59,10 @@ app.use(helmet());
 
 
 
+
+
+
+
 // ------------------------------------------------------
 // 📌 업로드 경로 (한글 파일명 깨짐 방지 헤더 포함)
 // ------------------------------------------------------
@@ -76,7 +80,7 @@ const ADMIN_IPS = [
 
   "1.220.123.2", // 회사 공인 IP
   "125.251.61.201", // 공장 공인 IP
-  "111.111.111.111",  // 개발자 집 IP
+  "119.195.161.193",  // 개발자 집 IP
 ];
 
 function adminIpGuard(req, res, next) {
@@ -103,7 +107,11 @@ const loginLimiter = rateLimit({
 // ------------------------------------------------------
 // 📌 라우터 등록
 // ------------------------------------------------------
-app.use("/api/auth/login", loginLimiter);
+app.use(
+  "/api/auth/login",
+  adminIpGuard,        // 🔥 IP 먼저 검사
+  loginLimiter
+);
 app.use("/api/auth", authRouter);
 
 app.use("/api/cert-items", postsCertificationRouter);
@@ -140,6 +148,16 @@ app.use("/api/traffic", trafficRouter);
 // 🔥 중요! posts_common보다 notice 라우터가 항상 위에 있어야 함
 app.use("/api/posts/notice", postsNoticeRouter);
 app.use("/api/posts", postsCommonRouter);
+
+// ------------------------------------------------------
+// 🔐 관리자 HTML 페이지 IP 보호
+// ------------------------------------------------------
+app.use(
+  ["/kr/admin", "/en/admin"],
+  adminIpGuard,
+  express.static(path.resolve(__dirname, "../"))
+);
+
 
 // ------------------------------------------------------
 // 📌 프론트 정적 제공

@@ -1,6 +1,26 @@
 // kr/admin/js/dashboard_core.js
 
-console.log("%c[dashboard_core] 로드 완료", "color:#4caf50;font-weight:bold;");
+//console.log("%c[dashboard_core] 로드 완료", "color:#4caf50;font-weight:bold;");
+
+// ===============================
+// 🎨 Dashboard Chart Color Palette
+// ===============================
+const CHART_COLORS = {
+  navy: "#0f2679",
+  green: "#2e7d32",
+  amber: "#f9a825",
+  purple: "#6a5acd",
+  red: "#c62828",
+  gray: "#9ca3af"
+};
+
+const CHART_BG = [
+  CHART_COLORS.navy,
+  CHART_COLORS.green,
+  CHART_COLORS.purple,
+  CHART_COLORS.amber,
+  CHART_COLORS.red
+];
 
 /* -----------------------------------------------------
    공통 GET 요청
@@ -14,37 +34,49 @@ function apiGet(url) {
 ----------------------------------------------------- */
 async function loadBasicStats() {
   try {
-    // 오늘 방문자
-    const todayRes = await apiGet("/api/traffic/daily");
-    const todayData = await todayRes.json();
-    const todayVisits = todayData?.[0]?.visits || 0;
-    document.getElementById("visitToday").textContent = todayVisits.toLocaleString();
+    const res = await apiGet("/api/traffic/summary");
+    const d = await res.json();
 
-    // 이번달 방문자
-    const monthRes = await apiGet("/api/traffic/monthly");
-    const monthData = await monthRes.json();
-    const thisMonth = monthData?.[0]?.visits || 0;
-    const lastMonth = monthData?.[1]?.visits || 0;
+    // UV
+    document.getElementById("uvToday").textContent = d.uv_today.toLocaleString();
+    document.getElementById("uvMonth").textContent = d.uv_month.toLocaleString();
 
-    document.getElementById("visitThisMonth").textContent = thisMonth.toLocaleString();
+    const uvGrowthEl = document.getElementById("uvGrowth");
+    const uvGrowth =
+      d.uv_last_month > 0
+        ? ((d.uv_month - d.uv_last_month) / d.uv_last_month) * 100
+        : null;
 
-    // 증가율
-    let growth = 0;
-    if (lastMonth > 0) {
-      growth = (((thisMonth - lastMonth) / lastMonth) * 100).toFixed(1);
-    }
-    document.getElementById("visitGrowth").textContent = growth + "%";
+    uvGrowthEl.textContent =
+      uvGrowth === null ? "NEW" : uvGrowth.toFixed(1) + "%";
+    uvGrowthEl.style.color =
+      uvGrowth > 0 ? "#2e7d32" :
+      uvGrowth < 0 ? "#c62828" :
+      "#6b7280";
 
-    // 게시물 수
-    const postRes = await apiGet("/api/admin/dashboard");
-    const postData = await postRes.json();
-    document.getElementById("totalPosts").textContent =
-      (postData.postCount || 0).toLocaleString();
+    // PV
+    document.getElementById("pvToday").textContent = d.pv_today.toLocaleString();
+    document.getElementById("pvMonth").textContent = d.pv_month.toLocaleString();
+
+    const pvGrowthEl = document.getElementById("pvGrowth");
+    const pvGrowth =
+      d.pv_last_month > 0
+        ? ((d.pv_month - d.pv_last_month) / d.pv_last_month) * 100
+        : null;
+
+    pvGrowthEl.textContent =
+      pvGrowth === null ? "NEW" : pvGrowth.toFixed(1) + "%";
+    pvGrowthEl.style.color =
+      pvGrowth > 0 ? "#2e7d32" :
+      pvGrowth < 0 ? "#c62828" :
+      "#6b7280";
 
   } catch (err) {
     console.error("KPI Error:", err);
   }
 }
+
+
 
 /* -----------------------------------------------------
    2) 최근 30일 방문자 그래프
@@ -61,19 +93,24 @@ async function loadDailyChart() {
       type: "line",
       data: {
         labels,
-        datasets: [
-          {
-            label: "일별 방문자",
-            data: values,
-            borderColor: "#0f2679",
-            tension: 0.3,
-            borderWidth: 2,
-            pointRadius: 2,
-          },
-        ],
+        datasets: [{
+          label: "일별 방문자",
+          data: values,
+          borderColor: CHART_COLORS.navy,
+          backgroundColor: "rgba(15,38,121,0.12)",
+          fill: true,
+          tension: 0.35,
+          pointRadius: 3,
+          pointBackgroundColor: CHART_COLORS.navy
+        }]
       },
-      options: { responsive: true, scales: { y: { beginAtZero: true } } },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
+      }
     });
+
   } catch (err) {
     console.error("loadDailyChart Error:", err);
   }
@@ -94,15 +131,26 @@ async function loadDeviceChart() {
       type: "doughnut",
       data: {
         labels,
-        datasets: [
-          {
-            data: values,
-            backgroundColor: ["#0f2679", "#4a6bb0", "#93a9d1"],
-          },
-        ],
+        datasets: [{
+          data: values,
+          backgroundColor: CHART_BG,
+          borderWidth: 0
+        }]
       },
-      options: { responsive: true },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: {
+              boxWidth: 14,
+              color: "#374151"
+            }
+          }
+        }
+      }
     });
+
   } catch (err) {
     console.error("loadDeviceChart Error:", err);
   }
@@ -123,16 +171,23 @@ async function loadCountryChart() {
       type: "bar",
       data: {
         labels,
-        datasets: [
-          {
-            label: "국가별 트래픽",
-            data: values,
-            backgroundColor: "#0f2679",
-          },
-        ],
+        datasets: [{
+          label: "국가별 트래픽",
+          data: values,
+          backgroundColor: CHART_COLORS.navy,
+          borderRadius: 6
+        }]
       },
-      options: { responsive: true, scales: { y: { beginAtZero: true } } },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false } },
+          y: { beginAtZero: true, grid: { color: "#e5e7eb" } }
+        }
+      }
     });
+
   } catch (err) {
     console.error("loadCountryChart Error:", err);
   }

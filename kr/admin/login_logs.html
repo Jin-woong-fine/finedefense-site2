@@ -1,3 +1,4 @@
+<!-- /kr/admin/login_logs.html -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -20,8 +21,6 @@
       background:#eef1f7;
       font-weight:600;
     }
-    .status-success { color: green; font-weight:600; }
-    .status-fail { color: red; font-weight:600; }
 
     .search-box {
       display:flex;
@@ -30,10 +29,60 @@
     }
     .input { padding:8px; border:1px solid #ccc; border-radius:6px; }
     .btn-search { padding:8px 12px; background:#0f2679; color:white; border:none; border-radius:6px; cursor:pointer; }
+
+
+    .status-success { color: #0a7a2f; font-weight:600; }
+    .status-fail { color: #c1121f; font-weight:600; }
+
+    .role-admin {
+      font-weight:700;
+      color:#0f2679;
+    }
+
+    .foreign-login {
+      background: #fff5f5;
+    }
+
+    .fail-reason {
+      font-size:12px;
+      color:#666;
+    }
+
+    .flag {
+      font-family:
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI Emoji",
+        "Apple Color Emoji",
+        "Noto Color Emoji";
+      font-size: 16px;
+      line-height: 1;
+      display: inline-block;
+
+      font-variant-emoji: emoji;   /* ⭐⭐⭐ 핵심 */
+    }
+
+    .flag-img{
+      width: 18px;
+      height: 12px;
+      object-fit: cover;
+      vertical-align: -2px;
+      margin-right: 6px;
+      border-radius: 2px;
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+
+
+    body {
+      font-family: "Noto Sans KR", sans-serif;
+    }
+
   </style>
 </head>
 
 <body>
+  
 <div id="sidebar"></div>
 
 <div class="main">
@@ -57,11 +106,13 @@
       <thead>
         <tr>
           <th>ID</th>
-          <th>유저ID</th>
           <th>아이디</th>
+          <th>권한</th>
           <th>IP</th>
+          <th>국가</th>
           <th>브라우저</th>
           <th>결과</th>
+          <th>실패사유</th>
           <th>시간</th>
         </tr>
       </thead>

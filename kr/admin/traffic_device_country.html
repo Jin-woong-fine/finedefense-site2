@@ -10,13 +10,12 @@
   <!-- 공통 관리자 CSS -->
   <link rel="stylesheet" href="./css/admin.css">
 
-  <!-- 1. 인증 / 공통 함수 -->
+  <!-- 인증 -->
   <script src="./js/common_auth.js"></script>
 
-  <!-- 2. 세션 -->
+  <!-- 세션 -->
   <script type="module" src="/js/session_manager.js"></script>
   <script type="module" src="./js/dashboard_session_timer.js"></script>
-
 
   <style>
     .grid-2 {
@@ -27,6 +26,34 @@
 
     .panel {
       padding: 28px;
+    }
+
+    .filter-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .range-buttons {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .range-btn {
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1px solid #cfd6ee;
+      background: #fff;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+
+    .range-btn.active {
+      background: #0f2679;
+      color: #fff;
+      border-color: #0f2679;
     }
 
     .rank-list {
@@ -41,10 +68,6 @@
       padding: 10px 12px;
       border-bottom: 1px solid #e5e7eb;
       font-size: 0.95rem;
-    }
-
-    .rank-item span:first-child {
-      color: #111;
     }
 
     .rank-item span:last-child {
@@ -65,18 +88,30 @@
   <!-- TOPBAR -->
   <div class="topbar">
     <div class="title">국가 / 디바이스 분석</div>
-
     <div style="display:flex; align-items:center; gap:12px;">
       <span id="session-timer" class="session-timer"></span>
-
       <div class="topbar-user" id="topbarUser">
         <span id="topbarUserName">관리자</span> ▾
         <div class="user-dropdown" id="userDropdown"></div>
       </div>
-
       <button onclick="location.href='../index.html'">홈으로</button>
     </div>
   </div>
+
+  <!-- 기간 필터 -->
+  <section class="panel">
+    <div class="filter-bar">
+      <h2 style="margin:0;">기간 선택</h2>
+      <div class="range-buttons">
+        <button class="range-btn" data-days="1">오늘</button>
+        <button class="range-btn" data-days="7">7일</button>
+        <button class="range-btn active" data-days="30">30일</button>
+        <button class="range-btn" data-days="365">1년</button>
+        <button class="range-btn" data-days="1095">3년</button>
+        <button class="range-btn" data-days="0">전체</button>
+      </div>
+    </div>
+  </section>
 
   <!-- 📊 Charts -->
   <section class="grid-2">
@@ -109,26 +144,33 @@
 <script src="./js/sidebar.js"></script>
 <script src="./js/topbar_user_menu.js"></script>
 
-
 <script>
 /* =====================================================
-   🌍 + 📱 COUNTRY / DEVICE TRAFFIC SCRIPT (INLINE)
-   - server routes:
-     GET /api/traffic/country   -> { country, cnt }
-     GET /api/traffic/device    -> { device_type, cnt }
+   🌍 + 📱 COUNTRY / DEVICE ANALYSIS
 ===================================================== */
 
 let countryChart;
 let deviceChart;
+let currentDays = 30;
 
-/* =====================================================
-   🔹 데이터 로드
-===================================================== */
+/* 기간 버튼 */
+document.querySelectorAll(".range-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".range-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    currentDays = Number(btn.dataset.days);
+    loadTrafficData();
+  });
+});
+
+/* 데이터 로드 */
 async function loadTrafficData() {
   try {
+    const query = currentDays > 0 ? `?days=${currentDays}` : "";
+
     const [countryRes, deviceRes] = await Promise.all([
-      fetch("/api/traffic/country"),
-      fetch("/api/traffic/device")
+      fetch(`/api/traffic/country${query}`),
+      fetch(`/api/traffic/device${query}`)
     ]);
 
     const countryData = await countryRes.json();
@@ -142,106 +184,73 @@ async function loadTrafficData() {
   }
 }
 
-/* =====================================================
-   🌍 국가
-===================================================== */
+/* ================= 국가 ================= */
 function renderCountry(data) {
-  const labels = data.map(d => d.country || "UNKNOWN");
-  const counts = data.map(d => d.cnt);
-
-  const ctx = document.getElementById("countryChart");
+  const top = data.slice(0, 10);
 
   if (countryChart) countryChart.destroy();
 
-  countryChart = new Chart(ctx, {
+  countryChart = new Chart(document.getElementById("countryChart"), {
     type: "doughnut",
     data: {
-      labels,
+      labels: top.map(d => d.country || "UNKNOWN"),
       datasets: [{
-        data: counts,
+        data: top.map(d => d.cnt),
         backgroundColor: [
-          "#0f2679",
-          "#3b82f6",
-          "#60a5fa",
-          "#93c5fd",
-          "#c7d2fe",
-          "#e0e7ff"
+          "#0f2679","#2563eb","#3b82f6","#60a5fa",
+          "#93c5fd","#bfdbfe","#e0e7ff"
         ]
       }]
     },
     options: {
-      plugins: {
-        legend: { position: "bottom" }
-      }
+      plugins: { legend: { position: "bottom" } }
     }
   });
 
   const ul = document.getElementById("countryList");
   ul.innerHTML = "";
-
-  data.forEach(d => {
-    const li = document.createElement("li");
-    li.className = "rank-item";
-    li.innerHTML = `
-      <span>${d.country || "UNKNOWN"}</span>
-      <span>${d.cnt}</span>
-    `;
-    ul.appendChild(li);
+  top.forEach(d => {
+    ul.innerHTML += `
+      <li class="rank-item">
+        <span>${d.country || "UNKNOWN"}</span>
+        <span>${d.cnt}</span>
+      </li>`;
   });
 }
 
-/* =====================================================
-   📱 디바이스
-===================================================== */
+/* ================= 디바이스 ================= */
 function renderDevice(data) {
-  const labels = data.map(d => d.device_type.toUpperCase());
-  const counts = data.map(d => d.cnt);
-
-  const ctx = document.getElementById("deviceChart");
-
   if (deviceChart) deviceChart.destroy();
 
-  deviceChart = new Chart(ctx, {
+  deviceChart = new Chart(document.getElementById("deviceChart"), {
     type: "pie",
     data: {
-      labels,
+      labels: data.map(d => d.device_type.toUpperCase()),
       datasets: [{
-        data: counts,
-        backgroundColor: [
-          "#0f2679",
-          "#2563eb",
-          "#60a5fa"
-        ]
+        data: data.map(d => d.cnt),
+        backgroundColor: ["#0f2679","#2563eb","#60a5fa"]
       }]
     },
     options: {
-      plugins: {
-        legend: { position: "bottom" }
-      }
+      plugins: { legend: { position: "bottom" } }
     }
   });
 
   const ul = document.getElementById("deviceList");
   ul.innerHTML = "";
-
   data.forEach(d => {
-    const li = document.createElement("li");
-    li.className = "rank-item";
-    li.innerHTML = `
-      <span>${d.device_type.toUpperCase()}</span>
-      <span>${d.cnt}</span>
-    `;
-    ul.appendChild(li);
+    ul.innerHTML += `
+      <li class="rank-item">
+        <span>${d.device_type.toUpperCase()}</span>
+        <span>${d.cnt}</span>
+      </li>`;
   });
 }
 
-/* =====================================================
-   초기 실행
-===================================================== */
+/* 초기 */
 loadSidebar("traffic_device_country");
 loadTrafficData();
 </script>
-
 
 </body>
 </html>

@@ -42,75 +42,188 @@ router.post("/visit", async (req, res) => {
     const device = parseDevice(ua);
     const { page = "", referrer = "" } = req.body;
 
-    let country = "UNKNOWN";
-    if (ip) {
-      const geo = geoip.lookup(ip);
-      if (geo?.country) country = geo.country;
+    if (!ip || !page) {
+      return res.json({ message: "skipped", reason: "no_ip_or_page" });
     }
 
-    await db.execute(
-      `INSERT INTO traffic_logs
-       (ip, user_agent, device_type, referrer, page, country)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [ip || "unknown", ua, device, referrer, page, country]
+    // 국가
+    let country = "UNKNOWN";
+    const geo = geoip.lookup(ip);
+    if (geo?.country) country = geo.country;
+
+    // ✅ 하루 1회 (IP + page 기준)
+    const [dedupe] = await db.execute(
+      `INSERT IGNORE INTO traffic_dedupe (ip, page, view_date)
+       VALUES (?, ?, CURDATE())`,
+      [ip, page]
     );
 
-    res.json({ message: "logged", ip, country });
+    // 처음 방문이면 실제 로그 기록
+    if (dedupe.affectedRows === 1) {
+      await db.execute(
+        `INSERT INTO traffic_logs
+         (ip, user_agent, device_type, referrer, page, country)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [ip, ua, device, referrer, page, country]
+      );
+    }
+
+    return res.json({
+      ok: true,
+      counted: dedupe.affectedRows === 1
+    });
+
   } catch (err) {
     console.error("traffic visit error:", err);
+    return res.status(500).json({ message: "error" });
+  }
+});
+
+
+
+/* ================================
+   🟦 0) UV / PV 요약 (대시보드용)
+================================ */
+router.get("/summary", async (req, res) => {
+  const [rows] = await db.execute(`
+    SELECT
+      -- UV
+      COUNT(DISTINCT CASE WHEN DATE(created_at)=CURDATE() THEN ip END) AS uv_today,
+      COUNT(DISTINCT CASE
+        WHEN YEAR(created_at)=YEAR(CURDATE())
+         AND MONTH(created_at)=MONTH(CURDATE())
+        THEN ip END) AS uv_month,
+
+      COUNT(DISTINCT CASE
+        WHEN YEAR(created_at)=YEAR(CURDATE() - INTERVAL 1 MONTH)
+         AND MONTH(created_at)=MONTH(CURDATE() - INTERVAL 1 MONTH)
+        THEN ip END) AS uv_last_month,
+
+      -- PV
+      COUNT(CASE WHEN DATE(created_at)=CURDATE() THEN 1 END) AS pv_today,
+      COUNT(CASE
+        WHEN YEAR(created_at)=YEAR(CURDATE())
+         AND MONTH(created_at)=MONTH(CURDATE())
+        THEN 1 END) AS pv_month,
+
+      COUNT(CASE
+        WHEN YEAR(created_at)=YEAR(CURDATE() - INTERVAL 1 MONTH)
+         AND MONTH(created_at)=MONTH(CURDATE() - INTERVAL 1 MONTH)
+        THEN 1 END) AS pv_last_month
+    FROM traffic_logs
+  `);
+
+  res.json(rows[0]);
+});
+
+
+
+
+/* ================================
+   🟦 2) 일별 통계 (UV / PV, 기간 선택)
+   GET /api/traffic/daily?days=30
+   - PV: COUNT(*)
+   - UV: COUNT(DISTINCT ip)
+================================ */
+router.get("/daily", async (req, res) => {
+  try {
+    const days = Math.max(1, Number(req.query.days || 30));
+
+    const [rows] = await db.execute(
+      `
+      SELECT
+        DATE(created_at) AS day,
+        COUNT(*) AS pv,
+        COUNT(DISTINCT ip) AS uv
+      FROM traffic_logs
+      WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
+      GROUP BY DATE(created_at)
+      ORDER BY day DESC
+      `,
+      [days]
+    );
+
+    res.json(rows);
+  } catch (err) {
+    console.error("traffic daily error:", err);
     res.status(500).json({ message: "error" });
   }
 });
 
-/* ================================
-   🟦 2) 일별 통계
-================================ */
-router.get("/daily", async (req, res) => {
-  const [rows] = await db.execute(`
-    SELECT 
-      DATE(created_at) AS day,
-      COUNT(*) AS visits
-    FROM traffic_logs
-    GROUP BY DATE(created_at)
-    ORDER BY day DESC
-    LIMIT 30
-  `);
-  res.json(rows);
-});
+
 
 /* ================================
-   🟦 3) 월별 통계
+   🟦 연도 목록
+   GET /api/traffic/years
+================================ */
+router.get("/years", async (req, res) => {
+  const [rows] = await db.execute(`
+    SELECT DISTINCT YEAR(created_at) AS year
+    FROM traffic_logs
+    ORDER BY year DESC
+  `);
+
+  res.json(rows.map(r => r.year));
+});
+
+
+/* ================================
+   🟦 3) 월별 통계 (연도 선택 가능)
+   /api/traffic/monthly?year=2024
 ================================ */
 router.get("/monthly", async (req, res) => {
-  const [rows] = await db.execute(`
+  const { year } = req.query;
+
+  let sql = `
     SELECT
       YEAR(created_at) AS year,
       MONTH(created_at) AS month,
       COUNT(*) AS visits
     FROM traffic_logs
+  `;
+
+  const params = [];
+
+  if (year && year !== "all") {
+    sql += ` WHERE YEAR(created_at) = ? `;
+    params.push(year);
+  }
+
+  sql += `
     GROUP BY year, month
     ORDER BY year DESC, month DESC
-    LIMIT 12
-  `);
+  `;
+
+  const [rows] = await db.execute(sql, params);
   res.json(rows);
 });
+
+
 
 /* ================================
    🟦 4) 페이지별 방문 수
 ================================ */
 router.get("/page-view", async (req, res) => {
+  const days = Number(req.query.days || 0);
+
+  let where = `WHERE page IS NOT NULL AND page != ''`;
+
+  if (days > 0) {
+    where += ` AND created_at >= DATE_SUB(NOW(), INTERVAL ${days} DAY)`;
+  }
+
   const [rows] = await db.execute(`
-    SELECT
-      page,
-      COUNT(*) AS views
+    SELECT page, COUNT(*) AS views
     FROM traffic_logs
-    WHERE page IS NOT NULL AND page != ''
+    ${where}
     GROUP BY page
     ORDER BY views DESC
     LIMIT 50
   `);
+
   res.json(rows);
 });
+
 
 /* ================================
    🟦 5) referrer 통계
@@ -143,20 +256,36 @@ router.get("/device", async (req, res) => {
   res.json(rows);
 });
 
+
 /* ================================
-   🟦 7) 국가별 통계
+   🟦 7) 국가별 통계 (기간 선택)
+   ?days=30
 ================================ */
 router.get("/country", async (req, res) => {
-  const [rows] = await db.execute(`
+  const days = Number(req.query.days || 0);
+
+  let sql = `
     SELECT
       country,
       COUNT(*) AS cnt
     FROM traffic_logs
+  `;
+  const params = [];
+
+  if (days > 0) {
+    sql += " WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL ? DAY)";
+    params.push(days);
+  }
+
+  sql += `
     GROUP BY country
     ORDER BY cnt DESC
-  `);
+  `;
+
+  const [rows] = await db.execute(sql, params);
   res.json(rows);
 });
+
 
 /* ================================
    🟦 8) 오래된 로그 정리 (🔥 중요)

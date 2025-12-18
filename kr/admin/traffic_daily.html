@@ -1,76 +1,52 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>일별 트래픽 분석 | Fine Defense Admin</title>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="./css/admin.css">
+  <link rel="stylesheet" href="./css/admin.css" />
 
-  <!-- 1. 인증 / 공통 함수 -->
+  <!-- 인증 / 공통 -->
   <script src="./js/common_auth.js"></script>
 
-  <!-- 2. 세션 -->
+  <!-- 세션 -->
   <script type="module" src="/js/session_manager.js"></script>
   <script type="module" src="./js/dashboard_session_timer.js"></script>
 
   <style>
-    .kpi-row {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin-bottom: 24px;
+    /* KPI */
+    .kpi-row{
+      display:grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap:16px;
+      margin-bottom:24px;
     }
-    .kpi-card {
-      background: #fff;
-      border-radius: 14px;
-      padding: 18px 20px;
-      box-shadow: 0 4px 14px rgba(15,38,121,0.08);
-    }
-    .kpi-card span {
-      font-size: 0.85rem;
-      color: #6b7280;
-    }
-    .kpi-card strong {
-      display: block;
-      margin-top: 6px;
-      font-size: 1.8rem;
-      font-weight: 700;
-      color: #0f2679;
-    }
+    @media (max-width:1100px){ .kpi-row{grid-template-columns:repeat(3,1fr);} }
+    @media (max-width:640px){ .kpi-row{grid-template-columns:repeat(2,1fr);} }
 
-    .filter-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 14px;
+    .kpi-card{
+      background:#fff;
+      border-radius:14px;
+      padding:18px 20px;
+      box-shadow:0 4px 14px rgba(15,38,121,0.08);
     }
-
-    .range-buttons {
-      display: flex;
-      gap: 6px;
+    .kpi-card span{
+      font-size:0.85rem;
+      color:#6b7280;
     }
-
-    .range-btn {
-      padding: 6px 14px;
-      border-radius: 999px;
-      border: 1px solid #cfd6ee;
-      background: #fff;
-      font-size: 0.8rem;
-      cursor: pointer;
-    }
-
-    .range-btn.active {
-      background: #0f2679;
-      color: #fff;
-      border-color: #0f2679;
+    .kpi-card strong{
+      display:block;
+      margin-top:6px;
+      font-size:1.8rem;
+      font-weight:700;
+      color:#0f2679;
+      letter-spacing:-0.02em;
     }
   </style>
-
 </head>
 
 <body data-admin-page="traffic_daily">
-
 <script>requireAnyUser();</script>
 
 <div id="sidebar"></div>
@@ -92,145 +68,113 @@
 
   <!-- KPI -->
   <section class="kpi-row">
-    <div class="kpi-card"><span>오늘 방문자</span><strong id="kpiToday">0</strong></div>
-    <div class="kpi-card"><span>최근 7일 평균</span><strong id="kpiAvg7">0</strong></div>
-    <div class="kpi-card"><span>최근 30일 누적</span><strong id="kpiSum30">0</strong></div>
-    <div class="kpi-card"><span>전일 대비</span><strong id="kpiDelta">0%</strong></div>
+    <!-- UV -->
+    <div class="kpi-card"><span>오늘 방문자 (UV)</span><strong id="kpiUvToday">0</strong></div>
+    <div class="kpi-card"><span>7일 평균 UV</span><strong id="kpiUvAvg7">0</strong></div>
+    <div class="kpi-card"><span>30일 UV 누적</span><strong id="kpiUvSum30">0</strong></div>
+
+    <!-- PV -->
+    <div class="kpi-card"><span>오늘 페이지뷰 (PV)</span><strong id="kpiPvToday">0</strong></div>
+    <div class="kpi-card"><span>7일 평균 PV</span><strong id="kpiPvAvg7">0</strong></div>
+    <div class="kpi-card"><span>30일 PV 누적</span><strong id="kpiPvSum30">0</strong></div>
   </section>
 
-  <!-- Chart -->
+  <!-- UV Chart -->
   <section class="panel">
-    <div class="filter-bar">
-      <h2 style="margin:0;">방문자 추이</h2>
-      <div class="range-buttons">
-        <button class="range-btn" data-days="7">7일</button>
-        <button class="range-btn active" data-days="30">30일</button>
-        <button class="range-btn" data-days="90">90일</button>
-      </div>
-    </div>
-    <canvas id="dailyChart"></canvas>
+    <h2 style="margin-bottom:12px;">방문자 추이 (UV)</h2>
+    <canvas id="uvChart"></canvas>
+  </section>
+
+  <!-- PV Chart -->
+  <section class="panel">
+    <h2 style="margin-bottom:12px;">페이지뷰 추이 (PV)</h2>
+    <canvas id="pvChart"></canvas>
   </section>
 
 </div>
 
-
-  <script src="./js/sidebar.js"></script>
-  <script src="./js/topbar_user_menu.js"></script>
-
+<script src="./js/sidebar.js"></script>
+<script src="./js/topbar_user_menu.js"></script>
 
 <script>
 /* =========================================================
-   🔥 DAILY TRAFFIC SCRIPT (INLINE)
-   - server response: { day, visits }
-   - server order: DESC
-   - server limit: 30
+   DAILY TRAFFIC — UV / PV
+   API: /api/traffic/daily?days=30
+   response: { day, uv, pv }
 ========================================================= */
 
-let chart;
-let currentDays = 30;
+let uvChart, pvChart;
+const DAYS = 30;
 
-// 기간 버튼
-document.querySelectorAll(".range-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".range-btn").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    currentDays = Number(btn.dataset.days);
-    loadTraffic();
-  });
-});
-
-async function loadTraffic() {
-  try {
-    const res = await fetch(`/api/traffic/daily?days=${currentDays}`);
+async function loadTraffic(){
+  try{
+    const res = await fetch(`/api/traffic/daily?days=${DAYS}`);
     const data = await res.json();
+    if(!Array.isArray(data)) return;
 
-    if (!Array.isArray(data)) {
-      console.error("Traffic API invalid response:", data);
-      return;
-    }
+    const rows = [...data].reverse(); // ASC
+    const labels = rows.map(r => r.day);
+    const uv = rows.map(r => Number(r.uv||0));
+    const pv = rows.map(r => Number(r.pv||0));
 
-    // 🔥 서버: 최신 → 과거 (DESC)
-    // → 프론트: 과거 → 최신 (ASC)
-    const sorted = [...data].reverse();
+    updateKPI(uv, pv);
+    renderUv(labels, uv);
+    renderPv(labels, pv);
 
-    // 🔥 서버 LIMIT 30 대응 (프론트에서 기간 컷)
-    const sliced = sorted.slice(-currentDays);
-
-    const labels = sliced.map(d => d.day);
-    const values = sliced.map(d => d.visits);
-
-    updateKPI(values);
-    renderChart(labels, values);
-
-  } catch (err) {
-    console.error("Failed to load traffic:", err);
+  }catch(e){
+    console.error(e);
   }
 }
 
-function updateKPI(values) {
-  const today = values.at(-1) || 0;
-  const yesterday = values.at(-2) || 0;
-
-  document.getElementById("kpiToday").textContent = today;
-
-  const avg7 =
-    values.length
-      ? Math.round(
-          values.slice(-7).reduce((a, b) => a + b, 0) /
-          Math.min(7, values.length)
-        )
-      : 0;
-
-  document.getElementById("kpiAvg7").textContent = avg7;
-
-  document.getElementById("kpiSum30").textContent =
-    values.slice(-30).reduce((a, b) => a + b, 0);
-
-  const delta = yesterday
-    ? (((today - yesterday) / yesterday) * 100).toFixed(1)
-    : 0;
-
-  document.getElementById("kpiDelta").textContent =
-    (delta >= 0 ? "+" : "") + delta + "%";
+/* KPI */
+function updateKPI(uv, pv){
+  set("kpiUvToday", uv.at(-1));
+  set("kpiPvToday", pv.at(-1));
+  set("kpiUvAvg7", avg(uv,7));
+  set("kpiPvAvg7", avg(pv,7));
+  set("kpiUvSum30", sum(uv,30));
+  set("kpiPvSum30", sum(pv,30));
 }
 
-function renderChart(labels, values) {
-  const ctx = document.getElementById("dailyChart");
+function set(id,v){ document.getElementById(id).textContent=(v||0).toLocaleString(); }
+function sum(a,n){ return a.slice(-n).reduce((x,y)=>x+y,0); }
+function avg(a,n){
+  const s=a.slice(-Math.min(n,a.length));
+  return s.length?Math.round(s.reduce((x,y)=>x+y,0)/s.length):0;
+}
 
-  if (chart) chart.destroy();
+/* Charts */
+function renderUv(labels, values){
+  if(uvChart) uvChart.destroy();
+  uvChart=new Chart(uvChartEl(), lineCfg(labels, values, "방문자 수", "#0f2679"));
+}
+function renderPv(labels, values){
+  if(pvChart) pvChart.destroy();
+  pvChart=new Chart(pvChartEl(), lineCfg(labels, values, "페이지뷰 수", "#2563eb"));
+}
+function uvChartEl(){ return document.getElementById("uvChart"); }
+function pvChartEl(){ return document.getElementById("pvChart"); }
 
-  chart = new Chart(ctx, {
-    type: "line",
-    data: {
-      labels,
-      datasets: [{
-        label: "방문자",
-        data: values,
-        borderWidth: 2,
-        tension: 0.3,
-        fill: true,
-        backgroundColor: "rgba(15,38,121,0.08)",
-        borderColor: "#0f2679",
-        pointRadius: 2
-      }]
+function lineCfg(labels, values, title, color){
+  return {
+    type:"line",
+    data:{ labels,
+      datasets:[{ data:values, borderColor:color,
+        backgroundColor:color+"14", fill:true, tension:.3, pointRadius:2 }]
     },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { display: false }
+    options:{
+      plugins:{ legend:{display:false},
+        tooltip:{callbacks:{label:c=>`${title}: ${c.raw.toLocaleString()}`}}
       },
-      scales: {
-        y: { beginAtZero: true }
-      }
+      scales:{ y:{beginAtZero:true} }
     }
-  });
+  };
 }
 
-// 초기 로드
+/* init */
 loadSidebar("traffic_daily");
 loadTraffic();
 </script>
-
 
 </body>
 </html>
