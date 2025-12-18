@@ -9,7 +9,7 @@ const router = express.Router();
    📊 1) 관리자 대시보드 통계 API
    GET /api/admin/dashboard
 ============================================================ */
-router.get("/dashboard", verifyToken, async (req, res) => {
+router.get("/monthly-views", verifyToken, async (req, res) => {
   try {
     // 이번달 조회수
     const [[thisMonth]] = await pool.execute(`
