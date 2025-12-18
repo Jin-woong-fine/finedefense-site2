@@ -35,10 +35,12 @@ function requireAnyUser() { requireLogin(); }
 function requireAdminOrEditor() {
   requireLogin(); // 로그인만 확인
 }
-const ADMIN_ONLY_PATHS = [
-  "/kr/admin/users.html",
-  "/kr/admin/login_logs.html",
-];
+if (!window.ADMIN_ONLY_PATHS) {
+  window.ADMIN_ONLY_PATHS = [
+    "/kr/admin/users.html",
+    "/kr/admin/login_logs.html",
+  ];
+}
 
 function requireAdminOrSuperadmin() {
   requireLogin();
@@ -46,7 +48,8 @@ function requireAdminOrSuperadmin() {
   const role = localStorage.getItem("role");
   const path = location.pathname;
 
-  if (!ADMIN_ONLY_PATHS.includes(path)) return;
+  if (!window.ADMIN_ONLY_PATHS.includes(path)) return;
+
 
   if (!["superadmin", "admin"].includes(role)) {
     denyAndBack("관리자만 접근 가능합니다.", "/kr/admin/index.html");
