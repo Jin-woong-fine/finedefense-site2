@@ -2,10 +2,7 @@
  * 🔐 Fine Defense Admin — Common Auth (2025 완전체)
  ****************************************************/
 
-if (typeof window.IS_ADMIN_PAGE === "undefined") {
-  window.IS_ADMIN_PAGE = location.pathname.includes("/admin");
-}
-
+window.IS_ADMIN_PAGE ??= location.pathname.includes("/admin");
 
 /****************************************************
  * 1) 유저 정보 / 토큰 / 헤더
@@ -105,7 +102,7 @@ function denyAndBack(message, fallback = "/kr/admin/notice-list.html") {
  * 3) 로그아웃
  ****************************************************/
 function logout(force = false) {
-  if (!IS_ADMIN_PAGE && !force) {
+  if (!window.IS_ADMIN_PAGE && !force) {
     console.warn("[auth] 홈페이지에서는 로그아웃 차단");
     return;
   }
@@ -237,7 +234,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // 🔥 관리자 페이지에서만 세션 제어
-  if (IS_ADMIN_PAGE) {
+  if (window.IS_ADMIN_PAGE) {
     startSessionWatcher();
     startSessionCountdown();
   } else {
