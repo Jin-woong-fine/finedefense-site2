@@ -199,6 +199,8 @@
   <script src="./js/topbar_user_menu.js"></script>
 
   <script>
+    requireEditPermission()
+
     let editor;
     let noticeId;
     let oldFileList = [];
@@ -206,7 +208,6 @@
 
     /* 초기 실행 */
     document.addEventListener("DOMContentLoaded", () => {
-      requireAdminOrEditor();
       document.getElementById("logoutBtn").addEventListener("click", logout);
 
       loadSidebar("notice");  // ⭐ 사이드바 정상 출력

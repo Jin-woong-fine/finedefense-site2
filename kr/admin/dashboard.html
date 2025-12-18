@@ -23,7 +23,6 @@
 <!-- ⭐ 페이지 식별자 (사이드바 active 표시용) -->
 <body data-admin-page="dashboard">
 
-<script> requireAnyUser(); </script>
 
 <!-- ⭐ 사이드바 -->
 <div id="sidebar"></div>
@@ -158,6 +157,10 @@
 <!-- 대시보드 데이터 스크립트 -->
 <script src="./js/dashboard_core.js"></script>
 <script src="./js/topbar_user_menu.js"></script>
+
+<script>
+requireLogin();
+</script>
 
 </body>
 </html>

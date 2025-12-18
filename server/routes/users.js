@@ -134,6 +134,16 @@ router.put(
         return res.status(400).json({ message: "Invalid role" });
       }
 
+      const targetId = Number(req.params.id);
+      const myId = req.user.id;
+
+      if (targetId === myId && role !== "superadmin") {
+        return res.status(400).json({
+          message: "자기 자신의 슈퍼관리자 권한은 제거할 수 없습니다.",
+        });
+      }
+
+
       await db.query(`UPDATE users SET role = ? WHERE id = ?`, [role, id]);
 
       res.json({ message: "role updated" });
@@ -154,6 +164,13 @@ router.delete(
   async (req, res) => {
     try {
       const { id } = req.params;
+
+      const targetId = Number(req.params.id);
+      const myId = req.user.id;
+
+      if (targetId === myId) {
+        return res.status(400).json({ message: "자기 자신은 삭제할 수 없습니다." });
+      }
 
       await db.query(`DELETE FROM users WHERE id = ?`, [id]);
 

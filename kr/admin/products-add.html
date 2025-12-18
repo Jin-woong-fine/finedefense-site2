@@ -392,7 +392,7 @@
    🔥 초기 설정 (권한 + 사이드바 + 로그아웃)
 ============================================================ */
 (function () {
-  requireAdminOrEditor();
+  requireWritePermission()
   loadSidebar("products");
 
   const logoutBtn = document.getElementById("logoutBtn");

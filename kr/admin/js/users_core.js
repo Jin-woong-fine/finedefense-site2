@@ -139,7 +139,13 @@ async function changeUserRole(id, newRole) {
 // 비밀번호 초기화
 // ============================================
 async function resetPassword(id) {
+  if (localStorage.getItem("role") !== "superadmin") {
+    alert("슈퍼관리자만 비밀번호 초기화가 가능합니다.");
+    return;
+  }
+
   const newPw = prompt("새 비밀번호를 입력하세요:");
+
   if (!newPw) return;
 
   const res = await fetch(`${API}/users/${id}/reset-password`, {
@@ -157,6 +163,11 @@ async function resetPassword(id) {
 // 사용자 삭제
 // ============================================
 async function deleteUser(id) {
+  if (localStorage.getItem("role") !== "superadmin") {
+    alert("슈퍼관리자만 사용자 삭제가 가능합니다.");
+    return;
+  }
+
   if (!confirm("정말 삭제하시겠습니까?")) return;
 
   const res = await fetch(`${API}/users/${id}`, {

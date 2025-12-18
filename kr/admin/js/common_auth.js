@@ -34,32 +34,70 @@ function requireLogin() {
 }
 function requireAnyUser() { requireLogin(); }
 function requireAdminOrEditor() {
-  const role = localStorage.getItem("role");
-  if (!["superadmin", "admin", "editor"].includes(role)) {
-    alert("접근 권한이 없습니다.");
-    location.href = "/kr/admin/login.html";
-  }
+  requireLogin(); // 로그인만 확인
 }
 const ADMIN_ONLY_PATHS = [
   "/kr/admin/users.html",
   "/kr/admin/login_logs.html",
 ];
+
 function requireAdminOrSuperadmin() {
+  requireLogin();
+
   const role = localStorage.getItem("role");
   const path = location.pathname;
 
   if (!ADMIN_ONLY_PATHS.includes(path)) return;
+
   if (!["superadmin", "admin"].includes(role)) {
-    alert("관리자만 접근 가능합니다.");
-    location.href = "/kr/admin/login.html";
+    denyAndBack("관리자만 접근 가능합니다.", "/kr/admin/index.html");
   }
 }
+
 function requireSuperadminStrict() {
+  requireLogin();
+
   if (localStorage.getItem("role") !== "superadmin") {
-    alert("슈퍼관리자만 접근 가능합니다.");
-    location.href = "/kr/admin/login.html";
+    denyAndBack("슈퍼관리자만 접근 가능합니다.", "/kr/admin/index.html");
   }
 }
+
+function requireWritePermission() {
+  requireLogin();
+
+  const role = localStorage.getItem("role");
+  if (!["superadmin", "admin", "editor"].includes(role)) {
+    denyAndBack("작성 권한이 없습니다.");
+  }
+}
+
+function requireEditPermission() {
+  requireLogin();
+
+  const role = localStorage.getItem("role");
+  if (!["superadmin", "admin", "editor"].includes(role)) {
+    denyAndBack("수정 권한이 없습니다.");
+  }
+}
+
+
+
+
+/****************************************************
+ * ❌ 권한 거부 공통 처리 (뒤로가기)
+ ****************************************************/
+function denyAndBack(message, fallback = "/kr/admin/notice-list.html") {
+  alert(message);
+
+  // 이전 페이지가 있으면 뒤로
+  if (document.referrer && document.referrer !== location.href) {
+    history.back();
+  } else {
+    location.href = fallback;
+  }
+}
+
+
 
 /****************************************************
  * 3) 로그아웃
@@ -243,4 +281,7 @@ window.requireAnyUser = requireAnyUser;
 window.requireAdminOrEditor = requireAdminOrEditor;
 window.requireAdminOrSuperadmin = requireAdminOrSuperadmin;
 window.requireSuperadminStrict = requireSuperadminStrict;
+window.requireWritePermission = requireWritePermission;
+window.requireEditPermission = requireEditPermission;
+
 window.showToast = showToast;
