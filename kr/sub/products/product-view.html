@@ -200,14 +200,22 @@
     }
 
 /* -----------------------------
-   설명 하단 우측 "목록으로" 버튼
+   설명 하단 우측 "Back to List" 버튼
 ------------------------------ */
-.product-back.bottom {
-  margin-top: 36px;              /* 설명과 간격 */
-  display: flex;
-  justify-content: flex-end;     /* 👉 오른쪽 정렬 */
+
+/* product-detail을 기준 컨테이너로 사용 */
+.product-detail {
+  position: relative;
 }
 
+/* 우측 하단 고정 */
+.product-back {
+  position: absolute;
+  right: 40px;
+  bottom: 32px;
+}
+
+/* 버튼 스타일 */
 .btn-back {
   background: #f5f5f7;
   border: 1px solid #d2d2d7;
@@ -217,18 +225,23 @@
   font-weight: 500;
   color: #0f2679;
   cursor: pointer;
-  transition: background 0.15s ease, transform 0.12s ease, box-shadow 0.12s ease;
+
+  transition:
+    background 0.15s ease,
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
 }
 
 .btn-back:hover {
   background: #e5e5ea;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
 .btn-back:active {
   transform: scale(0.96);
   box-shadow: none;
 }
+
 
   </style>
 </head>
