@@ -604,6 +604,8 @@ function renderNewImages() {
 document.getElementById("productForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
+  const lang = document.getElementById("lang").value; // ✅ 핵심
+
   if (summaryInput.value.trim().length > 255) {
     alert("요약(summary)은 최대 255자까지 입력 가능합니다.");
     summaryInput.focus();
@@ -618,7 +620,7 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
   form.append("title", document.getElementById("title").value.trim());
   form.append("summary", summaryInput.value.trim());
   form.append("category", document.getElementById("category").value);
-  form.append("lang", lang);
+  form.append("lang", lang); // ✅ 이제 정상
   form.append("sort_order", document.getElementById("sort_order").value);
   form.append("description_html", editor.getHTML());
   form.append("old_images", JSON.stringify(oldImages));
@@ -642,6 +644,7 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
     alert("수정 중 오류가 발생했습니다.");
   }
 });
+
 
 
 function goList() {
