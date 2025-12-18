@@ -6,7 +6,6 @@ import fs from "fs";
 import db from "../config/db.js";
 import { verifyToken, allowRoles } from "../middleware/auth.js";
 import { fileURLToPath } from "url";
-import { canUpdate } from "../middleware/auth.js";
 
 const router = express.Router();
 
@@ -56,7 +55,11 @@ const toDiskPath = (publicPath) => {
 router.post(
   "/create",
   verifyToken,
-  uploadCatalog.fields([{ name: "thumb", maxCount: 1 }, { name: "file", maxCount: 1 }]),
+  allowRoles("editor","admin","superadmin"),
+  uploadCatalog.fields([
+    { name: "thumb", maxCount: 1 },
+    { name: "file", maxCount: 1 }
+  ]),
   async (req, res) => {
     try {
       const { title, lang, category, sort_order } = req.body;
@@ -103,7 +106,11 @@ router.post(
 router.put(
   "/update/:id",
   verifyToken,
-  uploadCatalog.fields([{ name: "thumb", maxCount: 1 }, { name: "file", maxCount: 1 }]),
+  allowRoles("editor", "admin","superadmin"),   // ✅ 여기 추가
+  uploadCatalog.fields([
+    { name: "thumb", maxCount: 1 },
+    { name: "file", maxCount: 1 }
+  ]),
   async (req, res) => {
     try {
       const id = req.params.id;
@@ -315,21 +322,22 @@ router.post("/download/:id", async (req, res) => {
 router.get(
   "/top-views",
   verifyToken,
+  allowRoles("viewer", "editor", "admin", "superadmin"),
   async (req, res) => {
-  try {
-    const [rows] = await db.execute(
-      `SELECT id, title, views
-       FROM catalog_items
-       ORDER BY views DESC
-       LIMIT 5`
-    );
-    res.json(rows);
-  } catch (err) {
-    console.error("[catalog top views] 오류:", err);
-    res.status(500).json([]);
+    try {
+      const [rows] = await db.execute(
+        `SELECT id, title, views
+         FROM catalog_items
+         ORDER BY views DESC
+         LIMIT 5`
+      );
+      res.json(rows);
+    } catch (err) {
+      console.error("[catalog top views] 오류:", err);
+      res.status(500).json([]);
+    }
   }
-});
-
+);
 
 /* ======================================================
    📌 9) 카탈로그 다운로드 TOP 5
@@ -337,20 +345,22 @@ router.get(
 router.get(
   "/top-downloads",
   verifyToken,
+  allowRoles("viewer", "editor", "admin", "superadmin"),
   async (req, res) => {
-  try {
-    const [rows] = await db.execute(
-      `SELECT id, title, downloads
-       FROM catalog_items
-       ORDER BY downloads DESC
-       LIMIT 5`
-    );
-    res.json(rows);
-  } catch (err) {
-    console.error("[catalog top downloads] 오류:", err);
-    res.status(500).json([]);
+    try {
+      const [rows] = await db.execute(
+        `SELECT id, title, downloads
+         FROM catalog_items
+         ORDER BY downloads DESC
+         LIMIT 5`
+      );
+      res.json(rows);
+    } catch (err) {
+      console.error("[catalog top downloads] 오류:", err);
+      res.status(500).json([]);
+    }
   }
-});
+);
 
 /* ======================================================
    📌 순번(sort_order) 단독 수정
@@ -358,7 +368,7 @@ router.get(
 router.post(
   "/update-sort/:id",
   verifyToken,
-  canUpdate,
+  allowRoles("editor", "admin", "superadmin"),
   async (req, res) => {
   const { id } = req.params;
   const { sort_order } = req.body;
