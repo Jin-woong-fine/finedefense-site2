@@ -1,6 +1,4 @@
 // /js/session_timer.js
-console.log("[session_timer] loaded");
-
 const ADMIN_BAR_ROLES = ["superadmin", "admin", "editor", "viewer"];
 
 // ========================================

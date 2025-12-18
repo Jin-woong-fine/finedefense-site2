@@ -68,7 +68,6 @@ function initLanguageDropdown() {
     });
   });
 
-  console.log("[language.js] dropdown initialized on", window.location.pathname);
   return true;
 }
 
