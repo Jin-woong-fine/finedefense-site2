@@ -153,6 +153,9 @@
   // 사이드바 로딩
   loadSidebar("certifications");
 
+  const USER_ROLE = localStorage.getItem("role");
+  const CAN_DELETE = USER_ROLE === "superadmin";
+
   async function loadItems(){
     const lang = document.getElementById("filterLang").value;
     const search = document.getElementById("search").value;
@@ -199,9 +202,11 @@
           </td>
 
           <td>
-            <button class="btn-delete" onclick="deleteItem(${i.id})">
-              삭제
-            </button>
+            ${
+              CAN_DELETE
+                ? `<button class="btn-delete" onclick="deleteItem(${i.id})">삭제</button>`
+                : `<span style="color:#999;font-size:12px;">권한 없음</span>`
+            }
           </td>
         </tr>
       `;
@@ -221,8 +226,15 @@
         : `<tr><td colspan="7" style="text-align:center; color:#888;">등록된 특허 없음</td></tr>`;
   }
 
-  async function deleteItem(id){
-    if(!confirm("삭제하시겠습니까?")) return;
+async function deleteItem(id){
+
+  if (localStorage.getItem("role") !== "superadmin") {
+    alert("이 작업은 시스템 운영자만 수행할 수 있습니다.");
+    return;
+  }
+
+  if(!confirm("삭제하시겠습니까?")) return;
+
 
     const res = await fetch(`/api/cert-items/delete/${id}`, {
       method:"DELETE",

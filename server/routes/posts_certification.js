@@ -126,7 +126,11 @@ router.post("/update/:id", upload.fields([
 /* ============================================
    📌 인증/특허 삭제
 ============================================ */
-router.delete("/delete/:id", async (req, res) => {
+router.delete(
+  "/delete/:id",
+  verifyToken,
+  verifyRole("superadmin"),
+  async (req, res) => {
   try {
     await db.execute(`DELETE FROM cert_items WHERE id=?`, [req.params.id]);
     res.json({ message: "삭제 완료" });
