@@ -1,7 +1,7 @@
 // server/routes/adminDashboard.js
 import express from "express";
 import pool from "../config/db.js";
-import { verifyToken } from "../middleware/auth.js";
+import { verifyToken, canAccessDashboard } from "../middleware/auth.js";
 
 const router = express.Router();
 
@@ -9,7 +9,11 @@ const router = express.Router();
    📊 1) 관리자 대시보드 통계 API
    GET /api/admin/dashboard
 ============================================================ */
-router.get("/monthly-views", verifyToken, async (req, res) => {
+router.get(
+  "/dashboard",
+  verifyToken,
+  canAccessDashboard,
+  async (req, res) => {
   try {
     // 이번달 조회수
     const [[thisMonth]] = await pool.execute(`
@@ -92,7 +96,11 @@ router.get("/monthly-views", verifyToken, async (req, res) => {
    📈 2) 월별 조회수 그래프 API
    GET /api/admin/monthly-views
 ============================================================ */
-router.get("/monthly-views", verifyToken, async (req, res) => {
+router.get(
+  "/monthly-views",
+  verifyToken,
+  canAccessDashboard,
+  async (req, res) => {
   try {
     const [rows] = await pool.execute(`
       SELECT

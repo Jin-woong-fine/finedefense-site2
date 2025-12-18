@@ -2,6 +2,10 @@
 import express from "express";
 import db from "../config/db.js";
 import geoip from "geoip-lite";
+import { verifyToken, canAccessDashboard } from "../middleware/auth.js";
+
+
+
 
 const router = express.Router();
 
@@ -84,7 +88,7 @@ router.post("/visit", async (req, res) => {
 /* ================================
    🟦 0) UV / PV 요약 (대시보드용)
 ================================ */
-router.get("/summary", async (req, res) => {
+router.get("/summary", verifyToken, canAccessDashboard, async (req, res) => {
   const [rows] = await db.execute(`
     SELECT
       -- UV

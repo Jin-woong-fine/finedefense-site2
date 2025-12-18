@@ -4,8 +4,9 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import db from "../config/db.js";
-import { verifyToken, verifyRole } from "../middleware/auth.js";
+import { verifyToken, allowRoles } from "../middleware/auth.js";
 import { fileURLToPath } from "url";
+import { canUpdate } from "../middleware/auth.js";
 
 const router = express.Router();
 
@@ -176,7 +177,7 @@ router.put(
 router.delete(
   "/delete/:id",
   verifyToken,
-  verifyRole("superadmin"),
+  allowRoles("superadmin"),
   async (req, res) => {
   try {
     const id = req.params.id;
@@ -311,7 +312,10 @@ router.post("/download/:id", async (req, res) => {
 /* ======================================================
    📌 8) 카탈로그 조회수 TOP 5
 ====================================================== */
-router.get("/top-views", async (req, res) => {
+router.get(
+  "/top-views",
+  verifyToken,
+  async (req, res) => {
   try {
     const [rows] = await db.execute(
       `SELECT id, title, views
@@ -330,7 +334,10 @@ router.get("/top-views", async (req, res) => {
 /* ======================================================
    📌 9) 카탈로그 다운로드 TOP 5
 ====================================================== */
-router.get("/top-downloads", async (req, res) => {
+router.get(
+  "/top-downloads",
+  verifyToken,
+  async (req, res) => {
   try {
     const [rows] = await db.execute(
       `SELECT id, title, downloads
@@ -348,7 +355,11 @@ router.get("/top-downloads", async (req, res) => {
 /* ======================================================
    📌 순번(sort_order) 단독 수정
 ====================================================== */
-router.post("/update-sort/:id", verifyToken, async (req, res) => {
+router.post(
+  "/update-sort/:id",
+  verifyToken,
+  canUpdate,
+  async (req, res) => {
   const { id } = req.params;
   const { sort_order } = req.body;
 
