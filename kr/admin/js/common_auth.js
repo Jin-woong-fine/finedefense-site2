@@ -2,7 +2,9 @@
  * 🔐 Fine Defense Admin — Common Auth (2025 완전체)
  ****************************************************/
 
-const IS_ADMIN_PAGE = location.pathname.startsWith("/kr/admin/");
+if (typeof window.IS_ADMIN_PAGE === "undefined") {
+  window.IS_ADMIN_PAGE = location.pathname.includes("/admin");
+}
 
 
 /****************************************************
