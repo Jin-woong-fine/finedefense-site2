@@ -4,7 +4,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import db from "../config/db.js";
-import { verifyToken } from "../middleware/auth.js";
+import { verifyToken, verifyRole } from "../middleware/auth.js";
 import { fileURLToPath } from "url";
 
 const router = express.Router();
@@ -173,7 +173,11 @@ router.put(
 /* ======================================================
    📌 3) 카탈로그 삭제
 ====================================================== */
-router.delete("/delete/:id", verifyToken, async (req, res) => {
+router.delete(
+  "/delete/:id",
+  verifyToken,
+  verifyRole("superadmin"),
+  async (req, res) => {
   try {
     const id = req.params.id;
 

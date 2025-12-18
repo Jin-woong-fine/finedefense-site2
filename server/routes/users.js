@@ -38,7 +38,7 @@ const avatarStorage = multer.diskStorage({
 const uploadAvatar = multer({ storage: avatarStorage });
 
 /* ============================================================
-   📌 관리자용: 사용자 목록 조회 (editor, admin, superadmin)
+   📌 관리자용: 사용자 목록 조회 (에디터 이상)
 ============================================================ */
 router.get(
   "/",
