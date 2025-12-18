@@ -102,6 +102,8 @@ router.post("/", verifyToken, verifyEditor, (req, res) => {
 
 /* ==========================================================
    🔢 제품 순번(sort_order) 저장
+   - en 존재 시: kr + en 모두 변경
+   - en 없을 시: kr만 변경
 ========================================================== */
 router.put("/sort-order", verifyToken, verifyEditor, async (req, res) => {
   try {
@@ -111,14 +113,40 @@ router.put("/sort-order", verifyToken, verifyEditor, async (req, res) => {
       return res.status(400).json({ message: "Invalid orders format" });
     }
 
-    await Promise.all(
-      orders.map(({ id, sort_order }) =>
-        db.query(
-          `UPDATE products SET sort_order = ? WHERE id = ?`,
+    for (const { id, sort_order } of orders) {
+
+      // 1️⃣ 기준(kr) 제품의 group_id 조회
+      const [[base]] = await db.execute(
+        `SELECT group_id FROM products WHERE id = ?`,
+        [id]
+      );
+
+      if (!base) continue;
+
+      // 2️⃣ 같은 group_id에 en 버전 존재 여부 확인
+      const [[hasEn]] = await db.execute(
+        `SELECT id FROM products WHERE group_id = ? AND lang = 'en'`,
+        [base.group_id]
+      );
+
+      if (hasEn) {
+        // ✅ en 존재 → kr + en 모두 업데이트
+        await db.execute(
+          `UPDATE products
+           SET sort_order = ?
+           WHERE group_id = ?`,
+          [sort_order, base.group_id]
+        );
+      } else {
+        // ✅ en 없음 → kr만 업데이트
+        await db.execute(
+          `UPDATE products
+           SET sort_order = ?
+           WHERE id = ?`,
           [sort_order, id]
-        )
-      )
-    );
+        );
+      }
+    }
 
     res.json({ message: "ok" });
 
