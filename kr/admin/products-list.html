@@ -249,9 +249,53 @@ function renderTable() {
         />
       </td>
 
-      <td onclick="openProduct(${p.id})" style="cursor:pointer;">
-        ${p.title}
+      <td>
+        <div style="display:flex; align-items:center; gap:8px;">
+
+          <!-- KR 상세 -->
+          <span
+            onclick="openProductKR(${p.id})"
+            style="cursor:pointer; font-weight:500;"
+            title="KR 상세페이지 열기"
+          >
+            ${p.title}
+          </span>
+
+          <!-- EN 상태 표시 -->
+          ${
+            p.has_en
+              ? `<a
+                  href="/en/sub/products/product-view.html?id=${p.en_id}&lang=en"
+                  target="_blank"
+                  style="
+                    font-size:0.75rem;
+                    color:#0f2679;
+                    border:1px solid #0f2679;
+                    padding:2px 6px;
+                    border-radius:4px;
+                    text-decoration:none;
+                  "
+                  title="EN 상세페이지 열기"
+                >
+                  EN
+                </a>`
+              : `<span
+                  style="
+                    font-size:0.75rem;
+                    color:#999;
+                    border:1px solid #ccc;
+                    padding:2px 6px;
+                    border-radius:4px;
+                    cursor:default;
+                  "
+                  title="영문 페이지가 아직 없습니다"
+                >
+                  EN
+                </span>`
+          }
+        </div>
       </td>
+
 
       <td>
         <button class="btn btn-primary"
@@ -355,7 +399,7 @@ async function deleteProduct(id) {
 /* ===============================
    공개 페이지 (KR 기준)
 ================================ */
-function openProduct(id) {
+function openProductKR(id) {
   window.open(
     `/kr/sub/products/product-view.html?id=${id}&lang=kr`,
     "_blank"
