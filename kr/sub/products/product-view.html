@@ -149,15 +149,17 @@
     }
     .overlay-inner {
       position: relative;
-      max-width: 90vw;
-      max-height: 90vh;
+      max-width: 88vw;
+      max-height: 88vh;
       display: flex;
       align-items: center;
       justify-content: center;
     }
     .overlay-image {
-      max-width: 100%;
-      max-height: 100%;
+      max-height: 75vh;     /* 🔥 여기 핵심 */
+      max-width: 85vw;      /* 가로는 보조 제한 */
+      width: auto;
+      height: auto;
       border-radius: 10px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.5);
     }
