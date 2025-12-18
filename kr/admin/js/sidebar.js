@@ -37,40 +37,40 @@ async function loadSidebar(activePage = "") {
   const avatarSrc =
     avatarUrl || "/img/admin/avatar-placeholder.png"; // 기본 이미지도 제공
 
-  const menu = [
-    { title: "대시보드", link: "/kr/admin/dashboard.html", key: "dashboard", special: "dashboard-root" },
+    const menu = [
+      { title: "대시보드", link: "/kr/admin/dashboard.html", key: "dashboard", special: "dashboard-root" },
 
-    {
-      title: "트래픽 분석",
-      children: [
-        { title: "일별 통계", link: "/kr/admin/traffic_daily.html", key: "traffic_daily" },
-        { title: "월별 통계", link: "/kr/admin/traffic_monthly.html", key: "traffic_monthly" },
-        { title: "유입경로", link: "/kr/admin/traffic_referrer.html", key: "traffic_referrer" },
-        { title: "페이지 조회", link: "/kr/admin/traffic_pages.html", key: "traffic_pages" },
-        { title: "국가/디바이스", link: "/kr/admin/traffic_device_country.html", key: "traffic_device_country" }
-      ]
-    },
+      {
+        title: "트래픽 분석",
+        children: [
+          { title: "일별 통계", link: "/kr/admin/traffic_daily.html", key: "traffic_daily" },
+          { title: "월별 통계", link: "/kr/admin/traffic_monthly.html", key: "traffic_monthly" },
+          { title: "유입경로", link: "/kr/admin/traffic_referrer.html", key: "traffic_referrer" },
+          { title: "페이지 조회", link: "/kr/admin/traffic_pages.html", key: "traffic_pages" },
+          { title: "국가/디바이스", link: "/kr/admin/traffic_device_country.html", key: "traffic_device_country" }
+        ]
+      },
 
-    {
-      title: "게시물 관리",
-      children: [
-        { title: "공지사항", link: "/kr/admin/notice-list.html", key: "notice" },
-        { title: "뉴스룸", link: "/kr/admin/news-list.html", key: "news" },
-        { title: "제품 관리", link: "/kr/admin/products-list.html", key: "products" },
-        { title: "갤러리", link: "/kr/admin/gallery-list.html", key: "gallery" },
-        { title: "인증 및 특허", link: "/kr/admin/certification-list.html", key: "certification" },   
-        { title: "카탈로그", link: "/kr/admin/catalog-list.html", key: "catalog" },             
-        { title: "자료실", link: "/kr/admin/downloads-list.html", key: "downloads" }
-      ]
-    },
+      {
+        title: "게시물 관리",
+        children: [
+          { title: "공지사항", link: "/kr/admin/notice-list.html", key: "notice" },
+          { title: "뉴스룸", link: "/kr/admin/news-list.html", key: "news" },
+          { title: "제품 관리", link: "/kr/admin/products-list.html", key: "products" },
+          { title: "갤러리", link: "/kr/admin/gallery-list.html", key: "gallery" },
+          { title: "인증 및 특허", link: "/kr/admin/certification-list.html", key: "certification" },   
+          { title: "카탈로그", link: "/kr/admin/catalog-list.html", key: "catalog" },             
+          { title: "자료실", link: "/kr/admin/downloads-list.html", key: "downloads" }
+        ]
+      },
 
-    { title: "고객 문의", link: "/kr/admin/inquiry-list.html", key: "inquiry" }
-  ];
+      { title: "고객 문의", link: "/kr/admin/inquiry-list.html", key: "inquiry" },
 
-  if (role === "admin" || role === "superadmin") {
-    menu.push({ title: "사용자 관리", link: "/kr/admin/users.html", key: "users" });
-    menu.push({ title: "로그인 로그", link: "/kr/admin/login_logs.html", key: "logs" });
-  }
+      // 🔥 항상 보이게
+      { title: "사용자 관리", link: "/kr/admin/users.html", key: "users" },
+      { title: "로그인 로그", link: "/kr/admin/login_logs.html", key: "logs" }
+    ];
+
 
   // -------------------------------------------------------------
   // 🔵 사이드바 HTML 렌더링
