@@ -169,7 +169,7 @@ router.put("/update/:id", verifyToken, uploadNotice.array("files", 10), async (r
 // ============================================================
 // 📌 공지 삭제
 // ============================================================
-router.delete("/delete/:id", verifyToken, async (req, res) => {
+router.delete("/delete/:id", verifyToken, requireSuperAdmin, async (req, res) => {
   try {
     const id = Number(req.params.id);
 
