@@ -252,7 +252,7 @@ router.put("/:id", verifyToken, verifyEditor, (req, res) => {
             category = ?,
             sort_order = ?,
             description_html = ?
-        WHERE id = ? AND lang = ?`,
+        WHERE id = ?`,
         [
           title,
           summary || "",
