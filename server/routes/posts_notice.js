@@ -5,7 +5,7 @@ import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
 import db from "../config/db.js";
-import { verifyToken } from "../middleware/auth.js";
+import { verifyToken, canDelete } from "../middleware/auth.js";
 
 const router = express.Router();
 
@@ -169,7 +169,7 @@ router.put("/update/:id", verifyToken, uploadNotice.array("files", 10), async (r
 // ============================================================
 // 📌 공지 삭제
 // ============================================================
-router.delete("/delete/:id", verifyToken, requireSuperAdmin, async (req, res) => {
+router.delete("/delete/:id", verifyToken, canDelete, async (req, res) => {
   try {
     const id = Number(req.params.id);
 
