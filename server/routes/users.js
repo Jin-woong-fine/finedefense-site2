@@ -38,12 +38,12 @@ const avatarStorage = multer.diskStorage({
 const uploadAvatar = multer({ storage: avatarStorage });
 
 /* ============================================================
-   📌 관리자용: 사용자 목록 조회 (admin, superadmin)
+   📌 관리자용: 사용자 목록 조회 (editor, admin, superadmin)
 ============================================================ */
 router.get(
   "/",
   verifyToken,
-  verifyRole("admin", "superadmin"),
+  verifyRole("editor", "admin", "superadmin"),
   async (req, res) => {
     try {
       const [rows] = await db.query(

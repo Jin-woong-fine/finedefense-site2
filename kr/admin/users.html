@@ -97,8 +97,8 @@
 
 
 
-  // 접근 권한 검사: admin 또는 superadmin만 진입 가능
-  requireLogin()
+  // 접근 권한 검사: editor 이상 진입 가능
+  requireEditPermission()
 
   // 사이드바 로드
   loadSidebar("users");
