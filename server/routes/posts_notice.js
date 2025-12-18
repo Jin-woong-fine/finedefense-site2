@@ -5,7 +5,7 @@ import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
 import db from "../config/db.js";
-import { verifyToken, canDelete } from "../middleware/auth.js";
+router.delete("/delete/:id", verifyToken, canDelete, async (req, res) => {
 
 const router = express.Router();
 

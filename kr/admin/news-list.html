@@ -165,6 +165,8 @@
   /* 🔐 권한 체크 */
   requireEditPermission()
 
+  const isSuperAdmin = localStorage.getItem("role") === "superadmin";
+
   /* ===========================
      전역 변수
   =========================== */
@@ -256,8 +258,14 @@
 
         <td>
           <div class="actions">
-            <button class="btn btn-small btn-gray" onclick="editNews(event, ${n.id})">수정</button>
-            <button class="btn btn-small btn-danger" onclick="deleteNews(event, ${n.id})">삭제</button>
+            <button class="btn btn-small btn-gray"
+                    onclick="editNews(event, ${n.id})">수정</button>
+
+            ${isSuperAdmin
+              ? `<button class="btn btn-small btn-danger"
+                        onclick="deleteNews(event, ${n.id})">삭제</button>`
+              : ``
+            }
           </div>
         </td>
       </tr>
@@ -302,6 +310,11 @@
 
   async function deleteNews(e, id) {
     e.stopPropagation();
+
+    if (!isSuperAdmin) {
+      alert("삭제 권한이 없습니다.");
+      return;
+    }
     if (!confirm("삭제하시겠습니까?")) return;
 
     try {
