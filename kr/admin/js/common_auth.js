@@ -5,8 +5,6 @@
 const IS_ADMIN_PAGE = location.pathname.startsWith("/kr/admin/");
 
 
-console.log("%c[auth] common_auth.js 로드됨", "color:#ff9800;font-weight:bold;");
-
 /****************************************************
  * 1) 유저 정보 / 토큰 / 헤더
  ****************************************************/

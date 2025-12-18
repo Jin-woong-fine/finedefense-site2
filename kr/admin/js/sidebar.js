@@ -1,7 +1,5 @@
 // /kr/admin/js/sidebar.js
 
-console.log("%c[sidebar] 로드 완료", "color:#4caf50;font-weight:bold;");
-
 // -------------------------------------------------------------
 // 🔵 1) 프로필 API에서 avatar 가져오기 (비동기)
 // -------------------------------------------------------------
@@ -137,8 +135,6 @@ async function loadSidebar(activePage = "") {
       el.parentElement.classList.toggle("open");
     });
   });
-
-  console.log("[sidebar] 렌더 완료 — activePage:", activePage);
 }
 
 
