@@ -5,7 +5,8 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
-import { verifyToken } from "../middleware/auth.js";
+import { verifyToken, allowRoles } from "../middleware/auth.js";
+
 
 
 const router = express.Router();
@@ -34,10 +35,15 @@ const upload = multer({ storage });
 /* ============================================
    📌 인증/특허 추가
 ============================================ */
-router.post("/add", upload.fields([
-  { name: "thumb", maxCount: 1 },
-  { name: "file", maxCount: 1 }
-]), async (req, res) => {
+router.post(
+  "/add",
+  verifyToken,
+  allowRoles("editor", "admin", "superadmin"),
+  upload.fields([
+    { name: "thumb", maxCount: 1 },
+    { name: "file", maxCount: 1 }
+  ]),
+  async (req, res) => {
   try {
     const { type, title_kr, title_en, lang, sort_order } = req.body;
 
@@ -82,10 +88,15 @@ router.get("/detail/:id", async (req, res) => {
 /* ============================================
    📌 인증/특허 수정
 ============================================ */
-router.post("/update/:id", upload.fields([
-  { name: "thumb", maxCount: 1 },
-  { name: "file", maxCount: 1 }
-]), async (req, res) => {
+router.post(
+  "/update/:id",
+  verifyToken,
+  allowRoles("editor", "admin", "superadmin"),
+  upload.fields([
+    { name: "thumb", maxCount: 1 },
+    { name: "file", maxCount: 1 }
+  ]),
+  async (req, res) => {
   try {
     const id = req.params.id;
     const { type, title_kr, title_en, lang, sort_order } = req.body;
@@ -129,7 +140,7 @@ router.post("/update/:id", upload.fields([
 router.delete(
   "/delete/:id",
   verifyToken,
-  verifyRole("superadmin"),
+  allowRoles("superadmin"),
   async (req, res) => {
   try {
     await db.execute(`DELETE FROM cert_items WHERE id=?`, [req.params.id]);
@@ -188,7 +199,11 @@ router.get("/list", async (req, res) => {
    📌 리스트에서 순번 수정
 ============================================ */
 
-router.post("/update-sort/:id", verifyToken, async (req, res) => {
+router.post(
+  "/update-sort/:id",
+  verifyToken,
+  allowRoles("editor", "admin", "superadmin"),
+  async (req, res) => {
   const { id } = req.params;
   const { sort_order } = req.body;
 
