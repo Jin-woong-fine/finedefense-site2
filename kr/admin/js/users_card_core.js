@@ -53,9 +53,11 @@ function renderUserCard(u, myRole, myId) {
   return `
     <div class="user-card github-style">
 
-      <div class="avatar-wrap">
+        <div class="avatar-wrap"
+            onclick="openAvatarModal('${avatarUrl}')"
+            style="cursor:pointer">
         <img src="${avatarUrl}" alt="avatar">
-      </div>
+        </div>
 
       <div class="user-name">${u.name || "-"}</div>
 
@@ -139,3 +141,33 @@ function initAddUser() {
     loadUsers();
   };
 }
+
+
+
+/* ===============================
+   AVATAR MODAL CONTROL
+=============================== */
+function openAvatarModal(src) {
+  const modal = document.getElementById("avatarModal");
+  const img = document.getElementById("avatarModalImg");
+
+  img.src = src;
+  modal.classList.add("active");
+}
+
+function closeAvatarModal() {
+  const modal = document.getElementById("avatarModal");
+  modal.classList.remove("active");
+}
+
+/* 배경 클릭 닫기 */
+document.addEventListener("click", (e) => {
+  if (e.target.classList.contains("avatar-modal-backdrop")) {
+    closeAvatarModal();
+  }
+});
+
+/* ESC 키 닫기 */
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeAvatarModal();
+});

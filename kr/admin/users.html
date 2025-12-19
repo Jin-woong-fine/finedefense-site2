@@ -136,6 +136,58 @@
     }
 
     /* ===============================
+      AVATAR MODAL
+    =============================== */
+    .avatar-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: none;
+    }
+
+    .avatar-modal.active {
+      display: block;
+    }
+
+    .avatar-modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+    }
+
+    .avatar-modal-content {
+      position: relative;
+      z-index: 1;
+      max-width: 420px;
+      margin: 10vh auto;
+      background: #fff;
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+      text-align: center;
+    }
+
+    .avatar-modal-content img {
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #f0f2f8;
+    }
+
+    .avatar-modal-close {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      border: none;
+      background: none;
+      font-size: 26px;
+      cursor: pointer;
+      color: #666;
+    }
+
+
+    /* ===============================
       BUTTON COLORS
     =============================== */
     .btn-primary { background:#0f2679; color:#fff; }
@@ -146,6 +198,9 @@
       background: #d62828;
       color: #fff;
     }
+
+
+
 
   </style>
 </head>
@@ -197,6 +252,17 @@
   </section>
 
 </div>
+
+<!-- AVATAR MODAL -->
+<div id="avatarModal" class="avatar-modal">
+  <div class="avatar-modal-backdrop"></div>
+
+  <div class="avatar-modal-content">
+    <button class="avatar-modal-close" onclick="closeAvatarModal()">×</button>
+    <img id="avatarModalImg" src="" alt="avatar">
+  </div>
+</div>
+
 
 <!-- 공통 JS -->
 <script src="/kr/admin/js/common_auth.js"></script>
