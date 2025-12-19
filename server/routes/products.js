@@ -36,14 +36,16 @@ const upload = multer({ storage });
 ========================================================== */
 router.post("/", verifyToken, verifyEditor, (req, res) => {
   upload.array("images")(req, res, async (err) => {
-    if (err)
+    if (err) {
       return res.status(400).json({ message: "Upload error", detail: err.message });
+    }
 
     try {
       const { title, summary, category, description_html, sort_order, lang } = req.body;
 
-      if (!title || !category || !lang)
+      if (!title || !category || !lang) {
         return res.status(400).json({ message: "Missing required fields" });
+      }
 
       if (summary && summary.length > 255) {
         return res.status(400).json({
@@ -52,32 +54,37 @@ router.post("/", verifyToken, verifyEditor, (req, res) => {
       }
 
       let thumbnail = null;
-      if (req.files?.length > 0)
+      if (req.files?.length > 0) {
         thumbnail = "/uploads/products/" + req.files[0].filename;
+      }
 
-        const [insert] = await db.execute(
-          `INSERT INTO products
-          (title, summary, category, thumbnail, description_html, sort_order, lang)
-          VALUES (?, ?, ?, ?, ?, ?, ?)`,
-          [
-            title,
-            summary || "",
-            category,
-            thumbnail,
-            description_html || "",
-            sort_order || 999,
-            lang
-          ]
-        );
+      // 🔴 1️⃣ group_id 자동 생성
+      const [[row]] = await db.execute(
+        `SELECT IFNULL(MAX(group_id), 0) + 1 AS nextGroupId FROM products`
+      );
+      const groupId = row.nextGroupId;
 
-        const productId = insert.insertId;
+      // 🔴 2️⃣ 제품 INSERT (여기서 productId 생성)
+      const [insert] = await db.execute(
+        `INSERT INTO products
+         (group_id, title, summary, category, thumbnail,
+          description_html, sort_order, lang)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          groupId,
+          title,
+          summary || "",
+          category,
+          thumbnail,
+          description_html || "",
+          sort_order || 999,
+          lang
+        ]
+      );
 
-        await db.execute(
-          `UPDATE products SET group_id = ? WHERE id = ?`,
-          [productId, productId]
-        );
+      const productId = insert.insertId;
 
-
+      // 🔴 3️⃣ 이미지 저장
       if (req.files?.length > 0) {
         const values = req.files.map((f, idx) => [
           productId,
@@ -86,19 +93,22 @@ router.post("/", verifyToken, verifyEditor, (req, res) => {
         ]);
 
         await db.query(
-          `INSERT INTO product_images (product_id, url, sort_order) VALUES ?`,
+          `INSERT INTO product_images (product_id, url, sort_order)
+           VALUES ?`,
           [values]
         );
       }
 
-      res.status(201).json({ message: "created", id: productId });
+      // 🔴 4️⃣ 응답
+      return res.status(201).json({ message: "created", id: productId });
 
     } catch (e) {
       console.error("POST error:", e);
-      res.status(500).json({ message: "server error" });
+      return res.status(500).json({ message: "server error" });
     }
   });
 });
+
 
 /* ==========================================================
    🔢 제품 순번(sort_order) 저장
