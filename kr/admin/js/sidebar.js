@@ -67,7 +67,7 @@ async function loadSidebar(activePage = "") {
       { title: "고객 문의", link: "/kr/admin/inquiry-list.html", key: "inquiry" },
 
       // 🔥 항상 보이게
-      { title: "사용자 관리", link: "/kr/admin/users.html", key: "users" },
+      { title: "사용자 목록", link: "/kr/admin/users.html", key: "users" },
       { title: "로그인 로그", link: "/kr/admin/login_logs.html", key: "logs" }
     ];
 
