@@ -175,6 +175,12 @@ const categoryMap = {
 requireEditPermission()
 loadSidebar("products");
 
+const currentUser = getUser();
+const isAdmin =
+  currentUser?.role === "admin" ||
+  currentUser?.role === "superadmin";
+
+
 /* 전역 */
 let allProducts = [];
 
@@ -315,10 +321,13 @@ function renderTable() {
               </button>`
         }
 
-        <button class="btn btn-danger"
-          onclick="deleteProduct(${p.id})">
-          삭제
-        </button>
+        ${isAdmin ? `
+          <button class="btn btn-danger"
+            onclick="deleteProduct(${p.id})">
+            삭제
+          </button>
+        ` : ``}
+        
       </td>
     </tr>
   `).join("");

@@ -516,4 +516,67 @@ router.post("/:id/translate", verifyToken, verifyEditor, async (req, res) => {
 });
 
 
+/* ==========================================================
+   🗑 제품 삭제 (ADMIN 이상만)
+========================================================== */
+router.delete("/:id", verifyToken, verifyAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // 1️⃣ group_id 조회
+    const [[base]] = await db.execute(
+      `SELECT group_id FROM products WHERE id = ?`,
+      [id]
+    );
+
+    if (!base) {
+      return res.status(404).json({ message: "product not found" });
+    }
+
+    // 2️⃣ 해당 group 전체 제품 조회 (kr + en)
+    const [products] = await db.execute(
+      `SELECT id FROM products WHERE group_id = ?`,
+      [base.group_id]
+    );
+
+    const productIds = products.map(p => p.id);
+
+    // 3️⃣ 이미지 조회
+    const [images] = await db.query(
+      `SELECT url FROM product_images WHERE product_id IN (?)`,
+      [productIds]
+    );
+
+    // 4️⃣ 이미지 파일 삭제
+    images.forEach(img => {
+      const filePath = path.join(
+        uploadDir,
+        img.url.replace("/uploads/products/", "")
+      );
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    });
+
+    // 5️⃣ DB 삭제
+    await db.query(
+      `DELETE FROM product_images WHERE product_id IN (?)`,
+      [productIds]
+    );
+
+    await db.query(
+      `DELETE FROM products WHERE id IN (?)`,
+      [productIds]
+    );
+
+    res.json({ message: "deleted" });
+
+  } catch (e) {
+    console.error("DELETE error:", e);
+    res.status(500).json({ message: "server error" });
+  }
+});
+
+
+
 export default router;
