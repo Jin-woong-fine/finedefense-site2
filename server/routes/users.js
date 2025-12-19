@@ -48,7 +48,15 @@ router.get(
     try {
       const [rows] = await db.query(
         `
-        SELECT id, sort_order, username, name, role, department, position, created_at
+        SELECT
+          id,
+          username,
+          name,
+          role,
+          avatar_url,   -- 🔥 이 줄 반드시 추가
+          department,
+          position,
+          created_at
         FROM users
         ORDER BY sort_order ASC, id ASC
         `

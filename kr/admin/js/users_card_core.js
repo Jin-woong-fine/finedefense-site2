@@ -18,7 +18,7 @@ async function loadUsers() {
   const grid = document.getElementById("usersGrid");
   grid.innerHTML = "불러오는 중...";
 
-  const res = await fetch(`${API}/users`, { headers: getAuthHeaders(false) });
+  const res = await fetch(`${API}/users`, { headers: getAuthHeaders() });
   if (!res.ok) {
     grid.innerHTML = "로드 실패";
     return;
@@ -32,9 +32,10 @@ async function loadUsers() {
 }
 
 function renderUserCard(u, myRole, myId) {
-  const initial = (u.name || u.username || "?")[0].toUpperCase();
-  const avatar = u.avatar_url
-    ? `<img src="${u.avatar_url}" alt="avatar">`
+    const avatar = u.avatar_url
+    ? `<img src="${u.avatar_url}"
+            alt="avatar"
+            onerror="this.onerror=null;this.src='/img/admin/avatar-placeholder.png';">`
     : initial;
 
   const profileBtn =
@@ -88,6 +89,12 @@ async function resetPassword(id) {
 }
 
 async function deleteUser(id) {
+
+    if (localStorage.getItem("role") !== "superadmin") {
+    alert("권한 없음");
+    return;
+    }
+
   if (!confirm("삭제하시겠습니까?")) return;
 
   await fetch(`${API}/users/${id}`, {
@@ -104,10 +111,10 @@ function initAddUser() {
   document.getElementById("addUserPanel").style.display = "block";
 
   document.getElementById("addUserBtn").onclick = async () => {
-    const username = new_username.value.trim();
-    const name = new_name.value.trim();
-    const password = new_password.value.trim();
-    const role = new_role.value;
+    const username = document.getElementById("new_username").value.trim();
+    const name = document.getElementById("new_name").value.trim();
+    const password = document.getElementById("new_password").value.trim();
+    const role = document.getElementById("new_role").value;
 
     if (!username || !password) {
       alert("필수값 누락");
