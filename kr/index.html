@@ -727,6 +727,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
+<script>
+document.addEventListener("scroll", () => {
+  const body = document.body;
+
+  if (window.scrollY > 40) {
+    body.classList.add("scrolled");
+  } else {
+    body.classList.remove("scrolled");
+  }
+});
+</script>
+
+
 
 
 <style>
