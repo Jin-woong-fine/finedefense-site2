@@ -40,66 +40,59 @@ async function loadUsers() {
   const myId = Number(localStorage.getItem("user_id"));
   const myRole = localStorage.getItem("role");
 
-  table.innerHTML = users
-    .map((u) => {
-      let actions = "";
+ table.innerHTML = users
+  .map((u) => {
+    let actions = "";
 
-      // ================================
-      // ➤ 프로필 보기 버튼
-      // ================================
-      let profileBtn = `
+    // ================================
+    // ➤ 프로필 버튼
+    // ================================
+    let profileBtn = `
+      <button class="btn-small btn-edit"
+        onclick="location.href='/kr/admin/user_view.html?id=${u.id}'">
+        프로필
+      </button>
+    `;
+
+    if (u.id === myId) {
+      profileBtn = `
         <button class="btn-small btn-edit"
-          onclick="location.href='/kr/admin/user_view.html?id=${u.id}'">
-          프로필
+          onclick="location.href='/kr/admin/user_profile.html'">
+          내 프로필
         </button>
       `;
+    }
 
-      // -------------------------------
-      // 자기 자신인 경우 버튼 변경
-      // -------------------------------
-      if (u.id === myId) {
-        profileBtn = `
-          <button class="btn-small btn-edit"
-            onclick="location.href='/kr/admin/user_profile.html'">
-            내 프로필
-          </button>
-        `;
-      }
+    // ================================
+    // ➤ superadmin
+    // ================================
+    if (myRole === "superadmin") {
+      const roleSelect = `
+        <select onchange="changeUserRole(${u.id}, this.value)">
+          <option value="viewer" ${u.role === "viewer" ? "selected" : ""}>viewer</option>
+          <option value="editor" ${u.role === "editor" ? "selected" : ""}>editor</option>
+          <option value="admin" ${u.role === "admin" ? "selected" : ""}>admin</option>
+          <option value="superadmin" ${u.role === "superadmin" ? "selected" : ""}>superadmin</option>
+        </select>
+      `;
 
-      // ================================
-      // ➤ superadmin 전체 관리 가능
-      // ================================
-      if (myRole === "superadmin") {
-        const roleSelect = `
-          <select onchange="changeUserRole(${u.id}, this.value)">
-            <option value="viewer" ${u.role === "viewer" ? "selected" : ""}>viewer</option>
-            <option value="editor" ${u.role === "editor" ? "selected" : ""}>editor</option>
-            <option value="admin" ${u.role === "admin" ? "selected" : ""}>admin</option>
-            <option value="superadmin" ${u.role === "superadmin" ? "selected" : ""}>superadmin</option>
-          </select>
-        `;
+      actions = `
+        ${profileBtn}
+        <button class="btn-small btn-edit" onclick="resetPassword(${u.id})">비번초기화</button>
+        <button class="btn-small btn-delete" onclick="deleteUser(${u.id})">삭제</button>
+      `;
 
-        actions = `
-          ${profileBtn}
-          <button class="btn-small btn-edit" onclick="resetPassword(${u.id})">비번초기화</button>
-          <button class="btn-small btn-delete" onclick="deleteUser(${u.id})">삭제</button>
-        `;
+      return rowTemplate(u, roleSelect, actions);
+    }
 
-        return rowTemplate(u, roleSelect, actions);
-      }
-
-      // ================================
-      // ➤ admin (조회 전용)
-      // ================================
-      if (myRole === "admin") {
-        return rowTemplate(u, u.role, profileBtn);
-      }
-
-      // 기타 권한 접근 X
-      return rowTemplate(u, u.role, "-");
-    })
-    .join("");
+    // ================================
+    // ➤ 모든 로그인 사용자 (조회 전용)
+    // ================================
+    return rowTemplate(u, u.role, profileBtn);
+  })
+  .join("");
 }
+
 
 // ============================================
 // 행 템플릿 함수
