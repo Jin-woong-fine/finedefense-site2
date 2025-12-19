@@ -4,45 +4,106 @@
   <meta charset="UTF-8" />
   <title>사용자 관리 | Fine Defense 관리자</title>
 
-  <!-- 공통 관리자 CSS -->
   <link rel="stylesheet" href="./css/admin.css" />
 
-    <!-- 세션 매니저 -->
+  <!-- 세션 -->
   <script type="module" src="/js/session_manager.js"></script>
   <script type="module" src="./js/dashboard_session_timer.js"></script>
 
   <style>
-    .panel table {
+    /* ===============================
+       USER CARD GRID
+    =============================== */
+    .users-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 18px;
+    }
+
+    .user-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 6px 20px rgba(15,38,121,0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+
+    .user-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(15,38,121,0.12);
+    }
+
+    .user-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .user-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #0f2679;
+      color: #fff;
+      font-weight: 700;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .user-avatar img {
       width: 100%;
-      border-collapse: collapse;
+      height: 100%;
+      object-fit: cover;
     }
-    table th, table td {
-      padding: 10px;
-      border-bottom: 1px solid #ddd;
-      font-size: 15px;
+
+    .user-name {
+      font-weight: 700;
+      font-size: 1.05rem;
     }
-    table th {
-      background: #eef1f7;
-      font-weight: 600;
+
+    .user-role {
+      font-size: 0.85rem;
+      color: #555;
     }
-    .btn-small {
+
+    .user-username {
+      font-size: 0.85rem;
+      color: #666;
+      word-break: break-all;
+    }
+
+    .user-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+
+    .user-actions button {
       padding: 6px 10px;
-      font-size: 13px;
+      font-size: 0.8rem;
       border-radius: 6px;
-      cursor: pointer;
       border: none;
+      cursor: pointer;
     }
-    .btn-edit { background:#0f2679; color:#fff; }
-    .btn-delete { background:#d62828; color:#fff; }
-    .btn-save { background:#0f2679; color:#fff; }
+
+    .btn-primary { background:#0f2679; color:#fff; }
+    .btn-danger { background:#d62828; color:#fff; }
+    .btn-gray { background:#e5e7eb; color:#111; }
+
   </style>
 </head>
 
 <body>
-<!-- ⭐ 사이드바 -->
-<div id="sidebar" data-active="notice"></div>
 
-<!-- ⭐ 메인 -->
+<div id="sidebar"></div>
+
 <div class="main">
 
   <!-- TOPBAR -->
@@ -61,14 +122,14 @@
     </div>
   </div>
 
-  <!-- superadmin만 보이는 추가 폼 -->
+  <!-- ADD USER (superadmin) -->
   <section id="addUserPanel" class="panel" style="display:none;">
     <h3>사용자 추가</h3>
 
     <input id="new_username" class="input" placeholder="아이디(이메일)">
-    <input id="new_name" class="input" placeholder="이름(선택)">
+    <input id="new_name" class="input" placeholder="이름">
     <input id="new_password" class="input" type="password" placeholder="비밀번호">
-    
+
     <select id="new_role" class="input">
       <option value="viewer">viewer</option>
       <option value="editor">editor</option>
@@ -76,26 +137,13 @@
       <option value="superadmin">superadmin</option>
     </select>
 
-    <button id="addUserBtn" class="btn btn-primary" style="margin-top:15px;">추가</button>
+    <button id="addUserBtn" class="btn btn-primary" style="margin-top:12px;">추가</button>
   </section>
 
+  <!-- USER LIST -->
   <section class="panel">
     <h3>사용자 목록</h3>
-
-    <table>
-      <thead>
-        <tr>
-          <th>순번</th>
-          <th>ID</th>
-          <th>아이디</th>
-          <th>이름</th>
-          <th>권한</th>
-          <th>생성일</th>
-          <th>관리</th>
-        </tr>
-      </thead>
-      <tbody id="usersTable"></tbody>
-    </table>
+    <div id="usersGrid" class="users-grid"></div>
   </section>
 
 </div>
@@ -105,19 +153,11 @@
 <script src="/kr/admin/js/sidebar.js"></script>
 <script src="./js/topbar_user_menu.js"></script>
 
-<!-- 이 페이지 전용 JS -->
-<script src="/kr/admin/js/users_core.js"></script>
+<!-- 페이지 전용 JS -->
+<script src="/kr/admin/js/users_card_core.js"></script>
 
 <script>
-  const USER_ROLE = localStorage.getItem("role");
-  const IS_SUPERADMIN = USER_ROLE === "superadmin";
-
-
-
-  // 접근 권한 검사: editor 이상 진입 가능
-  requireEditPermission()
-
-  // 사이드바 로드
+  requireEditPermission();
   loadSidebar("users");
 </script>
 

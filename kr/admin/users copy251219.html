@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>사용자 관리 | Fine Defense 관리자</title>
+
+  <!-- 공통 관리자 CSS -->
+  <link rel="stylesheet" href="./css/admin.css" />
+
+    <!-- 세션 매니저 -->
+  <script type="module" src="/js/session_manager.js"></script>
+  <script type="module" src="./js/dashboard_session_timer.js"></script>
+
+  <style>
+    .panel table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table th, table td {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      font-size: 15px;
+    }
+    table th {
+      background: #eef1f7;
+      font-weight: 600;
+    }
+    .btn-small {
+      padding: 6px 10px;
+      font-size: 13px;
+      border-radius: 6px;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-edit { background:#0f2679; color:#fff; }
+    .btn-delete { background:#d62828; color:#fff; }
+    .btn-save { background:#0f2679; color:#fff; }
+  </style>
+</head>
+
+<body>
+<!-- ⭐ 사이드바 -->
+<div id="sidebar" data-active="notice"></div>
+
+<!-- ⭐ 메인 -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="title">사용자 관리</div>
+
+    <div style="display:flex; align-items:center; gap:12px;">
+      <span id="session-timer" class="session-timer">세션 계산중...</span>
+
+      <div class="topbar-user" id="topbarUser">
+        <span id="topbarUserName">관리자</span> ▾
+        <div class="user-dropdown" id="userDropdown"></div>
+      </div>
+
+      <button onclick="location.href='../index.html'">홈으로</button>
+    </div>
+  </div>
+
+  <!-- superadmin만 보이는 추가 폼 -->
+  <section id="addUserPanel" class="panel" style="display:none;">
+    <h3>사용자 추가</h3>
+
+    <input id="new_username" class="input" placeholder="아이디(이메일)">
+    <input id="new_name" class="input" placeholder="이름(선택)">
+    <input id="new_password" class="input" type="password" placeholder="비밀번호">
+    
+    <select id="new_role" class="input">
+      <option value="viewer">viewer</option>
+      <option value="editor">editor</option>
+      <option value="admin">admin</option>
+      <option value="superadmin">superadmin</option>
+    </select>
+
+    <button id="addUserBtn" class="btn btn-primary" style="margin-top:15px;">추가</button>
+  </section>
+
+  <section class="panel">
+    <h3>사용자 목록</h3>
+
+    <table>
+      <thead>
+        <tr>
+          <th>순번</th>
+          <th>ID</th>
+          <th>아이디</th>
+          <th>이름</th>
+          <th>권한</th>
+          <th>생성일</th>
+          <th>관리</th>
+        </tr>
+      </thead>
+      <tbody id="usersTable"></tbody>
+    </table>
+  </section>
+
+</div>
+
+<!-- 공통 JS -->
+<script src="/kr/admin/js/common_auth.js"></script>
+<script src="/kr/admin/js/sidebar.js"></script>
+<script src="./js/topbar_user_menu.js"></script>
+
+<!-- 이 페이지 전용 JS -->
+<script src="/kr/admin/js/users_core.js"></script>
+
+<script>
+  const USER_ROLE = localStorage.getItem("role");
+  const IS_SUPERADMIN = USER_ROLE === "superadmin";
+
+
+
+  // 접근 권한 검사: editor 이상 진입 가능
+  requireEditPermission()
+
+  // 사이드바 로드
+  loadSidebar("users");
+</script>
+
+</body>
+</html>
