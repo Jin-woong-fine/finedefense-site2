@@ -4,7 +4,12 @@
   <meta charset="UTF-8" />
   <title>사용자 관리 | Fine Defense 관리자</title>
 
+  <!-- 공통 관리자 CSS -->
   <link rel="stylesheet" href="./css/admin.css" />
+
+    <!-- 세션 매니저 -->
+  <script type="module" src="/js/session_manager.js"></script>
+  <script type="module" src="./js/dashboard_session_timer.js"></script>
 
   <style>
     .panel table {
@@ -34,15 +39,25 @@
 </head>
 
 <body>
-<div id="sidebar"></div>
+<!-- ⭐ 사이드바 -->
+<div id="sidebar" data-active="notice"></div>
 
+<!-- ⭐ 메인 -->
 <div class="main">
 
+  <!-- TOPBAR -->
   <div class="topbar">
-    <h2>사용자 관리</h2>
-    <div>
-      <button class="btn btn-primary" onclick="location.href='../index.html'">홈으로</button>
-      <button id="logoutBtn" class="btn btn-danger">로그아웃</button>
+    <div class="title">사용자 관리</div>
+
+    <div style="display:flex; align-items:center; gap:12px;">
+      <span id="session-timer" class="session-timer">세션 계산중...</span>
+
+      <div class="topbar-user" id="topbarUser">
+        <span id="topbarUserName">관리자</span> ▾
+        <div class="user-dropdown" id="userDropdown"></div>
+      </div>
+
+      <button onclick="location.href='../index.html'">홈으로</button>
     </div>
   </div>
 
