@@ -82,13 +82,13 @@ async function loadUsers() {
         <button class="btn-small btn-delete" onclick="deleteUser(${u.id})">삭제</button>
       `;
 
-      return rowTemplate(u, roleSelect, actions);
+      return rowTemplate(u, roleSelect, actions, myRole);
     }
 
     // ================================
     // ➤ 모든 로그인 사용자 (조회 전용)
     // ================================
-    return rowTemplate(u, u.role, profileBtn);
+    return rowTemplate(u, u.role, profileBtn, myRole);
   })
   .join("");
 }
@@ -97,9 +97,18 @@ async function loadUsers() {
 // ============================================
 // 행 템플릿 함수
 // ============================================
-function rowTemplate(u, roleCell, actionCell) {
+function rowTemplate(u, roleCell, actionCell, myRole) {
+  const orderCell =
+    myRole === "superadmin"
+      ? `<input type="number"
+           value="${u.sort_order ?? 0}"
+           style="width:60px"
+           onchange="updateOrder(${u.id}, this.value)">`
+      : (u.sort_order ?? "-");
+
   return `
     <tr>
+      <td>${orderCell}</td>
       <td>${u.id}</td>
       <td>${u.username}</td>
       <td>${u.name || "-"}</td>
@@ -109,6 +118,24 @@ function rowTemplate(u, roleCell, actionCell) {
     </tr>
   `;
 }
+
+// ============================================
+// 순번 변경 (superadmin)
+// ============================================
+async function updateOrder(id, value) {
+  const res = await fetch(`${API}/users/${id}/order`, {
+    method: "PUT",
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ sort_order: Number(value) || 0 })
+  });
+
+  if (!res.ok) {
+    alert("순번 변경 실패");
+  }
+}
+
+
+
 
 // ============================================
 // 역할 변경 (superadmin)

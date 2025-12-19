@@ -48,10 +48,10 @@ router.get(
     try {
       const [rows] = await db.query(
         `
-        SELECT id, username, name, role, department, position, created_at
+        SELECT id, sort_order, username, name, role, department, position, created_at
         FROM users
-        ORDER BY id ASC
-      `
+        ORDER BY sort_order ASC, id ASC
+        `
       );
 
       res.json(rows);
@@ -109,6 +109,35 @@ router.post("/", verifyToken, verifyRole("superadmin"), async (req, res) => {
     res.status(500).json({ message: "DB error" });
   }
 });
+
+
+/* ============================================================
+   🔢 사용자 순번 변경 (superadmin)
+   PUT /api/users/:id/order
+============================================================ */
+router.put(
+  "/:id/order",
+  verifyToken,
+  verifyRole("superadmin"),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { sort_order } = req.body;
+
+      await db.query(
+        `UPDATE users SET sort_order = ? WHERE id = ?`,
+        [Number(sort_order) || 0, id]
+      );
+
+      res.json({ message: "order updated" });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "DB error" });
+    }
+  }
+);
+
+
 
 /* ============================================================
    📌 관리자용: 역할 변경 (superadmin)
