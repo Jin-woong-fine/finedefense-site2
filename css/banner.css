@@ -37,15 +37,14 @@
   display: block;
 }
 
-/* 이미지 위 소프트 오버레이 */
 .slide::after {
   content: "";
   position: absolute;
   inset: 0;
   background: linear-gradient(
     to bottom,
-    rgba(0, 0, 0, 0.15),
-    rgba(0, 0, 0, 0.35)
+    rgba(0, 0, 0, 0.08),
+    rgba(0, 0, 0, 0.22)
   );
   z-index: 1;
 }
