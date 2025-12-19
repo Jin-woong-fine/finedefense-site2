@@ -32,51 +32,50 @@ async function loadUsers() {
 }
 
 function renderUserCard(u, myRole, myId) {
-  // ✅ 1. 먼저 initial 정의
-  const initial = (u.name || u.username || "?")[0].toUpperCase();
-
-  // ✅ 2. avatar는 그 다음
-  const avatar = u.avatar_url
-    ? `<img src="${u.avatar_url}"
-            alt="avatar"
-            onerror="this.onerror=null;this.src='/img/admin/avatar-placeholder.png';">`
-    : initial;
+  const avatarUrl = u.avatar_url || "/img/admin/avatar-placeholder.png";
+  const intro = (u.intro || "").trim();
 
   const profileBtn =
     u.id === myId
-      ? `<button class="btn-primary"
-                 onclick="location.href='/kr/admin/user_profile.html'">
-           내 프로필
-         </button>`
-      : `<button class="btn-primary"
-                 onclick="location.href='/kr/admin/user_view.html?id=${u.id}'">
-           프로필
-         </button>`;
+      ? `<button class="btn-primary" onclick="location.href='/kr/admin/user_profile.html'">내 프로필</button>`
+      : `<button class="btn-primary" onclick="location.href='/kr/admin/user_view.html?id=${u.id}'">프로필 보기</button>`;
 
-  const adminBtns =
+  const adminMenu =
     myRole === "superadmin"
       ? `
-        <button class="btn-gray" onclick="resetPassword(${u.id})">비번</button>
-        <button class="btn-danger" onclick="deleteUser(${u.id})">삭제</button>
+        <div class="card-menu">
+          <button onclick="resetPassword(${u.id})">비번 초기화</button>
+          <button class="danger" onclick="deleteUser(${u.id})">삭제</button>
+        </div>
       `
       : "";
 
   return `
-    <div class="user-card">
-      <div class="user-header">
-        <div class="user-avatar">${avatar}</div>
-        <div>
-          <div class="user-name">${u.name || "-"}</div>
-          <div class="user-role">${u.role}</div>
-        </div>
+    <div class="user-card github-style">
+
+      <div class="avatar-wrap">
+        <img src="${avatarUrl}" alt="avatar">
       </div>
+
+      <div class="user-name">${u.name || "-"}</div>
+
+      <div class="user-meta">
+        ${u.position || "직책 없음"} · ${u.department || "부서 없음"}
+      </div>
+
+      ${
+        intro
+          ? `<div class="user-intro">${intro}</div>`
+          : `<div class="user-intro empty">소개글 없음</div>`
+      }
 
       <div class="user-username">${u.username}</div>
 
       <div class="user-actions">
         ${profileBtn}
-        ${adminBtns}
       </div>
+
+      ${adminMenu}
     </div>
   `;
 }
