@@ -44,8 +44,8 @@
   inset: 0;
   background: linear-gradient(
     to bottom,
-    rgba(0, 0, 0, 0.25),
-    rgba(0, 0, 0, 0.65)
+    rgba(0, 0, 0, 0.15),
+    rgba(0, 0, 0, 0.35)
   );
   z-index: 1;
 }
@@ -76,7 +76,7 @@
   word-break: keep-all;
 
   text-shadow:
-    0 10px 36px rgba(0, 0, 0, 0.55);
+    0 6px 18px rgba(0, 0, 0, 0.35);
 }
 
 /* 서브 텍스트 */
@@ -95,7 +95,7 @@
   margin-right: auto;
 
   text-shadow:
-    0 6px 20px rgba(0, 0, 0, 0.45);
+    0 3px 12px rgba(0, 0, 0, 0.25);
 }
 
 /* =========================================================
