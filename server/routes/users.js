@@ -46,21 +46,20 @@ router.get(
   verifyRole("editor", "admin", "superadmin"),
   async (req, res) => {
     try {
-      const [rows] = await db.query(
-        `
+      const [rows] = await db.query(`
         SELECT
           id,
           username,
           name,
           role,
-          avatar_url,   -- 🔥 이 줄 반드시 추가
+          avatar_url,
           department,
           position,
+          intro,
           created_at
         FROM users
         ORDER BY sort_order ASC, id ASC
-        `
-      );
+      `);
 
       res.json(rows);
     } catch (err) {
