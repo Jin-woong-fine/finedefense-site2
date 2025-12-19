@@ -32,7 +32,11 @@ async function loadUsers() {
 }
 
 function renderUserCard(u, myRole, myId) {
-    const avatar = u.avatar_url
+  // ✅ 1. 먼저 initial 정의
+  const initial = (u.name || u.username || "?")[0].toUpperCase();
+
+  // ✅ 2. avatar는 그 다음
+  const avatar = u.avatar_url
     ? `<img src="${u.avatar_url}"
             alt="avatar"
             onerror="this.onerror=null;this.src='/img/admin/avatar-placeholder.png';">`
@@ -40,8 +44,14 @@ function renderUserCard(u, myRole, myId) {
 
   const profileBtn =
     u.id === myId
-      ? `<button class="btn-primary" onclick="location.href='/kr/admin/user_profile.html'">내 프로필</button>`
-      : `<button class="btn-primary" onclick="location.href='/kr/admin/user_view.html?id=${u.id}'">프로필</button>`;
+      ? `<button class="btn-primary"
+                 onclick="location.href='/kr/admin/user_profile.html'">
+           내 프로필
+         </button>`
+      : `<button class="btn-primary"
+                 onclick="location.href='/kr/admin/user_view.html?id=${u.id}'">
+           프로필
+         </button>`;
 
   const adminBtns =
     myRole === "superadmin"
