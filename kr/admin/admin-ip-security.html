@@ -227,37 +227,6 @@
 /* 🔐 권한 체크 & 사이드바 */
 requireAdminOrSuperadmin();
 loadSidebar("settings");
-
-
-function renderLogPagination(page, totalPages) {
-  const wrap = document.getElementById("logPagination");
-  if (!wrap) return;
-
-  if (totalPages <= 1) {
-    wrap.innerHTML = "";
-    return;
-  }
-
-  wrap.innerHTML = `
-    <button class="btn btn-secondary"
-      ${page <= 1 ? "disabled" : ""}
-      onclick="loadIpChangeLogs(${page - 1})">
-      이전
-    </button>
-
-    <span style="font-size:0.9rem;">
-      ${page} / ${totalPages}
-    </span>
-
-    <button class="btn btn-secondary"
-      ${page >= totalPages ? "disabled" : ""}
-      onclick="loadIpChangeLogs(${page + 1})">
-      다음
-    </button>
-  `;
-}
-
-
 </script>
 
 
