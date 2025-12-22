@@ -43,7 +43,7 @@ import helmet from "helmet";
 
 const app = express();
 
-app.set("trust proxy", true);
+app.set("trust proxy", 1);
 
 // 경로 설정
 const __filename = fileURLToPath(import.meta.url);
@@ -92,12 +92,15 @@ const loginLimiter = rateLimit({
 // ------------------------------------------------------
 // 📌 라우터 등록
 // ------------------------------------------------------
+// 로그인 보호
 app.post(
   "/api/auth/login",
   adminIpGuard,
-  loginLimiter,
-  authRouter
+  loginLimiter
 );
+
+// 인증 라우터
+app.use("/api/auth", authRouter);
 
 app.use("/api/cert-items", postsCertificationRouter);
 
