@@ -6,36 +6,33 @@ export default async function adminIpGuard(req, res, next) {
   try {
     const ip = getClientIp(req);
 
-    // 1️⃣ IP 못 얻음
-    if (!ip) {
-      await logBlock(req, "IP_NOT_DETECTED");
-      return hideEndpoint(req, res);
-    }
-
-    // 2️⃣ IP 제한 ON / OFF
     const [[setting]] = await db.execute(
       "SELECT enabled FROM admin_ip_settings WHERE id = 1"
     );
 
-    if (!setting || setting.enabled === 0) {
-      return next(); // 제한 OFF
+    // IP 제한 OFF
+    if (!setting?.enabled) {
+      return next();
     }
 
-    // 3️⃣ 화이트리스트 검사
-    const [rows] = await db.execute(
-      "SELECT id FROM admin_ip_whitelist WHERE ip = ? LIMIT 1",
+    const [[allowed]] = await db.execute(
+      "SELECT id FROM admin_ip_whitelist WHERE ip = ?",
       [ip]
     );
 
-    if (rows.length === 0) {
-      await logBlock(req, "IP_NOT_WHITELISTED");
-      return hideEndpoint(req, res);
+    // 허용 안 된 IP
+    if (!allowed) {
+      return res.status(403).json({
+        message: "접근이 차단되었습니다."
+      });
     }
 
-    next();
+    return next();
   } catch (err) {
-    console.error("adminIpGuard error:", err);
-    return res.status(500).json({ message: "Server error" });
+    console.error("❌ adminIpGuard ERROR:", err);
+    return res.status(500).json({
+      message: "IP 검사 중 오류"
+    });
   }
 }
 
