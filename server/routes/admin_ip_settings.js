@@ -34,14 +34,14 @@ router.patch("/ip-settings", verifyToken, async (req, res) => {
     console.log("🔥 LOG INSERT BEFORE", req.user);
 
     await db.execute(
-        `INSERT INTO admin_ip_change_logs
-        (user_id, username, action)
-        VALUES (?, ?, ?)`,
-        [
-        req.user?.id || null,
-        req.user?.username || null,
+    `INSERT INTO admin_ip_change_logs
+    (user_id, username, action)
+    VALUES (?, ?, ?)`,
+    [
+        req.user?.id,
+        req.user?.username || req.user?.name,
         enabled ? "ENABLE" : "DISABLE"
-        ]
+    ]
     );
 
     console.log("🔥 LOG INSERT AFTER");
@@ -93,8 +93,8 @@ router.post("/ip-whitelist", verifyToken, async (req, res) => {
         (user_id, username, action, ip, label)
         VALUES (?, ?, 'ADD', ?, ?)`,
         [
-        req.user?.id || null,
-        req.user?.username || null,
+        req.user?.id,
+        req.user?.username || req.user?.name, // ⭐ 수정
         ip,
         label || ""
         ]
@@ -144,8 +144,8 @@ router.delete("/ip-whitelist/:id", verifyToken, async (req, res) => {
         (user_id, username, action, ip, label)
         VALUES (?, ?, 'DELETE', ?, ?)`,
         [
-        req.user?.id || null,
-        req.user?.username || null,
+        req.user?.id,
+        req.user?.username || req.user?.name, // ⭐ 수정
         target?.ip || "",
         target?.label || ""
         ]
@@ -188,8 +188,8 @@ router.put("/ip-whitelist/:id", verifyToken, async (req, res) => {
         (user_id, username, action, ip, label)
         VALUES (?, ?, 'UPDATE', ?, ?)`,
         [
-        req.user?.id || null,
-        req.user?.username || null,
+        req.user?.id,
+        req.user?.username || req.user?.name, // ⭐ 수정
         ip,
         label || ""
         ]
