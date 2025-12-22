@@ -4,6 +4,19 @@ import { getClientIp } from "../utils/ip.js";
 
 export default async function adminIpGuard(req, res, next) {
   try {
+    const url = req.originalUrl;
+
+    /* ==================================================
+       🔓 0) IP 관리 API는 항상 통과
+       (토큰 검증은 라우터에서 별도 처리)
+    ================================================== */
+    if (
+      url.startsWith("/api/admin/ip-settings") ||
+      url.startsWith("/api/admin/ip-whitelist")
+    ) {
+      return next();
+    }
+
     const ip = getClientIp(req);
 
     // IP 못 얻으면 차단 (보수적)
@@ -11,7 +24,9 @@ export default async function adminIpGuard(req, res, next) {
       return hideEndpoint(req, res);
     }
 
-    // 1️⃣ IP 제한 ON / OFF 확인
+    /* ==================================================
+       1) IP 제한 ON / OFF 확인
+    ================================================== */
     const [[setting]] = await db.execute(
       "SELECT enabled FROM admin_ip_settings WHERE id = 1"
     );
@@ -21,7 +36,9 @@ export default async function adminIpGuard(req, res, next) {
       return next();
     }
 
-    // 2️⃣ 화이트리스트 검사
+    /* ==================================================
+       2) 화이트리스트 검사
+    ================================================== */
     const [rows] = await db.execute(
       "SELECT id FROM admin_ip_whitelist WHERE ip = ? LIMIT 1",
       [ip]
@@ -42,7 +59,7 @@ export default async function adminIpGuard(req, res, next) {
    🔒 엔드포인트 은닉 (HTML / API 구분)
 -------------------------------------------------- */
 function hideEndpoint(req, res) {
-  // API 요청
+  // API 요청 → 존재 숨김
   if (req.originalUrl.startsWith("/api/")) {
     return res.status(404).json({ message: "Not Found" });
   }
