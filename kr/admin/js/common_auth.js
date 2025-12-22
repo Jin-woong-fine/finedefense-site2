@@ -266,6 +266,19 @@ function showToast(message, duration = 1500) {
   }, duration);
 }
 
+/****************************************************
+ * 🔐 관리자 전용 (admin + superadmin)
+ ****************************************************/
+function requireAdminPermission() {
+  requireLogin();
+
+  const role = localStorage.getItem("role");
+  if (!["admin", "superadmin"].includes(role)) {
+    denyAndBack("관리자만 접근 가능합니다.", "/kr/admin/index.html");
+  }
+}
+
+
 
 
 
@@ -287,3 +300,5 @@ window.requireWritePermission = requireWritePermission;
 window.requireEditPermission = requireEditPermission;
 
 window.showToast = showToast;
+
+window.requireAdminPermission = requireAdminPermission;
