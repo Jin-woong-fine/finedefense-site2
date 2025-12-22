@@ -13,6 +13,7 @@ function authHeaders() {
 document.addEventListener("DOMContentLoaded", async () => {
   await loadIpSettings();
   await loadIpList();
+  await loadIpChangeLogs();
 
   document
     .getElementById("ipToggle")
@@ -276,3 +277,38 @@ async function addMyIp() {
     loadIpList();
 }
 
+
+
+/* ===============================
+   IP 변경 로그 로드
+================================ */
+async function loadIpChangeLogs() {
+  const tbody = document.getElementById("ipLogTableBody");
+  if (!tbody) return;
+
+  const res = await fetch("/api/admin/ip-change-logs", {
+    headers: authHeaders()
+  });
+
+  if (!res.ok) {
+    tbody.innerHTML = `<tr><td colspan="5">로그 불러오기 실패</td></tr>`;
+    return;
+  }
+
+  const list = await res.json();
+
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="5">로그 없음</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = list.map(row => `
+    <tr>
+      <td>${new Date(row.created_at).toLocaleString()}</td>
+      <td>${row.username || "-"}</td>
+      <td>${row.action}</td>
+      <td>${row.ip || "-"}</td>
+      <td>${row.label || ""}</td>
+    </tr>
+  `).join("");
+}
