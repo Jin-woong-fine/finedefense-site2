@@ -210,7 +210,15 @@ router.get("/public", async (req, res) => {
     const lang = req.query.lang || "kr";
 
     const [rows] = await db.execute(
-      `SELECT id, title, summary, category, thumbnail, description_html
+      `SELECT
+         id,
+         title,
+         summary,
+         category,
+         thumbnail,
+         description_html,
+         created_at,
+         updated_at
        FROM products
        WHERE lang = ?
        ORDER BY sort_order ASC, created_at DESC`,
@@ -223,6 +231,7 @@ router.get("/public", async (req, res) => {
     res.status(500).json({ message: "server error" });
   }
 });
+
 
 
 
