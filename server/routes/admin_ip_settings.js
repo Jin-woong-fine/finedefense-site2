@@ -223,7 +223,7 @@ router.get("/ip-my", verifyToken, (req, res) => {
 /* ===============================
    IP 변경 로그 조회 (READ ONLY)
 ================================ */
-router.get("/ip-change-logs", verifyToken, async (req, res) => {
+router.get("/ip-change-logs", async (req, res) => {
   const page = Math.max(parseInt(req.query.page) || 1, 1);
   const limit = Math.min(parseInt(req.query.limit) || 20, 100);
   const offset = (page - 1) * limit;
