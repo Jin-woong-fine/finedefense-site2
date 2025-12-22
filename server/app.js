@@ -95,7 +95,6 @@ const loginLimiter = rateLimit({
 app.post(
   "/api/auth/login",
   adminIpGuard,
-  adminIpSettingsRouter,   // ⭐ 이 줄이 핵심
   loginLimiter,
   authRouter
 );
@@ -105,6 +104,7 @@ app.use("/api/cert-items", postsCertificationRouter);
 app.use(
   "/api/admin",
   adminIpGuard,
+  adminIpSettingsRouter,
   adminDashboardRouter,
   adminRouter
 );
