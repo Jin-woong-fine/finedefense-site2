@@ -111,6 +111,11 @@
     <div class="setting-section">
       <div class="setting-title">🔐 관리자 IP 접근 제한</div>
 
+    <p style="font-size:0.9rem; color:#555; margin-bottom:14px; line-height:1.6;">
+        관리자 페이지 접근을 허용할 IP를 지정하여 무단 접속을 방지합니다.<br>
+        IP 제한 활성화 시, 등록된 IP에서만 관리자 페이지에 접근할 수 있습니다.
+    </p>
+
       <div class="toggle-row">
         <label>
           <input type="checkbox" id="ipToggle" />
@@ -120,7 +125,9 @@
       </div>
 
         <p style="font-size:0.85rem; color:#666; margin-top:6px;">
-        ※ IP 제한을 활성화하려면 최소 1개의 IP가 등록되어 있어야 합니다.
+        ※ 관리자 페이지 접근을 특정 IP로 제한하는 보안 기능입니다.<br>
+        ※ <strong>최소 1개의 IP가 등록되어 있어야 활성화</strong>할 수 있습니다.<br>
+        ※ 설정을 잘못하면 <strong>관리자 본인도 접속이 차단</strong>될 수 있으니 주의하세요.
         </p>
 
 
@@ -137,11 +144,22 @@
         </tbody>
       </table>
 
+        <p style="font-size:0.85rem; color:#666; margin-top:10px; line-height:1.6;">
+            ※ <strong>현재 접속 중인 IP는 삭제할 수 없습니다.</strong><br>
+            ※ IP 제한이 활성화된 상태에서는 <strong>최소 1개의 IP가 반드시 유지</strong>되어야 합니다.
+        </p>
+
         <div style="margin-top:12px;">
         <button class="btn btn-secondary" onclick="addMyIp()">
             내 IP 자동 추가
         </button>
         </div>
+
+        <p style="font-size:0.85rem; color:#666; margin-top:6px; line-height:1.6;">
+        ※ 현재 접속 중인 IP를 자동으로 등록합니다.<br>
+        ※ IP 제한을 활성화하기 전, <strong>반드시 본인 IP를 먼저 등록</strong>하세요.
+        </p>
+
 
       <div class="form-row">
         <input type="text" id="newIp" placeholder="IP 주소 (예: 1.2.3.4)" />
