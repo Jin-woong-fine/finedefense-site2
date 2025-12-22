@@ -22,12 +22,16 @@ export function verifyToken(req, res, next) {
     const token = matches[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
+    // 🔥 여기 추가
+    console.log("🔥 VERIFY TOKEN DECODED:", decoded);
+
     req.user = decoded;
     next();
   } catch (err) {
     return res.status(401).json({ message: "Token expired or invalid" });
   }
 }
+
 
 /* ============================================================
    💡 권한 체크 allowRoles()
