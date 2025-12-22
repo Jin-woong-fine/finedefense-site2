@@ -242,6 +242,13 @@
   box-shadow: none;
 }
 
+/* 작성일, 수정일 메타영역 */
+.product-meta {
+  font-size: 0.78rem;
+  color: #8a8a8a;
+  margin-bottom: 14px;
+}
+
 
   </style>
 </head>
@@ -273,6 +280,7 @@
 
 <section class="product-detail">
   <h1 id="productTitle" class="product-title">제품명</h1>
+  <div id="productMeta" class="product-meta"></div>
   <div id="productCategory" class="product-category"></div>
 
   <div class="product-content">
@@ -302,6 +310,19 @@
     <div data-include="/kr/components/footer.html"></div>
 
 <script>
+/* ==========================================================
+   📌 Util
+========================================================== */
+function formatDate(dateStr) {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  if (isNaN(d)) return "";
+  return d.toISOString().slice(0, 10);
+}
+
+
+
+
 /* ==========================================================
    📌 전역 상태
 ========================================================== */
@@ -352,6 +373,7 @@ function getCategoryLabel(code) {
 ========================================================== */
 function renderProduct({ product, images }) {
   const titleEl      = document.getElementById("productTitle");
+  const metaEl       = document.getElementById("productMeta"); 
   const categoryEl   = document.getElementById("productCategory");
   const descEl       = document.getElementById("productDesc");
   const mainImageEl  = document.getElementById("mainImage");
@@ -364,6 +386,24 @@ function renderProduct({ product, images }) {
   categoryEl.textContent = `카테고리: ${categoryLabel}`;
   // breadcrumb 2단계는 카테고리로 고정
   crumbProduct.textContent = categoryLabel;
+
+
+  // 날짜 메타
+  const created = formatDate(product.created_at);
+  const updated = formatDate(product.updated_at);
+
+  let metaText = "";
+
+  if (created && updated && created !== updated) {
+    metaText = `게시일: ${created} · 최종 수정: ${updated}`;
+  } else if (created) {
+    metaText = `게시일: ${created}`;
+  }
+
+
+metaEl.textContent = metaText;
+metaEl.style.display = metaText ? "block" : "none";
+
 
   // 대표 이미지
   const mainImg = product.thumbnail && product.thumbnail.trim()
@@ -416,6 +456,14 @@ function renderProduct({ product, images }) {
 
   /* description_html 출력 */
   descEl.innerHTML = product.description_html || "<p>설명이 없습니다.</p>";
+
+  // 🔥 category 쿼리 강제 세팅 (Back 버튼 / breadcrumb 안정화)
+  const url = new URL(window.location.href);
+  url.searchParams.set("category", product.category);
+  window.history.replaceState({}, "", url);
+
+
+
 }
 
 /* ==========================================================

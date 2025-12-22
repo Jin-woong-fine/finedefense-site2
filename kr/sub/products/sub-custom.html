@@ -116,17 +116,11 @@
       -webkit-box-orient: vertical;
     }
 
-    @media (max-width: 768px) {
-      .product-card {
-        flex-direction: column;
-      }
-      .card-image {
-        width: 100%;
-        height: 200px;
-      }
-      .product-cards {
-        grid-template-columns: 1fr;
-      }
+    /* 제품 등록일, 수정일 */
+    .card-meta {
+      font-size: 0.72rem;
+      color: #8b8b8b;
+      margin-bottom: 8px;
     }
   </style>
 </head>
@@ -178,6 +172,14 @@
     return (tmp.textContent || tmp.innerText || "").trim();
   }
 
+  // 날짜 포맷 (YYYY-MM-DD)
+  function formatDate(dateStr) {
+    if (!dateStr) return "";
+    const d = new Date(dateStr);
+    if (isNaN(d)) return "";
+    return d.toISOString().slice(0, 10);
+  }
+
   async function loadProducts() {
     const container = document.getElementById("productCards");
 
@@ -199,15 +201,27 @@
         const img = p.thumbnail || "/img/products/Image-placeholder.png";
         const link = `/kr/sub/products/product-view.html?id=${p.id}`;
 
-        // 🔥 summary → description_html 순서로 사용
+        // summary → description_html 순서
         const plainSummary = stripHtml(p.summary || "");
         const plainDescription = stripHtml(p.description_html || "");
-        const baseText = plainSummary || plainDescription || "제품 상세 설명 준비 중입니다.";
+        const baseText =
+          plainSummary || plainDescription || "제품 상세 설명 준비 중입니다.";
 
         const desc =
           baseText.length > 120
             ? baseText.slice(0, 120) + "…"
             : baseText;
+
+        // 날짜 처리
+        const created = formatDate(p.created_at);
+        const updated = formatDate(p.updated_at);
+
+        const meta =
+          created && updated && created !== updated
+            ? `등록 ${created} · 수정 ${updated}`
+            : created
+              ? `등록 ${created}`
+              : "";
 
         return `
           <a class="product-card" href="${link}">
@@ -216,11 +230,13 @@
             </div>
             <div class="card-content">
               <h3>${p.title}</h3>
+              ${meta ? `<div class="card-meta">${meta}</div>` : ""}
               <p>${desc}</p>
             </div>
-          </a>`;
+          </a>
+        `;
       }).join("");
-      
+
     } catch (err) {
       console.error("loadProducts 오류:", err);
       container.innerHTML = "<p>제품을 불러오는 중 오류가 발생했습니다.</p>";
@@ -229,6 +245,7 @@
 
   loadProducts();
 </script>
+
 
     <!-- 공통 스크립트 -->
     <script src="/js/include.js"></script>

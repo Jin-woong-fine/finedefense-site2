@@ -116,17 +116,11 @@
       -webkit-box-orient: vertical;
     }
 
-    @media (max-width: 768px) {
-      .product-card {
-        flex-direction: column;
-      }
-      .card-image {
-        width: 100%;
-        height: 200px;
-      }
-      .product-cards {
-        grid-template-columns: 1fr;
-      }
+    /* 제품 등록일, 수정일 */
+    .card-meta {
+      font-size: 0.72rem;
+      color: #8b8b8b;
+      margin-bottom: 8px;
     }
   </style>
 </head>
@@ -174,11 +168,19 @@
     <div data-include="/en/components/footer.html"></div>
 
 <script>
-  // 🔥 HTML 태그 제거 후 텍스트만 추출
+  // 🔥 Remove HTML tags and extract plain text
   function stripHtml(html) {
     const tmp = document.createElement("div");
     tmp.innerHTML = html;
     return (tmp.textContent || tmp.innerText || "").trim();
+  }
+
+  // 🔥 Date format (YYYY-MM-DD)
+  function formatDate(dateStr) {
+    if (!dateStr) return "";
+    const d = new Date(dateStr);
+    if (isNaN(d)) return "";
+    return d.toISOString().slice(0, 10);
   }
 
   async function loadProducts() {
@@ -186,11 +188,11 @@
 
     try {
       const res = await fetch("/api/products/public?lang=en");
-      if (!res.ok) throw new Error("서버 응답 오류");
+      if (!res.ok) throw new Error("Server response error");
 
       const all = await res.json();
 
-      // "수중고정형 케이블" 카테고리 필터
+      // "fixed" category only
       const products = all.filter(p => p.category === "fixed");
 
       if (products.length === 0) {
@@ -202,15 +204,27 @@
         const img = p.thumbnail || "/img/products/Image-placeholder.png";
         const link = `/en/sub/products/product-view.html?id=${p.id}&lang=en`;
 
-        // 🔥 summary → description_html 순서로 사용
+        // summary → description_html priority
         const plainSummary = stripHtml(p.summary || "");
         const plainDescription = stripHtml(p.description_html || "");
-        const baseText = plainSummary || plainDescription || "Product details are being prepared.";
+        const baseText =
+          plainSummary || plainDescription || "Product details are being prepared.";
 
         const desc =
           baseText.length > 120
             ? baseText.slice(0, 120) + "…"
             : baseText;
+
+        // 🔥 Date meta
+        const created = formatDate(p.created_at);
+        const updated = formatDate(p.updated_at);
+
+        const meta =
+          created && updated && created !== updated
+            ? `Published ${created} · Updated ${updated}`
+            : created
+              ? `Published ${created}`
+              : "";
 
         return `
           <a class="product-card" href="${link}">
@@ -219,19 +233,22 @@
             </div>
             <div class="card-content">
               <h3>${p.title}</h3>
+              ${meta ? `<div class="card-meta">${meta}</div>` : ""}
               <p>${desc}</p>
             </div>
-          </a>`;
+          </a>
+        `;
       }).join("");
 
     } catch (err) {
-      console.error("loadProducts 오류:", err);
-      container.innerHTML = "<p>제품 목록을 불러오는 중 오류가 발생했습니다.</p>";
+      console.error("loadProducts error:", err);
+      container.innerHTML = "<p>Failed to load product list.</p>";
     }
   }
 
   loadProducts();
 </script>
+
 
 
     <!-- 공통 스크립트 -->

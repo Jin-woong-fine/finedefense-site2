@@ -114,17 +114,11 @@
       -webkit-box-orient: vertical;
     }
 
-    @media (max-width: 768px) {
-      .product-card {
-        flex-direction: column;
-      }
-      .card-image {
-        width: 100%;
-        height: 200px;
-      }
-      .product-cards {
-        grid-template-columns: 1fr;
-      }
+    /* 제품 등록일, 수정일 */
+    .card-meta {
+      font-size: 0.72rem;
+      color: #8b8b8b;
+      margin-bottom: 8px;
     }
   </style>
 </head>
@@ -170,65 +164,88 @@
     <div data-include="/kr/components/footer.html"></div>
 
 
-<script>
-  // 🔥 HTML 태그 제거 후 설명 텍스트만 추출
-  function stripHtml(html) {
-    const tmp = document.createElement("div");
-    tmp.innerHTML = html;
-    return (tmp.textContent || tmp.innerText || "").trim();
-  }
-
-  async function loadProducts() {
-    const container = document.getElementById("productCards");
-
-    try {
-      const res = await fetch("/api/products/public?lang=kr");
-      if (!res.ok) throw new Error("서버 응답 오류");
-
-      const all = await res.json();
-
-      // "수중이동형 케이블" 카테고리 필터
-      const products = all.filter(p => p.category === "towed");
-
-      if (products.length === 0) {
-        container.innerHTML = "<p>등록된 수중이동형 케이블 제품이 없습니다.</p>";
-        return;
-      }
-
-      container.innerHTML = products.map(p => {
-        const img = p.thumbnail || "/img/products/Image-placeholder.png";
-        const link = `/kr/sub/products/product-view.html?id=${p.id}`;
-
-        // 🔥 summary → description_html 순서로 사용
-        const plainSummary = stripHtml(p.summary || "");
-        const plainDescription = stripHtml(p.description_html || "");
-        const baseText = plainSummary || plainDescription || "제품 상세 설명 준비 중입니다.";
-
-        const desc =
-          baseText.length > 120
-            ? baseText.slice(0, 120) + "…"
-            : baseText;
-
-        return `
-          <a class="product-card" href="${link}">
-            <div class="card-image">
-              <img src="${img}" alt="${p.title}">
-            </div>
-            <div class="card-content">
-              <h3>${p.title}</h3>
-              <p>${desc}</p>
-            </div>
-          </a>`;
-      }).join("");
-
-    } catch (err) {
-      console.error("loadProducts 오류:", err);
-      container.innerHTML = "<p>제품 목록을 불러오는 중 오류가 발생했습니다.</p>";
+  <script>
+    // 🔥 HTML 태그 제거 후 설명 텍스트만 추출
+    function stripHtml(html) {
+      const tmp = document.createElement("div");
+      tmp.innerHTML = html;
+      return (tmp.textContent || tmp.innerText || "").trim();
     }
-  }
 
-  loadProducts();
-</script>
+    // 🔥 날짜 포맷 (YYYY-MM-DD)
+    function formatDate(dateStr) {
+      if (!dateStr) return "";
+      const d = new Date(dateStr);
+      if (isNaN(d)) return "";
+      return d.toISOString().slice(0, 10);
+    }
+
+    async function loadProducts() {
+      const container = document.getElementById("productCards");
+
+      try {
+        const res = await fetch("/api/products/public?lang=kr");
+        if (!res.ok) throw new Error("서버 응답 오류");
+
+        const all = await res.json();
+
+        // "수중이동형 케이블" 카테고리 필터
+        const products = all.filter(p => p.category === "towed");
+
+        if (products.length === 0) {
+          container.innerHTML = "<p>등록된 수중이동형 케이블 제품이 없습니다.</p>";
+          return;
+        }
+
+        container.innerHTML = products.map(p => {
+          const img = p.thumbnail || "/img/products/Image-placeholder.png";
+          const link = `/kr/sub/products/product-view.html?id=${p.id}`;
+
+          // 🔥 summary → description_html 순서
+          const plainSummary = stripHtml(p.summary || "");
+          const plainDescription = stripHtml(p.description_html || "");
+          const baseText =
+            plainSummary || plainDescription || "제품 상세 설명 준비 중입니다.";
+
+          const desc =
+            baseText.length > 120
+              ? baseText.slice(0, 120) + "…"
+              : baseText;
+
+          // 🔥 날짜 처리
+          const created = formatDate(p.created_at);
+          const updated = formatDate(p.updated_at);
+
+          const meta =
+            created && updated && created !== updated
+              ? `등록 ${created} · 수정 ${updated}`
+              : created
+                ? `등록 ${created}`
+                : "";
+
+          return `
+            <a class="product-card" href="${link}">
+              <div class="card-image">
+                <img src="${img}" alt="${p.title}">
+              </div>
+              <div class="card-content">
+                <h3>${p.title}</h3>
+                ${meta ? `<div class="card-meta">${meta}</div>` : ""}
+                <p>${desc}</p>
+              </div>
+            </a>
+          `;
+        }).join("");
+
+      } catch (err) {
+        console.error("loadProducts 오류:", err);
+        container.innerHTML = "<p>제품 목록을 불러오는 중 오류가 발생했습니다.</p>";
+      }
+    }
+
+    loadProducts();
+  </script>
+
 
 
 
