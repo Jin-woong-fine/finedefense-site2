@@ -246,9 +246,9 @@ const [rows] = await db.execute(
     created_at
   FROM admin_ip_change_logs
   ORDER BY id DESC
-  LIMIT ? OFFSET ?
+  LIMIT ?, ?
   `,
-  [limit, offset]
+  [offset, limit]
 );
 
   res.json({
