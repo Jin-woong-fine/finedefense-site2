@@ -306,9 +306,6 @@ async function addMyIp() {
 /* ===============================
    IP 변경 로그 로드
 ================================ */
-let currentLogPage = 1;
-const LOG_LIMIT = 20;
-
 async function loadIpChangeLogs(page = 1) {
   currentLogPage = page;
 
