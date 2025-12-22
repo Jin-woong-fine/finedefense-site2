@@ -77,7 +77,7 @@ async function loadSidebar(activePage = "") {
       {
         title: "시스템 설정",
         children: [
-          { title: "관리자 IP 접근 제한", link: "/kr/admin/system-settings.html", key: "settings" }
+          { title: "관리자 IP 접근 제한", link: "/kr/admin/admin-ip-security.html", key: "settings" }
         ]
       }
 
