@@ -1,3 +1,4 @@
+// server/routes/admin_ip_settings.js
 import express from "express";
 import db from "../config/db.js";
 import { verifyToken } from "../middleware/auth.js";
@@ -233,23 +234,22 @@ router.get("/ip-change-logs", verifyToken, async (req, res) => {
   );
 
   // 실제 데이터
-  const [rows] = await db.execute(
+    const [rows] = await db.execute(
     `
     SELECT
-      id,
-      user_id,
-      username,
-      action,
-      page,
-      ip,
-      label,
-      created_at
+        id,
+        user_id,
+        username,
+        action,
+        ip,
+        label,
+        created_at
     FROM admin_ip_change_logs
     ORDER BY id DESC
     LIMIT ? OFFSET ?
     `,
     [limit, offset]
-  );
+    );
 
   res.json({
     page,
