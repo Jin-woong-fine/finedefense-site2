@@ -309,38 +309,46 @@ async function addMyIp() {
 async function loadIpChangeLogs(page = 1) {
   currentLogPage = page;
 
-  const res = await fetch(
-    `/api/admin/ip-change-logs?page=${page}&limit=${LOG_LIMIT}`,
-    { headers: authHeaders() }
-  );
+  try {
+    const res = await fetch(
+      `/api/admin/ip-change-logs?page=${page}&limit=${LOG_LIMIT}`,
+      { headers: authHeaders() }
+    );
 
-  if (!res.ok) {
+    if (!res.ok) {
+      document.getElementById("ipLogTableBody").innerHTML =
+        `<tr><td colspan="5">로그 불러오기 실패 (${res.status})</td></tr>`;
+      return;
+    }
+
+    const data = await res.json();
+    const tbody = document.getElementById("ipLogTableBody");
+
+    if (!data.rows || !data.rows.length) {
+      tbody.innerHTML = `<tr><td colspan="5">로그 없음</td></tr>`;
+      renderLogPagination(1, 1);
+      return;
+    }
+
+    tbody.innerHTML = data.rows.map(row => `
+      <tr>
+        <td>${new Date(row.created_at).toLocaleString()}</td>
+        <td>${row.username}</td>
+        <td>${row.action}</td>
+        <td>${row.ip || "-"}</td>
+        <td>${row.label || ""}</td>
+      </tr>
+    `).join("");
+
+    renderLogPagination(data.page, data.totalPages);
+
+  } catch (err) {
+    console.error("❌ loadIpChangeLogs ERROR:", err);
     document.getElementById("ipLogTableBody").innerHTML =
-      `<tr><td colspan="5">로그 불러오기 실패</td></tr>`;
-    return;
+      `<tr><td colspan="5">로그 로딩 중 오류</td></tr>`;
   }
-
-  const data = await res.json();
-  const tbody = document.getElementById("ipLogTableBody");
-
-  if (!data.rows.length) {
-    tbody.innerHTML = `<tr><td colspan="5">로그 없음</td></tr>`;
-    renderLogPagination(1, 1);
-    return;
-  }
-
-  tbody.innerHTML = data.rows.map(row => `
-    <tr>
-      <td>${new Date(row.created_at).toLocaleString()}</td>
-      <td>${row.username}</td>
-      <td>${row.action}</td>
-      <td>${row.ip || "-"}</td>
-      <td>${row.label || ""}</td>
-    </tr>
-  `).join("");
-
-  renderLogPagination(data.page, data.totalPages);
 }
+
 
 
 
