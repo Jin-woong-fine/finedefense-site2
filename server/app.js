@@ -7,6 +7,7 @@ import { fileURLToPath } from "url";
 
 // 라우터들
 import adminIpGuard from "./middleware/adminIpGuard.js";
+import adminIpSettingsRouter from "./routes/admin_ip_settings.js";
 
 
 import sendInquiryRouter from "./routes/sendInquiry.js";
@@ -94,6 +95,7 @@ const loginLimiter = rateLimit({
 app.post(
   "/api/auth/login",
   adminIpGuard,
+  adminIpSettingsRouter,   // ⭐ 이 줄이 핵심
   loginLimiter,
   authRouter
 );
