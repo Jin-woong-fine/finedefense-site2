@@ -523,21 +523,46 @@ async function loadFromExisting() {
    🔥 이미지 프리뷰 + 삭제 + 정렬
 ============================================================ */
 let imageFiles = [];
+const objectURLMap = new Map(); // ✅ 반드시 필요
+const MAX_IMAGES = 10; // ⭐ 최대 이미지 개수
 
 document.getElementById("images").addEventListener("change", (e) => {
   const files = [...e.target.files];
-  imageFiles.push(...files);
+
+  if (imageFiles.length + files.length > MAX_IMAGES) {
+    alert(`이미지는 최대 ${MAX_IMAGES}장까지 업로드 가능합니다.`);
+    e.target.value = ""; // 🔥 파일 선택 초기화
+    return;
+  }
+
+  files.forEach(f => {
+    if (!imageFiles.some(e =>
+      e.name === f.name &&
+      e.size === f.size &&
+      e.lastModified === f.lastModified
+    )) {
+      imageFiles.push(f);
+    }
+  });
+
   renderPreviews();
 });
+
 
 function renderPreviews() {
   const preview = document.getElementById("preview");
   preview.innerHTML = "";
 
   imageFiles.forEach((file, index) => {
-    const url = URL.createObjectURL(file);
+    let url = objectURLMap.get(file);
+    if (!url) {
+      url = URL.createObjectURL(file);
+      objectURLMap.set(file, url);
+    }
+
     const div = document.createElement("div");
     div.className = "img-item";
+    div.dataset.index = index;
 
     div.innerHTML = `
       <img src="${url}">
@@ -548,25 +573,50 @@ function renderPreviews() {
   });
 }
 
+
+
 function removeImage(index) {
+  const file = imageFiles[index];
+  const url = objectURLMap.get(file);
+
+  if (url) {
+    URL.revokeObjectURL(url);   // ✅ 여기
+    objectURLMap.delete(file);
+  }
+
   imageFiles.splice(index, 1);
   renderPreviews();
 }
+
 
 /* 드래그 정렬 */
 new Sortable(document.getElementById("preview"), {
   animation: 150,
   onEnd: () => {
     const newOrder = [];
-    const previews = document.querySelectorAll(".img-item img");
+    const items = document.querySelectorAll(".img-item");
 
-    previews.forEach(img => {
-      const file = imageFiles.find(f => URL.createObjectURL(f) === img.src);
-      if (file) newOrder.push(file);
+    items.forEach(item => {
+      const idx = Number(item.dataset.index);
+      if (!isNaN(idx)) {
+        newOrder.push(imageFiles[idx]);
+      }
     });
 
     imageFiles = newOrder;
+    renderPreviews(); // ⭐ index 재정렬 반영
   }
+});
+
+
+/* ============================================================
+   🔥 Object URL 정리 (페이지 이탈 시)
+============================================================ */
+window.addEventListener("beforeunload", () => {
+  objectURLMap.forEach(url => {
+    URL.revokeObjectURL(url);
+  });
+  objectURLMap.clear();
 });
 
 /* ============================================================
@@ -574,6 +624,10 @@ new Sortable(document.getElementById("preview"), {
 ============================================================ */
 document.getElementById("productForm").addEventListener("submit", async (e) => {
   e.preventDefault();
+
+  // 🔥 Object URL 정리 (submit 직전)
+  objectURLMap.forEach(url => URL.revokeObjectURL(url));
+  objectURLMap.clear();
 
 
   const summary = document.getElementById("summary").value.trim();

@@ -478,6 +478,9 @@ summaryInput.addEventListener("input", updateSummaryCount);
 let oldImages = [];   // string[]
 let newImages = [];   // File[]
 
+const objectURLMap = new Map(); // File -> ObjectURL
+const MAX_IMAGES = 10;
+
 /* ============================================================
    제품 불러오기
 ============================================================ */
@@ -535,6 +538,14 @@ function renderOldImages() {
       <button class="remove-btn">×</button>
     `;
 
+    if (index === 0) {
+      div.insertAdjacentHTML(
+        "beforeend",
+        `<span class="badge-main">대표</span>`
+      );
+    }
+
+
     div.querySelector("button").onclick = () => {
       oldImages.splice(index, 1);
       renderOldImages();
@@ -558,51 +569,77 @@ function renderOldImages() {
    신규 이미지 프리뷰
 ============================================================ */
 document.getElementById("images").addEventListener("change", (e) => {
-  newImages = Array.from(e.target.files);
+  const files = Array.from(e.target.files);
+
+  if (newImages.length + files.length > MAX_IMAGES) {
+    alert(`이미지는 최대 ${MAX_IMAGES}장까지 업로드 가능합니다.`);
+    e.target.value = "";
+    return;
+  }
+
+  files.forEach(f => {
+    if (!newImages.some(e =>
+      e.name === f.name &&
+      e.size === f.size &&
+      e.lastModified === f.lastModified
+    )) {
+      newImages.push(f);
+    }
+  });
+
   renderNewImages();
 });
+
 
 function renderNewImages() {
   const wrap = document.getElementById("previewNew");
   wrap.innerHTML = "";
 
   newImages.forEach((file, index) => {
-    const url = URL.createObjectURL(file);
+    let url = objectURLMap.get(file);
+    if (!url) {
+      url = URL.createObjectURL(file);
+      objectURLMap.set(file, url);
+    }
 
     const div = document.createElement("div");
     div.className = "img-item";
 
-    const img = document.createElement("img");
-    img.src = url;
-    img.onload = () => URL.revokeObjectURL(url);
+    div.innerHTML = `
+      <img src="${url}">
+      <button class="remove-btn">×</button>
+    `;
 
-    const btn = document.createElement("button");
-    btn.className = "remove-btn";
-    btn.textContent = "×";
-    btn.onclick = () => {
+    div.querySelector("button").onclick = () => {
+      const u = objectURLMap.get(file);
+      if (u) {
+        URL.revokeObjectURL(u);
+        objectURLMap.delete(file);
+      }
       newImages.splice(index, 1);
       renderNewImages();
     };
 
-    div.appendChild(img);
-
     if (index === 0) {
-      const badge = document.createElement("span");
-      badge.className = "badge-main";
-      badge.textContent = "대표";
-      div.appendChild(badge);
+      div.insertAdjacentHTML(
+        "beforeend",
+        `<span class="badge-main">대표</span>`
+      );
     }
 
-    div.appendChild(btn);
     wrap.appendChild(div);
   });
 }
+
 
 /* ============================================================
    수정 API 요청
 ============================================================ */
 document.getElementById("productForm").addEventListener("submit", async (e) => {
   e.preventDefault();
+
+  objectURLMap.forEach(url => URL.revokeObjectURL(url));
+  objectURLMap.clear();
 
   const lang = document.getElementById("lang").value; // ✅ 핵심
 
@@ -654,6 +691,15 @@ function goList() {
 
 document.getElementById("pageTitle").innerText =
   `제품 수정 (${lang.toUpperCase()})`;
+
+
+
+
+window.addEventListener("beforeunload", () => {
+  objectURLMap.forEach(url => URL.revokeObjectURL(url));
+  objectURLMap.clear();
+});
+
 
 </script>
 
