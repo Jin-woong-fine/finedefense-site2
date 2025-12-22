@@ -143,16 +143,16 @@ router.put("/sort-order", verifyToken, verifyEditor, async (req, res) => {
         // ✅ en 존재 → kr + en 모두 업데이트
         await db.execute(
           `UPDATE products
-           SET sort_order = ?
-           WHERE group_id = ?`,
+          SET sort_order = ?, updated_at = NOW()
+          WHERE group_id = ?`,
           [sort_order, base.group_id]
         );
       } else {
         // ✅ en 없음 → kr만 업데이트
         await db.execute(
           `UPDATE products
-           SET sort_order = ?
-           WHERE id = ?`,
+          SET sort_order = ?, updated_at = NOW()
+          WHERE id = ?`,
           [sort_order, id]
         );
       }
@@ -355,8 +355,13 @@ router.put("/:id", verifyToken, verifyEditor, (req, res) => {
       // 🔴 7️⃣ 제품 텍스트 업데이트
       await db.execute(
         `UPDATE products
-         SET title = ?, summary = ?, category = ?, sort_order = ?, description_html = ?
-         WHERE id = ?`,
+        SET title = ?,
+            summary = ?,
+            category = ?,
+            sort_order = ?,
+            description_html = ?,
+            updated_at = NOW()
+        WHERE id = ?`,
         [
           title,
           summary || "",
@@ -366,6 +371,7 @@ router.put("/:id", verifyToken, verifyEditor, (req, res) => {
           targetId
         ]
       );
+
 
       // 🔴 8️⃣ 삭제된 이미지 처리
       if (removed.length > 0) {
@@ -477,8 +483,9 @@ router.post("/:id/translate", verifyToken, verifyEditor, async (req, res) => {
     // 3️⃣ 신규 언어 버전 INSERT
     const [insert] = await db.execute(
       `INSERT INTO products
-        (group_id, title, summary, category, thumbnail, description_html, sort_order, lang)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      (group_id, title, summary, category, thumbnail,
+      description_html, sort_order, lang, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
       [
         base.group_id,
         base.title,
