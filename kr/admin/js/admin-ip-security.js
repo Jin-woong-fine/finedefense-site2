@@ -342,3 +342,36 @@ async function loadIpChangeLogs(page = 1) {
   renderLogPagination(data.page, data.totalPages);
 }
 
+
+
+/* ===============================
+   변경 로그 페이지네이션
+================================ */
+function renderLogPagination(page, totalPages) {
+  const wrap = document.getElementById("logPagination");
+  if (!wrap) return;
+
+  if (totalPages <= 1) {
+    wrap.innerHTML = "";
+    return;
+  }
+
+  wrap.innerHTML = `
+    <button class="btn btn-secondary"
+      ${page <= 1 ? "disabled" : ""}
+      onclick="loadIpChangeLogs(${page - 1})">
+      이전
+    </button>
+
+    <span style="margin:0 10px;">
+      ${page} / ${totalPages}
+    </span>
+
+    <button class="btn btn-secondary"
+      ${page >= totalPages ? "disabled" : ""}
+      onclick="loadIpChangeLogs(${page + 1})">
+      다음
+    </button>
+  `;
+}
+
