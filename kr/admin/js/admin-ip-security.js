@@ -1,6 +1,8 @@
 // 🔐 전역 상태 (필수)
 let ipLimitEnabled = false;
 let myIpCache = null;
+let currentLogPage = 1;
+const LOG_LIMIT = 20;
 
 function authHeaders() {
   const token = localStorage.getItem("token");
@@ -84,7 +86,7 @@ async function toggleIpLimit(e) {
   });
 
   ipLimitEnabled = enabled;
-  
+
   showToast(enabled ? "IP 제한 활성화됨" : "IP 제한 비활성화됨");
 
   setTimeout(() => {
@@ -304,33 +306,42 @@ async function addMyIp() {
 /* ===============================
    IP 변경 로그 로드
 ================================ */
-async function loadIpChangeLogs() {
-  const tbody = document.getElementById("ipLogTableBody");
-  if (!tbody) return;
+let currentLogPage = 1;
+const LOG_LIMIT = 20;
 
-  const res = await fetch("/api/admin/ip-change-logs", {
-    headers: authHeaders()
-  });
+async function loadIpChangeLogs(page = 1) {
+  currentLogPage = page;
+
+  const res = await fetch(
+    `/api/admin/ip-change-logs?page=${page}&limit=${LOG_LIMIT}`,
+    { headers: authHeaders() }
+  );
 
   if (!res.ok) {
-    tbody.innerHTML = `<tr><td colspan="5">로그 불러오기 실패</td></tr>`;
+    document.getElementById("ipLogTableBody").innerHTML =
+      `<tr><td colspan="5">로그 불러오기 실패</td></tr>`;
     return;
   }
 
-  const list = await res.json();
+  const data = await res.json();
+  const tbody = document.getElementById("ipLogTableBody");
 
-  if (!list.length) {
+  if (!data.rows.length) {
     tbody.innerHTML = `<tr><td colspan="5">로그 없음</td></tr>`;
+    renderLogPagination(1, 1);
     return;
   }
 
-  tbody.innerHTML = list.map(row => `
+  tbody.innerHTML = data.rows.map(row => `
     <tr>
       <td>${new Date(row.created_at).toLocaleString()}</td>
-      <td>${row.username || "-"}</td>
+      <td>${row.username}</td>
       <td>${row.action}</td>
       <td>${row.ip || "-"}</td>
       <td>${row.label || ""}</td>
     </tr>
   `).join("");
+
+  renderLogPagination(data.page, data.totalPages);
 }
+

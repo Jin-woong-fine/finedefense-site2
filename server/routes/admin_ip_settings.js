@@ -223,22 +223,43 @@ router.get("/ip-my", verifyToken, (req, res) => {
    IP 변경 로그 조회 (READ ONLY)
 ================================ */
 router.get("/ip-change-logs", verifyToken, async (req, res) => {
-  const [rows] = await db.execute(`
+  const page = Math.max(parseInt(req.query.page) || 1, 1);
+  const limit = Math.min(parseInt(req.query.limit) || 20, 100);
+  const offset = (page - 1) * limit;
+
+  // 전체 개수
+  const [[countRow]] = await db.execute(
+    "SELECT COUNT(*) AS total FROM admin_ip_change_logs"
+  );
+
+  // 실제 데이터
+  const [rows] = await db.execute(
+    `
     SELECT
       id,
       user_id,
       username,
       action,
+      page,
       ip,
       label,
       created_at
     FROM admin_ip_change_logs
     ORDER BY id DESC
-    LIMIT 100
-  `);
+    LIMIT ? OFFSET ?
+    `,
+    [limit, offset]
+  );
 
-  res.json(rows);
+  res.json({
+    page,
+    limit,
+    total: countRow.total,
+    totalPages: Math.ceil(countRow.total / limit),
+    rows
+  });
 });
+
 
 
 
