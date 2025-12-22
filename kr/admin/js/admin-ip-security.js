@@ -84,7 +84,13 @@ async function toggleIpLimit(e) {
   });
 
   ipLimitEnabled = enabled;
-  loadIpSettings();
+  
+  showToast(enabled ? "IP 제한 활성화됨" : "IP 제한 비활성화됨");
+
+  setTimeout(() => {
+    loadIpSettings();
+    loadIpChangeLogs();
+  }, 300);
 }
 
 
@@ -203,7 +209,13 @@ async function deleteIp(id) {
     headers: authHeaders()
   });
 
-  loadIpList();
+  showToast("IP가 삭제되었습니다");
+
+  setTimeout(() => {
+    loadIpList();
+    loadIpChangeLogs();
+  }, 300);
+
 }
 
 
@@ -231,8 +243,13 @@ async function updateIp(id, btn) {
     return;
   }
 
-  showToast("저장 완료");
+showToast("저장 완료");
+
+setTimeout(() => {
   loadIpList();
+  loadIpChangeLogs();
+}, 300);
+
 }
 
 
@@ -273,8 +290,13 @@ async function addMyIp() {
     return;
     }
 
-    showToast("내 IP가 추가되었습니다");
+  showToast("IP가 추가되었습니다");
+
+  setTimeout(() => {
     loadIpList();
+    loadIpChangeLogs();
+  }, 300);
+
 }
 
 
