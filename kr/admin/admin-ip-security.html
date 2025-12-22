@@ -81,13 +81,20 @@
     관리자 IP 로그 표시 보정
   ================================ */
 
-  .main,
-  .panel {
-    overflow: visible !important;
-  }
-
-  .setting-section {
-    overflow: visible !important;
+  /* 🔔 Toast 강제 최상단 표시 */
+  .toast-notice {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 99999; /* 🔥 핵심 */
+    background: #0f2679;
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
   }
 
 

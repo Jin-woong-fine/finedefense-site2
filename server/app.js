@@ -101,12 +101,19 @@ app.post(
 
 app.use("/api/cert-items", postsCertificationRouter);
 
+// 🔐 관리자 API (토큰 기반)
 app.use(
   "/api/admin",
-  adminIpGuard,
   adminIpSettingsRouter,
   adminDashboardRouter,
   adminRouter
+);
+
+// 🔐 관리자 HTML 페이지만 IP 제한
+app.use(
+  ["/kr/admin", "/en/admin"],
+  adminIpGuard,
+  express.static(path.resolve(__dirname, "../"))
 );
 
 app.use("/api/news", postsNewsRouter);
