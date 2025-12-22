@@ -29,17 +29,25 @@ router.patch("/ip-settings", verifyToken, async (req, res) => {
     [enabled ? 1 : 0]
   );
 
-  // 🔥 로그 추가 (여기)
-  await db.execute(
-    `INSERT INTO admin_ip_change_logs
-     (user_id, username, action)
-     VALUES (?, ?, ?)`,
-    [
-      req.user.id,
-      req.user.username,
-      enabled ? "ENABLE" : "DISABLE"
-    ]
-  );
+    // 🔥 로그 추가 (수정)
+    try {
+    console.log("🔥 LOG INSERT BEFORE", req.user);
+
+    await db.execute(
+        `INSERT INTO admin_ip_change_logs
+        (user_id, username, action)
+        VALUES (?, ?, ?)`,
+        [
+        req.user?.id || null,
+        req.user?.username || null,
+        enabled ? "ENABLE" : "DISABLE"
+        ]
+    );
+
+    console.log("🔥 LOG INSERT AFTER");
+    } catch (err) {
+    console.error("❌ IP SETTINGS LOG FAIL:", err);
+    }
 
   res.json({ ok: true });
 });
@@ -79,17 +87,21 @@ router.post("/ip-whitelist", verifyToken, async (req, res) => {
     [ip, label || ""]
   );
 
+    try {
     await db.execute(
-    `INSERT INTO admin_ip_change_logs
-    (user_id, username, action, ip, label)
-    VALUES (?, ?, 'ADD', ?, ?)`,
-    [
-        req.user.id,
-        req.user.username,
+        `INSERT INTO admin_ip_change_logs
+        (user_id, username, action, ip, label)
+        VALUES (?, ?, 'ADD', ?, ?)`,
+        [
+        req.user?.id || null,
+        req.user?.username || null,
         ip,
         label || ""
-    ]
+        ]
     );
+    } catch (err) {
+    console.error("❌ IP ADD LOG FAIL:", err);
+    }
 
   res.json({ ok: true });
 });
@@ -126,17 +138,22 @@ router.delete("/ip-whitelist/:id", verifyToken, async (req, res) => {
     [req.params.id]
   );
 
+    try {
     await db.execute(
-    `INSERT INTO admin_ip_change_logs
-    (user_id, username, action, ip, label)
-    VALUES (?, ?, 'DELETE', ?, ?)`,
-    [
-        req.user.id,
-        req.user.username,
+        `INSERT INTO admin_ip_change_logs
+        (user_id, username, action, ip, label)
+        VALUES (?, ?, 'DELETE', ?, ?)`,
+        [
+        req.user?.id || null,
+        req.user?.username || null,
         target?.ip || "",
         target?.label || ""
-    ]
+        ]
     );
+    } catch (err) {
+    console.error("❌ IP DELETE LOG FAIL:", err);
+    }
+
 
   res.json({ ok: true });
 });
@@ -165,17 +182,21 @@ router.put("/ip-whitelist/:id", verifyToken, async (req, res) => {
     [ip, label || "", id]
   );
 
+    try {
     await db.execute(
-    `INSERT INTO admin_ip_change_logs
-    (user_id, username, action, ip, label)
-    VALUES (?, ?, 'UPDATE', ?, ?)`,
-    [
-        req.user.id,
-        req.user.username,
+        `INSERT INTO admin_ip_change_logs
+        (user_id, username, action, ip, label)
+        VALUES (?, ?, 'UPDATE', ?, ?)`,
+        [
+        req.user?.id || null,
+        req.user?.username || null,
         ip,
         label || ""
-    ]
+        ]
     );
+    } catch (err) {
+    console.error("❌ IP UPDATE LOG FAIL:", err);
+    }
 
   res.json({ ok: true });
 });
