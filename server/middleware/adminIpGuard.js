@@ -6,9 +6,9 @@ export default async function adminIpGuard(req, res, next) {
   try {
     const ip = getClientIp(req);
 
-    // IP 못 얻으면 차단 (보수적으로)
+    // IP 못 얻으면 차단 (보수적)
     if (!ip) {
-      return res.status(404).json({ message: "Not Found" });
+      return hideEndpoint(req, res);
     }
 
     // 1️⃣ IP 제한 ON / OFF 확인
@@ -16,7 +16,7 @@ export default async function adminIpGuard(req, res, next) {
       "SELECT enabled FROM admin_ip_settings WHERE id = 1"
     );
 
-    // 설정 없거나 OFF면 통과
+    // 설정 없거나 OFF → 통과
     if (!setting || setting.enabled === 0) {
       return next();
     }
@@ -28,8 +28,7 @@ export default async function adminIpGuard(req, res, next) {
     );
 
     if (rows.length === 0) {
-      // 관리자 API 존재 숨김
-      return res.status(404).json({ message: "Not Found" });
+      return hideEndpoint(req, res);
     }
 
     next();
@@ -37,4 +36,17 @@ export default async function adminIpGuard(req, res, next) {
     console.error("adminIpGuard error:", err);
     return res.status(500).json({ message: "Server error" });
   }
+}
+
+/* --------------------------------------------------
+   🔒 엔드포인트 은닉 (HTML / API 구분)
+-------------------------------------------------- */
+function hideEndpoint(req, res) {
+  // API 요청
+  if (req.originalUrl.startsWith("/api/")) {
+    return res.status(404).json({ message: "Not Found" });
+  }
+
+  // HTML 요청
+  return res.sendStatus(404);
 }
