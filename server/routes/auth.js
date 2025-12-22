@@ -67,10 +67,16 @@ router.post("/login", async (req, res) => {
 
     /* 🟢 로그인 성공 */
     const token = jwt.sign(
-      { id: user.id, role: user.role, name: user.name },
+      {
+        id: user.id,
+        username: user.username, // ⭐⭐⭐ 핵심
+        name: user.name,
+        role: user.role
+      },
       process.env.JWT_SECRET,
       { expiresIn: "2h" }
     );
+
 
     const decoded = jwt.decode(token);
 
@@ -107,7 +113,7 @@ router.post("/refresh", verifyToken, (req, res) => {
   const user = req.user;
 
   const newToken = jwt.sign(
-    { id: user.id, role: user.role, name: user.name },
+    { id: user.id, username: user.username, name: user.name, role: user.role },
     process.env.JWT_SECRET,
     { expiresIn: "2h" }
   );
@@ -130,11 +136,7 @@ router.post("/extend", verifyToken, verifyRole(["admin", "superadmin"]), (req, r
 
     // 🔥 새 토큰 = 2시간
     const newToken = jwt.sign(
-      {
-        id: user.id,
-        role: user.role,
-        name: user.name,
-      },
+      { id: user.id, username: user.username, name: user.name, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: "2h" }
     );
