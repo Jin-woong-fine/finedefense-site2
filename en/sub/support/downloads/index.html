@@ -153,9 +153,12 @@
     `).join("");
   }
 
-    function openView(id) {
-    location.href = `/kr/sub/support/downloads/downloads-view.html?id=${id}`;
-    }
+  function openView(id) {
+    const isEn = location.pathname.startsWith("/en/");
+    const langPath = isEn ? "en" : "kr";
+
+    location.href = `/${langPath}/sub/support/downloads/downloads-view.html?id=${id}`;
+  }
 
   function printCategory(c) {
     return {
