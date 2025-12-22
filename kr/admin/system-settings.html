@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>시스템 설정 | Fine Defense 관리자</title>
+
+  <!-- 공통 관리자 CSS -->
+  <link rel="stylesheet" href="./css/admin.css" />
+
+  <style>
+  /* ===============================
+     SYSTEM SETTINGS
+  =============================== */
+
+  .setting-section {
+    margin-bottom: 40px;
+  }
+
+  .setting-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #0f2679;
+  }
+
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+
+  .badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .badge.on { background: #e6f6ee; color: #137a3d; }
+  .badge.off { background: #fdeaea; color: #b42318; }
+
+  .ip-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    font-size: 0.95rem;
+  }
+
+  .ip-table th,
+  .ip-table td {
+    padding: 11px 14px;
+    border-bottom: 1px solid #e1e6f5;
+    text-align: left;
+  }
+
+  .ip-table th {
+    background: #0f2679;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .ip-table tbody tr:hover td {
+    background: #f0f4ff;
+  }
+
+  .form-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+  }
+
+  .form-row input {
+    padding: 8px 10px;
+    flex: 1;
+  }
+  </style>
+</head>
+
+<body>
+
+<!-- 🔵 사이드바 -->
+<div id="sidebar"></div>
+
+<div class="main">
+
+  <!-- 🔵 TOPBAR -->
+  <div class="topbar">
+    <div class="title">시스템 설정</div>
+
+    <div style="display:flex; align-items:center; gap:12px;">
+      <span id="session-timer" class="session-timer">세션 계산중...</span>
+
+      <div class="topbar-user" id="topbarUser">
+        <span id="topbarUserName">관리자</span> ▾
+        <div class="user-dropdown" id="userDropdown"></div>
+      </div>
+
+      <button onclick="location.href='../index.html'">홈으로</button>
+    </div>
+  </div>
+
+  <!-- 🔵 설정 패널 -->
+  <section class="panel">
+
+    <!-- ===============================
+         관리자 IP 접근 제한
+    =============================== -->
+    <div class="setting-section">
+      <div class="setting-title">🔐 관리자 IP 접근 제한</div>
+
+      <div class="toggle-row">
+        <label>
+          <input type="checkbox" id="ipToggle" />
+          관리자 IP 제한 활성화
+        </label>
+        <span id="ipStatus" class="badge off">OFF</span>
+      </div>
+
+      <table class="ip-table">
+        <thead>
+          <tr>
+            <th style="width:220px;">IP 주소</th>
+            <th>설명</th>
+            <th style="width:120px;">관리</th>
+          </tr>
+        </thead>
+        <tbody id="ipTableBody">
+          <tr><td colspan="3">불러오는 중...</td></tr>
+        </tbody>
+      </table>
+
+      <div class="form-row">
+        <input type="text" id="newIp" placeholder="IP 주소 (예: 1.2.3.4)" />
+        <input type="text" id="newLabel" placeholder="설명 (본사, 공장, 개발자 집 등)" />
+        <button class="btn btn-primary" onclick="addIp()">추가</button>
+      </div>
+    </div>
+
+  </section>
+</div>
+
+<!-- 공통 JS -->
+<script src="/kr/admin/js/common_auth.js"></script>
+<script src="/kr/admin/js/sidebar.js"></script>
+<script src="/kr/admin/js/system-settings.js"></script>
+
+<script>
+/* 🔐 권한 체크 & 사이드바 */
+requireAdminPermission();
+loadSidebar("settings");
+</script>
+
+</body>
+</html>

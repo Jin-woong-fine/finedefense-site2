@@ -6,6 +6,9 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 // 라우터들
+import adminIpGuard from "./middleware/adminIpGuard.js";
+
+
 import sendInquiryRouter from "./routes/sendInquiry.js";
 import inquiryRouter from "./routes/inquiry.js";
 
@@ -75,25 +78,6 @@ app.use(
   })
 );
 
-// 🔐 관리자 IP 화이트리스트
-const ADMIN_IPS = [
-
-  "1.220.123.2", // 회사 공인 IP
-  "125.251.61.201", // 공장 공인 IP
-  "119.195.161.193",  // 개발자 집 IP
-];
-
-function adminIpGuard(req, res, next) {
-  const ip = req.ip;
-
-  if (!ADMIN_IPS.includes(ip)) {
-    // 404로 위장 (관리자 API 존재 숨김)
-    return res.status(404).json({ message: "Not Found" });
-  }
-  next();
-}
-
-
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15분
   max: 10,                 // 10회 제한
@@ -107,17 +91,21 @@ const loginLimiter = rateLimit({
 // ------------------------------------------------------
 // 📌 라우터 등록
 // ------------------------------------------------------
-app.use(
+app.post(
   "/api/auth/login",
-  adminIpGuard,        // 🔥 IP 먼저 검사
-  loginLimiter
+  adminIpGuard,
+  loginLimiter,
+  authRouter
 );
-app.use("/api/auth", authRouter);
 
 app.use("/api/cert-items", postsCertificationRouter);
 
-app.use("/api/admin", adminIpGuard, adminDashboardRouter);
-app.use("/api/admin", adminIpGuard, adminRouter);
+app.use(
+  "/api/admin",
+  adminIpGuard,
+  adminDashboardRouter,
+  adminRouter
+);
 
 app.use("/api/news", postsNewsRouter);
 app.use("/api/gallery", postsGalleryRouter);

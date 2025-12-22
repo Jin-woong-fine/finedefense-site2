@@ -66,9 +66,21 @@ async function loadSidebar(activePage = "") {
 
       { title: "고객 문의", link: "/kr/admin/inquiry-list.html", key: "inquiry" },
 
-      // 🔥 항상 보이게
-      { title: "사용자 목록", link: "/kr/admin/users.html", key: "users" },
-      { title: "로그인 로그", link: "/kr/admin/login_logs.html", key: "logs" }
+      {
+        title: "사용자 관리",
+        children: [
+          { title: "사용자 목록", link: "/kr/admin/users.html", key: "users" },
+          { title: "로그인 로그", link: "/kr/admin/login_logs.html", key: "logs" }
+        ]
+      },
+
+      {
+        title: "시스템 설정",
+        children: [
+          { title: "보안 설정", link: "/kr/admin/system-settings.html", key: "settings" }
+        ]
+      }
+
     ];
 
 
