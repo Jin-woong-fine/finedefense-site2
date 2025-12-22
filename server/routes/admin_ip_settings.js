@@ -29,6 +29,18 @@ router.patch("/ip-settings", verifyToken, async (req, res) => {
     [enabled ? 1 : 0]
   );
 
+  // 🔥 로그 추가 (여기)
+  await db.execute(
+    `INSERT INTO admin_ip_change_logs
+     (user_id, username, action)
+     VALUES (?, ?, ?)`,
+    [
+      req.user.id,
+      req.user.username,
+      enabled ? "ENABLE" : "DISABLE"
+    ]
+  );
+
   res.json({ ok: true });
 });
 
@@ -67,6 +79,18 @@ router.post("/ip-whitelist", verifyToken, async (req, res) => {
     [ip, label || ""]
   );
 
+    await db.execute(
+    `INSERT INTO admin_ip_change_logs
+    (user_id, username, action, ip, label)
+    VALUES (?, ?, 'ADD', ?, ?)`,
+    [
+        req.user.id,
+        req.user.username,
+        ip,
+        label || ""
+    ]
+    );
+
   res.json({ ok: true });
 });
 
@@ -90,10 +114,29 @@ router.delete("/ip-whitelist/:id", verifyToken, async (req, res) => {
     }
   }
 
+
+    const [[target]] = await db.execute(
+    "SELECT ip, label FROM admin_ip_whitelist WHERE id = ?",
+    [req.params.id]
+    );
+
+
   await db.execute(
     "DELETE FROM admin_ip_whitelist WHERE id = ?",
     [req.params.id]
   );
+
+    await db.execute(
+    `INSERT INTO admin_ip_change_logs
+    (user_id, username, action, ip, label)
+    VALUES (?, ?, 'DELETE', ?, ?)`,
+    [
+        req.user.id,
+        req.user.username,
+        target?.ip || "",
+        target?.label || ""
+    ]
+    );
 
   res.json({ ok: true });
 });
@@ -121,6 +164,18 @@ router.put("/ip-whitelist/:id", verifyToken, async (req, res) => {
     "UPDATE admin_ip_whitelist SET ip = ?, label = ? WHERE id = ?",
     [ip, label || "", id]
   );
+
+    await db.execute(
+    `INSERT INTO admin_ip_change_logs
+    (user_id, username, action, ip, label)
+    VALUES (?, ?, 'UPDATE', ?, ?)`,
+    [
+        req.user.id,
+        req.user.username,
+        ip,
+        label || ""
+    ]
+    );
 
   res.json({ ok: true });
 });

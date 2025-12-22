@@ -4,47 +4,31 @@ import { getClientIp } from "../utils/ip.js";
 
 export default async function adminIpGuard(req, res, next) {
   try {
-    const url = req.originalUrl;
-
-    /* ==================================================
-       🔓 0) IP 관리 API는 항상 통과
-       (토큰 검증은 라우터에서 별도 처리)
-    ================================================== */
-    if (
-      url.startsWith("/api/admin/ip-settings") ||
-      url.startsWith("/api/admin/ip-whitelist")
-    ) {
-      return next();
-    }
-
     const ip = getClientIp(req);
 
-    // IP 못 얻으면 차단 (보수적)
+    // 1️⃣ IP 못 얻음
     if (!ip) {
+      await logBlock(req, "IP_NOT_DETECTED");
       return hideEndpoint(req, res);
     }
 
-    /* ==================================================
-       1) IP 제한 ON / OFF 확인
-    ================================================== */
+    // 2️⃣ IP 제한 ON / OFF
     const [[setting]] = await db.execute(
       "SELECT enabled FROM admin_ip_settings WHERE id = 1"
     );
 
-    // 설정 없거나 OFF → 통과
     if (!setting || setting.enabled === 0) {
-      return next();
+      return next(); // 제한 OFF
     }
 
-    /* ==================================================
-       2) 화이트리스트 검사
-    ================================================== */
+    // 3️⃣ 화이트리스트 검사
     const [rows] = await db.execute(
       "SELECT id FROM admin_ip_whitelist WHERE ip = ? LIMIT 1",
       [ip]
     );
 
     if (rows.length === 0) {
+      await logBlock(req, "IP_NOT_WHITELISTED");
       return hideEndpoint(req, res);
     }
 
@@ -56,14 +40,35 @@ export default async function adminIpGuard(req, res, next) {
 }
 
 /* --------------------------------------------------
-   🔒 엔드포인트 은닉 (HTML / API 구분)
+   🔒 차단 로그 기록 (🔥 핵심)
+-------------------------------------------------- */
+async function logBlock(req, reason) {
+  try {
+    const clientIp = getClientIp(req) || "UNKNOWN";
+
+    await db.execute(
+      `INSERT INTO admin_ip_block_logs
+       (user_id, username, client_ip, request_path, reason)
+       VALUES (?, ?, ?, ?, ?)`,
+      [
+        req.user?.id || null,
+        req.user?.username || null,
+        clientIp,
+        req.originalUrl,
+        reason
+      ]
+    );
+  } catch (e) {
+    console.error("IP block log failed:", e);
+  }
+}
+
+/* --------------------------------------------------
+   🔐 엔드포인트 은닉
 -------------------------------------------------- */
 function hideEndpoint(req, res) {
-  // API 요청 → 존재 숨김
   if (req.originalUrl.startsWith("/api/")) {
     return res.status(404).json({ message: "Not Found" });
   }
-
-  // HTML 요청
   return res.sendStatus(404);
 }
