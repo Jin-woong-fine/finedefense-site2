@@ -119,6 +119,11 @@
         <span id="ipStatus" class="badge off">OFF</span>
       </div>
 
+        <p style="font-size:0.85rem; color:#666; margin-top:6px;">
+        ※ IP 제한을 활성화하려면 최소 1개의 IP가 등록되어 있어야 합니다.
+        </p>
+
+
       <table class="ip-table">
         <thead>
           <tr>
@@ -131,6 +136,12 @@
           <tr><td colspan="3">불러오는 중...</td></tr>
         </tbody>
       </table>
+
+        <div style="margin-top:12px;">
+        <button class="btn btn-secondary" onclick="addMyIp()">
+            내 IP 자동 추가
+        </button>
+        </div>
 
       <div class="form-row">
         <input type="text" id="newIp" placeholder="IP 주소 (예: 1.2.3.4)" />
@@ -149,7 +160,7 @@
 
 <script>
 /* 🔐 권한 체크 & 사이드바 */
-requireAdminPermission();
+requireAdminOrSuperadmin();
 loadSidebar("settings");
 </script>
 
