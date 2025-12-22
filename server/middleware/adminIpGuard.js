@@ -3,6 +3,14 @@ import db from "../config/db.js";
 import { getClientIp } from "../utils/ip.js";
 
 export default async function adminIpGuard(req, res, next) {
+
+    
+  // 🔥 API 요청은 IP 가드 적용하지 않음
+  if (req.originalUrl.startsWith("/api/")) {
+    return next();
+  }
+
+  
   try {
     const ip = getClientIp(req);
 
