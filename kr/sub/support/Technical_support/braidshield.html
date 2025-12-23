@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Braid Shield Calculator</title>
+
+<style>
+:root {
+  --accent: #007aff;
+  --border: #e5e5ea;
+  --bg: #ffffff;
+  --bg-subtle: #f5f5f7;
+  --text: #1c1c1e;
+  --text-muted: #6e6e73;
+}
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
+               "Apple SD Gothic Neo", system-ui, sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.6;
+}
+
+h2 {
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.calculator {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 28px;
+}
+
+.calc-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 24px;
+  align-items: end;
+}
+
+.calc-row label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.calc-row input {
+  margin-top: 6px;
+  padding: 10px 12px;
+  font-size: 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+.calc-row button {
+  padding: 12px 22px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+table {
+  width: 100%;
+  margin-top: 24px;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+th, td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: right;
+}
+
+th:first-child, td:first-child {
+  text-align: left;
+}
+
+.note {
+  margin-top: 14px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+</style>
+</head>
+
+<body>
+
+<section>
+<h2>Braid Shield Calculator</h2>
+
+<div class="calculator">
+
+  <div class="calc-row">
+    <div>
+      <label>Wire Diameter (mm)</label>
+      <input type="number" id="wireDia" step="0.01" placeholder="e.g. 0.20">
+    </div>
+
+    <div>
+      <label>Ends per Carrier</label>
+      <input type="number" id="ends" placeholder="e.g. 16">
+    </div>
+
+    <div>
+      <label>Number of Carriers</label>
+      <input type="number" id="carriers" placeholder="e.g. 24">
+    </div>
+
+    <div>
+      <label>Picks per Inch (PPI)</label>
+      <input type="number" id="ppi" placeholder="e.g. 30">
+    </div>
+
+    <div>
+      <label>Core Diameter (mm)</label>
+      <input type="number" id="coreDia" step="0.01" placeholder="e.g. 5.0">
+    </div>
+
+    <div>
+      <button onclick="calculateBraid()">Calculate</button>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Item</th>
+        <th>Result</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Braid Pitch</td>
+        <td id="pitch">-</td>
+      </tr>
+      <tr>
+        <td>Braid Angle</td>
+        <td id="angle">-</td>
+      </tr>
+      <tr>
+        <td>Coverage</td>
+        <td id="coverage">-</td>
+      </tr>
+      <tr>
+        <td>Estimated Outer Diameter</td>
+        <td id="outerDia">-</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="note">
+    ※ Braid angle should typically be between 18° and 40°.<br>
+    ※ This calculator is provided for reference purposes only.  
+    Actual braid coverage and outer diameter may vary depending on compaction and manufacturing conditions.
+  </div>
+
+</div>
+</section>
+
+<script>
+function calculateBraid() {
+  const d = parseFloat(document.getElementById("wireDia").value);
+  const E = parseFloat(document.getElementById("ends").value);
+  const C = parseFloat(document.getElementById("carriers").value);
+  const PPI = parseFloat(document.getElementById("ppi").value);
+  const Dc = parseFloat(document.getElementById("coreDia").value);
+
+  if (!d || !E || !C || !PPI || !Dc) return;
+
+  // Pitch (mm)
+  const P = 25.4 / (PPI / (C / 2));
+
+  // inch conversion
+  const d_in = d / 25.4;
+  const Dc_in = Dc / 25.4;
+
+  // Braid angle
+  const tana = (2 * Math.PI * (Dc_in + 2 * d_in) * P) / C;
+  const a = Math.atan(tana) * 180 / Math.PI;
+
+  // Coverage
+  const F = E * P * d_in / Math.sin(a * Math.PI / 180);
+  const K = 100 * (2 * F - (F * F));
+
+  // Estimated outer diameter (mm)
+  const Dout = Dc + 2 * d * Math.cos(a * Math.PI / 180);
+
+  document.getElementById("pitch").textContent =
+    P.toFixed(2) + " mm";
+
+  document.getElementById("angle").textContent =
+    a.toFixed(2) + " °";
+
+  document.getElementById("coverage").textContent =
+    K.toFixed(1) + " %";
+
+  document.getElementById("outerDia").textContent =
+    Dout.toFixed(2) + " mm";
+
+  if (a < 18 || a >= 40) {
+    alert("Warning: Braid angle is outside the typical range (18°–40°).");
+  }
+}
+</script>
+
+</body>
+</html>
