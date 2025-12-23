@@ -161,7 +161,7 @@
 <script>
   let conductors = [];
 
-  fetch('./data/conductor_astm.json')
+  fetch('/kr/sub/support/technical_support/data/conductor_astm.json')
     .then(res => res.json())
     .then(json => {
       conductors = json.conductors;
