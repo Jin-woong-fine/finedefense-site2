@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Conductor Selection Tool</title>
+
+  <style>
+        :root {
+        --accent: #007aff;
+        --border: #e5e5ea;
+        --bg: #ffffff;
+        --bg-subtle: #f5f5f7;
+        --text: #1c1c1e;
+        --text-muted: #6e6e73;
+        }
+
+        * {
+        box-sizing: border-box;
+        }
+
+        body {
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
+                    "Apple SD Gothic Neo", system-ui, sans-serif;
+        font-size: 14px;
+        color: var(--text);
+        line-height: 1.6;
+        background: var(--bg);
+        }
+
+        h1 {
+        font-size: 22px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        }
+
+        h2 {
+        font-size: 17px;
+        font-weight: 600;
+        margin-bottom: 12px;
+        }
+
+        section {
+        margin-bottom: 56px;
+        }
+
+        /* ===== Calculator ===== */
+        .calculator {
+        background: var(--bg-subtle);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 28px;
+        }
+
+        .calc-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 24px;
+        align-items: end;
+        }
+
+        .calc-row label {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-muted);
+        }
+
+        .calc-row input,
+        .calc-row select {
+        margin-top: 6px;
+        padding: 10px 12px;
+        font-size: 14px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: #fff;
+        transition: border-color .2s, box-shadow .2s;
+        }
+
+        .calc-row input:focus,
+        .calc-row select:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 4px rgba(0,122,255,0.15);
+        }
+
+        /* Slider */
+        .calc-row input[type="range"] {
+        padding: 0;
+        height: 4px;
+        background: #d1d1d6;
+        border-radius: 2px;
+        }
+
+        #rangeValue {
+        margin-top: 8px;
+        font-size: 12px;
+        color: var(--accent);
+        font-weight: 600;
+        }
+
+        /* Button */
+        .calc-row button {
+        padding: 12px 22px;
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform .1s ease, box-shadow .1s ease, background .2s;
+        }
+
+        .calc-row button:hover {
+        background: #0063d1;
+        }
+
+        .calc-row button:active {
+        transform: translateY(1px);
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.15);
+        }
+
+        /* ===== Tables ===== */
+        table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin-top: 20px;
+        font-size: 13px;
+        }
+
+        th, td {
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--border);
+        text-align: right;
+        }
+
+        th {
+        color: var(--text-muted);
+        font-weight: 500;
+        background: var(--bg);
+        }
+
+        td:first-child,
+        th:first-child {
+        text-align: left;
+        }
+
+        tbody tr:hover {
+        background: #f9f9fb;
+        }
+
+        tr.recommended {
+        background: rgba(0,122,255,0.12);
+        font-weight: 600;
+        }
+
+        tr.match {
+        background: #f3f8ff;
+        }
+
+        /* ===== Note ===== */
+        .note {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-top: 12px;
+        }
+
+        .calculator,
+        table {
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        }
+
+        table * {
+        -webkit-user-drag: none;
+        }
+
+  </style>
+</head>
+
+<body>
+
+<h1>Conductor Selection Tool</h1>
+
+<!-- ================= Calculator ================= -->
+<section>
+  <h2>1. Conductor Calculator</h2>
+
+  <div class="calculator">
+    <div class="calc-row">
+      <label>
+        DC Resistance (Ω/km)
+        <input type="number" id="maxResistance" step="0.001" placeholder="e.g. 10">
+      </label>
+
+      <label>
+        Coating
+        <select id="coating">
+          <option value="Tin">Tin</option>
+          <option value="Plain">Plain</option>
+        </select>
+      </label>
+
+        <label>
+            Matching Range (%)
+            <input type="range"
+                    id="rangePercent"
+                    min="50"
+                    max="100"
+                    step="5"
+                    value="70">
+            <span id="rangeValue">70%</span>
+        </label>
+
+
+      <button id="calcBtn">Find Conductors</button>
+    </div>
+  </div>
+
+  <div id="calcResult"></div>
+</section>
+
+<p class="note">
+  Matching conductors are displayed within the selected resistance range.
+</p>
+
+
+<!-- ================= Filtered Result ================= -->
+<section>
+  <h2>2. Matching Conductors</h2>
+  <div id="filteredTable"></div>
+</section>
+
+<!-- ================= Full Data ================= -->
+<section>
+  <h2>3. Full Conductor Reference</h2>
+
+  <table id="fullTable">
+    <thead>
+      <tr>
+        <th>Code</th>
+        <th>Strands</th>
+        <th>Wire Ø (mm)</th>
+        <th>Area (mm²)</th>
+        <th>Coating</th>
+        <th>Resistance (Ω/km)</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div class="note">
+    Reference data based on ASTM B-286. For technical selection purposes only.
+  </div>
+</section>
+
+<script>
+  let conductors = [];
+
+  fetch('./conductor_astm.json')
+    .then(res => res.json())
+    .then(json => {
+      conductors = json.conductors;
+      renderFullTable(conductors);
+    });
+
+    document.getElementById('calcBtn').addEventListener('click', () => {
+    const maxR = parseFloat(document.getElementById('maxResistance').value);
+    const coating = document.getElementById('coating').value;
+    const ratio = parseInt(rangeInput.value, 10) / 100;
+
+    if (isNaN(maxR)) return;
+
+    const lowerBound = maxR * ratio;
+
+    const filtered = conductors
+        .filter(c => c.coating === coating)
+        .filter(c =>
+        c.resistance_ohm_km <= maxR &&
+        c.resistance_ohm_km >= lowerBound
+        )
+        .sort((a, b) => a.area_mm2 - b.area_mm2);
+
+    renderFilteredTable(filtered);
+    highlightFullTable(filtered.map(c => c.code));
+    });
+
+
+  function renderFilteredTable(list) {
+    const container = document.getElementById('filteredTable');
+    container.innerHTML = '';
+
+    if (!list.length) {
+      container.innerHTML = '<p>No matching conductors found.</p>';
+      return;
+    }
+
+    const recommended = list[0];
+
+    let html = `
+      <table>
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Strands</th>
+            <th>Wire Ø (mm)</th>
+            <th>Area (mm²)</th>
+            <th>Resistance (Ω/km)</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    list.forEach(c => {
+      html += `
+        <tr class="${c === recommended ? 'recommended' : ''}">
+            <td>${c.code}</td>
+            <td>${c.strand_count}</td>
+            <td>${c.wire_diameter_mm}</td>
+            <td>${c.area_mm2}</td>
+            <td>${c.resistance_ohm_km}</td>
+        </tr>
+      `;
+    });
+
+    html += '</tbody></table>';
+    container.innerHTML = html;
+  }
+
+    const rangeInput = document.getElementById('rangePercent');
+    const rangeValue = document.getElementById('rangeValue');
+
+    rangeValue.textContent = rangeInput.value + '%';
+
+    rangeInput.addEventListener('input', () => {
+    rangeValue.textContent = rangeInput.value + '%';
+    });
+
+
+
+  function renderFullTable(data) {
+    const tbody = document.querySelector('#fullTable tbody');
+    tbody.innerHTML = '';
+
+    data.forEach(c => {
+      const tr = document.createElement('tr');
+      tr.dataset.code = c.code;
+      tr.innerHTML = `
+        <td>${c.code}</td>
+        <td>${c.strand_count}</td>
+        <td>${c.wire_diameter_mm}</td>
+        <td>${c.area_mm2}</td>
+        <td>${c.coating}</td>
+        <td>${c.resistance_ohm_km}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function highlightFullTable(codes) {
+    document.querySelectorAll('#fullTable tbody tr').forEach(tr => {
+      tr.classList.toggle('match', codes.includes(tr.dataset.code));
+    });
+  }
+
+
+
+
+</script>
+
+</body>
+</html>

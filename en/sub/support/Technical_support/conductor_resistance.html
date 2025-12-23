@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Conductor Resistance Calculator</title>
+
+<!-- ===== 기존 CSS 그대로 ===== -->
+<style>
+:root {
+  --accent: #007aff;
+  --border: #e5e5ea;
+  --bg: #ffffff;
+  --bg-subtle: #f5f5f7;
+  --text: #1c1c1e;
+  --text-muted: #6e6e73;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
+               "Apple SD Gothic Neo", system-ui, sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.6;
+}
+h1 {
+font-size: 22px;
+font-weight: 600;
+margin-bottom: 20px;
+}
+h2 {
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+.calculator {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 28px;
+}
+.calc-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 24px;
+  align-items: end;
+}
+.calc-row label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+.calc-row input,
+.calc-row select {
+  margin-top: 6px;
+  padding: 10px 12px;
+  font-size: 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+.calc-row button {
+  padding: 12px 22px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+table {
+  width: 100%;
+  margin-top: 24px;
+  border-collapse: collapse;
+}
+th, td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: right;
+}
+th:first-child, td:first-child {
+  text-align: left;
+}
+.note {
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.formula-block {
+  margin-top: 32px;
+}
+
+.formula-block h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.formula-block p {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.formula-block .formula {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont;
+  color: var(--text);
+}
+</style>
+</head>
+
+<body>
+
+<section>
+<h1>Conductor Resistance Calculator</h1>
+
+<div class="calculator">
+  <div class="calc-row">
+    <div>
+        <label>Strand Diameter (mm)</label>
+        <select id="strandDiaSelect" onchange="setStrandDia()">
+        <option value="">Select strand diameter</option>
+        <option value="0.08">0.08</option>
+        <option value="0.10">0.10</option>
+        <option value="0.12">0.12</option>
+        <option value="0.16">0.16</option>
+        <option value="0.19">0.19</option>
+        <option value="0.20">0.20</option>
+        <option value="0.25">0.25</option>
+        <option value="0.30">0.30</option>
+        <option value="0.32">0.32</option>
+        <option value="0.40">0.40</option>
+        <option value="0.50">0.50</option>
+        <option value="0.51">0.51</option>
+        <option value="0.64">0.64</option>
+        <option value="0.80">0.80</option>
+        <option value="1.00">1.00</option>
+        </select>
+
+        <input type="number" id="strandDia" step="0.01" placeholder="Manual Input Available">
+    </div>
+
+    <div>
+      <label>Number of Strands (EA)</label>
+      <input type="number" id="strandCnt" placeholder="ex) 19">
+    </div>
+
+    <div>
+      <label>Plating</label>
+      <select id="material">
+        <option value="bare">Bare Copper</option>
+        <option value="tinned">Tinned Copper</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Temperature (°C)</label>
+      <input type="number" id="temp" value="20">
+    </div>
+
+    <div>
+      <button onclick="calculate()">Calculate</button>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Item</th>
+        <th>Result</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Conductor Cross-Sectional Area</td>
+        <td id="area">-</td>
+      </tr>
+      <tr>
+        <td>Equivalent AWG</td>
+        <td id="awg">-</td>
+      </tr>
+      <tr>
+        <td>DC Resistance at 20 °C</td>
+        <td id="res20">-</td>
+      </tr>
+      <tr>
+        <td>Temperature-Corrected Resistance</td>
+        <td id="resTemp">-</td>
+      </tr>
+    </tbody>
+  </table>
+
+    <div class="note">
+    <p>※ DC resistance at 1 km, reference temperature 20 °C.</p>
+    <p>※ This calculator is provided for reference purposes only.<br>
+        Actual values may vary depending on manufacturing tolerances and operating conditions.</p>
+    </div>
+</div>
+
+<div class="calculator formula-block">
+  <h3>Calculation Method</h3>
+
+  <p>
+    The conductor resistance is calculated using the standard DC resistance
+    formula based on the total conductor cross-sectional area.
+  </p>
+
+  <p class="formula">
+    R = ρ · L / A<br>
+    R(T) = R<sub>20</sub> · [1 + α (T − 20)]
+  </p>
+
+  <p>
+    where ρ is the electrical resistivity of copper at 20&nbsp;°C,
+    L is the conductor length, A is the total conductor cross-sectional area,
+    and α is the temperature coefficient of copper.
+  </p>
+</div>
+
+</section>
+
+
+<script>
+    const awgTable = [
+    { awg: 30, area: 0.0509 },
+    { awg: 28, area: 0.0804 },
+    { awg: 26, area: 0.128 },
+    { awg: 24, area: 0.205 },
+    { awg: 22, area: 0.326 },
+    { awg: 20, area: 0.518 },
+    { awg: 18, area: 0.823 },
+    { awg: 16, area: 1.31 },
+    { awg: 14, area: 2.08 },
+    { awg: 12, area: 3.31 },
+    { awg: 10, area: 5.26 },
+    { awg: 8,  area: 8.37 },
+    { awg: 6,  area: 13.3 },
+    { awg: 4,  area: 21.2 },
+    { awg: 2,  area: 33.6 },
+    { awg: 1,  area: 42.4 },
+    { awg: "1/0", area: 53.5 }
+    ];
+
+    function findClosestAWG(area) {
+    let closest = awgTable[0];
+    let minDiff = Math.abs(area - closest.area);
+
+    awgTable.forEach(item => {
+        const diff = Math.abs(area - item.area);
+        if (diff < minDiff) {
+        minDiff = diff;
+        closest = item;
+        }
+    });
+
+    return closest;
+    }
+
+    
+
+function calculate() {
+  const d = parseFloat(document.getElementById("strandDia").value);
+  const n = parseInt(document.getElementById("strandCnt").value);
+  const temp = parseFloat(document.getElementById("temp").value);
+  const material = document.getElementById("material").value;
+
+  if (!d || !n) return;
+
+  const rho = material === "tinned" ? 0.0178 : 0.017241;
+  const alpha = 0.00393;
+
+  const areaStrand = Math.PI * Math.pow(d / 2, 2);
+  const areaTotal = areaStrand * n;
+  const awg = findClosestAWG(areaTotal);
+
+  const r20 = (rho * 1000) / areaTotal;
+  const rTemp = r20 * (1 + alpha * (temp - 20));
+
+  document.getElementById("area").textContent =
+    areaTotal.toFixed(3) + " mm²";
+
+  document.getElementById("res20").textContent =
+    r20.toFixed(2) + " Ω/km";
+
+  document.getElementById("resTemp").textContent =
+    rTemp.toFixed(2) + " Ω/km";
+
+  document.getElementById("awg").textContent =
+  "AWG " + awg.awg + " (Ref. " + awg.area + " mm²)";
+}
+
+function setStrandDia() {
+  const select = document.getElementById("strandDiaSelect");
+  const input = document.getElementById("strandDia");
+
+  if (select.value) {
+    input.value = select.value;
+  }
+}
+
+
+
+</script>
+
+</body>
+</html>

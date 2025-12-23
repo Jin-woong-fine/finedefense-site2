@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Technical Support | Fine Defense</title>
+
+  <!-- 공통 CSS -->
+
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/sub-banner.css">
+
+    <style>
+        /* =========================================
+        Technical Support Page (Scoped)
+        ========================================= */
+
+        .tech-support-page .support-layout {
+        display: flex;
+        max-width: 1200px;
+        margin: 60px auto;
+        gap: 32px;
+        }
+
+        /* Left menu */
+        .tech-support-page .support-menu {
+        flex: 0 0 28%;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+
+        .tech-support-page .support-menu ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        }
+
+        .tech-support-page .support-menu li {
+        padding: 18px 22px;
+        cursor: pointer;
+        border-bottom: 1px solid #eee;
+        font-size: 15px;
+        transition: background .2s;
+        }
+
+        .tech-support-page .support-menu li:hover {
+        background: #f8f9fd;
+        }
+
+        .tech-support-page .support-menu li.active {
+        background: #f4f6fb;
+        color: #0f2679;
+        font-weight: 600;
+        }
+
+        /* Right content */
+        .tech-support-page .support-content {
+        flex: 1;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        padding: 32px;
+        }
+
+        .tech-support-page .support-content .content {
+        display: none;
+        }
+
+        .tech-support-page .support-content .content.active {
+        display: block;
+        }
+
+        .tech-support-page .support-content iframe {
+        width: 100%;
+        min-height: 70vh;
+        border: none;
+        }
+
+        .tech-support-page .support-menu li.disabled {
+        color: #999;
+        cursor: default;
+        }
+
+        .tech-support-page .support-menu li.disabled:hover {
+        background: transparent;
+        }
+
+        .tech-support-page .coming-soon {
+        padding: 80px 20px;
+        text-align: center;
+        color: #666;
+        }
+
+        .tech-support-page .coming-soon h3 {
+        font-size: 22px;
+        color: #0f2679;
+        margin-bottom: 10px;
+        }
+
+        /* 기술지원 페이지 드래그 방지 */
+        .tech-support-page {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        }
+
+        .tech-support-page img {
+        -webkit-user-drag: none;
+        user-drag: none;
+        pointer-events: none;
+        }
+
+        .tech-support-page input,
+        .tech-support-page textarea {
+        user-select: text;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<!-- 관리자 세션바 (정확한 ID 부여) -->
+<div id="adminBarContainer" data-include="/en/components/admin-session-bar.html"></div>
+
+<!-- 공통 헤더 -->
+<div id="headerContainer" data-include="/en/components/header.html"></div>
+
+
+  <!-- 서브 배너 -->
+  <section class="sub-banner">
+    <img src="/img/sub-banners/subbanner_support_6.png" alt="기술지원">
+    <div class="banner-text">
+    <h1>Technical Support</h1>
+    <p>We provide support for standard-based calculations, design applications, and technical reviews.</p>
+    </div>
+  </section>
+
+    <!-- breadcrumb -->
+  <div class="breadcrumb">
+    <a href="/en/index.html">Home</a> &gt;
+    <span class="crumb crumb-level1 active">Support</span> &gt;
+    <span class="crumb crumb-level2 active">Technical Support</span>
+    <div id="side-tabs"></div>
+  </div>
+
+
+    <div class="tech-support-page">
+
+        <div class="support-layout">
+
+            <aside class="support-menu">
+            <ul>
+                <li class="active" data-target="conductor">Conductor Selector</li>
+                <li data-target="resistance">Conductor Resistance Calculator</li>
+                <li data-target="braid">Braid Shield Calculator</li>
+                <li data-target="coming" class="disabled">Coming Soon</li>
+            </ul>
+            </aside>
+
+            <section class="support-content">
+
+            <div id="conductor" class="content active">
+                <iframe src="/en/sub/support/Technical_support/conductor_selector.html" loading="lazy"></iframe>
+            </div>
+
+            <div id="resistance" class="content">
+                <iframe src="/en/sub/support/Technical_support/conductor_resistance.html" loading="lazy"></iframe>
+            </div>
+
+            <div id="braid" class="content">
+                <iframe src="/en/sub/support/Technical_support/braidshield.html" loading="lazy"></iframe>
+            </div>
+
+            <!-- 준비중 전용 -->
+            <div id="coming" class="content">
+                <div class="coming-soon">
+                <h3>Coming Soon</h3>
+                <p>This tool is currently under development.</p>
+                </div>
+            </div>
+
+            </section>
+
+        </div>
+    </div>
+
+    <!-- 공통 푸터 -->
+    <div data-include="/en/components/footer.html"></div>
+
+    <!-- 공통 스크립트 -->
+    <script src="/js/include.js"></script>
+    <script src="/js/session_timer.js"></script>
+    <script src="/js/language.js"></script>
+    <script src="/js/nav.js"></script>
+
+
+    <script>
+    document
+    .querySelectorAll('.tech-support-page .support-menu li')
+    .forEach(item => {
+        item.addEventListener('click', () => {
+
+        // ❌ disabled 항목 클릭 방지
+        if (item.classList.contains('disabled')) return;
+
+        const targetId = item.dataset.target;
+        const page = item.closest('.tech-support-page');
+        const target = page.querySelector('#' + targetId);
+
+        // ❌ target 없으면 중단 (안전장치)
+        if (!target) return;
+
+        page.querySelectorAll('.support-menu li')
+            .forEach(li => li.classList.remove('active'));
+
+        page.querySelectorAll('.support-content .content')
+            .forEach(c => c.classList.remove('active'));
+
+        item.classList.add('active');
+        target.classList.add('active');
+
+
+        history.pushState(
+            { tab: targetId },
+            '',
+            `#${targetId}`
+            );
+        });
+    });
+
+    </script>
+
+    <script>
+    window.addEventListener('popstate', e => {
+    const tab = e.state?.tab || location.hash.replace('#', '') || 'conductor';
+
+    const page = document.querySelector('.tech-support-page');
+    if (!page) return;
+
+    const menuItem = page.querySelector(`.support-menu li[data-target="${tab}"]`);
+    const content = page.querySelector(`#${tab}`);
+
+    if (!menuItem || !content) return;
+
+    page.querySelectorAll('.support-menu li')
+        .forEach(li => li.classList.remove('active'));
+
+    page.querySelectorAll('.support-content .content')
+        .forEach(c => c.classList.remove('active'));
+
+    menuItem.classList.add('active');
+    content.classList.add('active');
+    });
+
+    </script>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+    highlightBreadcrumb();
+
+    const hash = location.hash.replace('#', '');
+    if (hash) {
+        const btn = document.querySelector(
+        `.support-menu li[data-target="${hash}"]`
+        );
+        btn?.click();
+    }
+    });
+    </script>
+
+
+
+
+</body>
+</html>
