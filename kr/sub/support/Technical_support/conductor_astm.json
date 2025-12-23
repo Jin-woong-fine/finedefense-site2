@@ -1,0 +1,106 @@
+{
+  "meta": {
+    "title": "Stranded Copper Conductor Data",
+    "based_on": "ASTM B-286",
+    "description": "Reference data for stranded copper conductors. For technical selection purposes only. Actual construction may vary."
+  },
+  "conductors": [
+    { "code": "0000-2109", "strand_count": 2109, "coating": "Tin", "wire_diameter_mm": 0.254, "area_mm2": 106.86, "resistance_ohm_km": 0.18900 },
+    { "code": "000-1672", "strand_count": 1672, "coating": "Tin", "wire_diameter_mm": 0.254, "area_mm2": 84.72, "resistance_ohm_km": 0.23850 },
+    { "code": "00-1330", "strand_count": 1330, "coating": "Tin", "wire_diameter_mm": 0.254, "area_mm2": 67.39, "resistance_ohm_km": 0.29990 },
+    { "code": "0-1064", "strand_count": 1064, "coating": "Tin", "wire_diameter_mm": 0.254, "area_mm2": 53.91, "resistance_ohm_km": 0.37400 },
+    { "code": "0-1045", "strand_count": 1045, "coating": "Tin", "wire_diameter_mm": 0.254, "area_mm2": 52.95, "resistance_ohm_km": 0.38060 },
+    { "code": "1-836", "strand_count": 836, "coating": "Tin", "wire_diameter_mm": 0.254, "area_mm2": 42.36, "resistance_ohm_km": 0.47570 },
+    { "code": "1-817", "strand_count": 817, "coating": "Tin", "wire_diameter_mm": 0.254, "area_mm2": 41.40, "resistance_ohm_km": 0.48880 },
+    { "code": "2-665", "strand_count": 665, "coating": "Tin", "wire_diameter_mm": 0.254, "area_mm2": 33.70, "resistance_ohm_km": 0.60040 },
+    { "code": "4-133", "strand_count": 133, "coating": "Tin", "wire_diameter_mm": 0.455, "area_mm2": 21.59, "resistance_ohm_km": 0.91860 },
+    { "code": "4-420", "strand_count": 420, "coating": "Tin", "wire_diameter_mm": 0.254, "area_mm2": 21.28, "resistance_ohm_km": 0.94820 },
+    { "code": "6-133", "strand_count": 133, "coating": "Tin", "wire_diameter_mm": 0.361, "area_mm2": 13.59, "resistance_ohm_km": 1.45600 },
+    { "code": "6-266", "strand_count": 266, "coating": "Tin", "wire_diameter_mm": 0.254, "area_mm2": 13.48, "resistance_ohm_km": 1.49900 },
+    { "code": "8-133", "strand_count": 133, "coating": "Tin", "wire_diameter_mm": 0.287, "area_mm2": 8.61, "resistance_ohm_km": 2.29900 },
+    { "code": "8-168", "strand_count": 168, "coating": "Tin", "wire_diameter_mm": 0.254, "area_mm2": 8.51, "resistance_ohm_km": 2.37500 },
+    { "code": "10-105", "strand_count": 105, "coating": "Tin", "wire_diameter_mm": 0.254, "area_mm2": 5.32, "resistance_ohm_km": 3.77300 },
+    { "code": "10-104", "strand_count": 104, "coating": "Tin", "wire_diameter_mm": 0.254, "area_mm2": 5.27, "resistance_ohm_km": 3.80500 },
+    { "code": "10-49", "strand_count": 49, "coating": "Tin", "wire_diameter_mm": 0.361, "area_mm2": 5.01, "resistance_ohm_km": 3.96900 },
+    { "code": "10-37", "strand_count": 37, "coating": "Tin", "wire_diameter_mm": 0.404, "area_mm2": 4.74, "resistance_ohm_km": 4.13300 },
+    { "code": "12-65", "strand_count": 65, "coating": "Tin", "wire_diameter_mm": 0.254, "area_mm2": 3.29, "resistance_ohm_km": 6.06900 },
+    { "code": "12-37", "strand_count": 37, "coating": "Tin", "wire_diameter_mm": 0.320, "area_mm2": 2.98, "resistance_ohm_km": 6.59500 },
+    { "code": "12-19", "strand_count": 19, "coating": "Tin", "wire_diameter_mm": 0.455, "area_mm2": 3.085, "resistance_ohm_km": 6.29900 },
+    { "code": "14-41", "strand_count": 41, "coating": "Tin", "wire_diameter_mm": 0.254, "area_mm2": 2.078, "resistance_ohm_km": 9.64600 },
+    { "code": "14-19", "strand_count": 19, "coating": "Tin", "wire_diameter_mm": 0.361, "area_mm2": 1.941, "resistance_ohm_km": 10.00700 },
+    { "code": "16-26", "strand_count": 26, "coating": "Tin", "wire_diameter_mm": 0.254, "area_mm2": 1.317, "resistance_ohm_km": 15.05900 },
+    { "code": "16-19", "strand_count": 19, "coating": "Tin", "wire_diameter_mm": 0.287, "area_mm2": 1.229, "resistance_ohm_km": 15.81400 },
+    { "code": "18-16", "strand_count": 16, "coating": "Tin", "wire_diameter_mm": 0.254, "area_mm2": 0.811, "resistance_ohm_km": 25.20000 },
+    { "code": "18-19", "strand_count": 19, "coating": "Tin", "wire_diameter_mm": 0.254, "area_mm2": 0.963, "resistance_ohm_km": 20.40700 },
+    { "code": "18-7", "strand_count": 7, "coating": "Tin", "wire_diameter_mm": 0.404, "area_mm2": 0.897, "resistance_ohm_km": 21.45700 },
+    { "code": "20-19", "strand_count": 19, "coating": "Tin", "wire_diameter_mm": 0.203, "area_mm2": 0.616, "resistance_ohm_km": 32.02100 },
+    { "code": "20-10", "strand_count": 10, "coating": "Tin", "wire_diameter_mm": 0.254, "area_mm2": 0.507, "resistance_ohm_km": 38.71400 },
+    { "code": "20-7", "strand_count": 7, "coating": "Tin", "wire_diameter_mm": 0.320, "area_mm2": 0.563, "resistance_ohm_km": 34.12100 },
+    { "code": "22-19", "strand_count": 19, "coating": "Tin", "wire_diameter_mm": 0.160, "area_mm2": 0.382, "resistance_ohm_km": 52.16500 },
+    { "code": "22-7", "strand_count": 7, "coating": "Tin", "wire_diameter_mm": 0.254, "area_mm2": 0.355, "resistance_ohm_km": 54.79000 },
+    { "code": "24-19", "strand_count": 19, "coating": "Tin", "wire_diameter_mm": 0.127, "area_mm2": 0.241, "resistance_ohm_km": 83.33300 },
+    { "code": "24-7", "strand_count": 7, "coating": "Tin", "wire_diameter_mm": 0.203, "area_mm2": 0.227, "resistance_ohm_km": 85.95800 },
+    { "code": "26-19", "strand_count": 19, "coating": "Tin", "wire_diameter_mm": 0.102, "area_mm2": 0.154, "resistance_ohm_km": 131.56000 },
+    { "code": "26-7", "strand_count": 7, "coating": "Tin", "wire_diameter_mm": 0.160, "area_mm2": 0.141, "resistance_ohm_km": 139.76000 },
+    { "code": "28-19", "strand_count": 19, "coating": "Tin", "wire_diameter_mm": 0.079, "area_mm2": 0.093, "resistance_ohm_km": 222.11000 },
+    { "code": "28-7", "strand_count": 7, "coating": "Tin", "wire_diameter_mm": 0.127, "area_mm2": 0.089, "resistance_ohm_km": 223.75000 },
+    { "code": "30-7", "strand_count": 7, "coating": "Tin", "wire_diameter_mm": 0.102, "area_mm2": 0.057, "resistance_ohm_km": 354.33000 },
+    { "code": "32-7", "strand_count": 7, "coating": "Tin", "wire_diameter_mm": 0.079, "area_mm2": 0.034, "resistance_ohm_km": 597.11000 },
+
+    { "code": "0000-2109", "strand_count": 2109, "coating": "Plain", "wire_diameter_mm": 0.254, "area_mm2": 106.86, "resistance_ohm_km": 0.17620 },
+    { "code": "000-1672", "strand_count": 1672, "coating": "Plain", "wire_diameter_mm": 0.254, "area_mm2": 84.72, "resistance_ohm_km": 0.22210 },
+    { "code": "00-1330", "strand_count": 1330, "coating": "Plain", "wire_diameter_mm": 0.254, "area_mm2": 67.39, "resistance_ohm_km": 0.27920 },
+    { "code": "0-1064", "strand_count": 1064, "coating": "Plain", "wire_diameter_mm": 0.254, "area_mm2": 53.91, "resistance_ohm_km": 0.34780 },
+    { "code": "0-1045", "strand_count": 1045, "coating": "Plain", "wire_diameter_mm": 0.254, "area_mm2": 52.95, "resistance_ohm_km": 0.35430 },
+    { "code": "1-836", "strand_count": 836, "coating": "Plain", "wire_diameter_mm": 0.254, "area_mm2": 42.36, "resistance_ohm_km": 0.44290 },
+    { "code": "1-817", "strand_count": 817, "coating": "Plain", "wire_diameter_mm": 0.254, "area_mm2": 41.40, "resistance_ohm_km": 0.45600 },
+    { "code": "2-665", "strand_count": 665, "coating": "Plain", "wire_diameter_mm": 0.254, "area_mm2": 33.70, "resistance_ohm_km": 0.55770 },
+
+    { "code": "4-133", "strand_count": 133, "coating": "Plain", "wire_diameter_mm": 0.455, "area_mm2": 21.59, "resistance_ohm_km": 0.86290 },
+    { "code": "4-420", "strand_count": 420, "coating": "Plain", "wire_diameter_mm": 0.254, "area_mm2": 21.28, "resistance_ohm_km": 0.85580 },
+
+    { "code": "6-133", "strand_count": 133, "coating": "Plain", "wire_diameter_mm": 0.361, "area_mm2": 13.59, "resistance_ohm_km": 1.37100 },
+    { "code": "6-266", "strand_count": 266, "coating": "Plain", "wire_diameter_mm": 0.254, "area_mm2": 13.48, "resistance_ohm_km": 1.39700 },
+
+    { "code": "8-133", "strand_count": 133, "coating": "Plain", "wire_diameter_mm": 0.287, "area_mm2": 8.61, "resistance_ohm_km": 2.16800 },
+    { "code": "8-168", "strand_count": 168, "coating": "Plain", "wire_diameter_mm": 0.254, "area_mm2": 8.51, "resistance_ohm_km": 2.21100 },
+
+    { "code": "10-105", "strand_count": 105, "coating": "Plain", "wire_diameter_mm": 0.254, "area_mm2": 5.32, "resistance_ohm_km": 3.51000 },
+    { "code": "10-104", "strand_count": 104, "coating": "Plain", "wire_diameter_mm": 0.254, "area_mm2": 5.27, "resistance_ohm_km": 3.54300 },
+    { "code": "10-49", "strand_count": 49, "coating": "Plain", "wire_diameter_mm": 0.361, "area_mm2": 5.01, "resistance_ohm_km": 3.74000 },
+    { "code": "10-37", "strand_count": 37, "coating": "Plain", "wire_diameter_mm": 0.404, "area_mm2": 4.74, "resistance_ohm_km": 3.90400 },
+
+    { "code": "12-65", "strand_count": 65, "coating": "Plain", "wire_diameter_mm": 0.254, "area_mm2": 3.29, "resistance_ohm_km": 5.67500 },
+    { "code": "12-37", "strand_count": 37, "coating": "Plain", "wire_diameter_mm": 0.320, "area_mm2": 2.98, "resistance_ohm_km": 6.20100 },
+    { "code": "12-19", "strand_count": 19, "coating": "Plain", "wire_diameter_mm": 0.455, "area_mm2": 3.085, "resistance_ohm_km": 5.93800 },
+
+    { "code": "14-41", "strand_count": 41, "coating": "Plain", "wire_diameter_mm": 0.254, "area_mm2": 2.078, "resistance_ohm_km": 8.99000 },
+    { "code": "14-19", "strand_count": 19, "coating": "Plain", "wire_diameter_mm": 0.361, "area_mm2": 1.941, "resistance_ohm_km": 9.41600 },
+
+    { "code": "16-26", "strand_count": 26, "coating": "Plain", "wire_diameter_mm": 0.254, "area_mm2": 1.317, "resistance_ohm_km": 14.00900 },
+    { "code": "16-19", "strand_count": 19, "coating": "Plain", "wire_diameter_mm": 0.287, "area_mm2": 1.229, "resistance_ohm_km": 14.89500 },
+
+    { "code": "18-16", "strand_count": 16, "coating": "Plain", "wire_diameter_mm": 0.254, "area_mm2": 0.811, "resistance_ohm_km": 22.56000 },
+    { "code": "18-19", "strand_count": 19, "coating": "Plain", "wire_diameter_mm": 0.254, "area_mm2": 0.963, "resistance_ohm_km": 18.99600 },
+    { "code": "18-7", "strand_count": 7, "coating": "Plain", "wire_diameter_mm": 0.404, "area_mm2": 0.897, "resistance_ohm_km": 20.21000 },
+
+    { "code": "20-19", "strand_count": 19, "coating": "Plain", "wire_diameter_mm": 0.203, "area_mm2": 0.616, "resistance_ohm_km": 29.85600 },
+    { "code": "20-10", "strand_count": 10, "coating": "Plain", "wire_diameter_mm": 0.254, "area_mm2": 0.507, "resistance_ohm_km": 36.08900 },
+    { "code": "20-7", "strand_count": 7, "coating": "Plain", "wire_diameter_mm": 0.320, "area_mm2": 0.563, "resistance_ohm_km": 32.18500 },
+
+    { "code": "22-19", "strand_count": 19, "coating": "Plain", "wire_diameter_mm": 0.160, "area_mm2": 0.382, "resistance_ohm_km": 48.55600 },
+    { "code": "22-7", "strand_count": 7, "coating": "Plain", "wire_diameter_mm": 0.254, "area_mm2": 0.355, "resistance_ohm_km": 51.18100 },
+
+    { "code": "24-19", "strand_count": 19, "coating": "Plain", "wire_diameter_mm": 0.127, "area_mm2": 0.241, "resistance_ohm_km": 77.42800 },
+    { "code": "24-7", "strand_count": 7, "coating": "Plain", "wire_diameter_mm": 0.203, "area_mm2": 0.227, "resistance_ohm_km": 80.38100 },
+
+    { "code": "26-19", "strand_count": 19, "coating": "Plain", "wire_diameter_mm": 0.102, "area_mm2": 0.154, "resistance_ohm_km": 122.37000 },
+    { "code": "26-7", "strand_count": 7, "coating": "Plain", "wire_diameter_mm": 0.160, "area_mm2": 0.141, "resistance_ohm_km": 130.24000 },
+
+    { "code": "28-19", "strand_count": 19, "coating": "Plain", "wire_diameter_mm": 0.079, "area_mm2": 0.093, "resistance_ohm_km": 207.02000 },
+    { "code": "28-7", "strand_count": 7, "coating": "Plain", "wire_diameter_mm": 0.127, "area_mm2": 0.089, "resistance_ohm_km": 208.66000 },
+
+    { "code": "30-7", "strand_count": 7, "coating": "Plain", "wire_diameter_mm": 0.102, "area_mm2": 0.057, "resistance_ohm_km": 328.08000 },
+    { "code": "32-7", "strand_count": 7, "coating": "Plain", "wire_diameter_mm": 0.079, "area_mm2": 0.034, "resistance_ohm_km": 557.74000 }
+  ]
+}
