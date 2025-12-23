@@ -155,7 +155,7 @@
             <aside class="support-menu">
             <ul>
                 <li class="active" data-target="conductor">Conductor Selector</li>
-                <li data-target="resistance" class="resistance">Conductor Resistance Calculator</li>
+                <li data-target="resistance">Conductor Resistance Calculator</li>
                 <li data-target="braid" class="disabled">Braid Shield Calculator</li>
                 <li data-target="coming" class="disabled">Coming Soon</li>
             </ul>
@@ -190,22 +190,6 @@
 
     <!-- 공통 푸터 -->
     <div data-include="/kr/components/footer.html"></div>
-
-
-    <script>
-    document.addEventListener("DOMContentLoaded", () => {
-    highlightBreadcrumb();
-
-    const hash = location.hash.replace('#', '');
-    if (hash) {
-        const btn = document.querySelector(
-        `.support-menu li[data-target="${hash}"]`
-        );
-        btn?.click();
-    }
-    });
-    </script>
-
 
     <!-- 공통 스크립트 -->
     <script src="/js/include.js"></script>
@@ -271,7 +255,23 @@
     menuItem.classList.add('active');
     content.classList.add('active');
     });
+
     </script>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+    highlightBreadcrumb();
+
+    const hash = location.hash.replace('#', '');
+    if (hash) {
+        const btn = document.querySelector(
+        `.support-menu li[data-target="${hash}"]`
+        );
+        btn?.click();
+    }
+    });
+    </script>
+
 
 
 
