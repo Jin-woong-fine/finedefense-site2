@@ -9,6 +9,7 @@
 ============================================================ */
 
 let hideTimer = null;
+let lv2Ready = false;
 
 /* ------------------------------------------------------------
    1) 언어 감지
@@ -227,6 +228,8 @@ function initBreadcrumbTabs() {
 
   // 레벨2 Hover
   lv2?.addEventListener("mouseenter", () => {
+    if (!lv2Ready) return;   // ⭐ 추가된 가드
+
     const p = location.pathname.toLowerCase();
     let tabs = [];
 
@@ -293,12 +296,12 @@ function initBreadcrumbTabs() {
         ? [
             { name: "1:1 문의", link: `${base}/support/inquiry/index.html` },
             { name: "자료실", link: `${base}/support/downloads/index.html` },
-            { name: "기술지원", link: `/kr/support/technical_support/index.html` },
+            { name: "기술지원", link: `${base}/support/technical_support/index.html` },
           ]
         : [
             { name: "Inquiry", link: `${base}/support/inquiry/index.html` },
             { name: "Download", link: `${base}/support/downloads/index.html` },
-            { name: "Technical Support", link: `/en/support/technical_support/index.html` },
+            { name: "Technical Support", link: `${base}/support/technical_support/index.html` },
           ];
     }
 
@@ -320,6 +323,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   highlightTopMenu();
   initBreadcrumbTabs();
+
+  setTimeout(() => {
+    lv2Ready = true;
+  }, 300);
 });
 
 window.addEventListener("load", () => {
