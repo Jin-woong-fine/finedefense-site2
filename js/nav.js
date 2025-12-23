@@ -293,10 +293,12 @@ function initBreadcrumbTabs() {
         ? [
             { name: "1:1 문의", link: `${base}/support/inquiry/index.html` },
             { name: "자료실", link: `${base}/support/downloads/index.html` },
+            { name: "기술지원", link: `${base}/support/technical_support/index.html` },
           ]
         : [
             { name: "Inquiry", link: `${base}/support/inquiry/index.html` },
             { name: "Download", link: `${base}/support/downloads/index.html` },
+            { name: "Technical Support", link: `${base}/support/technical_support/index.html` },
           ];
     }
 

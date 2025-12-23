@@ -176,24 +176,3 @@
 .main-menu > li > a:hover {
   color: #0f2679;
 }
-
-
-/* ===============================
-   ✅ 반응형
-================================*/
-@media (max-width: 768px) {
-  .breadcrumb {
-    font-size: 0.9rem;
-    padding: 12px 5%;
-    gap: 16px;
-  }
-
-  #side-tabs {
-    left: 6%;
-    width: 200px;
-  }
-
-  #side-tabs a {
-    font-size: 0.9rem;
-  }
-}
