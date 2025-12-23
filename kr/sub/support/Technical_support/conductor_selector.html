@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <title>Conductor Selection Tool</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
     body {
@@ -122,6 +121,18 @@
         </select>
       </label>
 
+        <label>
+            Matching Range (%)
+            <input type="range"
+                    id="rangePercent"
+                    min="50"
+                    max="100"
+                    step="5"
+                    value="70">
+            <span id="rangeValue">70%</span>
+        </label>
+
+
       <button id="calcBtn">Find Conductors</button>
     </div>
   </div>
@@ -168,26 +179,27 @@
       renderFullTable(conductors);
     });
 
-  document.getElementById('calcBtn').addEventListener('click', () => {
+    document.getElementById('calcBtn').addEventListener('click', () => {
     const maxR = parseFloat(document.getElementById('maxResistance').value);
     const coating = document.getElementById('coating').value;
+    const ratio = parseInt(rangeInput.value, 10) / 100;
 
     if (isNaN(maxR)) return;
 
-    const lowerBound = maxR * 0.7;
+    const lowerBound = maxR * ratio;
 
     const filtered = conductors
-    .filter(c => c.coating === coating)
-    .filter(c =>
+        .filter(c => c.coating === coating)
+        .filter(c =>
         c.resistance_ohm_km <= maxR &&
         c.resistance_ohm_km >= lowerBound
-    )
-    .sort((a, b) => a.area_mm2 - b.area_mm2);
+        )
+        .sort((a, b) => a.area_mm2 - b.area_mm2);
 
-
-        renderFilteredTable(filtered);
-        highlightFullTable(filtered.map(c => c.code));
+    renderFilteredTable(filtered);
+    highlightFullTable(filtered.map(c => c.code));
     });
+
 
   function renderFilteredTable(list) {
     const container = document.getElementById('filteredTable');
@@ -230,6 +242,17 @@
     container.innerHTML = html;
   }
 
+    const rangeInput = document.getElementById('rangePercent');
+    const rangeValue = document.getElementById('rangeValue');
+
+    rangeValue.textContent = rangeInput.value + '%';
+
+    rangeInput.addEventListener('input', () => {
+    rangeValue.textContent = rangeInput.value + '%';
+    });
+
+
+
   function renderFullTable(data) {
     const tbody = document.querySelector('#fullTable tbody');
     tbody.innerHTML = '';
@@ -254,6 +277,10 @@
       tr.classList.toggle('match', codes.includes(tr.dataset.code));
     });
   }
+
+
+
+
 </script>
 
 </body>
