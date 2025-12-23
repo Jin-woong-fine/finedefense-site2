@@ -76,6 +76,15 @@
         border: none;
         }
 
+        .tech-support-page .support-menu li.disabled {
+        color: #999;
+        cursor: default;
+        }
+
+        .tech-support-page .support-menu li.disabled:hover {
+        background: transparent;
+        }
+
     </style>
 
 </head>
@@ -113,28 +122,28 @@
 
         <aside class="support-menu">
         <ul>
-            <li class="active" data-target="braid">편조 설계 계산기</li>
-            <li data-target="shield">차폐 구조 계산기</li>
-            <li data-target="docs">기술 자료</li>
-            <li data-target="inquiry">기술지원 문의</li>
+            <li class="active" data-target="conductor">Conductor Selector</li>
+            <li data-target="resistance">Resistance Calculator</li>
+            <li data-target="braid">Braid Shield Calculator</li>
+            <li class="disabled">Additional Tools (Coming Soon)</li>
         </ul>
         </aside>
 
         <section class="support-content">
-        <div id="braid" class="content active">
-            <iframe src="/kr/tech/braid-calculator.html" loading="lazy"></iframe>
+        <div id="conductor" class="content active">
+            <iframe src="#" loading="lazy"></iframe>
         </div>
 
-        <div id="shield" class="content">
-            <iframe src="/kr/tech/shield-calculator.html" loading="lazy"></iframe>
+        <div id="resistance" class="content">
+            <iframe src="#" loading="lazy"></iframe>
         </div>
 
-        <div id="docs" class="content">
-            <iframe src="/kr/tech/resources.html" loading="lazy"></iframe>
+        <div id="braid" class="content">
+            <iframe src="#" loading="lazy"></iframe>
         </div>
 
-        <div id="inquiry" class="content">
-            <div data-include="/kr/support/technical-inquiry-form.html"></div>
+        <div id="disabled" class="content">
+            <div data-include="#"></div>
         </div>
         </section>
 
