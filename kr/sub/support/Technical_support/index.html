@@ -97,6 +97,24 @@
         margin-bottom: 10px;
         }
 
+        /* 기술지원 페이지 드래그 방지 */
+        .tech-support-page {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        }
+
+        .tech-support-page img {
+        -webkit-user-drag: none;
+        user-drag: none;
+        pointer-events: none;
+        }
+
+        .tech-support-page input,
+        .tech-support-page textarea {
+        user-select: text;
+        }
 
     </style>
 
