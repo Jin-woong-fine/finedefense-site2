@@ -89,6 +89,29 @@ th:first-child, td:first-child {
   font-size: 12px;
   color: var(--text-muted);
 }
+
+
+.formula-block {
+  margin-top: 32px;
+}
+
+.formula-block h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.formula-block p {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.formula-block .formula {
+  color: var(--text);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont;
+}
+
 </style>
 </head>
 
@@ -116,8 +139,8 @@ th:first-child, td:first-child {
     </div>
 
     <div>
-      <label>Picks per Inch (PPI)</label>
-      <input type="number" id="ppi" placeholder="e.g. 30">
+      <label>Braid Pitch (mm)</label>
+      <input type="number" id="pitchInput" step="0.1" placeholder="e.g. 8.0">
     </div>
 
     <div>
@@ -164,6 +187,40 @@ th:first-child, td:first-child {
   </div>
 
 </div>
+
+<div class="calculator formula-block">
+  <h3>Calculation Method</h3>
+
+  <p>
+    The braid geometry is calculated based on standard helical braid theory
+    using braid pitch and carrier configuration.
+  </p>
+
+  <p class="formula">
+    Braid angle:<br>
+    α = arctan [ (2π · (D<sub>c</sub> + 2d) · P) / C ]
+  </p>
+
+  <p class="formula">
+    Coverage:<br>
+    K = 100 · (2F − F²)<br>
+    F = (E · P · d) / sin α
+  </p>
+
+  <p class="formula">
+    Estimated outer diameter after braiding:<br>
+    D<sub>out</sub> = D<sub>c</sub> + 2 · d · cos α
+  </p>
+
+  <p>
+    where d is the wire diameter, D<sub>c</sub> is the core diameter,
+    P is the braid pitch, C is the number of carriers,
+    and E is the number of ends per carrier.
+  </p>
+</div>
+
+
+
 </section>
 
 <script>
@@ -171,13 +228,10 @@ function calculateBraid() {
   const d = parseFloat(document.getElementById("wireDia").value);
   const E = parseFloat(document.getElementById("ends").value);
   const C = parseFloat(document.getElementById("carriers").value);
-  const PPI = parseFloat(document.getElementById("ppi").value);
+  const P = parseFloat(document.getElementById("pitchInput").value);
   const Dc = parseFloat(document.getElementById("coreDia").value);
 
-  if (!d || !E || !C || !PPI || !Dc) return;
-
-  // Pitch (mm)
-  const P = 25.4 / (PPI / (C / 2));
+  if (!d || !E || !C || !P || !Dc) return;
 
   // inch conversion
   const d_in = d / 25.4;
