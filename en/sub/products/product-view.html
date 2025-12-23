@@ -608,9 +608,16 @@ function goProductList() {
 </script>
 
 
+<!-- 이미지 우클릭 방지 -->
 <script>
 document.querySelectorAll('.product-detail img').forEach(img => {
   img.addEventListener('contextmenu', e => e.preventDefault());
+});
+
+document.addEventListener("contextmenu", e => {
+  if (e.target.closest(".image-overlay")) {
+    e.preventDefault();
+  }
 });
 </script>
 
