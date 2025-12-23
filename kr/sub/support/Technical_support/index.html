@@ -5,9 +5,7 @@
   <meta charset="UTF-8">
   <title>기술지원 | Fine Defense</title>
 
-  <!-- 공통 CSS -->git add .
-git commit -m "도체 선정 css 변경"
-git push origin main
+  <!-- 공통 CSS -->
 
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/sub-banner.css">
@@ -197,6 +195,14 @@ git push origin main
     <script>
     document.addEventListener("DOMContentLoaded", () => {
     highlightBreadcrumb();
+
+    const hash = location.hash.replace('#', '');
+    if (hash) {
+        const btn = document.querySelector(
+        `.support-menu li[data-target="${hash}"]`
+        );
+        btn?.click();
+    }
     });
     </script>
 
@@ -232,10 +238,42 @@ git push origin main
 
         item.classList.add('active');
         target.classList.add('active');
+
+
+        history.pushState(
+            { tab: targetId },
+            '',
+            `#${targetId}`
+            );
         });
     });
 
     </script>
+
+    <script>
+    window.addEventListener('popstate', e => {
+    const tab = e.state?.tab || location.hash.replace('#', '') || 'conductor';
+
+    const page = document.querySelector('.tech-support-page');
+    if (!page) return;
+
+    const menuItem = page.querySelector(`.support-menu li[data-target="${tab}"]`);
+    const content = page.querySelector(`#${tab}`);
+
+    if (!menuItem || !content) return;
+
+    page.querySelectorAll('.support-menu li')
+        .forEach(li => li.classList.remove('active'));
+
+    page.querySelectorAll('.support-content .content')
+        .forEach(c => c.classList.remove('active'));
+
+    menuItem.classList.add('active');
+    content.classList.add('active');
+    });
+    </script>
+
+
 
 </body>
 </html>
