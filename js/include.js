@@ -4,6 +4,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const targets = document.querySelectorAll("[data-include]");
 
   targets.forEach(async (el) => {
+    // ✅ 이미 include된 요소는 재처리 방지
+    if (el.dataset.included === "true") return;
+    el.dataset.included = "true";
+
     const url = el.getAttribute("data-include");
     if (!url) return;
 
@@ -47,6 +51,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 document.addEventListener("includeLoaded", () => {
+  if (trafficSent) return;
+  trafficSent = true;
+  
   fetch("/api/traffic/visit", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
