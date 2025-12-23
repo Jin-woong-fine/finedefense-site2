@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <title>기술지원 문의 | Fine Defense</title>
+
+  <!-- 공통 CSS -->
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/sub-banner.css">
+
+    <style>
+        /* =========================================
+        Technical Support Page (Scoped)
+        ========================================= */
+
+        .tech-support-page .support-layout {
+        display: flex;
+        max-width: 1200px;
+        margin: 60px auto;
+        gap: 32px;
+        }
+
+        /* Left menu */
+        .tech-support-page .support-menu {
+        flex: 0 0 28%;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+
+        .tech-support-page .support-menu ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        }
+
+        .tech-support-page .support-menu li {
+        padding: 18px 22px;
+        cursor: pointer;
+        border-bottom: 1px solid #eee;
+        font-size: 15px;
+        transition: background .2s;
+        }
+
+        .tech-support-page .support-menu li:hover {
+        background: #f8f9fd;
+        }
+
+        .tech-support-page .support-menu li.active {
+        background: #f4f6fb;
+        color: #0f2679;
+        font-weight: 600;
+        }
+
+        /* Right content */
+        .tech-support-page .support-content {
+        flex: 1;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        padding: 32px;
+        }
+
+        .tech-support-page .support-content .content {
+        display: none;
+        }
+
+        .tech-support-page .support-content .content.active {
+        display: block;
+        }
+
+        .tech-support-page .support-content iframe {
+        width: 100%;
+        min-height: 70vh;
+        border: none;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<!-- 관리자 세션바 (정확한 ID 부여) -->
+<div id="adminBarContainer" data-include="/kr/components/admin-session-bar.html"></div>
+
+<!-- 공통 헤더 -->
+<div id="headerContainer" data-include="/kr/components/header.html"></div>
+
+
+  <!-- 서브 배너 -->
+  <section class="sub-banner">
+    <img src="/img/sub-banners/subbanner_support_6.png" alt="기술지원">
+    <div class="banner-text">
+    <h1>기술지원</h1>
+    <p>표준 기반 계산, 설계 적용, 기술 검토에 대한 문의를 지원합니다.</p>
+    </div>
+  </section>
+
+    <!-- breadcrumb -->
+  <div class="breadcrumb">
+    <a href="/kr/index.html">홈</a> &gt;
+    <span class="crumb crumb-level1 active">고객지원</span> &gt;
+    <span class="crumb crumb-level2 active">기술지원</span>
+    <div id="side-tabs"></div>
+  </div>
+
+
+    <div class="tech-support-page">
+
+    <div class="support-layout">
+
+        <aside class="support-menu">
+        <ul>
+            <li class="active" data-target="braid">편조 설계 계산기</li>
+            <li data-target="shield">차폐 구조 계산기</li>
+            <li data-target="docs">기술 자료</li>
+            <li data-target="inquiry">기술지원 문의</li>
+        </ul>
+        </aside>
+
+        <section class="support-content">
+        <div id="braid" class="content active">
+            <iframe src="/kr/tech/braid-calculator.html" loading="lazy"></iframe>
+        </div>
+
+        <div id="shield" class="content">
+            <iframe src="/kr/tech/shield-calculator.html" loading="lazy"></iframe>
+        </div>
+
+        <div id="docs" class="content">
+            <iframe src="/kr/tech/resources.html" loading="lazy"></iframe>
+        </div>
+
+        <div id="inquiry" class="content">
+            <div data-include="/kr/support/technical-inquiry-form.html"></div>
+        </div>
+        </section>
+
+    </div>
+    </div>
+
+    <!-- 공통 푸터 -->
+    <div data-include="/kr/components/footer.html"></div>
+
+
+    <!-- 공통 스크립트 -->
+    <script src="/js/include.js"></script>
+    <script src="/js/session_timer.js"></script>
+    <script src="/js/language.js"></script>
+    <script src="/js/nav.js"></script>
+
+
+    <script>
+    document
+    .querySelectorAll('.tech-support-page .support-menu li')
+    .forEach(item => {
+        item.addEventListener('click', () => {
+        const page = item.closest('.tech-support-page');
+
+        page.querySelectorAll('.support-menu li')
+            .forEach(li => li.classList.remove('active'));
+
+        page.querySelectorAll('.support-content .content')
+            .forEach(c => c.classList.remove('active'));
+
+        item.classList.add('active');
+        page.querySelector('#' + item.dataset.target)
+            .classList.add('active');
+        });
+    });
+    </script>
+
+</body>
+</html>
