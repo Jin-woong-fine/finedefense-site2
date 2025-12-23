@@ -593,11 +593,14 @@ function goProductList() {
   }
 }
 
-
-
-
-
 </script>
+
+<script>
+document.querySelectorAll('.product-detail img').forEach(img => {
+  img.addEventListener('contextmenu', e => e.preventDefault());
+});
+</script>
+
 
     <!-- 공통 스크립트 -->
     <script src="/js/include.js"></script>
