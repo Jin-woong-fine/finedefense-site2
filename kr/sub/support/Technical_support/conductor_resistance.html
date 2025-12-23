@@ -90,8 +90,27 @@ th:first-child, td:first-child {
 <div class="calculator">
   <div class="calc-row">
     <div>
-      <label>소선경 (mm)</label>
-      <input type="number" id="strandDia" step="0.01" placeholder="ex) 0.32">
+        <label>소선경 (mm)</label>
+        <select id="strandDiaSelect" onchange="setStrandDia()">
+        <option value="">직접 입력</option>
+        <option value="0.08">0.08</option>
+        <option value="0.10">0.10</option>
+        <option value="0.12">0.12</option>
+        <option value="0.16">0.16</option>
+        <option value="0.19">0.19</option>
+        <option value="0.20">0.20</option>
+        <option value="0.25">0.25</option>
+        <option value="0.30">0.30</option>
+        <option value="0.32">0.32</option>
+        <option value="0.40">0.40</option>
+        <option value="0.50">0.50</option>
+        <option value="0.51">0.51</option>
+        <option value="0.64">0.64</option>
+        <option value="0.80">0.80</option>
+        <option value="1.00">1.00</option>
+        </select>
+
+        <input type="number" id="strandDia" step="0.01" placeholder="직접 입력 가능">
     </div>
 
     <div>
@@ -214,10 +233,22 @@ function calculate() {
 
   document.getElementById("resTemp").textContent =
     rTemp.toFixed(2) + " Ω/km";
-    
+
   document.getElementById("awg").textContent =
   "AWG " + awg.awg + " (Ref. " + awg.area + " mm²)";
 }
+
+function setStrandDia() {
+  const select = document.getElementById("strandDiaSelect");
+  const input = document.getElementById("strandDia");
+
+  if (select.value) {
+    input.value = select.value;
+  }
+}
+
+
+
 </script>
 
 </body>
