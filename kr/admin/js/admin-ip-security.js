@@ -1,3 +1,5 @@
+// kr/admin/js/admin-ip-security.js
+
 // 🔐 전역 상태 (필수)
 let ipLimitEnabled = false;
 let myIpCache = null;
