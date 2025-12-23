@@ -5,7 +5,10 @@
   <meta charset="UTF-8">
   <title>기술지원 | Fine Defense</title>
 
-  <!-- 공통 CSS -->
+  <!-- 공통 CSS -->git add .
+git commit -m "도체 선정 css 변경"
+git push origin main
+
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/sub-banner.css">
 
@@ -153,7 +156,7 @@
 
             <aside class="support-menu">
             <ul>
-                <li class="active" data-target="disabled">Conductor Selector</li>
+                <li class="active" data-target="conductor">Conductor Selector</li>
                 <li data-target="resistance" class="disabled">Resistance Calculator</li>
                 <li data-target="braid" class="disabled">Braid Shield Calculator</li>
                 <li data-target="coming" class="disabled">Coming Soon</li>
@@ -210,7 +213,16 @@
     .querySelectorAll('.tech-support-page .support-menu li')
     .forEach(item => {
         item.addEventListener('click', () => {
+
+        // ❌ disabled 항목 클릭 방지
+        if (item.classList.contains('disabled')) return;
+
+        const targetId = item.dataset.target;
         const page = item.closest('.tech-support-page');
+        const target = page.querySelector('#' + targetId);
+
+        // ❌ target 없으면 중단 (안전장치)
+        if (!target) return;
 
         page.querySelectorAll('.support-menu li')
             .forEach(li => li.classList.remove('active'));
@@ -219,10 +231,10 @@
             .forEach(c => c.classList.remove('active'));
 
         item.classList.add('active');
-        page.querySelector('#' + item.dataset.target)
-            .classList.add('active');
+        target.classList.add('active');
         });
     });
+
     </script>
 
 </body>
