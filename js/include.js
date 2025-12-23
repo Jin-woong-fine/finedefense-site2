@@ -1,10 +1,11 @@
 // /js/include.js
+let trafficSent = false;
 
 document.addEventListener("DOMContentLoaded", () => {
   const targets = document.querySelectorAll("[data-include]");
 
   targets.forEach(async (el) => {
-    // ✅ 이미 include된 요소는 재처리 방지
+    // ✅ 중복 include 방지
     if (el.dataset.included === "true") return;
     el.dataset.included = "true";
 
@@ -12,16 +13,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!url) return;
 
     try {
-      // ★ admin bar 먼저 처리 (url 기준)
+      // ★ admin bar 먼저 처리
       if (url.includes("admin-session-bar.html")) {
         const res = await fetch(url);
         const html = await res.text();
         el.innerHTML = html;
-
-        // admin bar가 로드되었음을 body에 표시 → padding-top 등 조정
-        // ❌ include.js에서는 절대 body 상태를 건드리지 않는다
-        // document.body.classList.add("has-admin-bar");
-        return; // 아래 일반 include 로직 실행 안함
+        return;
       }
 
       // ★ 일반 include 처리
@@ -31,29 +28,25 @@ document.addEventListener("DOMContentLoaded", () => {
       const temp = document.createElement("div");
       temp.innerHTML = html;
 
-      // include된 요소를 현재 위치에 삽입
       while (temp.firstChild) {
         el.parentNode.insertBefore(temp.firstChild, el);
       }
 
-      // placeholder 제거
       el.remove();
     } catch (err) {
       console.error("include error:", url, err);
     }
   });
 
-  // include 완료 신호 (옵션)
   setTimeout(() => {
     document.dispatchEvent(new Event("includeLoaded"));
   }, 20);
 });
 
-
 document.addEventListener("includeLoaded", () => {
-  if (trafficSent) return;
+  if (trafficSent) return;   // ✅ 이제 존재함
   trafficSent = true;
-  
+
   fetch("/api/traffic/visit", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
