@@ -90,9 +90,9 @@ th:first-child, td:first-child {
 <div class="calculator">
   <div class="calc-row">
     <div>
-        <label>소선경 (mm)</label>
+        <label>strand diameter (mm)</label>
         <select id="strandDiaSelect" onchange="setStrandDia()">
-        <option value="">소선경 선택</option>
+        <option value="">Select strand diameter</option>
         <option value="0.08">0.08</option>
         <option value="0.10">0.10</option>
         <option value="0.12">0.12</option>
@@ -114,12 +114,12 @@ th:first-child, td:first-child {
     </div>
 
     <div>
-      <label>소선수 (EA)</label>
+      <label>Number of Strands (EA)</label>
       <input type="number" id="strandCnt" placeholder="ex) 19">
     </div>
 
     <div>
-      <label>도금 여부</label>
+      <label>Plating</label>
       <select id="material">
         <option value="bare">Bare Copper</option>
         <option value="tinned">Tinned Copper</option>
@@ -127,44 +127,44 @@ th:first-child, td:first-child {
     </div>
 
     <div>
-      <label>온도 (°C)</label>
+      <label>Temperature (°C)</label>
       <input type="number" id="temp" value="20">
     </div>
 
     <div>
-      <button onclick="calculate()">계산하기</button>
+      <button onclick="calculate()">Calculate</button>
     </div>
   </div>
 
   <table>
     <thead>
       <tr>
-        <th>항목</th>
-        <th>결과</th>
+        <th>Item</th>
+        <th>Result</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td>도체 단면적</td>
+        <td>Conductor Cross-Sectional Area</td>
         <td id="area">-</td>
       </tr>
       <tr>
-        <td>동등 AWG</td>
+        <td>Equivalent AWG</td>
         <td id="awg">-</td>
       </tr>
       <tr>
-        <td>20 °C 기준 저항</td>
+        <td>DC Resistance at 20 °C</td>
         <td id="res20">-</td>
       </tr>
       <tr>
-        <td>온도 보정 저항</td>
+        <td>Temperature-Corrected Resistance</td>
         <td id="resTemp">-</td>
       </tr>
     </tbody>
   </table>
 
   <div class="note">
-    ※ 계산 결과는 DC 저항 기준이며, 1 km 길이 기준입니다.
+    ※ DC resistance at 1 km, reference temperature 20 °C.
   </div>
 </div>
 </section>
