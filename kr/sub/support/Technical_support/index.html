@@ -85,6 +85,19 @@
         background: transparent;
         }
 
+        .tech-support-page .coming-soon {
+        padding: 80px 20px;
+        text-align: center;
+        color: #666;
+        }
+
+        .tech-support-page .coming-soon h3 {
+        font-size: 22px;
+        color: #0f2679;
+        margin-bottom: 10px;
+        }
+
+
     </style>
 
 </head>
@@ -118,36 +131,42 @@
 
     <div class="tech-support-page">
 
-    <div class="support-layout">
+        <div class="support-layout">
 
-        <aside class="support-menu">
-        <ul>
-            <li class="active" data-target="conductor">Conductor Selector</li>
-            <li data-target="resistance">Resistance Calculator</li>
-            <li data-target="braid">Braid Shield Calculator</li>
-            <li class="disabled">Additional Tools (Coming Soon)</li>
-        </ul>
-        </aside>
+            <aside class="support-menu">
+            <ul>
+                <li class="active" data-target="conductor">Conductor Selector</li>
+                <li data-target="resistance" class="disabled">Resistance Calculator</li>
+                <li data-target="braid" class="disabled">Braid Shield Calculator</li>
+                <li data-target="coming" class="disabled">Coming Soon</li>
+            </ul>
+            </aside>
 
-        <section class="support-content">
-        <div id="disabled" class="content active">
-            <iframe src="#" loading="lazy"></iframe>
+            <section class="support-content">
+
+            <div id="conductor" class="content active">
+                <iframe src="/kr/tech/conductor-selector.html" loading="lazy"></iframe>
+            </div>
+
+            <div id="resistance" class="content">
+                <iframe src="/kr/tech/resistance-calculator.html" loading="lazy"></iframe>
+            </div>
+
+            <div id="braid" class="content">
+                <iframe src="/kr/tech/braid-shield-calculator.html" loading="lazy"></iframe>
+            </div>
+
+            <!-- 준비중 전용 -->
+            <div id="coming" class="content">
+                <div class="coming-soon">
+                <h3>Coming Soon</h3>
+                <p>This tool is currently under development.</p>
+                </div>
+            </div>
+
+            </section>
+
         </div>
-
-        <div id="disabled" class="content">
-            <iframe src="#" loading="lazy"></iframe>
-        </div>
-
-        <div id="disabled" class="content">
-            <iframe src="#" loading="lazy"></iframe>
-        </div>
-
-        <div id="disabled" class="content">
-            <div data-include="#"></div>
-        </div>
-        </section>
-
-    </div>
     </div>
 
     <!-- 공통 푸터 -->
