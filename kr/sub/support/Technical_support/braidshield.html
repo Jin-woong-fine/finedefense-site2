@@ -112,6 +112,15 @@ th:first-child, td:first-child {
   font-family: system-ui, -apple-system, BlinkMacSystemFont;
 }
 
+.hint {
+  display: block;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+
 </style>
 </head>
 
@@ -124,23 +133,52 @@ th:first-child, td:first-child {
 
   <div class="calc-row">
     <div>
-      <label>Wire Diameter (mm)</label>
-      <input type="number" id="wireDia" step="0.01" placeholder="e.g. 0.20">
+    <label>Wire Diameter (mm)</label>
+
+    <select id="wireDiaSelect" onchange="setWireDia()">
+        <option value="">Select wire diameter</option>
+        <option value="0.08">0.08</option>
+        <option value="0.10">0.10</option>
+        <option value="0.12">0.12</option>
+        <option value="0.16">0.16</option>
+        <option value="0.19">0.19</option>
+        <option value="0.20">0.20</option>
+        <option value="0.25">0.25</option>
+        <option value="0.30">0.30</option>
+        <option value="0.32">0.32</option>
+        <option value="0.40">0.40</option>
+        <option value="0.50">0.50</option>
+        <option value="0.51">0.51</option>
+        <option value="0.64">0.64</option>
+        <option value="0.80">0.80</option>
+        <option value="1.00">1.00</option>
+    </select>
+
+    <input type="number" id="wireDia" step="0.01" placeholder="Manual Input">
     </div>
 
     <div>
-      <label>Ends per Carrier</label>
-      <input type="number" id="ends" placeholder="e.g. 16">
+        <label>
+        Ends per Carrier
+        <span class="hint">Common: 8, 12, 16, 24</span>
+        </label>
+        <input type="number" id="ends" placeholder="e.g. 16">
     </div>
 
     <div>
-      <label>Number of Carriers</label>
-      <input type="number" id="carriers" placeholder="e.g. 24">
+        <label>
+        Number of Carriers
+        <span class="hint">Common: 16, 24, 32, 36, 48</span>
+        </label>
+        <input type="number" id="carriers" placeholder="e.g. 24">
     </div>
 
     <div>
-      <label>Braid Pitch (mm)</label>
-      <input type="number" id="pitchInput" step="0.1" placeholder="e.g. 8.0">
+        <label>
+        Braid Pitch (mm)
+        <span class="hint">Typical: 6 – 12 mm</span>
+        </label>
+        <input type="number" id="pitchInput" step="0.1" placeholder="e.g. 8.0">
     </div>
 
     <div>
@@ -264,6 +302,20 @@ function calculateBraid() {
     alert("Warning: Braid angle is outside the typical range (18°–40°).");
   }
 }
+
+
+
+function setWireDia() {
+  const select = document.getElementById("wireDiaSelect");
+  const input = document.getElementById("wireDia");
+
+  if (select.value) {
+    input.value = select.value;
+  }
+}
+
+
+
 </script>
 
 </body>
