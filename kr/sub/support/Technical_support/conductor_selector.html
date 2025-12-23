@@ -198,11 +198,11 @@
       <table>
         <thead>
           <tr>
-            <th>Area (mm²)</th>
-            <th>Resistance (Ω/km)</th>
+            <th>Code</th>
             <th>Strands</th>
             <th>Wire Ø (mm)</th>
-            <th>Code</th>
+            <th>Area (mm²)</th>
+            <th>Resistance (Ω/km)</th>
           </tr>
         </thead>
         <tbody>
@@ -211,11 +211,11 @@
     list.forEach(c => {
       html += `
         <tr class="${c === recommended ? 'recommended' : ''}">
-          <td>${c.area_mm2}</td>
-          <td>${c.resistance_ohm_km}</td>
-          <td>${c.strand_count}</td>
-          <td>${c.wire_diameter_mm}</td>
-          <td>${c.code}</td>
+            <td>${c.code}</td>
+            <td>${c.strand_count}</td>
+            <td>${c.wire_diameter_mm}</td>
+            <td>${c.area_mm2}</td>
+            <td>${c.resistance_ohm_km}</td>
         </tr>
       `;
     });
@@ -232,12 +232,12 @@
       const tr = document.createElement('tr');
       tr.dataset.code = c.code;
       tr.innerHTML = `
-        <td>${c.area_mm2}</td>
-        <td>${c.resistance_ohm_km}</td>
-        <td>${c.coating}</td>
+        <td>${c.code}</td>
         <td>${c.strand_count}</td>
         <td>${c.wire_diameter_mm}</td>
-        <td>${c.code}</td>
+        <td>${c.area_mm2}</td>
+        <td>${c.coating}</td>
+        <td>${c.resistance_ohm_km}</td>
       `;
       tbody.appendChild(tr);
     });
