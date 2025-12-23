@@ -174,14 +174,20 @@
 
     if (isNaN(maxR)) return;
 
-    const filtered = conductors
-      .filter(c => c.coating === coating)
-      .filter(c => c.resistance_ohm_km <= maxR)
-      .sort((a, b) => a.area_mm2 - b.area_mm2);
+    const lowerBound = maxR * 0.7;
 
-    renderFilteredTable(filtered);
-    highlightFullTable(filtered.map(c => c.code));
-  });
+    const filtered = conductors
+    .filter(c => c.coating === coating)
+    .filter(c =>
+        c.resistance_ohm_km <= maxR &&
+        c.resistance_ohm_km >= lowerBound
+    )
+    .sort((a, b) => a.area_mm2 - b.area_mm2);
+
+
+        renderFilteredTable(filtered);
+        highlightFullTable(filtered.map(c => c.code));
+    });
 
   function renderFilteredTable(list) {
     const container = document.getElementById('filteredTable');
