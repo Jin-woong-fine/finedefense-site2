@@ -250,6 +250,29 @@
 }
 
 
+/* ===============================
+   Product Detail Drag Protection
+=============================== */
+
+.product-detail {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* 이미지 드래그 방지 */
+.product-detail img {
+  -webkit-user-drag: none;
+  user-drag: none;
+}
+
+/* 버튼, 인터랙션 요소는 선택 허용 */
+.product-detail button {
+  user-select: none;
+  cursor: pointer;
+}
+
   </style>
 </head>
 
