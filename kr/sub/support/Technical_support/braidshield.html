@@ -243,8 +243,8 @@ th:first-child, td:first-child {
     </thead>
     <tbody>
       <tr>
-        <td>Braid Pitch</td>
-        <td id="pitch">-</td>
+        <td>Picks per Inch (PPI)</td>
+        <td id="ppiResult">-</td>
       </tr>
       <tr>
         <td>Braid Angle</td>
@@ -311,6 +311,7 @@ function calculateBraid() {
   const C = parseFloat(document.getElementById("carriers").value);
   const P = parseFloat(document.getElementById("pitchInput").value);
   const Dc = parseFloat(document.getElementById("coreDia").value);
+  const PPI = (25.4 * (C / 2)) / P;
 
   if (!d || !E || !C || !P || !Dc) return;
 
@@ -329,8 +330,8 @@ function calculateBraid() {
   // Estimated outer diameter (mm)
   const Dout = Dc + 2 * d * Math.cos(a * Math.PI / 180);
 
-  document.getElementById("pitch").textContent =
-    P.toFixed(2) + " mm";
+  document.getElementById("ppiResult").textContent =
+    PPI.toFixed(1);
 
   document.getElementById("angle").textContent =
     a.toFixed(2) + " °";
@@ -356,8 +357,6 @@ function setWireDia() {
     input.value = select.value;
   }
 }
-
-
 
 </script>
 
