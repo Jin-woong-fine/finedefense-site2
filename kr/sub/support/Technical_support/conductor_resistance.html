@@ -84,6 +84,27 @@ th:first-child, td:first-child {
   font-size: 12px;
   color: var(--text-muted);
 }
+
+.formula-block {
+  margin-top: 32px;
+}
+
+.formula-block h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.formula-block p {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.formula-block .formula {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont;
+  color: var(--text);
+}
 </style>
 </head>
 
@@ -174,13 +195,13 @@ th:first-child, td:first-child {
         Actual values may vary depending on manufacturing tolerances and operating conditions.</p>
     </div>
 </div>
-</section>
 
-<section class="formula-section">
+<div class="calculator formula-block">
   <h3>Calculation Method</h3>
+
   <p>
-    The conductor resistance is calculated using the standard DC resistance formula
-    based on total cross-sectional area.
+    The conductor resistance is calculated using the standard DC resistance
+    formula based on the total conductor cross-sectional area.
   </p>
 
   <p class="formula">
@@ -193,6 +214,8 @@ th:first-child, td:first-child {
     L is the conductor length, A is the total conductor cross-sectional area,
     and α is the temperature coefficient of copper.
   </p>
+</div>
+
 </section>
 
 
