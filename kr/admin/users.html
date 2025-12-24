@@ -220,33 +220,52 @@
 
 
 
+
     /* ===============================
-      ADD USER PANEL (SUPERADMIN)
+      ADD USER PANEL (HORIZONTAL)
     =============================== */
     #addUserPanel {
-      max-width: 420px;
+      max-width: none;
       margin-bottom: 32px;
 
       background: linear-gradient(180deg, #ffffff, #f8f9ff);
       border-radius: 18px;
-      padding: 22px 22px 24px;
+      padding: 20px 24px 22px;
 
       box-shadow: 0 10px 30px rgba(15,38,121,0.12);
       border: 1px solid #e6e9f4;
     }
 
+    /* 타이틀 */
     #addUserPanel h3 {
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       font-size: 1.05rem;
       font-weight: 700;
       color: #0f2679;
     }
 
-    /* 입력 필드 공통 */
+    /* 입력 영역을 가로로 */
+    #addUserPanel {
+      display: grid;
+      grid-template-columns:
+        1.6fr   /* 아이디 */
+        1fr     /* 이름 */
+        1.1fr   /* 비밀번호 */
+        0.9fr   /* 권한 */
+        0.8fr;  /* 버튼 */
+      gap: 12px;
+      align-items: end;
+    }
+
+    /* h3 전체 폭 */
+    #addUserPanel h3 {
+      grid-column: 1 / -1;
+    }
+
+    /* input / select */
     #addUserPanel .input {
       width: 100%;
       padding: 10px 12px;
-      margin-bottom: 10px;
 
       border-radius: 10px;
       border: 1px solid #d9deee;
@@ -262,7 +281,7 @@
       box-shadow: 0 0 0 2px rgba(15,38,121,0.12);
     }
 
-    /* role select */
+    /* select 화살표 */
     #addUserPanel select.input {
       cursor: pointer;
       background-image:
@@ -278,19 +297,19 @@
     /* 추가 버튼 */
     #addUserPanel .btn-primary {
       width: 100%;
-      margin-top: 14px;
       padding: 10px;
 
       border-radius: 12px;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: 600;
     }
 
-    /* superadmin 강조 태그 느낌 (선택) */
+    /* superadmin 라벨 */
     #addUserPanel::before {
       content: "SUPERADMIN";
-      display: inline-block;
-      margin-bottom: 8px;
+      position: absolute;
+      transform: translateY(-100%);
+      margin-top: -6px;
 
       font-size: 0.65rem;
       font-weight: 700;
@@ -301,9 +320,6 @@
       padding: 4px 8px;
       border-radius: 6px;
     }
-
-
-
 
   </style>
 </head>
