@@ -48,11 +48,20 @@ function renderUserCard(u, myRole, myId) {
       ? `
         <div class="order-control">
           <button onclick="changeOrder(${u.id}, -1)">▲</button>
-          <span>${u.sort_order ?? 0}</span>
+
+          <input
+            type="number"
+            class="order-input"
+            value="${u.sort_order ?? 0}"
+            onkeydown="onOrderKey(event, ${u.id})"
+            onblur="updateOrder(${u.id}, this.value)"
+          />
+
           <button onclick="changeOrder(${u.id}, 1)">▼</button>
         </div>
       `
       : "";
+
 
 
 
@@ -219,7 +228,7 @@ document.addEventListener("keydown", (e) => {
 
 
 /* ===============================
-   수번 수정
+   순번 수정
 =============================== */
 async function changeOrder(id, diff) {
   if (localStorage.getItem("role") !== "superadmin") return;
@@ -238,4 +247,32 @@ async function changeOrder(id, diff) {
   });
 
   loadUsers();
+}
+/* ===============================
+   직접 순번 수정
+=============================== */
+
+async function updateOrder(id, value) {
+  if (localStorage.getItem("role") !== "superadmin") return;
+
+  const newOrder = Number(value);
+  if (isNaN(newOrder)) return;
+
+  await fetch(`${API}/users/${id}/order`, {
+    method: "PUT",
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ sort_order: newOrder })
+  });
+
+  loadUsers();
+}
+
+/* ===============================
+   Enter 키 처리 (입력 중 바로 적용)
+=============================== */
+
+function onOrderKey(e, id) {
+  if (e.key === "Enter") {
+    e.target.blur();
+  }
 }
