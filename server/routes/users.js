@@ -219,27 +219,34 @@ router.delete(
 );
 
 /* ============================================================
-   📌 관리자용: 비밀번호 초기화 (superadmin)
+   📌 비밀번호 초기화
+   - 본인: 가능
+   - 타인: superadmin만 가능
 ============================================================ */
 router.put(
   "/:id/reset-password",
   verifyToken,
-  verifyRole("superadmin"),
   async (req, res) => {
     try {
-      const { id } = req.params;
-      const { newPassword } = req.body;
+      const targetId = Number(req.params.id);
+      const myId = req.user.id;
+      const myRole = req.user.role;
 
+      if (targetId !== myId && myRole !== "superadmin") {
+        return res.status(403).json({ message: "권한 없음" });
+      }
+
+      const { newPassword } = req.body;
       if (!newPassword) {
         return res.status(400).json({ message: "새 비밀번호 필요" });
       }
 
       const hash = await bcrypt.hash(newPassword, 10);
 
-      await db.query(`UPDATE users SET password = ? WHERE id = ?`, [
-        hash,
-        id,
-      ]);
+      await db.query(
+        `UPDATE users SET password = ? WHERE id = ?`,
+        [hash, targetId]
+      );
 
       res.json({ message: "password reset complete" });
     } catch (err) {
@@ -248,6 +255,7 @@ router.put(
     }
   }
 );
+
 
 /* ============================================================
    👤 내 프로필 조회 (로그인 사용자)

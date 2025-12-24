@@ -40,12 +40,36 @@ function renderUserCard(u, myRole, myId) {
       ? `<button class="btn-primary" onclick="location.href='/kr/admin/user_profile.html'">내 프로필</button>`
       : `<button class="btn-primary" onclick="location.href='/kr/admin/user_view.html?id=${u.id}'">프로필 보기</button>`;
 
-  const adminMenu =
+  const canResetPw = (u.id === myId) || (myRole === "superadmin");
+  const canDelete  = (myRole === "superadmin" && u.id !== myId);
+
+  const orderControl =
     myRole === "superadmin"
       ? `
+        <div class="order-control">
+          <button onclick="changeOrder(${u.id}, -1)">▲</button>
+          <span>${u.sort_order ?? 0}</span>
+          <button onclick="changeOrder(${u.id}, 1)">▼</button>
+        </div>
+      `
+      : "";
+
+
+
+  const adminMenu =
+    canResetPw || canDelete
+      ? `
         <div class="card-menu">
-          <button onclick="resetPassword(${u.id})">비번 초기화</button>
-          <button class="danger" onclick="deleteUser(${u.id})">삭제</button>
+          ${
+            canResetPw
+              ? `<button onclick="resetPassword(${u.id})">비번 초기화</button>`
+              : ""
+          }
+          ${
+            canDelete
+              ? `<button class="danger" onclick="deleteUser(${u.id})">삭제</button>`
+              : ""
+          }
         </div>
       `
       : "";
@@ -77,6 +101,7 @@ function renderUserCard(u, myRole, myId) {
         ${profileBtn}
       </div>
 
+      ${orderControl}
       ${adminMenu}
     </div>
   `;
@@ -84,8 +109,27 @@ function renderUserCard(u, myRole, myId) {
 
 /* ===== superadmin 기능 ===== */
 
-async function resetPassword(id) {
-  if (localStorage.getItem("role") !== "superadmin") return;
+  async function resetPassword(id) {
+    async function resetPassword(id) {
+    const myId = Number(localStorage.getItem("user_id"));
+    const myRole = localStorage.getItem("role");
+
+    if (id !== myId && myRole !== "superadmin") {
+      alert("권한 없음");
+      return;
+    }
+
+    const pw = prompt("새 비밀번호:");
+    if (!pw) return;
+
+    await fetch(`${API}/users/${id}/reset-password`, {
+      method: "PUT",
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ newPassword: pw })
+    });
+
+    alert("비밀번호 변경 완료");
+  }
 
   const pw = prompt("새 비밀번호:");
   if (!pw) return;
@@ -171,3 +215,27 @@ document.addEventListener("click", (e) => {
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") closeAvatarModal();
 });
+
+
+
+/* ===============================
+   수번 수정
+=============================== */
+async function changeOrder(id, diff) {
+  if (localStorage.getItem("role") !== "superadmin") return;
+
+  const span = document.querySelector(
+    `.order-control button[onclick="changeOrder(${id}, -1)"]`
+  )?.nextElementSibling;
+
+  const currentOrder = Number(span?.textContent) || 0;
+  const newOrder = currentOrder + diff;
+
+  await fetch(`${API}/users/${id}/order`, {
+    method: "PUT",
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ sort_order: newOrder })
+  });
+
+  loadUsers();
+}
