@@ -155,6 +155,16 @@ body {
   margin-top: 6px;
 }
 
+
+/* 대시보드 단독 메뉴 강조 */
+#sidebar .menu-item.audit_logs {
+  font-weight: 700;
+  color: #ffffff;
+  background: rgba(255,255,255,0.12);
+  border-left: 4px solid rgba(255,255,255,0.6);
+  margin-top: 6px;
+}
+
 /* ===========================================================
    MAIN CONTENT
 =========================================================== */
