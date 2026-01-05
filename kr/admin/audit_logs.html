@@ -175,19 +175,55 @@ async function loadAuditLogs() {
 
 
 function formatDiff(before, after) {
-  if (!before && after) return "▶ 생성됨";
-  if (before && !after) return "▶ 삭제됨";
+  // CREATE
+  if (!before && after) {
+    return `<span style="color:#0a7a2f;font-weight:600">생성됨</span>`;
+  }
 
+  // DELETE
+  if (before && !after) {
+    return `<span style="color:#c1121f;font-weight:600">삭제됨</span>`;
+  }
+
+  // UPDATE
   if (!before || !after) return "-";
 
-  const diff = [];
+  let html = `<table style="width:100%; font-size:12px;">`;
+
   for (const key in after) {
-    if (before[key] !== after[key]) {
-      diff.push(`${key}: "${before[key]}" → "${after[key]}"`);
-    }
+    const b = before[key];
+    const a = after[key];
+
+    if (JSON.stringify(b) === JSON.stringify(a)) continue;
+
+    const beforeVal =
+      b === null || b === undefined
+        ? "-"
+        : typeof b === "object"
+        ? JSON.stringify(b)
+        : b;
+
+    const afterVal =
+      a === null || a === undefined
+        ? "-"
+        : typeof a === "object"
+        ? JSON.stringify(a)
+        : a;
+
+    html += `
+      <tr>
+        <td style="width:80px;font-weight:600;color:#333">${key}</td>
+        <td style="color:#c1121f;white-space:pre-wrap">${beforeVal}</td>
+        <td style="color:#0a7a2f;white-space:pre-wrap">${afterVal}</td>
+      </tr>
+    `;
   }
-  return diff.length ? diff.join("\n") : "변경 없음";
+
+  html += `</table>`;
+
+  return html || "변경 없음";
 }
+
 
 loadAuditLogs();
 </script>
