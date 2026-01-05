@@ -133,11 +133,9 @@ async function loadAuditLogs() {
   if (keyword) params.append("search", keyword);
   if (action) params.append("action", action);
 
-  const res = await fetch("/api/audit/logs?" + params.toString(), {
-    headers: {
-      Authorization: "Bearer " + localStorage.getItem("token")
-    }
-  });
+    const res = await fetch("/api/audit/logs?" + params.toString(), {
+    headers: authHeaders()   // 🔥 이걸로 교체
+    });
 
   const data = await res.json();
   const tbody = document.getElementById("logTable");
