@@ -5,7 +5,7 @@ import { fileURLToPath } from "url";
 import db from "../config/db.js";
 import { verifyToken, verifyEditor, verifyAdmin } from "../middleware/auth.js";
 import fs from "fs";
-
+import Audit from "../utils/auditLogger.js";
 
 const router = express.Router();
 
@@ -83,6 +83,24 @@ router.post("/", verifyToken, verifyEditor, (req, res) => {
       );
 
       const productId = insert.insertId;
+
+      // ⭐ AUDIT LOG (CREATE)
+      await Audit.log({
+        contentType: Audit.CONTENT_TYPE.PRODUCT,
+        contentId: productId,
+        action: Audit.ACTION.CREATE,
+        actor: req.user,
+        after: {
+          group_id: groupId,
+          title,
+          category,
+          lang,
+          sort_order: sort_order || 999,
+          thumbnail
+        },
+        req
+      });
+
 
       // 🔴 3️⃣ 이미지 저장
       if (req.files?.length > 0) {
@@ -241,6 +259,23 @@ router.get("/public", async (req, res) => {
 router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
+
+    // ⭐ BEFORE 데이터 (audit)
+    const [[before]] = await db.execute(
+      `SELECT *
+        FROM products
+        WHERE id = ?`,
+      [id]
+    );
+
+    if (!before) {
+      return res.status(404).json({ message: "product not found" });
+    }
+
+
+
+
+
     const lang = req.query.lang || "kr";
 
     // 1️⃣ group_id 찾기
@@ -440,6 +475,26 @@ router.put("/:id", verifyToken, verifyEditor, (req, res) => {
         [newThumbnail, targetId]
       );
 
+      // ⭐ AUDIT LOG (UPDATE)
+      await Audit.log({
+        contentType: Audit.CONTENT_TYPE.PRODUCT,
+        contentId: targetId,
+        action: Audit.ACTION.UPDATE,
+        actor: req.user,
+        before,
+        after: {
+          title,
+          summary,
+          category,
+          lang,
+          sort_order: sort_order || 999,
+          removedImages: removed,
+          addedImages: req.files?.map(f => f.originalname) || []
+        },
+        req
+      });
+
+
       // ✅ 끝
       return res.json({ message: "updated" });
 
@@ -509,6 +564,22 @@ router.post("/:id/translate", verifyToken, verifyEditor, async (req, res) => {
 
     const newId = insert.insertId;
 
+
+    // ⭐ AUDIT LOG (TRANSLATE = CREATE)
+    await Audit.log({
+      contentType: Audit.CONTENT_TYPE.PRODUCT,
+      contentId: newId,
+      action: Audit.ACTION.CREATE,
+      actor: req.user,
+      after: {
+        base_id: id,
+        lang,
+        group_id: base.group_id
+      },
+      req
+    });
+
+
     // 4️⃣ 🔥 이미지(product_images) 복제
     const [images] = await db.execute(
       `SELECT url, sort_order FROM product_images WHERE product_id = ?`,
@@ -548,6 +619,17 @@ router.post("/:id/translate", verifyToken, verifyEditor, async (req, res) => {
 router.delete("/:id", verifyToken, verifyAdmin, async (req, res) => {
   try {
     const { id } = req.params;
+
+    // ⭐ BEFORE 데이터 (audit)
+    const [[before]] = await db.execute(
+      `SELECT * FROM products WHERE id = ?`,
+      [id]
+    );
+
+    if (!before) {
+      return res.status(404).json({ message: "product not found" });
+    }
+
 
     // 1️⃣ group_id 조회
     const [[base]] = await db.execute(
@@ -594,6 +676,17 @@ router.delete("/:id", verifyToken, verifyAdmin, async (req, res) => {
       `DELETE FROM products WHERE id IN (?)`,
       [productIds]
     );
+
+
+    // ⭐ AUDIT LOG (DELETE)
+    await Audit.log({
+      contentType: Audit.CONTENT_TYPE.PRODUCT,
+      contentId: id,
+      action: Audit.ACTION.DELETE,
+      actor: req.user,
+      before,
+      req
+    });
 
     res.json({ message: "deleted" });
 

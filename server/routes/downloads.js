@@ -6,6 +6,7 @@ import fs from "fs";
 import { fileURLToPath } from "url";
 import db from "../config/db.js";
 import { verifyToken } from "../middleware/auth.js";
+import Audit from "../utils/auditLogger.js";
 
 const router = express.Router();
 
@@ -99,6 +100,23 @@ router.post(
 
       const itemId = result.insertId;
 
+      // ⭐ AUDIT LOG (CREATE)
+      await Audit.log({
+        contentType: Audit.CONTENT_TYPE.DOWNLOAD,
+        contentId: itemId,
+        action: Audit.ACTION.CREATE,
+        actor: req.user,
+        after: {
+          title,
+          lang,
+          category,
+          sort_order: sortOrder,
+          file_count: files.length,
+          thumb_url: thumbUrl
+        },
+        req
+      });
+
       // 2) 첨부파일 레코드 생성
       for (const f of files) {
         const utf8Original = Buffer.from(f.originalname, "latin1").toString("utf8");
@@ -173,6 +191,20 @@ router.get("/list", async (req, res) => {
 router.get("/detail/:id", async (req, res) => {
   try {
     const id = Number(req.params.id);
+
+    // ⭐ BEFORE 데이터 (audit)
+    const [[before]] = await db.execute(
+      `SELECT *
+        FROM downloads_items
+        WHERE id = ?`,
+      [id]
+    );
+
+    if (!before) {
+      return res.status(404).json({ message: "자료 없음" });
+    }
+
+
     if (!id) return res.status(400).json({ message: "잘못된 ID" });
 
     const [items] = await db.execute(
@@ -293,6 +325,25 @@ router.put(
         );
       }
 
+      // ⭐ AUDIT LOG (UPDATE)
+      await Audit.log({
+        contentType: Audit.CONTENT_TYPE.DOWNLOAD,
+        contentId: id,
+        action: Audit.ACTION.UPDATE,
+        actor: req.user,
+        before,
+        after: {
+          title,
+          lang,
+          category,
+          sort_order: sortOrder,
+          removedFileIds: removeIds,
+          addedFiles: newFiles.map(f => f.originalname)
+        },
+        req
+      });
+
+
       res.json({ message: "자료 수정 완료" });
     } catch (err) {
       console.error("📌 자료 수정 오류:", err);
@@ -309,6 +360,20 @@ router.put(
 router.delete("/delete/:id", verifyToken, async (req, res) => {
   try {
     const id = Number(req.params.id);
+
+    // ⭐ BEFORE 데이터 (audit)
+    const [[before]] = await db.execute(
+      `SELECT *
+        FROM downloads_items
+        WHERE id = ?`,
+      [id]
+    );
+
+    if (!before) {
+      return res.status(404).json({ message: "자료 없음" });
+    }
+
+
     if (!id) return res.status(400).json({ message: "잘못된 ID" });
 
     // 1) 첨부파일 경로 조회
@@ -332,6 +397,16 @@ router.delete("/delete/:id", verifyToken, async (req, res) => {
     // 3) DB에서 첨부파일 / 본문 삭제
     await db.execute(`DELETE FROM downloads_files WHERE item_id = ?`, [id]);
     await db.execute(`DELETE FROM downloads_items WHERE id = ?`, [id]);
+
+    // ⭐ AUDIT LOG (DELETE)
+    await Audit.log({
+      contentType: Audit.CONTENT_TYPE.DOWNLOAD,
+      contentId: id,
+      action: Audit.ACTION.DELETE,
+      actor: req.user,
+      before,
+      req
+    });
 
     res.json({ message: "자료 삭제 완료" });
   } catch (err) {

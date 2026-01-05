@@ -6,6 +6,9 @@ import fs from "fs";
 import db from "../config/db.js";
 import { verifyToken, allowRoles } from "../middleware/auth.js";
 import { fileURLToPath } from "url";
+import Audit from "../utils/auditLogger.js";
+
+
 
 const router = express.Router();
 
@@ -91,6 +94,26 @@ router.post(
         ]
       );
 
+      const itemId = result.insertId;
+
+      // ⭐ AUDIT LOG (CREATE)
+      await Audit.log({
+        contentType: Audit.CONTENT_TYPE.CATALOG,
+        contentId: itemId,
+        action: Audit.ACTION.CREATE,
+        actor: req.user,
+        after: {
+          title,
+          lang,
+          category,
+          sort_order: safeSort,
+          thumb_url: thumbUrl,
+          file_url: fileUrl,
+          file_size: fileSize
+        },
+        req
+      });
+
       res.json({ message: "카탈로그 등록 완료", id: result.insertId });
 
     } catch (err) {
@@ -126,6 +149,7 @@ router.put(
       if (!rows.length) return res.status(404).json({ message: "not found" });
 
       const old = rows[0];
+
 
       const thumb = req.files.thumb?.[0] || null;
       const file = req.files.file?.[0] || null;
@@ -169,6 +193,25 @@ router.put(
         ]
       );
 
+      // ⭐ AUDIT LOG (UPDATE)
+      await Audit.log({
+        contentType: Audit.CONTENT_TYPE.CATALOG,
+        contentId: id,
+        action: Audit.ACTION.UPDATE,
+        actor: req.user,
+        before: old,
+        after: {
+          title,
+          lang,
+          category,
+          sort_order: safeSort,
+          thumb_url: thumbUrl,
+          file_url: fileUrl,
+          file_size: fileSize
+        },
+        req
+      });
+
       res.json({ message: "수정 완료" });
 
     } catch (err) {
@@ -210,6 +253,18 @@ router.delete(
     }
 
     await db.execute(`DELETE FROM catalog_items WHERE id=?`, [id]);
+
+
+    // ⭐ AUDIT LOG (DELETE)
+    await Audit.log({
+      contentType: Audit.CONTENT_TYPE.CATALOG,
+      contentId: id,
+      action: Audit.ACTION.DELETE,
+      actor: req.user,
+      before: item,
+      req
+    });
+
 
     res.json({ message: "삭제 완료" });
 

@@ -6,6 +6,7 @@ import fs from "fs";
 import db from "../config/db.js";
 import { verifyToken } from "../middleware/auth.js";
 import { fileURLToPath } from "url";
+import Audit from "../utils/auditLogger.js";
 
 const router = express.Router();
 
@@ -79,6 +80,21 @@ router.post(
 
       const postId = result.insertId;
 
+      // ⭐ AUDIT LOG (CREATE)
+      await Audit.log({
+        contentType: Audit.CONTENT_TYPE.NEWS,
+        contentId: postId,
+        action: Audit.ACTION.CREATE,
+        actor: req.user,
+        after: {
+          title,
+          lang: lang || "kr",
+          main_image: mainImg
+        },
+        req
+      });
+
+
       // ✅ 이미지 있을 때만 post_images 저장
       for (const f of files) {
         await db.execute(
@@ -108,6 +124,19 @@ router.put(
   async (req, res) => {
     try {
       const postId = Number(req.params.id);
+
+      // ⭐ BEFORE 데이터 조회 (audit용)
+      const [[before]] = await db.execute(
+        `SELECT title, content, lang, main_image
+          FROM posts
+          WHERE id=? AND category='news'`,
+        [postId]
+      );
+
+      if (!before) {
+        return res.status(404).json({ message: "뉴스 없음" });
+      }
+
       if (!postId) return res.status(400).json({ message: "잘못된 ID" });
 
       const { title, content, lang } = req.body;
@@ -144,6 +173,22 @@ router.put(
         }
       }
 
+      // ⭐ AUDIT LOG (UPDATE)
+      await Audit.log({
+        contentType: Audit.CONTENT_TYPE.NEWS,
+        contentId: postId,
+        action: Audit.ACTION.UPDATE,
+        actor: req.user,
+        before,
+        after: {
+          title,
+          content,
+          lang: lang || "kr",
+          replacedImages: files.length ? files.map(f => f.originalname) : []
+        },
+        req
+      });
+
       res.json({ message: "뉴스 수정 완료" });
 
     } catch (err) {
@@ -159,6 +204,20 @@ router.put(
 router.delete("/delete/:id", verifyToken, async (req, res) => {
   try {
     const postId = Number(req.params.id);
+
+    // ⭐ BEFORE 데이터 조회 (audit용)
+    const [[before]] = await db.execute(
+      `SELECT title, content, lang, main_image
+        FROM posts
+        WHERE id=? AND category='news'`,
+      [postId]
+    );
+
+    if (!before) {
+      return res.status(404).json({ message: "뉴스 없음" });
+    }
+
+
     if (!postId) return res.status(400).json({ message: "잘못된 ID" });
 
     const [images] = await db.execute(
@@ -174,6 +233,18 @@ router.delete("/delete/:id", verifyToken, async (req, res) => {
     await db.execute(`DELETE FROM post_images WHERE post_id=?`, [postId]);
     await db.execute(`DELETE FROM post_view_logs WHERE post_id=?`, [postId]);
     await db.execute(`DELETE FROM posts WHERE id=? AND category='news'`, [postId]);
+
+
+    // ⭐ AUDIT LOG (DELETE)
+    await Audit.log({
+      contentType: Audit.CONTENT_TYPE.NEWS,
+      contentId: postId,
+      action: Audit.ACTION.DELETE,
+      actor: req.user,
+      before,
+      req
+    });
+
 
     res.json({ message: "뉴스 삭제 완료" });
 

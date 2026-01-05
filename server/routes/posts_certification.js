@@ -6,6 +6,7 @@ import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
 import { verifyToken, allowRoles } from "../middleware/auth.js";
+import Audit from "../utils/auditLogger.js";
 
 
 
@@ -55,6 +56,24 @@ router.post(
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [type, title_kr, title_en, lang, sort_order, thumb, file]
     );
+
+    // ⭐ AUDIT LOG (CREATE)
+    await Audit.log({
+      contentType: Audit.CONTENT_TYPE.CERTIFICATE,
+      contentId: result.insertId,
+      action: Audit.ACTION.CREATE,
+      actor: req.user,
+      after: {
+        type,
+        title_kr,
+        title_en,
+        lang,
+        sort_order,
+        thumb_url: thumb,
+        file_url: file
+      },
+      req
+    });
 
     res.json({ id: result.insertId, message: "등록 완료" });
 
@@ -108,6 +127,10 @@ router.post(
     );
     if (!oldRows.length) return res.status(404).json({ message: "not found" });
 
+    const before = oldRows[0];
+
+
+
     let thumb_url = oldRows[0].thumb_url;
     let file_url = oldRows[0].file_url;
 
@@ -124,6 +147,25 @@ router.post(
         WHERE id=?`,
       [type, title_kr, title_en, lang, sort_order, thumb_url, file_url, id]
     );
+
+    // ⭐ AUDIT LOG (UPDATE)
+    await Audit.log({
+      contentType: Audit.CONTENT_TYPE.CERTIFICATE,
+      contentId: id,
+      action: Audit.ACTION.UPDATE,
+      actor: req.user,
+      before,
+      after: {
+        type,
+        title_kr,
+        title_en,
+        lang,
+        sort_order,
+        thumb_url,
+        file_url
+      },
+      req
+    });
 
     res.json({ message: "수정 완료" });
 
@@ -143,7 +185,29 @@ router.delete(
   allowRoles("superadmin"),
   async (req, res) => {
   try {
+    // ⭐ BEFORE 데이터 (audit)
+    const [[before]] = await db.execute(
+      `SELECT * FROM cert_items WHERE id=?`,
+      [req.params.id]
+    );
+
+    if (!before) {
+      return res.status(404).json({ message: "not found" });
+    }
+
     await db.execute(`DELETE FROM cert_items WHERE id=?`, [req.params.id]);
+
+
+    // ⭐ AUDIT LOG (DELETE)
+    await Audit.log({
+      contentType: Audit.CONTENT_TYPE.CERTIFICATE,
+      contentId: req.params.id,
+      action: Audit.ACTION.DELETE,
+      actor: req.user,
+      before,
+      req
+    });
+
     res.json({ message: "삭제 완료" });
   } catch (err) {
     console.error("🔥 delete 오류:", err);

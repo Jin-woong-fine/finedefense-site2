@@ -6,6 +6,7 @@ import fs from "fs";
 import db from "../config/db.js";
 import { verifyToken } from "../middleware/auth.js";
 import { fileURLToPath } from "url";
+import Audit from "../utils/auditLogger.js";
 
 const router = express.Router();
 
@@ -79,6 +80,23 @@ router.post(
 
       const postId = result.insertId;
 
+      // ⭐ AUDIT LOG (CREATE)
+      await Audit.log({
+        contentType: Audit.CONTENT_TYPE.GALLERY,
+        contentId: postId,
+        action: Audit.ACTION.CREATE,
+        actor: req.user,
+        after: {
+          title,
+          description: description || "",
+          lang: lang || "kr",
+          image_count: files.length,
+          main_image: coverImage
+        },
+        req
+      });
+
+
       for (const f of files) {
         await db.execute(
           `INSERT INTO post_images (post_id, image_path) VALUES (?, ?)`,
@@ -105,6 +123,19 @@ router.put(
   async (req, res) => {
     try {
       const postId = Number(req.params.id);
+
+      // ⭐ BEFORE 데이터 조회 (audit)
+      const [[before]] = await db.execute(
+        `SELECT title, content, lang, main_image
+          FROM posts
+          WHERE id=? AND category='gallery'`,
+        [postId]
+      );
+
+      if (!before) {
+        return res.status(404).json({ message: "갤러리 없음" });
+      }
+
       if (!postId) return res.status(400).json({ message: "잘못된 ID" });
 
       const { title, description, lang } = req.body;
@@ -171,6 +202,23 @@ router.put(
         );
       }
 
+      // ⭐ AUDIT LOG (UPDATE)
+      await Audit.log({
+        contentType: Audit.CONTENT_TYPE.GALLERY,
+        contentId: postId,
+        action: Audit.ACTION.UPDATE,
+        actor: req.user,
+        before,
+        after: {
+          title,
+          description: description || "",
+          lang: lang || "kr",
+          removedImages: toRemove,
+          addedImages: newUploadPaths
+        },
+        req
+      });
+
       res.json({ message: "갤러리 수정 완료" });
 
     } catch (err) {
@@ -187,6 +235,20 @@ router.put(
 router.delete("/delete/:id", verifyToken, async (req, res) => {
   try {
     const postId = Number(req.params.id);
+
+    // ⭐ BEFORE 데이터 조회 (audit)
+    const [[before]] = await db.execute(
+      `SELECT title, content, lang, main_image
+        FROM posts
+        WHERE id=? AND category='gallery'`,
+      [postId]
+    );
+
+    if (!before) {
+      return res.status(404).json({ message: "갤러리 없음" });
+    }
+
+
     if (!postId) return res.status(400).json({ message: "잘못된 ID" });
 
     const [images] = await db.execute(
@@ -201,6 +263,16 @@ router.delete("/delete/:id", verifyToken, async (req, res) => {
 
     await db.execute(`DELETE FROM post_images WHERE post_id=?`, [postId]);
     await db.execute(`DELETE FROM posts WHERE id=? AND category='gallery'`, [postId]);
+
+    // ⭐ AUDIT LOG (DELETE)
+    await Audit.log({
+      contentType: Audit.CONTENT_TYPE.GALLERY,
+      contentId: postId,
+      action: Audit.ACTION.DELETE,
+      actor: req.user,
+      before,
+      req
+    });
 
     res.json({ message: "갤러리 삭제 완료" });
 
