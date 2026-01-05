@@ -126,6 +126,7 @@ loadSidebar("logs");
 document.getElementById("logoutBtn").onclick = logout;
 
 async function loadAuditLogs() {
+  console.log("TOKEN:", localStorage.getItem("token"));
   const keyword = document.getElementById("searchInput").value.trim();
   const action = document.getElementById("actionFilter").value;
 
