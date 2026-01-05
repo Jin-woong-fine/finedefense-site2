@@ -45,11 +45,18 @@ router.get(
 
       const [rows] = await db.execute(sql, params);
 
-      const result = rows.map(r => ({
+        const result = rows.map(r => ({
         ...r,
-        before_data: r.before_data ? JSON.parse(r.before_data) : null,
-        after_data: r.after_data ? JSON.parse(r.after_data) : null
-      }));
+        before_data:
+            typeof r.before_data === "string"
+            ? JSON.parse(r.before_data)
+            : r.before_data,
+
+        after_data:
+            typeof r.after_data === "string"
+            ? JSON.parse(r.after_data)
+            : r.after_data
+        }));
 
       res.json(result);
 
