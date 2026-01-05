@@ -39,7 +39,7 @@ import trafficRouter from "./routes/traffic.js";
 
 import helmet from "helmet";
 
-
+import auditLogsRouter from "./routes/audit_logs.js";
 
 const app = express();
 
@@ -61,7 +61,7 @@ app.use(express.json({ limit: "30mb" }));
 app.use(express.urlencoded({ extended: true, limit: "30mb" }));
 app.use(helmet());
 
-
+app.use("/api/audit", auditLogsRouter);
 
 
 
