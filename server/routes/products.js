@@ -90,6 +90,7 @@ router.post("/", verifyToken, verifyEditor, (req, res) => {
         contentId: productId,
         action: Audit.ACTION.CREATE,
         actor: req.user,
+        before: null,          // ✅ 명시적으로 선언
         after: {
           group_id: groupId,
           title,

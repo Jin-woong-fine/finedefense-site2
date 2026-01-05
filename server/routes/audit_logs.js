@@ -4,24 +4,21 @@ import { verifyToken, allowRoles } from "../middleware/auth.js";
 
 const router = express.Router();
 
+/* ✅ 절대 죽지 않는 JSON 파서 */
 const safeParse = (value) => {
   if (!value) return null;
-
-  // 이미 object면 그대로 사용
   if (typeof value === "object") return value;
 
-  // string이면 JSON 시도
   if (typeof value === "string") {
     try {
       return JSON.parse(value);
     } catch {
-      return null; // ❗ 여기서 죽지 않게 막는 게 핵심
+      return null;
     }
   }
 
   return null;
 };
-
 
 router.get(
   "/logs",
@@ -53,10 +50,12 @@ router.get(
       }
 
       if (search) {
-        sql += ` AND (
-          a.actor_name LIKE ?
-          OR a.content_type LIKE ?
-        )`;
+        sql += `
+          AND (
+            a.actor_name LIKE ?
+            OR a.content_type LIKE ?
+          )
+        `;
         params.push(`%${search}%`, `%${search}%`);
       }
 
@@ -64,12 +63,11 @@ router.get(
 
       const [rows] = await db.execute(sql, params);
 
-        const result = rows.map(r => ({
+      const result = rows.map(r => ({
         ...r,
         before_data: safeParse(r.before_data),
         after_data: safeParse(r.after_data)
-        }));
-
+      }));
 
       res.json(result);
 
