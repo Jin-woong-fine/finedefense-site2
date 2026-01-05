@@ -1,4 +1,4 @@
-const db = require("../db");
+import db from "../config/db.js";
 
 const CONTENT_TYPE = Object.freeze({
   NOTICE: "NOTICE",
@@ -25,11 +25,7 @@ async function log({
   after = null,
   req
 }) {
-  if (!contentType || !contentId || !action || !actor) {
-    throw new Error("audit log missing required field");
-  }
-
-  await db.query(
+  await db.execute(
     `INSERT INTO content_audit_logs
      (content_type, content_id, action,
       actor_id, actor_name,
@@ -50,7 +46,7 @@ async function log({
   );
 }
 
-module.exports = {
+export default {
   CONTENT_TYPE,
   ACTION,
   log
