@@ -1,0 +1,186 @@
+<!-- /kr/admin/audit_logs.html -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>게시물 수정 기록 | Fine Defense 관리자</title>
+
+  <link rel="stylesheet" href="./css/admin.css">
+
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      font-size: 14px;
+      vertical-align: top;
+    }
+    th {
+      background:#eef1f7;
+      font-weight:600;
+    }
+
+    .search-box {
+      display:flex;
+      gap:10px;
+      margin-bottom:20px;
+    }
+
+    .input {
+      padding:8px;
+      border:1px solid #ccc;
+      border-radius:6px;
+    }
+
+    .btn-search {
+      padding:8px 12px;
+      background:#0f2679;
+      color:white;
+      border:none;
+      border-radius:6px;
+      cursor:pointer;
+    }
+
+    .action-create { color:#0a7a2f; font-weight:600; }
+    .action-update { color:#0f2679; font-weight:600; }
+    .action-delete { color:#c1121f; font-weight:600; }
+
+    .content-type {
+      font-weight:600;
+      color:#333;
+    }
+
+    .diff-box {
+      font-size:12px;
+      background:#f8f9fc;
+      border-radius:6px;
+      padding:8px;
+      white-space: pre-wrap;
+      max-height:120px;
+      overflow:auto;
+    }
+
+    body {
+      font-family: "Noto Sans KR", sans-serif;
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="sidebar"></div>
+
+<div class="main">
+
+  <div class="topbar">
+    <h2>게시물 수정 기록</h2>
+    <div>
+      <button class="btn btn-primary" onclick="location.href='../index.html'">홈으로</button>
+      <button id="logoutBtn" class="btn btn-danger">로그아웃</button>
+    </div>
+  </div>
+
+  <section class="panel">
+
+    <!-- 🔍 검색 -->
+    <div class="search-box">
+      <input type="text" id="searchInput" class="input" placeholder="작성자 / 제목 검색">
+      <select id="actionFilter" class="input">
+        <option value="">전체 액션</option>
+        <option value="CREATE">CREATE</option>
+        <option value="UPDATE">UPDATE</option>
+        <option value="DELETE">DELETE</option>
+      </select>
+      <button class="btn-search" onclick="loadAuditLogs()">검색</button>
+    </div>
+
+    <!-- 📋 테이블 -->
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>콘텐츠</th>
+          <th>액션</th>
+          <th>작성자</th>
+          <th>IP</th>
+          <th>변경 내용</th>
+          <th>시간</th>
+        </tr>
+      </thead>
+      <tbody id="logTable"></tbody>
+    </table>
+
+  </section>
+
+</div>
+
+<script src="/kr/admin/js/common_auth.js"></script>
+<script src="/kr/admin/js/sidebar.js"></script>
+
+<script>
+requireAdminOrSuperadmin();
+loadSidebar("logs");
+document.getElementById("logoutBtn").onclick = logout;
+
+async function loadAuditLogs() {
+  const keyword = document.getElementById("searchInput").value.trim();
+  const action = document.getElementById("actionFilter").value;
+
+  const params = new URLSearchParams();
+  if (keyword) params.append("search", keyword);
+  if (action) params.append("action", action);
+
+  const res = await fetch("/api/audit/logs?" + params.toString(), {
+    headers: {
+      Authorization: "Bearer " + localStorage.getItem("token")
+    }
+  });
+
+  const data = await res.json();
+  const tbody = document.getElementById("logTable");
+  tbody.innerHTML = "";
+
+  data.forEach(log => {
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+      <td>${log.id}</td>
+      <td class="content-type">${log.content_type} #${log.content_id}</td>
+      <td class="action-${log.action.toLowerCase()}">${log.action}</td>
+      <td>${log.actor_name || "-"}</td>
+      <td>${log.ip || "-"}</td>
+      <td>
+        <div class="diff-box">
+${formatDiff(log.before_data, log.after_data)}
+        </div>
+      </td>
+      <td>${new Date(log.created_at).toLocaleString()}</td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+}
+
+function formatDiff(before, after) {
+  if (!before && after) return "▶ 생성됨";
+  if (before && !after) return "▶ 삭제됨";
+
+  if (!before || !after) return "-";
+
+  const diff = [];
+  for (const key in after) {
+    if (before[key] !== after[key]) {
+      diff.push(`${key}: "${before[key]}" → "${after[key]}"`);
+    }
+  }
+  return diff.length ? diff.join("\n") : "변경 없음";
+}
+
+loadAuditLogs();
+</script>
+
+</body>
+</html>
