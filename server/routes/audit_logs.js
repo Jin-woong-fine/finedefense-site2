@@ -27,7 +27,7 @@ router.get(
           a.action,
           a.before_data,
           a.after_data,
-          a.ip,
+          a.ip_address AS ip,
           a.created_at,
           u.name AS actor_name
           FROM content_audit_logs a
