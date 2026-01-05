@@ -135,33 +135,44 @@ async function loadAuditLogs() {
   if (action) params.append("action", action);
 
     const res = await fetch("/api/audit/logs?" + params.toString(), {
-    headers: authHeaders()   // 🔥 이걸로 교체
+    headers: {
+        Authorization: "Bearer " + localStorage.getItem("token")
+    }
     });
 
-  const data = await res.json();
-  const tbody = document.getElementById("logTable");
-  tbody.innerHTML = "";
+    const data = await res.json();
 
-  data.forEach(log => {
+    // ✅ 여기! (forEach 전에)
+    if (!Array.isArray(data)) {
+    console.error("Audit API error:", data);
+    alert("Audit 로그 API 오류 (서버 에러)");
+    return;
+    }
+
+    const tbody = document.getElementById("logTable");
+    tbody.innerHTML = "";
+
+    data.forEach(log => {
     const tr = document.createElement("tr");
 
     tr.innerHTML = `
-      <td>${log.id}</td>
-      <td class="content-type">${log.content_type} #${log.content_id}</td>
-      <td class="action-${log.action.toLowerCase()}">${log.action}</td>
-      <td>${log.actor_name || "-"}</td>
-      <td>${log.ip || "-"}</td>
-      <td>
+        <td>${log.id}</td>
+        <td class="content-type">${log.content_type} #${log.content_id}</td>
+        <td class="action-${log.action.toLowerCase()}">${log.action}</td>
+        <td>${log.actor_name || "-"}</td>
+        <td>${log.ip || "-"}</td>
+        <td>
         <div class="diff-box">
-${formatDiff(log.before_data, log.after_data)}
+    ${formatDiff(log.before_data, log.after_data)}
         </div>
-      </td>
-      <td>${new Date(log.created_at).toLocaleString()}</td>
+        </td>
+        <td>${new Date(log.created_at).toLocaleString()}</td>
     `;
 
     tbody.appendChild(tr);
-  });
+    });
 }
+
 
 function formatDiff(before, after) {
   if (!before && after) return "▶ 생성됨";

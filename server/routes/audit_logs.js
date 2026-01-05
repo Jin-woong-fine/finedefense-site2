@@ -1,4 +1,3 @@
-// server/routes/audit_logs.js
 import express from "express";
 import db from "../config/db.js";
 import { verifyToken, allowRoles } from "../middleware/auth.js";
@@ -27,7 +26,6 @@ router.get(
         FROM content_audit_logs a
         WHERE 1=1
       `;
-
       const params = [];
 
       if (action) {
@@ -36,38 +34,28 @@ router.get(
       }
 
       if (search) {
-        sql += `
-          AND (
-            a.actor_name LIKE ?
-            OR a.content_type LIKE ?
-          )
-        `;
+        sql += ` AND (
+          a.actor_name LIKE ?
+          OR a.content_type LIKE ?
+        )`;
         params.push(`%${search}%`, `%${search}%`);
       }
 
-      sql += `
-        ORDER BY a.id DESC
-        LIMIT 500
-      `;
+      sql += ` ORDER BY a.id DESC LIMIT 500`;
 
-
-      console.log("AUDIT LOGS QUERY:", sql);
-      console.log("PARAMS:", params);
-
-      
       const [rows] = await db.execute(sql, params);
 
-      res.json(
-        rows.map(r => ({
-          ...r,
-          before_data: r.before_data ? JSON.parse(r.before_data) : null,
-          after_data: r.after_data ? JSON.parse(r.after_data) : null
-        }))
-      );
+      const result = rows.map(r => ({
+        ...r,
+        before_data: r.before_data ? JSON.parse(r.before_data) : null,
+        after_data: r.after_data ? JSON.parse(r.after_data) : null
+      }));
+
+      res.json(result);
 
     } catch (err) {
-      console.error("🔥 AUDIT LOG SQL ERROR:", err);
-      res.status(500).json({ message: "audit logs error" });
+      console.error("[audit_logs] error:", err);
+      res.status(500).json({ message: err.message });
     }
   }
 );
