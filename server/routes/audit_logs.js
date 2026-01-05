@@ -30,8 +30,8 @@ router.get(
           a.ip,
           a.created_at,
           u.name AS actor_name
-        FROM audit_logs a
-        LEFT JOIN users u ON u.id = a.actor_id
+          FROM content_audit_logs a
+          LEFT JOIN users u ON u.id = a.actor_id
         WHERE 1=1
       `;
       const params = [];
