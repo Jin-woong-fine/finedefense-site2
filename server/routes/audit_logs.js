@@ -29,33 +29,38 @@ router.get(
           a.after_data,
           a.ip_address AS ip,
           a.created_at,
-          u.name AS actor_name
-          FROM content_audit_logs a
-          LEFT JOIN users u ON u.id = a.actor_id
+          a.actor_name
+        FROM content_audit_logs a
         WHERE 1=1
       `;
       const params = [];
 
+      // ✅ action 필터
       if (action) {
         sql += ` AND a.action = ?`;
         params.push(action);
       }
 
+      // ✅ search 필터 (actor_name / content_type)
       if (search) {
         sql += `
           AND (
-            a.content_type LIKE ?
-            OR u.name LIKE ?
+            a.actor_name LIKE ?
+            OR a.content_type LIKE ?
           )
         `;
         params.push(`%${search}%`, `%${search}%`);
       }
 
-      sql += ` ORDER BY a.id DESC LIMIT 500`;
+      // ✅ 정렬은 항상 마지막
+      sql += `
+        ORDER BY a.id DESC
+        LIMIT 500
+      `;
 
       const [rows] = await db.execute(sql, params);
 
-      // 🔥 JSON 문자열 → 객체 변환 (중요)
+      // JSON 파싱
       const result = rows.map(r => ({
         ...r,
         before_data: r.before_data ? JSON.parse(r.before_data) : null,
