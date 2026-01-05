@@ -5,12 +5,6 @@ import { verifyToken, allowRoles } from "../middleware/auth.js";
 
 const router = express.Router();
 
-/**
- * GET /api/audit/logs
- * query:
- *  - search (optional)
- *  - action (optional)
- */
 router.get(
   "/logs",
   verifyToken,
@@ -33,15 +27,14 @@ router.get(
         FROM content_audit_logs a
         WHERE 1=1
       `;
+
       const params = [];
 
-      // ✅ action 필터
       if (action) {
         sql += ` AND a.action = ?`;
         params.push(action);
       }
 
-      // ✅ search 필터 (actor_name / content_type)
       if (search) {
         sql += `
           AND (
@@ -52,7 +45,6 @@ router.get(
         params.push(`%${search}%`, `%${search}%`);
       }
 
-      // ✅ 정렬은 항상 마지막
       sql += `
         ORDER BY a.id DESC
         LIMIT 500
@@ -60,17 +52,16 @@ router.get(
 
       const [rows] = await db.execute(sql, params);
 
-      // JSON 파싱
-      const result = rows.map(r => ({
-        ...r,
-        before_data: r.before_data ? JSON.parse(r.before_data) : null,
-        after_data: r.after_data ? JSON.parse(r.after_data) : null
-      }));
-
-      res.json(result);
+      res.json(
+        rows.map(r => ({
+          ...r,
+          before_data: r.before_data ? JSON.parse(r.before_data) : null,
+          after_data: r.after_data ? JSON.parse(r.after_data) : null
+        }))
+      );
 
     } catch (err) {
-      console.error("[audit_logs] error:", err);
+      console.error("🔥 AUDIT LOG SQL ERROR:", err);
       res.status(500).json({ message: "audit logs error" });
     }
   }
