@@ -6,6 +6,7 @@ import fs from "fs";
 import { fileURLToPath } from "url";
 import db from "../config/db.js";
 import { verifyToken, canDelete } from "../middleware/auth.js";
+import Audit from "../utils/auditLogger.js";
 
 
 const router = express.Router();
@@ -80,6 +81,21 @@ router.post("/create", verifyToken, uploadNotice.array("files", 10), async (req,
 
     const postId = result.insertId;
 
+    // ⭐ 감사 로그 추가
+    await Audit.log({
+      contentType: Audit.CONTENT_TYPE.NOTICE,
+      contentId: postId,
+      action: Audit.ACTION.CREATE,
+      actor: req.user,
+      after: {
+        title,
+        lang,
+        sort_order
+      },
+      req
+    });
+
+
     // 2) 첨부파일 저장
     for (const f of req.files) {
       await db.execute(
@@ -109,6 +125,19 @@ router.put("/update/:id", verifyToken, uploadNotice.array("files", 10), async (r
     if (!title || !content || !lang) {
       return res.status(400).json({ message: "필수 값 누락" });
     }
+
+    // ⭐ BEFORE 데이터 조회 (audit용)
+    const [[before]] = await db.execute(
+      `SELECT title, content, lang, sort_order
+        FROM posts
+        WHERE id=? AND category='notice'`,
+      [id]
+    );
+
+    if (!before) {
+      return res.status(404).json({ message: "공지 없음" });
+    }
+
 
     // 기본 내용 수정
     await db.execute(
@@ -150,6 +179,24 @@ router.put("/update/:id", verifyToken, uploadNotice.array("files", 10), async (r
       );
     }
 
+    // ⭐ AUDIT LOG (UPDATE)
+    await Audit.log({
+      contentType: Audit.CONTENT_TYPE.NOTICE,
+      contentId: id,
+      action: Audit.ACTION.UPDATE,
+      actor: req.user,
+      before,
+      after: {
+        title,
+        content,
+        lang,
+        sort_order,
+        addedFiles: req.files?.map(f => f.originalname) || [],
+        removedFileIds: removeIds
+      },
+      req
+    });
+
     // 새 파일 저장
     for (const f of req.files) {
       await db.execute(
@@ -178,6 +225,19 @@ router.delete(
   try {
     const id = Number(req.params.id);
 
+    // ⭐ BEFORE 데이터 조회 (audit용)
+    const [[before]] = await db.execute(
+      `SELECT id, title, content, lang, sort_order
+        FROM posts
+        WHERE id=? AND category='notice'`,
+      [id]
+    );
+
+    if (!before) {
+      return res.status(404).json({ message: "공지 없음" });
+    }
+
+
     // 파일 조회
     const [files] = await db.execute(
       `SELECT file_path FROM post_files WHERE post_id=?`,
@@ -195,6 +255,17 @@ router.delete(
     // DB 삭제
     await db.execute(`DELETE FROM post_files WHERE post_id=?`, [id]);
     await db.execute(`DELETE FROM posts WHERE id=? AND category='notice'`, [id]);
+
+
+    // ⭐ AUDIT LOG (DELETE)
+    await Audit.log({
+      contentType: Audit.CONTENT_TYPE.NOTICE,
+      contentId: id,
+      action: Audit.ACTION.DELETE,
+      actor: req.user,
+      before,
+      req
+    });
 
     res.json({ message: "공지 삭제 완료" });
 
