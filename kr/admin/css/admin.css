@@ -157,7 +157,7 @@ body {
 
 
 /* 대시보드 단독 메뉴 강조 */
-#sidebar .menu-item.audit_logs {
+#sidebar .menu-item.audit-root {
   font-weight: 700;
   color: #ffffff;
   background: rgba(255,255,255,0.12);
