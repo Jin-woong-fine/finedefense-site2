@@ -4,6 +4,25 @@ import { verifyToken, allowRoles } from "../middleware/auth.js";
 
 const router = express.Router();
 
+const safeParse = (value) => {
+  if (!value) return null;
+
+  // 이미 object면 그대로 사용
+  if (typeof value === "object") return value;
+
+  // string이면 JSON 시도
+  if (typeof value === "string") {
+    try {
+      return JSON.parse(value);
+    } catch {
+      return null; // ❗ 여기서 죽지 않게 막는 게 핵심
+    }
+  }
+
+  return null;
+};
+
+
 router.get(
   "/logs",
   verifyToken,
@@ -47,16 +66,10 @@ router.get(
 
         const result = rows.map(r => ({
         ...r,
-        before_data:
-            typeof r.before_data === "string"
-            ? JSON.parse(r.before_data)
-            : r.before_data,
-
-        after_data:
-            typeof r.after_data === "string"
-            ? JSON.parse(r.after_data)
-            : r.after_data
+        before_data: safeParse(r.before_data),
+        after_data: safeParse(r.after_data)
         }));
+
 
       res.json(result);
 
