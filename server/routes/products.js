@@ -397,6 +397,24 @@ router.put("/:id", verifyToken, verifyEditor, (req, res) => {
 
       const removed = dbList.filter(name => !oldList.includes(name));
 
+
+
+      // ⭐ BEFORE 데이터 (audit)
+      const [[before]] = await db.execute(
+        `SELECT
+          title,
+          summary,
+          category,
+          sort_order,
+          description_html,
+          thumbnail
+        FROM products
+        WHERE id = ?`,
+        [targetId]
+      );
+
+
+
       // 🔴 7️⃣ 제품 텍스트 업데이트
       await db.execute(
         `UPDATE products
@@ -572,6 +590,7 @@ router.post("/:id/translate", verifyToken, verifyEditor, async (req, res) => {
       contentId: newId,
       action: Audit.ACTION.CREATE,
       actor: req.user,
+      before: null,   // ✅ 추가
       after: {
         base_id: id,
         lang,
