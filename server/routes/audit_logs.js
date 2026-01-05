@@ -50,6 +50,11 @@ router.get(
         LIMIT 500
       `;
 
+
+      console.log("AUDIT LOGS QUERY:", sql);
+      console.log("PARAMS:", params);
+
+      
       const [rows] = await db.execute(sql, params);
 
       res.json(
