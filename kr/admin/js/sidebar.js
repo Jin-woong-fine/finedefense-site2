@@ -60,7 +60,7 @@ async function loadSidebar(activePage = "") {
           { title: "갤러리", link: "/kr/admin/gallery-list.html", key: "gallery" },
           { title: "인증 및 특허", link: "/kr/admin/certification-list.html", key: "certification" },   
           { title: "카탈로그", link: "/kr/admin/catalog-list.html", key: "catalog" },             
-          { title: "자료실", link: "/kr/admin/downloads-list.html", key: "downloads" }
+          { title: "자료실", link: "/kr/admin/downloads-list.html", key: "downloads" },
           { title: "게시물 수정 기록", link: "/kr/admin/audit_logs.html", key: "audit_logs" }
         ]
       },
