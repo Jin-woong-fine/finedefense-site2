@@ -215,8 +215,8 @@ function initBreadcrumbTabs() {
         { name: "고객지원", link: `${base}/support/inquiry/index.html` },
       ]
     : [
-        { name: "About Us", link: `${base}/company/overview.html` },
-        { name: "Products", link: `${base}/products/sub-towed.html` },
+        { name: "Who we are", link: `${base}/company/overview.html` },
+        { name: "What we do", link: `${base}/products/sub-towed.html` },
         { name: "Media Center", link: `${base}/pr/newsroom/index.html` },
         { name: "Support", link: `${base}/support/inquiry/index.html` },
       ];
@@ -237,20 +237,14 @@ function initBreadcrumbTabs() {
     if (p.includes("/company/")) {
       tabs = LANG === "kr"
         ? [
-            { name: "기업개요", link: `${base}/company/overview.html` },
-            { name: "CEO 인사말", link: `${base}/company/ceo.html` },
+            { name: "기업소개", link: `${base}/company/overview.html` },
             { name: "연혁", link: `${base}/company/history.html` },
-            { name: "기업이념 및 비전", link: `${base}/company/vision.html` },
-            { name: "조직도", link: `${base}/company/organization.html` },
-            { name: "찾아오시는 길", link: `${base}/company/location.html` },
+            { name: "사업장", link: `${base}/company/location.html` },
           ]
         : [
-            { name: "Overview", link: `${base}/company/overview.html` },
-            { name: "CEO Message", link: `${base}/company/ceo.html` },
-            { name: "History", link: `${base}/company/history.html` },
-            { name: "Vision", link: `${base}/company/vision.html` },
-            { name: "Organization", link: `${base}/company/organization.html` },
-            { name: "Location", link: `${base}/company/location.html` },
+            { name: "About Us", link: `${base}/company/overview.html` },
+            { name: "Our History", link: `${base}/company/history.html` },
+            { name: "Locations", link: `${base}/company/location.html` },
           ];
     }
 
@@ -258,16 +252,16 @@ function initBreadcrumbTabs() {
     if (p.includes("/products/") || p.includes("/product/")) {
       tabs = LANG === "kr"
         ? [
-            { name: "수중이동형케이블", link: `${base}/products/sub-towed.html` },
-            { name: "수중고정형케이블", link: `${base}/products/sub-fixed.html` },
+            { name: "수중이동형 케이블", link: `${base}/products/sub-towed.html` },
+            { name: "수중고정형 케이블", link: `${base}/products/sub-fixed.html` },
             { name: "수중커넥터", link: `${base}/products/sub-connector.html` },
             { name: "커스텀케이블", link: `${base}/products/sub-custom.html` },
           ]
         : [
-            { name: "Towed Cable", link: `${base}/products/sub-towed.html` },
-            { name: "Fixed Cable", link: `${base}/products/sub-fixed.html` },
-            { name: "Connector", link: `${base}/products/sub-connector.html` },
-            { name: "Custom Cable", link: `${base}/products/sub-custom.html` },
+            { name: "Towed Underwater Cables", link: `${base}/products/sub-towed.html` },
+            { name: "Fixed Underwater Cables", link: `${base}/products/sub-fixed.html` },
+            { name: "Underwater Connectors", link: `${base}/products/sub-connector.html` },
+            { name: "Custom Cables", link: `${base}/products/sub-custom.html` },
           ];
     }
 
