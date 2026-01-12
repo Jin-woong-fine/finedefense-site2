@@ -79,39 +79,72 @@
 
 
     /* ===============================
-      Overview Cards
-    ================================ */
+      Overview Cards (기존 overview.html 스타일)
+    =============================== */
 
     .company-grid {
       display: grid;
       grid-template-columns: repeat(5, minmax(180px, 1fr));
       gap: 20px;
+      margin-top: 40px;
     }
 
     .info-card {
       position: relative;
-      padding: 28px 20px;
       border-radius: 12px;
-      background: linear-gradient(160deg, #e8f3ff, #f9fbff);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      padding: 28px 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      background: #f5f8ff;
+      overflow: hidden;
       text-align: left;
       transition: transform 0.25s ease, box-shadow 0.25s ease;
     }
 
     .info-card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 10px 20px rgba(15,38,121,0.15);
+      transform: translateY(-5px);
+      box-shadow: 0 8px 18px rgba(15, 38, 121, 0.12);
     }
 
     .info-card h3 {
+      color: #0f2679;
       font-size: 1.2rem;
+      font-weight: 700;
       margin-bottom: 8px;
     }
 
     .info-card p {
+      color: #333;
       font-size: 1.0rem;
       font-weight: 500;
+      margin: 0;
+      line-height: 1.5;
     }
+
+    /* 카드별 배경 */
+    .info-card:nth-child(1) { background: linear-gradient(160deg, #e8f3ff, #f8fbff); }
+    .info-card:nth-child(2) { background: linear-gradient(160deg, #f5f7fa, #fafbfc); }
+    .info-card:nth-child(3) { background: linear-gradient(160deg, #ecf4ff, #f9fbff); }
+    .info-card:nth-child(4) { background: linear-gradient(160deg, #f0f6f6, #f9fcfc); }
+    .info-card:nth-child(5) { background: linear-gradient(160deg, #edf3ff, #f9fbff); }
+
+    /* SVG 아이콘 */
+    .info-card::before {
+      content: "";
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      opacity: 0.15;
+    }
+
+    .info-card:nth-child(1)::before { background-image: url("/img/icons/calendar.svg"); }
+    .info-card:nth-child(2)::before { background-image: url("/img/icons/location.svg"); }
+    .info-card:nth-child(3)::before { background-image: url("/img/icons/team.svg"); }
+    .info-card:nth-child(4)::before { background-image: url("/img/icons/gear.svg"); }
+    .info-card:nth-child(5)::before { background-image: url("/img/icons/factory.svg"); }
 
     /* ===============================
       CEO Message
