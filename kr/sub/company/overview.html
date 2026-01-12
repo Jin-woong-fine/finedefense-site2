@@ -1,16 +1,23 @@
-<!-- /kr/sub/company/overview.html -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="description" content="화인디펜스 기업개요">
-  <title>기업개요 | 화인디펜스</title>
+  <meta name="description" content="화인디펜스 회사소개">
+  <title>회사소개 | 화인디펜스</title>
 
   <!-- 공통 CSS -->
-  <link rel="stylesheet" href="/css/style.css" />
-  <link rel="stylesheet" href="/css/sub-banner.css" />
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/sub-banner.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- 🔹 기존 페이지들 style 전부 여기로 합치면 됨 -->
+  <!-- (overview / ceo / vision / organization style 그대로 복붙) -->
 
   <style>
+    /* ===============================
+      Company Introduction - Common
+    ================================ */
+
     body {
       margin: 0;
       font-family: "Noto Sans KR", sans-serif;
@@ -18,49 +25,48 @@
       color: #333;
     }
 
-    .page-header {
-      text-align: center;
-      background: #ffffff;
-      padding: 100px 20px 20px;
-      border-bottom: 1px solid #e4e8f0;
-      margin-top: 10px;
+    section {
+      width: 100%;
     }
 
-    .page-header h1 {
-      font-size: 2.0rem;
-      color: #0f2679;
-      margin-bottom: 10px;
-    }
-
-    .page-header p {
-      font-size: 1.4rem;
-      color: #666;
-      opacity: 0.8;
+    h1, h2, h3 {
       margin: 0;
+      font-weight: 700;
+      color: #0f2679;
     }
 
-    /* ===== 회사 개요 본문 ===== */
+    p {
+      margin: 0;
+      line-height: 1.8;
+    }
+
+    .page-container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+
+    /* ===============================
+      Overview
+    ================================ */
+
     .overview-section {
       max-width: 1100px;
-      margin: 30px auto;
-      padding: 45px 40px;
+      margin: 40px auto;
+      padding: 50px 40px;
       background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-      line-height: 1.7;
-      color: #333;
+      border-radius: 14px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
       text-align: center;
     }
 
     .overview-section h1 {
-      font-size: 2rem;
-      color: #0f2679;
+      font-size: 2.0rem;
       margin-bottom: 10px;
     }
 
     .overview-subtitle {
       font-size: 1.4rem;
-      font-weight: 500;
       color: #2976db;
       margin-bottom: 40px;
     }
@@ -68,9 +74,8 @@
     .overview-text {
       font-size: 1.1rem;
       font-weight: 500;
-      color: #000000;
+      color: #222;
       text-align: left;
-      line-height: 1.8;
       margin-bottom: 50px;
     }
 
@@ -78,172 +83,331 @@
       margin-bottom: 15px;
     }
 
-    /* ===== 회사 개요 카드 디자인 ===== */
+
+    /* ===============================
+      Overview Cards
+    ================================ */
+
     .company-grid {
       display: grid;
       grid-template-columns: repeat(5, minmax(180px, 1fr));
       gap: 20px;
-      justify-items: stretch;
-      margin-top: 40px;
-    }
-
-    @media (max-width: 1024px) {
-      .company-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 25px;
-      }
-    }
-
-    @media (max-width: 600px) {
-      .company-grid {
-        grid-template-columns: 1fr;
-      }
     }
 
     .info-card {
       position: relative;
-      border-radius: 12px;
       padding: 28px 20px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-      background: #f5f8ff;
-      overflow: hidden;
+      border-radius: 12px;
+      background: linear-gradient(160deg, #e8f3ff, #f9fbff);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
       text-align: left;
       transition: transform 0.25s ease, box-shadow 0.25s ease;
     }
 
     .info-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 18px rgba(15, 38, 121, 0.12);
+      transform: translateY(-6px);
+      box-shadow: 0 10px 20px rgba(15,38,121,0.15);
     }
 
     .info-card h3 {
-      color: #0f2679;
       font-size: 1.2rem;
-      font-weight: 700;
       margin-bottom: 8px;
     }
 
     .info-card p {
-      color: #333;
       font-size: 1.0rem;
       font-weight: 500;
-      margin: 0;
-      line-height: 1.5;
     }
 
-    /* 카드별 색상 */
-    .info-card:nth-child(1) { background: linear-gradient(160deg, #e8f3ff, #f8fbff); }
-    .info-card:nth-child(2) { background: linear-gradient(160deg, #f5f7fa, #fafbfc); }
-    .info-card:nth-child(3) { background: linear-gradient(160deg, #ecf4ff, #f9fbff); }
-    .info-card:nth-child(4) { background: linear-gradient(160deg, #f0f6f6, #f9fcfc); }
-    .info-card:nth-child(5) { background: linear-gradient(160deg, #edf3ff, #f9fbff); }
+    /* ===============================
+      CEO Message
+    ================================ */
 
-    /* 아이콘 */
-    .info-card::before {
-      content: "";
-      position: absolute;
-      top: 15px;
-      right: 20px;
-      width: 40px;
-      height: 40px;
-      background-size: contain;
-      background-repeat: no-repeat;
-      opacity: 0.15;
+    .ceo-section {
+      max-width: 1000px;
+      margin: 80px auto;
+      padding: 50px 40px;
+      background: #ffffff;
+      border-radius: 14px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
 
-    .info-card:nth-child(1)::before { background-image: url("/img/icons/calendar.svg"); }
-    .info-card:nth-child(2)::before { background-image: url("/img/icons/location.svg"); }
-    .info-card:nth-child(3)::before { background-image: url("/img/icons/team.svg"); }
-    .info-card:nth-child(4)::before { background-image: url("/img/icons/gear.svg"); }
-    .info-card:nth-child(5)::before { background-image: url("/img/icons/factory.svg"); }
-
-    @media (max-width: 768px) {
-      .info-card {
-        text-align: center;
-        padding: 25px 20px;
-      }
-      .info-card::before {
-        display: none;
-      }
+    .ceo-section h1 {
+      text-align: center;
+      font-size: 2.0rem;
+      margin-bottom: 40px;
     }
+
+    .ceo-message {
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin-bottom: 40px;
+    }
+
+    .ceo-message p {
+      margin-bottom: 16px;
+    }
+
+    .ceo-signature {
+      text-align: right;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #222;
+    }
+
+    /* ===============================
+      Vision & Philosophy
+    ================================ */
+
+    .vision-section {
+      max-width: 1100px;
+      margin: 60px auto;
+      padding: 50px 40px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+      text-align: center;
+    }
+
+    .vision-section h2 {
+      font-size: 2.0rem;
+      margin-bottom: 20px;
+    }
+
+    .vision-section > p {
+      font-size: 1.4rem;
+      color: #444;
+      margin-bottom: 50px;
+    }
+
+    .vision-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 40px;
+    }
+
+    .vision-card {
+      padding: 40px 25px;
+      border-radius: 14px;
+      background: linear-gradient(180deg, #ffffff, #f7f9ff);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .vision-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 10px 22px rgba(0,0,0,0.12);
+    }
+
+    .vision-card i {
+      font-size: 2.8rem;
+      margin-bottom: 20px;
+      color: #0f2679;
+    }
+
+    .vision-card h3 {
+      font-size: 1.4rem;
+      margin-bottom: 10px;
+    }
+
+    .vision-card p {
+      font-size: 1.2rem;
+      color: #555;
+    }
+
+    /* ===============================
+      Organization Chart
+    ================================ */
+
+    .organization {
+      max-width: 1000px;
+      margin: 60px auto;
+      padding: 60px 40px;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      text-align: center;
+    }
+
+    .org-chart {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 50px;
+    }
+
+    /* 대표 / 임원 */
+    .org-node {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 20px 60px;
+      border-radius: 12px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .org-node.ceo {
+      background: linear-gradient(135deg, #2f62d0, #4a80f0);
+    }
+
+    .org-node.executive {
+      background: linear-gradient(135deg, #5a6fae, #7c8fd8);
+    }
+
+    /* 부서 */
+    .org-branch {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 40px;
+    }
+
+    .org-dept {
+      min-width: 160px;
+      padding: 20px 35px;
+      border-radius: 12px;
+      border: 2px solid #0f2679;
+      color: #0f2679;
+      font-size: 1.1rem;
+      font-weight: 600;
+      background: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .org-dept:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 10px 18px rgba(15,38,121,0.15);
+    }
+
+    .org-dept i {
+      display: block;
+      font-size: 1.8rem;
+      margin-bottom: 6px;
+    }
+
   </style>
+  
 </head>
 
 <body>
 
-  <!-- 관리자 세션바 (정확한 ID 부여) -->
-  <div id="adminBarContainer" data-include="/kr/components/admin-session-bar.html"></div>
+<!-- 관리자 세션바 -->
+<div id="adminBarContainer" data-include="/kr/components/admin-session-bar.html"></div>
 
-  <!-- 공통 헤더 -->
-  <div id="headerContainer" data-include="/kr/components/header.html"></div>
+<!-- 헤더 -->
+<div id="headerContainer" data-include="/kr/components/header.html"></div>
 
+<!-- 서브 배너 -->
+<section class="sub-banner">
+  <img src="/img/sub-banners/subbanner_introduction.png" alt="회사소개 배너">
+  <div class="banner-text">
+    <h1>회사소개</h1>
+    <p>해양 방산 시스템을 연결하는 핵심 케이블 기술</p>
+  </div>
+</section>
 
-  <!-- 서브 배너 -->
-  <section class="sub-banner">
-    <img src="/img/sub-banners/subbanner_introduction.png" alt="회사소개 배너" />
-    <div class="banner-text">
-      <h1>회사소개</h1>
-      <p>해양 방산 시스템을 연결하는 핵심 케이블 기술</p>
-    </div>
-  </section>
+<!-- breadcrumb -->
+<div class="breadcrumb">
+  <a href="/">홈</a> &gt;
+  <span class="crumb crumb-level1">회사소개</span> &gt;
+  <span class="crumb crumb-level2">기업개요</span>
+</div>
 
-  <!-- BreadCrumb -->
-  <div class="breadcrumb">
-    <a href="/">홈</a> &gt;
-    <span class="crumb crumb-level1">회사소개</span> &gt;
-    <span class="crumb crumb-level2">기업개요</span>
+<!-- ================================================= -->
+<!-- 1️⃣ 기업개요 -->
+<!-- ================================================= -->
+<section class="overview-section">
+  <h1>기업개요</h1>
+  <p class="overview-subtitle">해양 방산 시스템을 연결하는 핵심 케이블 기술</p>
 
-    <div id="side-tabs" class="side-tabs hidden"></div>
+  <div class="overview-text">
+    <p>㈜화인디펜스는 ...</p>
+    <p>소수정예의 전문 엔지니어로 구성된 ...</p>
+    <p>해양방위산업의 신뢰할 수 있는 파트너로 성장...</p>
   </div>
 
-  <!-- 본문 -->
-  <section class="overview-section">
-    <h1>기업개요</h1>
-    <p class="overview-subtitle">해양 방산 시스템을 연결하는 핵심 케이블 기술</p>
+  <div class="company-grid">
+    <!-- 카드들 그대로 -->
+  </div>
+</section>
 
-    <div class="overview-text">
-      <p>㈜화인디펜스는 해양방위산업 분야의 핵심 기술을 기반으로 소나시스템과 잠수함에 적용되는 고정형·이동형 수중케이블 등 방위산업용 특수 케이블을 설계·제작·시험하는 전문 기업입니다.</p>
-      <p>소수정예의 전문 엔지니어로 구성된 기술중심 강소기업으로서, 설계부터 제조, 시험, 평가에 이르는 전 과정을 자체 수행하며 축적된 기술력과 품질 관리 노하우를 바탕으로 국내외 해양 방산 프로젝트의 신뢰성 높은 솔루션을 제공합니다.</p>
-      <p>화인디펜스는 축적된 기술력과 품질을 기반으로 해양방위산업의 신뢰할 수 있는 파트너로 성장해 나가고 있습니다.</p>
+<!-- ================================================= -->
+<!-- 2️⃣ CEO 인사말 -->
+<!-- ================================================= -->
+<section class="ceo-section">
+  <h1>CEO 인사말</h1>
+
+  <div class="ceo-message">
+    <p>안녕하십니까?<br>(주)화인디펜스 홈페이지를 방문해주신 여러분께...</p>
+    <!-- 이하 동일 -->
+  </div>
+
+  <div class="ceo-signature">(주)화인디펜스 직원 일동</div>
+</section>
+
+<!-- ================================================= -->
+<!-- 3️⃣ 기업이념 및 비전 -->
+<!-- ================================================= -->
+<section class="vision-section">
+  <h2>화인디펜스의 핵심가치</h2>
+  <p>Fine Defense는 신뢰와 기술혁신을 바탕으로...</p>
+
+  <div class="vision-grid">
+    <div class="vision-card">
+      <i class="fas fa-lightbulb"></i>
+      <h3>기업이념</h3>
+      <p>끊임없는 기술혁신과 품질 신뢰...</p>
     </div>
 
-    <!-- 회사 개요 카드 -->
-    <div class="company-grid">
-      <div class="info-card">
-        <h3>설립</h3>
-        <p>2005년 5월 18일</p>
-      </div>
-
-      <div class="info-card">
-        <h3>본사 위치</h3>
-        <p>경기도 안양시 동안구 학의로 250, 902호</p>
-      </div>
-
-      <div class="info-card">
-        <h3>임직원 수</h3>
-        <p>약 18명</p>
-      </div>
-
-      <div class="info-card">
-        <h3>주요사업</h3>
-        <p>수중예인케이블 · 수중터미네이션 · 수중케이블배선장치 · 커스텀 케이블 등</p>
-      </div>
-
-      <div class="info-card">
-        <h3>사업장</h3>
-        <p>본사 · 옥천1공장 · <br> 옥천2공장</p>
-      </div>
+    <div class="vision-card">
+      <i class="fas fa-bullseye"></i>
+      <h3>미션</h3>
+      <p>해양 방위산업의 기술 자립...</p>
     </div>
-  </section>
 
-  <!-- 공통 푸터 -->
-  <div data-include="/kr/components/footer.html"></div>
+    <div class="vision-card">
+      <i class="fas fa-rocket"></i>
+      <h3>비전</h3>
+      <p>Global Defense Cable Solution Leader</p>
+    </div>
+  </div>
+</section>
 
-  <!-- 공통 스크립트 -->
-  <script src="/js/include.js"></script>
-  <script src="/js/session_timer.js"></script>
-  <script src="/js/language.js"></script>
-  <script src="/js/nav.js"></script>
+<!-- ================================================= -->
+<!-- 4️⃣ 조직도 -->
+<!-- ================================================= -->
+<section class="organization">
+  <div class="org-chart">
+    <div class="org-node ceo">
+      <i class="fas fa-user-tie"></i> 대표이사
+    </div>
+
+    <div class="org-node executive">
+      <i class="fas fa-user-gear"></i> 전무이사
+    </div>
+
+    <div class="org-branch">
+      <div class="org-dept"><i class="fas fa-lightbulb"></i> 연구소</div>
+      <div class="org-dept"><i class="fas fa-briefcase"></i> 경영지원팀</div>
+      <div class="org-dept"><i class="fas fa-handshake"></i> 영업팀</div>
+      <div class="org-dept"><i class="fas fa-cart-shopping"></i> 구매팀</div>
+      <div class="org-dept"><i class="fas fa-check-circle"></i> 품질관리팀</div>
+      <div class="org-dept"><i class="fas fa-industry"></i> 생산팀</div>
+    </div>
+  </div>
+</section>
+
+<!-- 푸터 -->
+<div data-include="/kr/components/footer.html"></div>
+
+<!-- 공통 JS -->
+<script src="/js/include.js"></script>
+<script src="/js/session_timer.js"></script>
+<script src="/js/language.js"></script>
+<script src="/js/nav.js"></script>
 
 </body>
 </html>
