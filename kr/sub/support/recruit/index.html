@@ -294,6 +294,14 @@
       margin: 80px 0;
     }
 
+
+    .char-count {
+      font-size: 13px;
+      color: #6e6e73;
+      text-align: right;
+      margin-top: 6px;
+    }
+
     </style>
 
 </head>
@@ -367,7 +375,14 @@
 
       <div class="form-group">
         <label for="message">자기소개 / 전달사항</label>
-        <textarea id="message" placeholder=" "></textarea>
+        <textarea id="message"
+                  maxlength="500"
+                  placeholder="자기소개 및 전달사항 (최대 500자)">
+        </textarea>
+        <div class="char-count">
+          <span id="messageCount">0</span> / 500
+        </div>
+
       </div>
 
       <!-- 파일 업로드 -->
@@ -418,6 +433,17 @@
 <script src="/js/nav.js"></script>
 
 <script>
+
+  const messageEl = document.getElementById("message");
+  const countEl = document.getElementById("messageCount");
+
+  messageEl.addEventListener("input", () => {
+    countEl.textContent = messageEl.value.length;
+  });
+
+
+
+
   /* 채용공고 목록 로드 (공개 공고만) */
   async function loadRecruitList() {
     try {
