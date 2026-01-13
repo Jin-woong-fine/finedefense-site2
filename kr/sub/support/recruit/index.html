@@ -350,12 +350,12 @@
       const wrap = document.getElementById("recruitList");
       wrap.innerHTML = "";
 
-      if (activeList.length === 0) {
+      if (list.length === 0) {
         wrap.innerHTML = "<p>현재 진행 중인 채용공고가 없습니다.</p>";
         return;
       }
 
-      activeList.forEach(item => {
+      list.forEach(item => {
         const div = document.createElement("div");
         div.className = "recruit-item";
         div.innerHTML = `
