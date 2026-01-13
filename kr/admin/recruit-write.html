@@ -191,7 +191,7 @@ if (recruitId) {
 }
 
 async function loadRecruit() {
-  const res = await fetch(`/api/recruit/admin/${recruitId}`, {
+  const res = await fetch(`/api/recruit/${recruitId}`, {
     headers: {
       Authorization: "Bearer " + localStorage.getItem("token")
     }
@@ -227,8 +227,8 @@ async function submitRecruit() {
   }
 
   const url = recruitId
-    ? `/api/recruit/admin/update/${recruitId}`
-    : `/api/recruit/admin/create`;
+    ? `/api/recruit/update/${recruitId}`
+    : `/api/recruit/create`;
 
   const method = recruitId ? "PUT" : "POST";
 
