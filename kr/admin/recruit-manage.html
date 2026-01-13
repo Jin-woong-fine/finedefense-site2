@@ -234,13 +234,18 @@ document.querySelectorAll(".tab-btn").forEach(btn => {
    채용공고 로드
 =============================== */
 async function loadRecruitPosts() {
-  const res = await fetch("/api/recruit/admin/list", {
+  const res = await fetch("/api/recruit/list", {
     headers: {
       Authorization: "Bearer " + localStorage.getItem("token")
     }
   });
-  const list = await res.json();
 
+  if (!res.ok) {
+    console.error("❌ 채용공고 목록 로드 실패");
+    return;
+  }
+
+  const list = await res.json();
   const tbody = document.querySelector("#tab-recruit tbody");
   tbody.innerHTML = "";
 
@@ -268,17 +273,25 @@ async function loadRecruitPosts() {
   });
 }
 
+
+
+
 /* ===============================
    인재 DB 로드
 =============================== */
 async function loadTalentDB() {
-  const res = await fetch("/api/recruit/admin/talents", {
+  const res = await fetch("/api/recruit/talents", {
     headers: {
       Authorization: "Bearer " + localStorage.getItem("token")
     }
   });
-  const list = await res.json();
 
+  if (!res.ok) {
+    console.error("❌ 인재 DB 로드 실패");
+    return;
+  }
+
+  const list = await res.json();
   const tbody = document.querySelector("#tab-talent tbody");
   tbody.innerHTML = "";
 
@@ -288,7 +301,7 @@ async function loadTalentDB() {
         <td>${i + 1}</td>
         <td>${t.name}</td>
         <td>${t.email}</td>
-        <td>${t.created_at.slice(0,10)}</td>
+        <td>${t.created_at.slice(0, 10)}</td>
         <td>${t.resume_path ? "O" : "-"}</td>
         <td>
           <div class="actions">
@@ -302,6 +315,7 @@ async function loadTalentDB() {
     `;
   });
 }
+
 
 /* ===============================
    액션
@@ -318,7 +332,7 @@ function editRecruit(id) {
 async function toggleRecruit(id, active) {
   if (!confirm("상태를 변경하시겠습니까?")) return;
 
-  await fetch(`/api/recruit/admin/toggle/${id}`, {
+  const res = await fetch(`/api/recruit/toggle/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -327,18 +341,33 @@ async function toggleRecruit(id, active) {
     body: JSON.stringify({ is_active: active ? 0 : 1 })
   });
 
+  if (!res.ok) {
+    alert("상태 변경 실패");
+    return;
+  }
+
   loadRecruitPosts();
 }
 
+
+
+/* ===============================
+   인재 삭제
+=============================== */
 async function deleteTalent(id) {
   if (!confirm("인재 정보를 삭제하시겠습니까?")) return;
 
-  await fetch(`/api/recruit/admin/talent/${id}`, {
+  const res = await fetch(`/api/recruit/talent/${id}`, {
     method: "DELETE",
     headers: {
       Authorization: "Bearer " + localStorage.getItem("token")
     }
   });
+
+  if (!res.ok) {
+    alert("삭제 실패");
+    return;
+  }
 
   loadTalentDB();
 }
