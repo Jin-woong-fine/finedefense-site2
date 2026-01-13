@@ -5,10 +5,13 @@
   <title>채용공고 작성 | Fine Defense Admin</title>
 
   <link rel="stylesheet" href="./css/admin.css">
+    <link rel="stylesheet"
+  href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
 
   <!-- 세션 -->
   <script type="module" src="/js/session_manager.js"></script>
   <script type="module" src="./js/dashboard_session_timer.js"></script>
+
 
   <style>
     .panel {
@@ -109,7 +112,7 @@
 
   <!-- TOPBAR -->
   <div class="topbar">
-    <div class="title">채용공고 작성</div>
+    <div class="title" id="pageTitle">채용공고 작성</div>
 
     <div style="display:flex; align-items:center; gap:12px;">
       <span id="session-timer" class="session-timer">세션 계산중...</span>
@@ -163,8 +166,15 @@
 
     <div class="form-group">
       <label>공고 내용</label>
-      <textarea id="content" placeholder="채용 상세 내용"></textarea>
+      <div id="editor" style="border:1px solid #ccd3f0;border-radius:8px;"></div>
     </div>
+
+    <div class="form-group">
+    <label>이미지 첨부</label>
+    <input type="file" id="images" accept="image/*" multiple>
+    <div id="preview" class="image-row"></div>
+    </div>
+
 
     <div class="form-group checkbox-group">
     <label class="checkbox-label">
@@ -185,6 +195,7 @@
 <script src="/kr/admin/js/common_auth.js"></script>
 <script src="/kr/admin/js/sidebar.js"></script>
 <script src="./js/topbar_user_menu.js"></script>
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 
 <script>
 requireEditPermission();
@@ -192,6 +203,50 @@ loadSidebar("recruit");
 
 const params = new URLSearchParams(location.search);
 const recruitId = params.get("id");
+
+
+
+let editor;
+
+document.addEventListener("DOMContentLoaded", () => {
+  editor = new toastui.Editor({
+    el: document.querySelector('#editor'),
+    height: '500px',
+    initialEditType: 'wysiwyg',
+    previewStyle: 'vertical',
+
+    hooks: {
+      addImageBlobHook: async (blob, callback) => {
+        try {
+          const form = new FormData();
+          form.append("image", blob);
+
+          const res = await fetch("/api/uploads_editor/image", {
+            method: "POST",
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            },
+            body: form
+          });
+
+          const out = await res.json();
+
+          if (out.url) {
+            // ✅ 본문에 <img src="..."> 자동 삽입
+            callback(out.url, "editor-image");
+          } else {
+            alert("이미지 업로드 실패");
+          }
+        } catch (err) {
+          console.error(err);
+          alert("이미지 업로드 오류");
+        }
+      }
+    }
+  });
+});
+
+
 
 /* ===============================
    수정 모드 로드
@@ -214,7 +269,7 @@ async function loadRecruit() {
   document.getElementById("career_level").value = r.career_level || "";
   document.getElementById("location").value = r.location || "";
   document.getElementById("sort_order").value = r.sort_order ?? 9999;
-  document.getElementById("content").value = r.content;
+  editor.setHTML(r.content || "");
   document.getElementById("is_active").checked = !!r.is_active;
 }
 
@@ -222,19 +277,32 @@ async function loadRecruit() {
    저장
 =============================== */
 async function submitRecruit() {
-  const payload = {
-    title: document.getElementById("title").value.trim(),
-    employment_type: document.getElementById("employment_type").value,
-    career_level: document.getElementById("career_level").value,
-    location: document.getElementById("location").value,
-    sort_order: Number(document.getElementById("sort_order").value || 9999),
-    content: document.getElementById("content").value,
-    is_active: document.getElementById("is_active").checked ? 1 : 0
-  };
+  if (!editor) {
+    alert("에디터가 아직 로드되지 않았습니다.");
+    return;
+  }
 
-  if (!payload.title || !payload.content) {
+  const title = document.getElementById("title").value.trim();
+  const content = editor.getHTML();
+
+  if (!title || !content) {
     alert("제목과 내용은 필수입니다.");
     return;
+  }
+
+  const form = new FormData();
+  form.append("title", title);
+  form.append("employment_type", document.getElementById("employment_type").value);
+  form.append("career_level", document.getElementById("career_level").value);
+  form.append("location", document.getElementById("location").value);
+  form.append("sort_order", document.getElementById("sort_order").value || 9999);
+  form.append("is_active", document.getElementById("is_active").checked ? 1 : 0);
+  form.append("content", content);
+
+  // 이미지 첨부 (있을 경우)
+  const imgs = document.getElementById("images");
+  if (imgs) {
+    [...imgs.files].forEach(f => form.append("images", f));
   }
 
   const url = recruitId
@@ -246,10 +314,9 @@ async function submitRecruit() {
   const res = await fetch(url, {
     method,
     headers: {
-      "Content-Type": "application/json",
       Authorization: "Bearer " + localStorage.getItem("token")
     },
-    body: JSON.stringify(payload)
+    body: form   // ❗ Content-Type 절대 넣지 말 것
   });
 
   if (res.ok) {
@@ -259,6 +326,29 @@ async function submitRecruit() {
     alert("저장 실패");
   }
 }
+
+
+/* ===============================
+   이미지 미리보기
+=============================== */
+document.getElementById("images")?.addEventListener("change", function () {
+  const preview = document.getElementById("preview");
+  preview.innerHTML = "";
+
+  [...this.files].forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = document.createElement("img");
+      img.src = e.target.result;
+      img.className = "preview-img";
+      preview.appendChild(img);
+    };
+    reader.readAsDataURL(file);
+  });
+});
+
+
+
 </script>
 
 </body>

@@ -4,7 +4,44 @@ import db from "../config/db.js";
 import { verifyToken, canDelete } from "../middleware/auth.js";
 import Audit from "../utils/auditLogger.js";
 
+
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
+
+
+
 const router = express.Router();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const UPLOAD_ROOT = path.join(__dirname, "../public/uploads");
+const RECRUIT_DIR = path.join(UPLOAD_ROOT, "recruit_images");
+
+if (!fs.existsSync(RECRUIT_DIR)) {
+  fs.mkdirSync(RECRUIT_DIR, { recursive: true });
+}
+
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, RECRUIT_DIR);
+  },
+  filename: (req, file, cb) => {
+    const safeName = Buffer
+      .from(file.originalname, "latin1")
+      .toString("utf8");
+    const unique = Date.now() + "_" + Math.round(Math.random() * 1e9);
+    cb(null, `${unique}_${safeName}`);
+  }
+});
+
+const uploadRecruit = multer({
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 } // 10MB
+});
 
 
 /* ===============================
@@ -35,7 +72,11 @@ router.put("/toggle/:id", verifyToken, async (req, res) => {
 /* ============================================================
    📌 채용공고 등록
 ============================================================ */
-router.post("/create", verifyToken, async (req, res) => {
+router.post(
+  "/create",
+  verifyToken,
+  uploadRecruit.array("images", 5),
+  async (req, res) => {
   try {
     const {
       title,
@@ -61,6 +102,16 @@ router.post("/create", verifyToken, async (req, res) => {
 
     const postId = result.insertId;
 
+    const imagePaths = req.files.map(f =>
+    `/uploads/recruit_images/${f.filename}`
+    );
+
+    // 필요하면 JSON으로 posts 테이블에 저장
+    await db.execute(
+    `UPDATE recruit_posts SET images=? WHERE id=?`,
+    [JSON.stringify(imagePaths), postId]
+    );
+
     await Audit.log({
       contentType: Audit.CONTENT_TYPE.RECRUIT,
       contentId: postId,
@@ -81,7 +132,11 @@ router.post("/create", verifyToken, async (req, res) => {
 /* ============================================================
    📌 채용공고 수정
 ============================================================ */
-router.put("/update/:id", verifyToken, async (req, res) => {
+router.put(
+  "/update/:id",
+  verifyToken,
+  uploadRecruit.array("images", 5),
+  async (req, res) => {
   try {
     const id = Number(req.params.id);
     const {
