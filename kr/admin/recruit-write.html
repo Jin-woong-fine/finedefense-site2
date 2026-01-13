@@ -218,33 +218,35 @@ document.addEventListener("DOMContentLoaded", () => {
     hooks: {
       addImageBlobHook: async (blob, callback) => {
         try {
-          const form = new FormData();
-          form.append("image", blob);
+          const formData = new FormData();
+          formData.append("image", blob);
 
-          const res = await fetch("/api/uploads_editor/image", {
+          const res = await fetch("/api/uploads/image", {
             method: "POST",
             headers: {
               Authorization: "Bearer " + localStorage.getItem("token")
             },
-            body: form
+            body: formData
           });
 
-          const out = await res.json();
+          const data = await res.json();
 
-          if (out.url) {
-            // ✅ 본문에 <img src="..."> 자동 삽입
-            callback(out.url, "editor-image");
-          } else {
-            alert("이미지 업로드 실패");
+          if (!data.url) {
+            throw new Error("이미지 URL 없음");
           }
+
+          // ✅ 에디터 본문에 이미지 삽입
+          callback(data.url, "image");
+
         } catch (err) {
-          console.error(err);
-          alert("이미지 업로드 오류");
+          console.error("에디터 이미지 업로드 실패:", err);
+          alert("이미지 업로드 실패");
         }
       }
     }
   });
 });
+
 
 
 
