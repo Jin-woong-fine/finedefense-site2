@@ -65,7 +65,16 @@ async function loadSidebar(activePage = "") {
         ]
       },
 
-      { title: "고객 문의", link: "/kr/admin/inquiry-list.html", key: "inquiry" },
+      { title: "", link: "/kr/admin/inquiry-list.html", key: "inquiry" },
+
+      {
+        title: "고객지원",
+        children: [
+          { title: "고객문의 관리", link: "/kr/admin/inquiry-list.html", key: "inquiry"},
+          { title: "채용공고 및 인재DB 관리", link: "/kr/admin/recruit-manage.html", key: "recruit" },
+        ]
+      },
+
 
       {
         title: "사용자 관리",
