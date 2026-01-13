@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>채용공고 작성 | Fine Defense Admin</title>
+
+  <link rel="stylesheet" href="./css/admin.css">
+
+  <!-- 세션 -->
+  <script type="module" src="/js/session_manager.js"></script>
+  <script type="module" src="./js/dashboard_session_timer.js"></script>
+
+  <style>
+    .panel {
+      background:#fff;
+      padding:30px 34px;
+      border-radius:12px;
+      box-shadow:0 6px 20px rgba(15,38,121,0.08);
+      max-width:900px;
+    }
+
+    .form-group {
+      margin-bottom:22px;
+    }
+
+    label {
+      font-weight:600;
+      display:block;
+      margin-bottom:6px;
+    }
+
+    input, select, textarea {
+      width:100%;
+      padding:10px 12px;
+      border-radius:8px;
+      border:1px solid #ccd3f0;
+      font-size:0.95rem;
+    }
+
+    textarea {
+      min-height:220px;
+      resize:vertical;
+    }
+
+    .btns {
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      margin-top:30px;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div id="sidebar" data-active="recruit"></div>
+
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="title" id="pageTitle">채용공고 작성</div>
+    <button onclick="history.back()">목록으로</button>
+  </div>
+
+  <section class="panel">
+
+    <div class="form-group">
+      <label>공고 제목</label>
+      <input type="text" id="title" placeholder="채용공고 제목">
+    </div>
+
+    <div class="form-group">
+      <label>고용 형태</label>
+      <select id="employment_type">
+        <option value="">선택</option>
+        <option>정규직</option>
+        <option>계약직</option>
+        <option>인턴</option>
+        <option>기타</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>경력</label>
+      <select id="career_level">
+        <option value="">선택</option>
+        <option>신입</option>
+        <option>경력</option>
+        <option>무관</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>근무지</label>
+      <input type="text" id="location" placeholder="예: 서울 / 판교">
+    </div>
+
+    <div class="form-group">
+      <label>정렬 순서</label>
+      <input type="number" id="sort_order" value="9999">
+    </div>
+
+    <div class="form-group">
+      <label>공고 내용</label>
+      <textarea id="content" placeholder="채용 상세 내용"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>
+        <input type="checkbox" id="is_active" checked>
+        공개 상태
+      </label>
+    </div>
+
+    <div class="btns">
+      <button class="btn btn-gray" onclick="history.back()">취소</button>
+      <button class="btn btn-primary" onclick="submitRecruit()">저장</button>
+    </div>
+
+  </section>
+</div>
+
+<script src="/kr/admin/js/common_auth.js"></script>
+<script src="/kr/admin/js/sidebar.js"></script>
+
+<script>
+requireEditPermission();
+loadSidebar("recruit");
+
+const params = new URLSearchParams(location.search);
+const recruitId = params.get("id");
+
+/* ===============================
+   수정 모드 로드
+=============================== */
+if (recruitId) {
+  document.getElementById("pageTitle").innerText = "채용공고 수정";
+  loadRecruit();
+}
+
+async function loadRecruit() {
+  const res = await fetch(`/api/recruit/admin/${recruitId}`, {
+    headers: {
+      Authorization: "Bearer " + localStorage.getItem("token")
+    }
+  });
+  const r = await res.json();
+
+  document.getElementById("title").value = r.title;
+  document.getElementById("employment_type").value = r.employment_type || "";
+  document.getElementById("career_level").value = r.career_level || "";
+  document.getElementById("location").value = r.location || "";
+  document.getElementById("sort_order").value = r.sort_order ?? 9999;
+  document.getElementById("content").value = r.content;
+  document.getElementById("is_active").checked = !!r.is_active;
+}
+
+/* ===============================
+   저장
+=============================== */
+async function submitRecruit() {
+  const payload = {
+    title: document.getElementById("title").value.trim(),
+    employment_type: document.getElementById("employment_type").value,
+    career_level: document.getElementById("career_level").value,
+    location: document.getElementById("location").value,
+    sort_order: Number(document.getElementById("sort_order").value || 9999),
+    content: document.getElementById("content").value,
+    is_active: document.getElementById("is_active").checked ? 1 : 0
+  };
+
+  if (!payload.title || !payload.content) {
+    alert("제목과 내용은 필수입니다.");
+    return;
+  }
+
+  const url = recruitId
+    ? `/api/recruit/admin/update/${recruitId}`
+    : `/api/recruit/admin/create`;
+
+  const method = recruitId ? "PUT" : "POST";
+
+  const res = await fetch(url, {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + localStorage.getItem("token")
+    },
+    body: JSON.stringify(payload)
+  });
+
+  if (res.ok) {
+    alert("저장되었습니다.");
+    location.href = "/kr/admin/recruit-list.html";
+  } else {
+    alert("저장 실패");
+  }
+}
+</script>
+
+</body>
+</html>
