@@ -85,6 +85,19 @@
     display: flex;
     gap: 6px;
   }
+
+
+  .recruit-title {
+    color: #0f2679;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .recruit-title:hover {
+    text-decoration: underline;
+  }
+
   </style>
 </head>
 
@@ -253,7 +266,13 @@ async function loadRecruitPosts() {
     tbody.innerHTML += `
       <tr>
         <td>${i + 1}</td>
-        <td>${r.title}</td>
+        <td>
+          <a href="javascript:void(0)"
+            class="recruit-title"
+            onclick="editRecruit(${r.id})">
+            ${r.title}
+          </a>
+        </td>
         <td>${r.employment_type || "-"}</td>
         <td>${r.career_level || "-"}</td>
         <td>${r.location || "-"}</td>
@@ -271,6 +290,7 @@ async function loadRecruitPosts() {
       </tr>
     `;
   });
+
 }
 
 
