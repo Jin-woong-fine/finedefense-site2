@@ -27,7 +27,7 @@
                     "Apple SD Gothic Neo", "Noto Sans KR",
                     "Segoe UI", sans-serif;
         margin: 0;
-        color: var(--text);
+        color: #1f2937; /* 다크그레이 */
     }
 
     .recruit-wrapper {
@@ -49,21 +49,21 @@
     =============================== */
     .recruit-item {
       background: #ffffff;
-      border-radius: 14px;
+      border-radius: 12px;
       padding: 20px 24px;
-      border: 1px solid var(--border);
+      border: 1px solid #e5e7eb;
+      box-shadow: none;           /* 그림자 제거 */
     }
 
     .recruit-item:hover {
-      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+      background: #f9fafb;        /* 색만 살짝 */
     }
 
     .recruit-item h3 {
-      font-size: 17px;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 6px;
-      line-height: 1.4;
+      font-size: 18px;
+      font-weight: 500;   /* 🔥 600 → 500 */
+      line-height: 1.5;
+      color: #111827;
     }
 
     /* 선택된 채용공고 */
@@ -74,8 +74,8 @@
 
     .recruit-meta {
       font-size: 13px;
-      color: var(--muted);
-      line-height: 1.6;
+      color: #9ca3af;   /* 아주 연한 회색 */
+      margin-top: 4px;
     }
 
     .recruit-item::before {
@@ -104,12 +104,7 @@
       border-radius: 20px;
       padding: 44px 48px;
     }
-
-    .apply-desc {
-      font-size: 14px;
-      color: var(--subtext);
-      line-height: 1.7;
-    }
+    
 
     /* ===============================
         입력 필드
@@ -221,9 +216,11 @@
       margin-right: 6px;
     }
 
+    .apply-desc,
     .privacy-desc {
-      color: var(--subtext);
-      line-height: 1.6;
+      color: #6b7280;
+      font-size: 14px;
+      line-height: 1.7;
     }
 
 
@@ -265,7 +262,11 @@
       margin-bottom: 80px;
     }
 
-
+    .section-divider {
+      height: 1px;
+      background: #e5e7eb;
+      margin: 80px 0;
+    }
 
     </style>
 
@@ -309,6 +310,9 @@
         <!-- 관리자 DB에서 로드 -->
       </div>
     </div>
+
+    <div class="section-divider"></div>
+
 
     <!-- 지원하기 -->
     <div class="apply-wrapper">
