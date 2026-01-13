@@ -139,20 +139,45 @@
         파일 업로드
     =============================== */
     .file-group {
-        margin-bottom: 24px;
+        margin-bottom: 28px;
     }
 
     .file-group label {
-        display: block;
-        font-size: 15px;
+        display: inline-block;
+        font-size: 14px;
         font-weight: 600;
-        margin-bottom: 6px;
+        color: #1d1d1f;
+        margin-bottom: 8px;
+        padding: 6px 10px;
+        background: #f2f4f8;
+        border-radius: 8px;
     }
+
+
+    .file-group input[type="file"] {
+        display: block;
+        margin-top: 10px;
+        padding: 14px 16px;
+        border-radius: 12px;
+        border: 1px dashed #cfd6e4;
+        background: #ffffff;
+        font-size: 14px;
+        color: #444;
+        cursor: pointer;
+    }
+
+    .file-group input[type="file"]:hover {
+        background: #f9fafc;
+        border-color: #0071e3;
+    }
+
 
     .file-desc {
         font-size: 13px;
-        color: var(--subtext);
-        margin-top: 4px;
+        color: #6e6e73;
+        margin-top: 6px;
+        margin-left: 4px;
+        line-height: 1.5;
     }
 
     input[type="file"] {
