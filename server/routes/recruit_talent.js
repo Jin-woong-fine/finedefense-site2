@@ -71,6 +71,10 @@ router.post(
         return res.status(400).json({ message: "이력서는 필수입니다" });
       }
 
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return res.status(400).json({ message: "이메일 형식 오류" });
+    }
+
       const resumePath = req.files.resume[0].filename;
       const coverPath = req.files.cover?.[0]?.filename || null;
       const portfolioPath = req.files.portfolio?.[0]?.filename || null;
@@ -99,14 +103,14 @@ router.post(
         ]
       );
 
-      await Audit.log({
+        await Audit.log({
         contentType: Audit.CONTENT_TYPE.RECRUIT,
         contentId: result.insertId,
         action: Audit.ACTION.CREATE,
-        actor: { name, email },
+        actor: null,              // ⭐ 중요
         after: { name, email },
         req
-      });
+        });
 
       res.json({ message: "인재 DB 등록 완료" });
 
