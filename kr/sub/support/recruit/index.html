@@ -196,6 +196,29 @@
       margin: 64px 0;
     }
 
+    /* 개인정보 동의 */
+    .privacy-box {
+      margin: 40px 0 24px;
+      padding: 20px 24px;
+      background: #f9f9fb;
+      border-radius: 14px;
+      font-size: 14px;
+    }
+
+    .privacy-check {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .privacy-check input {
+      margin-right: 6px;
+    }
+
+    .privacy-desc {
+      color: var(--subtext);
+      line-height: 1.6;
+    }
 
     </style>
 
@@ -211,10 +234,10 @@
 
 <!-- 서브 배너 -->
 <section class="sub-banner">
-  <img src="/img/sub-banners/subbanner_support_6.png" alt="채용안내">
+  <img src="/img/sub-banners/subbanner_support_6.png" alt="채용안내 및 지원">
   <div class="banner-text">
     <h1>채용안내</h1>
-    <p>Fine Defense와 함께 성장할 인재를 기다립니다.</p>
+    <p>Fine Defense는 미래를 함께 만들어갈 인재를 기다립니다.</p>
   </div>
 </section>
 
@@ -222,7 +245,7 @@
 <div class="breadcrumb">
   <a href="/kr/index.html">홈</a> &gt;
   <span class="crumb crumb-level1 active">고객지원</span> &gt;
-  <span class="crumb crumb-level2 active">채용안내</span>
+  <span class="crumb crumb-level2 active">채용안내 및 지원</span>
   <div id="side-tabs"></div>
 </div>
 
@@ -240,12 +263,18 @@
 
     <!-- 지원하기 -->
     <div class="apply-wrapper">
-      <div class="section-title">지원하기</div>
+      <div class="section-title">인재 DB 등록</div>
       <div class="apply-desc">
-        ※ 이력서는 PDF 형식을 권장합니다. (최대 3개 파일 업로드 가능)
-      </div>
+        Fine Defense는 상시 인재 DB를 운영하고 있습니다.<br>
+        아래 양식을 통해 인재 정보를 등록해주시면,
+        향후 채용이 진행될 경우 우선적으로 검토될 수 있습니다.<br><br>
 
-      <input type="hidden" id="recruit_id">
+        이력서는 <strong>PDF 및 이미지(JPG, PNG)</strong> 파일만 업로드 가능하며,
+        파일당 최대 용량은 <strong>10MB</strong>입니다.<br>
+        등록된 개인정보 및 제출 서류는
+        인재 DB 관리 목적을 위해 최대 <strong>12개월</strong>간 보관되며,
+        보관 기간 경과 후에는 내부 정책에 따라 파기 또는 분리 보관됩니다.
+      </div>
 
       <div class="form-group">
         <input type="text" id="name" placeholder=" " required>
@@ -265,6 +294,7 @@
       <!-- 파일 업로드 -->
       <div class="file-group">
         <label>이력서 (필수)</label>
+        <div class="file-desc">PDF 또는 이미지(JPG, PNG)</div>
         <input type="file" id="file_resume" accept=".pdf,.jpg,.jpeg,.png" required>
       </div>
 
@@ -279,7 +309,22 @@
         <div class="file-desc">포트폴리오, 경력증빙 등</div>
       </div>
 
-      <button class="btn-submit" onclick="submitApplication()">지원서 제출</button>
+      <!-- 개인정보 수집·이용 동의 -->
+      <div class="privacy-box">
+        <label class="privacy-check">
+          <input type="checkbox" id="agree_privacy" required>
+          개인정보 수집·이용에 동의합니다. (필수)
+        </label>
+        <div class="privacy-desc">
+          • 수집 항목: 이름, 이메일, 지원 내용, 이력서 및 첨부 파일<br>
+          • 수집 목적: 인재 DB 관리 및 향후 채용 검토<br>
+          • 보관 기간: 인재 DB 관리 목적을 위해 최대 12개월간 보관되며,
+                      보관 기간 경과 후에는 내부 정책에 따라 파기 또는 분리 보관됩니다.<br><br>
+          ※ 개인정보 수집·이용에 대한 동의를 거부할 수 있으나, 동의하지 않을 경우 인재 DB 등록이 제한됩니다.
+        </div>
+      </div>
+
+      <button class="btn-submit" onclick="submitApplication()">인재 DB 등록</button>
     </div>
   </div>
 </div>
@@ -311,37 +356,36 @@ async function loadRecruitList() {
         ${item.employment_type} · ${item.career_level} · ${item.location}
       </div>
     `;
-    div.onclick = () => selectRecruit(item.id, item.title, div);
+
+    div.onclick = () => {
+      location.href = `/kr/support/recruit/recruit-view.html?id=${item.id}`;
+    };
+
     wrap.appendChild(div);
   });
-}
-
-function selectRecruit(id, title, el) {
-  // 선택된 recruit_id 저장
-  document.getElementById("recruit_id").value = id;
-
-  // 기존 active 제거
-  document.querySelectorAll(".recruit-item")
-    .forEach(item => item.classList.remove("active"));
-
-  // 현재 클릭한 카드 active
-  el.classList.add("active");
-
-  // 지원서 영역으로 스크롤
-  document.querySelector(".apply-wrapper")
-    .scrollIntoView({ behavior: "smooth" });
 }
 
 /* 지원서 제출 */
 async function submitApplication() {
 
-  if (!document.getElementById("recruit_id").value) {
-    alert("지원할 채용공고를 먼저 선택해주세요.");
+  if (!document.getElementById("agree_privacy").checked) {
+    alert("개인정보 수집·이용에 동의하셔야 인재 DB 등록이 가능합니다.");
+    return;
+  }
+
+  const resume = document.getElementById("file_resume").files[0];
+  if (!resume) {
+    alert("이력서를 첨부해주세요.");
+    return;
+  }
+
+  const MAX_SIZE = 10 * 1024 * 1024;
+  if (resume.size > MAX_SIZE) {
+    alert("이력서는 최대 10MB까지 업로드 가능합니다.");
     return;
   }
 
   const formData = new FormData();
-  formData.append("recruit_id", document.getElementById("recruit_id").value);
   formData.append("name", document.getElementById("name").value);
   formData.append("email", document.getElementById("email").value);
   formData.append("message", document.getElementById("message").value);
@@ -358,10 +402,10 @@ async function submitApplication() {
   });
 
   if (res.ok) {
-    alert("지원이 정상적으로 접수되었습니다.");
+    alert("인재 정보가 정상적으로 등록되었습니다.");
     location.reload();
   } else {
-    alert("지원 중 오류가 발생했습니다.");
+    alert("등록 중 오류가 발생했습니다.");
   }
 }
 
