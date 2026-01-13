@@ -170,7 +170,7 @@ function showSideTabs(list, trigger) {
       { d: "/pr/gallery/gallery-view",       i: "/pr/gallery/index.html" },
       { d: "/pr/certification/certification-view", i: "/pr/certification/index.html" },
       { d: "/pr/catalog/catalog-view",       i: "/pr/catalog/index.html" },
-      { d: "/support/downloads/downloads-view", i: "/support/downloads/index.html" },
+      //{ d: "/support/downloads/downloads-view", i: "/support/downloads/index.html" },
     ];
 
     DETAIL.forEach(m => {
@@ -289,12 +289,13 @@ function initBreadcrumbTabs() {
       tabs = LANG === "kr"
         ? [
             { name: "1:1 문의", link: `${base}/support/inquiry/index.html` },
-            { name: "자료실", link: `${base}/support/downloads/index.html` },
+    //        { name: "자료실", link: `${base}/support/downloads/index.html` },
             { name: "기술지원", link: `${base}/support/Technical_support/index.html` },
+            { name: "채용안내", link: `${base}/support/Technical_support/recruit.html` },
           ]
         : [
             { name: "Inquiry", link: `${base}/support/inquiry/index.html` },
-            { name: "Download", link: `${base}/support/downloads/index.html` },
+    //        { name: "Download", link: `${base}/support/downloads/index.html` },
             { name: "Technical Support", link: `${base}/support/Technical_support/index.html` },
           ];
     }
