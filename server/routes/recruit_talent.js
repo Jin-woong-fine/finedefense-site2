@@ -71,9 +71,9 @@ router.post(
         return res.status(400).json({ message: "이력서는 필수입니다" });
       }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return res.status(400).json({ message: "이메일 형식 오류" });
-    }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return res.status(400).json({ message: "이메일 형식 오류" });
+      }
 
       const resumePath = req.files.resume[0].filename;
       const coverPath = req.files.cover?.[0]?.filename || null;
@@ -84,7 +84,7 @@ router.post(
         req.socket.remoteAddress ||
         null;
 
-      const [result] = await db.execute(
+      await db.execute(
         `
         INSERT INTO recruit_talents
           (name, email, message,
@@ -103,6 +103,58 @@ router.post(
         ]
       );
 
+      /* ===============================
+         📧 메일 발송 (여기서!)
+      =============================== */
+
+      // 관리자 알림
+      try {
+        await transporter.sendMail({
+          from: `"Fine Defense Recruit" <${process.env.HIWORKS_USER}>`,
+          to: `
+            inquiry@finedefense.co.kr,
+            jwpark@finedefense.co.kr
+          `,
+          subject: "[채용] 인재 DB 신규 등록",
+          html: `
+            <h3>인재 DB 신규 등록</h3>
+            <p><b>이름:</b> ${name}</p>
+            <p><b>이메일:</b> ${email}</p>
+            <p><b>IP:</b> ${ip}</p>
+            <p>
+              이력서: ${resumePath ? "O" : "X"}<br>
+              자기소개서: ${coverPath ? "O" : "X"}<br>
+              포트폴리오: ${portfolioPath ? "O" : "X"}
+            </p>
+            <p>※ 파일은 관리자 페이지에서 확인하세요.</p>
+          `
+        });
+      } catch (e) {
+        console.error("관리자 메일 실패:", e);
+      }
+
+      // 지원자 자동 회신
+      try {
+        await transporter.sendMail({
+          from: `"Fine Defense" <${process.env.HIWORKS_USER}>`,
+          to: email,
+          subject: "[Fine Defense] 인재 DB 등록이 완료되었습니다",
+          html: `
+            <p>${name}님 안녕하세요.</p>
+            <p>Fine Defense 인재 DB에 정상적으로 등록되었습니다.</p>
+            <p>
+              등록해주신 정보는 향후 채용 진행 시 참고되며,<br>
+              관련 법령에 따라 최대 12개월간 보관됩니다.
+            </p>
+            <p style="color:#888;font-size:12px;">
+              본 메일은 자동 발송되었습니다.
+            </p>
+          `
+        });
+      } catch (e) {
+        console.error("지원자 메일 실패:", e);
+      }
+
       res.json({ message: "인재 DB 등록 완료" });
 
     } catch (err) {
@@ -111,58 +163,6 @@ router.post(
     }
   }
 );
-
-/* ============================================================
-   메일 송부
-============================================================ */
-
-const transporter = nodemailer.createTransport({
-  host: "smtp.hiworks.com",
-  port: 465,
-  secure: true,
-  auth: {
-    user: process.env.HIWORKS_USER,
-    pass: process.env.HIWORKS_PASS
-  }
-});
-
-await transporter.sendMail({
-  from: `"Fine Defense Recruit" <${process.env.HIWORKS_USER}>`,
-  to: `
-    inquiry@finedefense.co.kr,
-    jwpark@finedefense.co.kr,
-  `,
-  subject: "[채용] 인재 DB 신규 등록",
-  html: `
-    <h3>인재 DB 신규 등록</h3>
-    <p><b>이름:</b> ${name}</p>
-    <p><b>이메일:</b> ${email}</p>
-    <p><b>IP:</b> ${ip}</p>
-    <p>
-      이력서: ${resumePath ? "O" : "X"}<br>
-      자기소개서: ${coverPath ? "O" : "X"}<br>
-      포트폴리오: ${portfolioPath ? "O" : "X"}
-    </p>
-    <p>※ 파일은 관리자 페이지에서 확인하세요.</p>
-  `
-});
-
-await transporter.sendMail({
-  from: `"Fine Defense" <${process.env.HIWORKS_USER}>`,
-  to: email,
-  subject: "[Fine Defense] 인재 DB 등록이 완료되었습니다",
-  html: `
-    <p>${name}님 안녕하세요.</p>
-    <p>Fine Defense 인재 DB에 정상적으로 등록되었습니다.</p>
-    <p>
-      등록해주신 정보는 향후 채용 진행 시 참고되며,<br>
-      관련 법령에 따라 최대 12개월간 보관됩니다.
-    </p>
-    <p style="color:#888;font-size:12px;">
-      본 메일은 자동 발송되었습니다.
-    </p>
-  `
-});
 
 
 
