@@ -176,3 +176,19 @@
 .main-menu > li > a:hover {
   color: #0f2679;
 }
+
+
+/* ===============================================
+   ✅ Breadcrumb Home Link — FORCE FIX
+=============================================== */
+
+.breadcrumb a.breadcrumb-home {
+  color: #0f2679;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.breadcrumb a.breadcrumb-home:hover {
+  color: #193aaf;
+  text-decoration: underline;
+}
