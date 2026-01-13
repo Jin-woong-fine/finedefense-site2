@@ -72,10 +72,20 @@
         font-weight: 600;
     }
 
+    /* 선택된 채용공고 */
+    .recruit-item.active {
+      border: 2px solid var(--accent);
+      box-shadow: 0 12px 32px rgba(0,113,227,0.25);
+    }
+
     .recruit-meta {
         font-size: 15px;
         color: var(--subtext);
     }
+
+
+
+
 
     /* ===============================
         지원서 카드
@@ -167,15 +177,6 @@
         background: #005ecb;
     }
 
-    @media (max-width: 768px) {
-        .apply-wrapper {
-        padding: 36px 28px;
-        }
-
-        .section-title {
-        font-size: 26px;
-        }
-    }
     </style>
 
 </head>
@@ -287,19 +288,35 @@ async function loadRecruitList() {
         ${item.employment_type} · ${item.career_level} · ${item.location}
       </div>
     `;
-    div.onclick = () => selectRecruit(item.id, item.title);
+    div.onclick = () => selectRecruit(item.id, item.title, div);
     wrap.appendChild(div);
   });
 }
 
-function selectRecruit(id, title) {
+function selectRecruit(id, title, el) {
+  // 선택된 recruit_id 저장
   document.getElementById("recruit_id").value = id;
-  alert(`선택된 채용공고: ${title}`);
-  window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+
+  // 기존 active 제거
+  document.querySelectorAll(".recruit-item")
+    .forEach(item => item.classList.remove("active"));
+
+  // 현재 클릭한 카드 active
+  el.classList.add("active");
+
+  // 지원서 영역으로 스크롤
+  document.querySelector(".apply-wrapper")
+    .scrollIntoView({ behavior: "smooth" });
 }
 
 /* 지원서 제출 */
 async function submitApplication() {
+
+  if (!document.getElementById("recruit_id").value) {
+    alert("지원할 채용공고를 먼저 선택해주세요.");
+    return;
+  }
+
   const formData = new FormData();
   formData.append("recruit_id", document.getElementById("recruit_id").value);
   formData.append("name", document.getElementById("name").value);
