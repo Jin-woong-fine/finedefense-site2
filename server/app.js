@@ -41,6 +41,9 @@ import helmet from "helmet";
 
 import auditLogsRouter from "./routes/audit_logs.js";
 
+import recruitRoutes from "./routes/recruit.js";
+
+
 const app = express();
 
 app.set("trust proxy", 1);
@@ -63,8 +66,8 @@ app.use(helmet());
 
 app.use("/api/audit", auditLogsRouter);
 
-
-
+// 채용공고 및 인재DB관리
+app.use("/api/recruit", recruitRoutes);
 
 
 // ------------------------------------------------------

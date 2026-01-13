@@ -221,5 +221,150 @@ document.querySelectorAll(".tab-btn").forEach(btn => {
 });
 </script>
 
+
+<script>
+requireEditPermission();
+loadSidebar("recruit");
+
+/* ===============================
+   TAB SWITCH
+=============================== */
+document.querySelectorAll(".tab-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const tab = btn.dataset.tab;
+
+    document.querySelectorAll(".tab-btn")
+      .forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    document.querySelectorAll(".tab-panel")
+      .forEach(p => p.classList.remove("active"));
+    document.getElementById("tab-" + tab)
+      .classList.add("active");
+  });
+});
+
+/* ===============================
+   채용공고 로드
+=============================== */
+async function loadRecruitPosts() {
+  const res = await fetch("/api/recruit/admin/list", {
+    headers: {
+      Authorization: "Bearer " + localStorage.getItem("token")
+    }
+  });
+  const list = await res.json();
+
+  const tbody = document.querySelector("#tab-recruit tbody");
+  tbody.innerHTML = "";
+
+  list.forEach((r, i) => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${i + 1}</td>
+        <td>${r.title}</td>
+        <td>${r.employment_type || "-"}</td>
+        <td>${r.career_level || "-"}</td>
+        <td>${r.location || "-"}</td>
+        <td>${r.is_active ? "공개" : "비공개"}</td>
+        <td>
+          <div class="actions">
+            <button class="btn btn-small btn-gray"
+              onclick="editRecruit(${r.id})">수정</button>
+            <button class="btn btn-small btn-danger"
+              onclick="toggleRecruit(${r.id}, ${r.is_active})">
+              ${r.is_active ? "비공개" : "공개"}
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+/* ===============================
+   인재 DB 로드
+=============================== */
+async function loadTalentDB() {
+  const res = await fetch("/api/recruit/admin/talents", {
+    headers: {
+      Authorization: "Bearer " + localStorage.getItem("token")
+    }
+  });
+  const list = await res.json();
+
+  const tbody = document.querySelector("#tab-talent tbody");
+  tbody.innerHTML = "";
+
+  list.forEach((t, i) => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${i + 1}</td>
+        <td>${t.name}</td>
+        <td>${t.email}</td>
+        <td>${t.created_at.slice(0,10)}</td>
+        <td>${t.resume_path ? "O" : "-"}</td>
+        <td>
+          <div class="actions">
+            <button class="btn btn-small btn-gray"
+              onclick="viewTalent(${t.id})">상세</button>
+            <button class="btn btn-small btn-danger"
+              onclick="deleteTalent(${t.id})">삭제</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+/* ===============================
+   액션
+=============================== */
+function editRecruit(id) {
+  location.href = `/kr/admin/recruit-edit.html?id=${id}`;
+}
+
+async function toggleRecruit(id, active) {
+  if (!confirm("상태를 변경하시겠습니까?")) return;
+
+  await fetch(`/api/recruit/admin/toggle/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + localStorage.getItem("token")
+    },
+    body: JSON.stringify({ is_active: active ? 0 : 1 })
+  });
+
+  loadRecruitPosts();
+}
+
+async function deleteTalent(id) {
+  if (!confirm("인재 정보를 삭제하시겠습니까?")) return;
+
+  await fetch(`/api/recruit/admin/talent/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: "Bearer " + localStorage.getItem("token")
+    }
+  });
+
+  loadTalentDB();
+}
+
+function viewTalent(id) {
+  window.open(`/kr/admin/talent-view.html?id=${id}`, "_blank");
+}
+
+/* ===============================
+   INIT
+=============================== */
+loadRecruitPosts();
+loadTalentDB();
+</script>
+
+
+
+
 </body>
 </html>
