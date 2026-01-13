@@ -208,9 +208,9 @@ document.addEventListener("DOMContentLoaded", () => {
       addImageBlobHook: async (blob, callback) => {
         try {
           const formData = new FormData();
-          formData.append("image", blob); // ⚠️ multer field name = image
+          formData.append("image", blob);
 
-          const res = await fetch("/api/uploads-editor/image", {
+          const res = await fetch("/api/uploads/editor/image", {
             method: "POST",
             headers: {
               Authorization: "Bearer " + localStorage.getItem("token")
@@ -219,25 +219,24 @@ document.addEventListener("DOMContentLoaded", () => {
           });
 
           if (!res.ok) {
-            throw new Error("이미지 업로드 실패");
+            const text = await res.text();
+            throw new Error(text);
           }
 
           const result = await res.json();
-
-          // ⭐ 서버에서 내려준 URL 그대로 사용
           callback(result.url, blob.name);
 
         } catch (err) {
-          console.error(err);
-          alert("이미지 업로드에 실패했습니다.");
+          console.error("❌ 이미지 업로드 실패:", err);
+          alert("이미지 업로드 실패");
         }
       }
     }
   });
 });
 
-// 기존 코드 유지
 loadSidebar("recruit");
+
 
 const params = new URLSearchParams(location.search);
 const recruitId = params.get("id");
