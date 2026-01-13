@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1200">
+  <title>채용공고 | Fine Defense</title>
+
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/sub-banner.css">
+
+  <style>
+    .view-wrap {
+      max-width: 900px;
+      margin: 50px auto 120px;
+      background: #fff;
+      padding: 48px 56px;
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+    }
+
+    .title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #0f2679;
+      margin-bottom: 12px;
+    }
+
+    .meta {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 36px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .meta span::after {
+      content: "·";
+      margin-left: 10px;
+    }
+    .meta span:last-child::after {
+      content: "";
+    }
+
+    .article-body {
+      font-size: 0.95rem;
+      line-height: 1.75;
+      color: #333;
+    }
+
+    .article-body img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .article-body p {
+      margin-bottom: 14px;
+    }
+
+    .apply-box {
+      margin-top: 60px;
+      padding: 32px;
+      background: #f5f7fb;
+      border-radius: 16px;
+      text-align: center;
+    }
+
+    .apply-box h3 {
+      font-size: 1.2rem;
+      margin-bottom: 12px;
+      color: #0f2679;
+    }
+
+    .apply-box p {
+      font-size: 0.9rem;
+      color: #555;
+      margin-bottom: 20px;
+    }
+
+    .apply-btn {
+      display: inline-block;
+      padding: 14px 26px;
+      background: #0f2679;
+      color: #fff;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .apply-btn:hover {
+      background: #0c1f63;
+    }
+
+    .back-btn {
+      margin-top: 50px;
+      display: inline-block;
+      padding: 10px 18px;
+      background: #e5e7eb;
+      color: #333;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    .breadcrumb .crumb {
+      color: #0f2679 !important;
+      font-weight: 600 !important;
+    }
+
+    .breadcrumb .crumb.active {
+      font-weight: 700 !important;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- 관리자 세션바 -->
+<div id="adminBarContainer" data-include="/kr/components/admin-session-bar.html"></div>
+
+<!-- 공통 헤더 -->
+<div id="headerContainer" data-include="/kr/components/header.html"></div>
+
+<section class="sub-banner">
+  <img src="/img/sub-banners/subbanner_support_6.png" alt="채용안내">
+  <div class="banner-text">
+    <h1>고객지원</h1>
+    <p>Fine Defense와 함께할 인재를 기다립니다.</p>
+  </div>
+</section>
+
+<div class="breadcrumb">
+  <a href="/kr/index.html">홈</a> &gt;
+  <span class="crumb crumb-level1 active">고객지원</span> &gt;
+  <span class="crumb crumb-level2 active">채용안내</span>
+  <div id="side-tabs"></div>
+</div>
+
+<div class="view-wrap">
+
+  <h1 class="title" id="title"></h1>
+
+  <div class="meta" id="meta"></div>
+
+  <!-- 🔥 채용공고 본문 (HTML 그대로 출력) -->
+  <div id="viewer" class="article-body"></div>
+
+  <!-- 지원 안내 -->
+  <div class="apply-box">
+    <h3>지원 방법</h3>
+    <p>
+      본 채용공고에 지원을 희망하시는 경우,<br>
+      인재 DB 등록 페이지를 통해 지원서를 제출해 주세요.
+    </p>
+  </div>
+
+  <a href="index.html" class="back-btn">목록으로</a>
+
+</div>
+
+<!-- 공통 푸터 -->
+<div data-include="/kr/components/footer.html"></div>
+
+<!-- 공통 스크립트 -->
+<script src="/js/include.js"></script>
+<script src="/js/session_timer.js"></script>
+<script src="/js/language.js"></script>
+<script src="/js/nav.js"></script>
+
+<script>
+  const id = new URLSearchParams(location.search).get("id");
+  if (!id) location.href = "index.html";
+
+  loadRecruit();
+
+  async function loadRecruit() {
+    try {
+      const res = await fetch(`/api/recruit/public/detail/${id}`);
+      if (!res.ok) throw new Error("불러오기 실패");
+
+      const data = await res.json();
+
+      document.getElementById("title").textContent = data.title;
+
+      document.getElementById("meta").innerHTML = `
+        <span>${data.employment_type || "-"}</span>
+        <span>${data.career_level || "-"}</span>
+        <span>${data.location || "-"}</span>
+        <span>${new Date(data.created_at).toLocaleDateString()}</span>
+      `;
+
+      document.getElementById("viewer").innerHTML = data.content || "";
+
+    } catch (err) {
+      alert("채용공고를 불러올 수 없습니다.");
+      location.href = "index.html";
+    }
+  }
+</script>
+
+</body>
+</html>

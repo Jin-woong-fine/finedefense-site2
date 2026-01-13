@@ -4,7 +4,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import db from "../config/db.js";
-import Audit from "../utils/auditLogger.js";
+import nodemailer from "nodemailer";
 
 const router = express.Router();
 
@@ -111,5 +111,59 @@ router.post(
     }
   }
 );
+
+/* ============================================================
+   메일 송부
+============================================================ */
+
+const transporter = nodemailer.createTransport({
+  host: "smtp.hiworks.com",
+  port: 465,
+  secure: true,
+  auth: {
+    user: process.env.HIWORKS_USER,
+    pass: process.env.HIWORKS_PASS
+  }
+});
+
+await transporter.sendMail({
+  from: `"Fine Defense Recruit" <${process.env.HIWORKS_USER}>`,
+  to: `
+    inquiry@finedefense.co.kr,
+    jwpark@finedefense.co.kr,
+  `,
+  subject: "[채용] 인재 DB 신규 등록",
+  html: `
+    <h3>인재 DB 신규 등록</h3>
+    <p><b>이름:</b> ${name}</p>
+    <p><b>이메일:</b> ${email}</p>
+    <p><b>IP:</b> ${ip}</p>
+    <p>
+      이력서: ${resumePath ? "O" : "X"}<br>
+      자기소개서: ${coverPath ? "O" : "X"}<br>
+      포트폴리오: ${portfolioPath ? "O" : "X"}
+    </p>
+    <p>※ 파일은 관리자 페이지에서 확인하세요.</p>
+  `
+});
+
+await transporter.sendMail({
+  from: `"Fine Defense" <${process.env.HIWORKS_USER}>`,
+  to: email,
+  subject: "[Fine Defense] 인재 DB 등록이 완료되었습니다",
+  html: `
+    <p>${name}님 안녕하세요.</p>
+    <p>Fine Defense 인재 DB에 정상적으로 등록되었습니다.</p>
+    <p>
+      등록해주신 정보는 향후 채용 진행 시 참고되며,<br>
+      관련 법령에 따라 최대 12개월간 보관됩니다.
+    </p>
+    <p style="color:#888;font-size:12px;">
+      본 메일은 자동 발송되었습니다.
+    </p>
+  `
+});
+
+
 
 export default router;
