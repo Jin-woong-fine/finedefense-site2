@@ -1,4 +1,4 @@
-// server/routes/posts_recruit.js
+// server/routes/recruit.js
 import express from "express";
 import db from "../config/db.js";
 import { verifyToken, canDelete } from "../middleware/auth.js";
@@ -8,22 +8,9 @@ const router = express.Router();
 
 
 /* ===============================
-   관리자 – 채용공고 목록
-=============================== */
-router.get("/admin/list", verifyToken, async (req, res) => {
-  const [rows] = await db.execute(`
-    SELECT *
-    FROM recruit_posts
-    ORDER BY sort_order ASC, created_at DESC
-  `);
-  res.json(rows);
-});
-
-
-/* ===============================
    관리자 – 채용공고 공개/비공개
 =============================== */
-router.put("/admin/toggle/:id", verifyToken, async (req, res) => {
+router.put("/toggle/:id", verifyToken, async (req, res) => {
   const id = Number(req.params.id);
   const { is_active } = req.body;
 
@@ -238,7 +225,7 @@ router.get("/:id", verifyToken, async (req, res) => {
 /* ===============================
    관리자 – 인재 DB 목록
 =============================== */
-router.get("/admin/talents", verifyToken, async (req, res) => {
+router.get("/talents", verifyToken, async (req, res) => {
   const [rows] = await db.execute(`
     SELECT id, name, email, resume_path, created_at
     FROM recruit_talents
@@ -250,7 +237,7 @@ router.get("/admin/talents", verifyToken, async (req, res) => {
 /* ===============================
    관리자 – 인재 DB 삭제
 =============================== */
-router.delete("/admin/talent/:id", verifyToken, canDelete, async (req, res) => {
+router.delete("/talent/:id", verifyToken, canDelete, async (req, res) => {
   const id = Number(req.params.id);
 
   await db.execute(`DELETE FROM recruit_talents WHERE id=?`, [id]);
