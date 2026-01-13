@@ -45,28 +45,19 @@
     /* ===============================
         채용공고 카드
     =============================== */
-    .recruit-list {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 16px;
-        margin-bottom: 80px;
-    }
-
     .recruit-item {
-      background: transparent;
-      box-shadow: none;
-      border-radius: 0;
-      padding: 24px 8px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .recruit-item:last-child {
-      border-bottom: none;
+      position: relative;
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 24px 26px;
+      border: 1px solid #e6ebf3;
+      cursor: pointer;
+      transition: box-shadow 0.2s ease, transform 0.15s ease;
     }
 
     .recruit-item:hover {
-      background: #f9f9fb;
-      transform: none;
+      box-shadow: 0 10px 26px rgba(15, 38, 121, 0.08);
+      transform: translateY(-2px);
     }
 
     .recruit-item h3 {
@@ -86,6 +77,20 @@
         color: var(--subtext);
     }
 
+    .recruit-item::before {
+      content: "";
+      position: absolute;      /* ⭐ absolute */
+      left: 0;
+      top: 16px;
+      bottom: 16px;
+      width: 3px;
+      background: transparent;
+      border-radius: 2px;
+    }
+
+    .recruit-item:hover::before {
+      background: var(--accent);
+    }
 
 
 
@@ -221,52 +226,6 @@
     }
 
 
-    /* ===============================
-      채용공고 리스트 개선
-    =============================== */
-
-    .recruit-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-      margin-bottom: 80px;
-    }
-
-    .recruit-item {
-      background: #ffffff;
-      border-radius: 14px;
-      padding: 24px 26px;
-      margin-bottom: 14px;
-      border: 1px solid #e6ebf3;
-      cursor: pointer;
-      transition: box-shadow 0.2s ease, transform 0.15s ease;
-    }
-
-    .recruit-item:last-child {
-      margin-bottom: 0;
-    }
-
-    .recruit-item:hover {
-      box-shadow: 0 10px 26px rgba(15, 38, 121, 0.08);
-      transform: translateY(-2px);
-    }
-
-    /* 포인트 바 */
-    .recruit-item::before {
-      content: "";
-      position: absolute;
-      left: 0;
-      top: 18px;
-      bottom: 18px;
-      width: 3px;
-      background: transparent;
-    }
-
-
-    .recruit-item:hover::before {
-      background: var(--accent);
-    }
-
     /* 제목 */
     .recruit-item h3 {
       font-size: 20px;
@@ -306,6 +265,7 @@
     }
 
 
+
     </style>
 
 </head>
@@ -342,7 +302,7 @@
   <div class="recruit-card">
 
     <!-- 채용공고 -->
-    <div class="recruit-section"></div>
+    <div class="recruit-section">
       <div class="section-title">채용 공고</div>
       <div class="recruit-list" id="recruitList">
         <!-- 관리자 DB에서 로드 -->
