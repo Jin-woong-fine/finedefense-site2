@@ -12,12 +12,13 @@
 
     <style>
     :root {
-        --bg: #f5f5f7;
-        --card: #ffffff;
-        --text: #1d1d1f;
-        --subtext: #6e6e73;
-        --accent: #0071e3;
-        --border: #e5e5ea;
+      --bg: #f6f7f9;
+      --card: #ffffff;
+      --text: #1f2937;        /* 메인 텍스트 */
+      --subtext: #6b7280;     /* 🔥 더 연한 회색 */
+      --muted: #9ca3af;       /* 보조 정보 */
+      --accent: #2563eb;      /* 덜 튀는 블루 */
+      --border: #e5e7eb;
     }
 
     body {
@@ -36,34 +37,33 @@
     }
 
     .section-title {
-        font-size: 32px;
-        font-weight: 700;
-        margin-bottom: 24px;
-        letter-spacing: -0.02em;
+      font-size: 26px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 20px;
+      letter-spacing: -0.015em;
     }
 
     /* ===============================
         채용공고 카드
     =============================== */
     .recruit-item {
-      position: relative;
       background: #ffffff;
       border-radius: 14px;
-      padding: 24px 26px;
-      border: 1px solid #e6ebf3;
-      cursor: pointer;
-      transition: box-shadow 0.2s ease, transform 0.15s ease;
+      padding: 20px 24px;
+      border: 1px solid var(--border);
     }
 
     .recruit-item:hover {
-      box-shadow: 0 10px 26px rgba(15, 38, 121, 0.08);
-      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
     }
 
     .recruit-item h3 {
-        font-size: 20px;
-        margin: 0 0 8px;
-        font-weight: 600;
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+      line-height: 1.4;
     }
 
     /* 선택된 채용공고 */
@@ -73,8 +73,9 @@
     }
 
     .recruit-meta {
-        font-size: 15px;
-        color: var(--subtext);
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
     }
 
     .recruit-item::before {
@@ -99,15 +100,15 @@
         지원서 카드
     =============================== */
     .apply-wrapper {
-      background: #fafbff;
+      background: #f9fafb;
       border-radius: 20px;
-      padding: 48px 56px;
+      padding: 44px 48px;
     }
 
     .apply-desc {
-        font-size: 15px;
-        color: var(--subtext);
-        margin-bottom: 40px;
+      font-size: 14px;
+      color: var(--subtext);
+      line-height: 1.7;
     }
 
     /* ===============================
