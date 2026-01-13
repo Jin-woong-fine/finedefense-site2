@@ -214,6 +214,17 @@
         pointer-events: auto;
       }
 
+      /* breadcrumb Home link force style */
+      .breadcrumb-home {
+        color: #0f2679 !important;
+        font-weight: 600;
+        text-decoration: none;
+      }
+
+      .breadcrumb-home:hover {
+        color: #193aaf !important;
+        text-decoration: underline;
+      }
 
     </style>
   </head>
@@ -236,7 +247,7 @@
   <!-- Breadcrumb -->
 <div class="breadcrumb-wrap">
   <div class="breadcrumb">
-    <a href="/en">Home</a> &gt;
+    <a href="/en" class="breadcrumb-home">Home</a> &gt;
     <span class="crumb crumb-level1">About Us</span> &gt;
     <span class="crumb crumb-level2">Our History</span>
 
