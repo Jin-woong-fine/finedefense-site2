@@ -4,9 +4,6 @@ import { verifyToken, allowRoles } from "../middleware/auth.js";
 
 const router = express.Router();
 
-
-
-
 function safeParse(v) {
   if (!v) return null;
   if (typeof v === "object") return v;

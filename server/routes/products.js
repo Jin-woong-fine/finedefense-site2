@@ -249,21 +249,9 @@ router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
-    // ⭐ BEFORE 데이터 (audit)
-    const [[before]] = await db.execute(
-      `SELECT *
-        FROM products
-        WHERE id = ?`,
-      [id]
-    );
-
     if (!before) {
       return res.status(404).json({ message: "product not found" });
     }
-
-
-
-
 
     const lang = req.query.lang || "kr";
 
@@ -407,6 +395,18 @@ router.put("/:id", verifyToken, verifyEditor, (req, res) => {
           [values]
         );
       }
+
+
+      await Promise.all(
+        keep.map((filename, index) =>
+          db.query(
+            `UPDATE product_images
+            SET sort_order=?
+            WHERE product_id=? AND url=?`,
+            [index, target.id, "/uploads/products/" + filename]
+          )
+        )
+      );
 
       const newThumb =
         keep[0]
@@ -584,8 +584,31 @@ router.delete("/:id", verifyToken, verifyAdmin, async (req, res) => {
       if (fs.existsSync(p)) fs.unlinkSync(p);
     });
 
-    await db.execute(`DELETE FROM product_images WHERE product_id=?`, [id]);
-    await db.execute(`DELETE FROM products WHERE id=?`, [id]);
+    const [[base]] = await db.execute(
+      `SELECT group_id FROM products WHERE id=?`,
+      [id]
+    );
+
+    const [products] = await db.execute(
+      `SELECT id FROM products WHERE group_id=?`,
+      [base.group_id]
+    );
+
+    const ids = products.map(p => p.id);
+
+    const [imgs] = await db.query(
+      `SELECT url FROM product_images WHERE product_id IN (?)`,
+      [ids]
+    );
+
+    imgs.forEach(i => {
+      const p = path.join(uploadDir, i.url.replace("/uploads/products/", ""));
+      if (fs.existsSync(p)) fs.unlinkSync(p);
+    });
+
+    await db.query(`DELETE FROM product_images WHERE product_id IN (?)`, [ids]);
+    await db.query(`DELETE FROM products WHERE id IN (?)`, [ids]);
+
 
     await Audit.log({
       contentType: Audit.CONTENT_TYPE.PRODUCT,
