@@ -94,9 +94,9 @@
         지원서 카드
     =============================== */
     .apply-wrapper {
-      background: transparent;
-      padding: 0;
-      box-shadow: none;
+      background: #fafbff;
+      border-radius: 20px;
+      padding: 48px 56px;
     }
 
     .apply-desc {
@@ -233,32 +233,35 @@
     }
 
     .recruit-item {
-      position: relative;
-      padding: 28px 12px 28px 20px;
-      border-bottom: 1px solid var(--border);
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 24px 26px;
+      margin-bottom: 14px;
+      border: 1px solid #e6ebf3;
       cursor: pointer;
-      transition: background 0.2s ease;
+      transition: box-shadow 0.2s ease, transform 0.15s ease;
     }
 
     .recruit-item:last-child {
-      border-bottom: none;
+      margin-bottom: 0;
     }
 
     .recruit-item:hover {
-      background: #f7f9fc;
+      box-shadow: 0 10px 26px rgba(15, 38, 121, 0.08);
+      transform: translateY(-2px);
     }
 
-    /* 왼쪽 포인트 바 */
+    /* 포인트 바 */
     .recruit-item::before {
       content: "";
       position: absolute;
       left: 0;
-      top: 20px;
-      bottom: 20px;
+      top: 18px;
+      bottom: 18px;
       width: 3px;
       background: transparent;
-      transition: background 0.2s ease;
     }
+
 
     .recruit-item:hover::before {
       background: var(--accent);
@@ -291,7 +294,16 @@
       content: "";
     }
 
+    /* ===============================
+      채용공고 섹션 배경
+    =============================== */
 
+    .recruit-section {
+      background: #f7f9fc;
+      border-radius: 20px;
+      padding: 36px 40px;
+      margin-bottom: 80px;
+    }
 
 
     </style>
@@ -330,9 +342,11 @@
   <div class="recruit-card">
 
     <!-- 채용공고 -->
-    <div class="section-title">채용 공고</div>
-    <div class="recruit-list" id="recruitList">
-      <!-- 관리자 DB에서 로드 -->
+    <div class="recruit-section"></div>
+      <div class="section-title">채용 공고</div>
+      <div class="recruit-list" id="recruitList">
+        <!-- 관리자 DB에서 로드 -->
+      </div>
     </div>
 
     <!-- 지원하기 -->
