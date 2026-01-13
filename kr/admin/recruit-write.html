@@ -16,7 +16,8 @@
       padding:30px 34px;
       border-radius:12px;
       box-shadow:0 6px 20px rgba(15,38,121,0.08);
-      max-width:900px;
+      max-width: 1000px;   /* 또는 1100px */
+      margin: 0 auto;      /* 중앙 정렬 보장 */
     }
 
     .form-group {
@@ -38,7 +39,8 @@
     }
 
     textarea {
-      min-height:220px;
+      min-height: 260px;
+      line-height: 1.6;
       resize:vertical;
     }
 
@@ -47,7 +49,38 @@
       justify-content:flex-end;
       gap:10px;
       margin-top:30px;
+      border-top: 1px solid #e1e6f5;
+      padding-top: 20px;
     }
+
+    .checkbox-group {
+    margin-top: 10px;
+    }
+
+    .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    }
+
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+    outline: none;
+    border-color: #0f2679;
+    box-shadow: 0 0 0 2px rgba(15,38,121,0.15);
+    }
+
+    .required {
+    color: #d9534f;
+    font-weight: 700;
+    margin-left: 2px;
+    }
+
+
   </style>
 </head>
 
@@ -67,7 +100,7 @@
   <section class="panel">
 
     <div class="form-group">
-      <label>공고 제목</label>
+      <label>공고 제목 <span class="required">*</span></label>
       <input type="text" id="title" placeholder="채용공고 제목">
     </div>
 
@@ -107,11 +140,11 @@
       <textarea id="content" placeholder="채용 상세 내용"></textarea>
     </div>
 
-    <div class="form-group">
-      <label>
+    <div class="form-group checkbox-group">
+    <label class="checkbox-label">
         <input type="checkbox" id="is_active" checked>
         공개 상태
-      </label>
+    </label>
     </div>
 
     <div class="btns">
