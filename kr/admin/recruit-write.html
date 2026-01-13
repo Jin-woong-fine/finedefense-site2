@@ -54,19 +54,20 @@
     }
 
     .checkbox-group {
-    margin-top: 10px;
+    margin-top: 20px;
     }
 
     .checkbox-label {
     display: flex;
     align-items: center;
     gap: 8px;
-    }
-
-    .checkbox-label label {
-    margin: 0;
     font-weight: 600;
     cursor: pointer;
+    }
+
+    /* 기존 label block 스타일 영향 제거 */
+    .checkbox-label {
+    margin-bottom: 0;
     }
 
 
@@ -145,10 +146,10 @@
     </div>
 
     <div class="form-group checkbox-group">
-    <div class="checkbox-label">
+    <label class="checkbox-label">
         <input type="checkbox" id="is_active" checked>
-        <label for="is_active">공개 상태</label>
-    </div>
+        공개 상태
+    </label>
     </div>
 
 
