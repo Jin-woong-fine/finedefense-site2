@@ -7,30 +7,6 @@ import Audit from "../utils/auditLogger.js";
 const router = express.Router();
 
 
-// 🔓 공개용 채용공고 목록 (비로그인)
-router.get("/public/list", async (req, res) => {
-  try {
-    const [rows] = await db.execute(`
-      SELECT
-        id,
-        title,
-        employment_type,
-        career_level,
-        location
-      FROM recruit_posts
-      WHERE is_active = 1
-      ORDER BY sort_order ASC, created_at DESC
-    `);
-
-    res.json(rows);
-  } catch (err) {
-    console.error("공개 채용공고 목록 오류:", err);
-    res.status(500).json({ message: "error" });
-  }
-});
-
-
-
 
 /* ===============================
    관리자 – 채용공고 공개/비공개
@@ -57,15 +33,43 @@ router.put("/toggle/:id", verifyToken, async (req, res) => {
 });
 
 
-// 공개용 채용공고 목록
+/* ============================================================
+   🔓 공개용 채용공고 API (비로그인)
+============================================================ */
+
+// 공개 채용공고 목록
 router.get("/public/list", async (req, res) => {
-  const [rows] = await db.execute(`
-    SELECT id, title, employment_type, career_level, location
-    FROM recruit_posts
-    WHERE is_active = 1
-    ORDER BY sort_order ASC, created_at DESC
-  `);
-  res.json(rows);
+  try {
+    const [rows] = await db.execute(`
+      SELECT id, title, employment_type, career_level, location
+      FROM recruit_posts
+      WHERE is_active = 1
+      ORDER BY sort_order ASC, created_at DESC
+    `);
+    res.json(rows);
+  } catch (err) {
+    console.error("공개 채용공고 목록 오류:", err);
+    res.status(500).json({ message: "error" });
+  }
+});
+
+// 공개 채용공고 상세
+router.get("/public/:id", async (req, res) => {
+  try {
+    const [[row]] = await db.execute(
+      `SELECT * FROM recruit_posts WHERE id=? AND is_active=1`,
+      [req.params.id]
+    );
+
+    if (!row) {
+      return res.status(404).json({ message: "not found" });
+    }
+
+    res.json(row);
+  } catch (err) {
+    console.error("공개 채용공고 상세 오류:", err);
+    res.status(500).json({ message: "error" });
+  }
 });
 
 
@@ -97,19 +101,16 @@ router.post("/create", verifyToken, async (req, res) => {
       [title, employment_type, career_level, location, content, sort_order]
     );
 
-    const postId = result.insertId;
-
     await Audit.log({
       contentType: Audit.CONTENT_TYPE.RECRUIT,
-      contentId: postId,
+      contentId: result.insertId,
       action: Audit.ACTION.CREATE,
       actor: req.user,
       after: { title, employment_type, career_level, location, sort_order },
       req
     });
 
-    res.json({ message: "채용공고 등록 완료", id: postId });
-
+    res.json({ message: "채용공고 등록 완료" });
   } catch (err) {
     console.error("📌 채용공고 등록 오류:", err);
     res.status(500).json({ message: "채용공고 등록 오류" });
@@ -120,69 +121,55 @@ router.post("/create", verifyToken, async (req, res) => {
    📌 채용공고 수정
 ============================================================ */
 router.put("/update/:id", verifyToken, async (req, res) => {
-  try {
-    const id = Number(req.params.id);
-    const {
-      title,
-      employment_type,
-      career_level,
-      location,
-      content,
-      sort_order,
-      is_active
-    } = req.body;
+  const id = Number(req.params.id);
 
-    const [[before]] = await db.execute(
-      `SELECT * FROM recruit_posts WHERE id=?`,
-      [id]
-    );
+  const [[before]] = await db.execute(
+    `SELECT * FROM recruit_posts WHERE id=?`,
+    [id]
+  );
 
-    if (!before) {
-      return res.status(404).json({ message: "채용공고 없음" });
-    }
-
-    await db.execute(
-      `
-      UPDATE recruit_posts SET
-        title = COALESCE(?, title),
-        employment_type = COALESCE(?, employment_type),
-        career_level = COALESCE(?, career_level),
-        location = COALESCE(?, location),
-        content = COALESCE(?, content),
-        sort_order = COALESCE(?, sort_order),
-        is_active = COALESCE(?, is_active),
-        updated_at = NOW()
-      WHERE id=?
-      `,
-      [
-        title,
-        employment_type,
-        career_level,
-        location,
-        content,
-        sort_order,
-        is_active,
-        id
-      ]
-    );
-
-    await Audit.log({
-      contentType: Audit.CONTENT_TYPE.RECRUIT,
-      contentId: id,
-      action: Audit.ACTION.UPDATE,
-      actor: req.user,
-      before,
-      after: req.body,
-      req
-    });
-
-    res.json({ message: "채용공고 수정 완료" });
-
-  } catch (err) {
-    console.error("📌 채용공고 수정 오류:", err);
-    res.status(500).json({ message: "수정 오류" });
+  if (!before) {
+    return res.status(404).json({ message: "채용공고 없음" });
   }
+
+  await db.execute(
+    `
+    UPDATE recruit_posts SET
+      title = COALESCE(?, title),
+      employment_type = COALESCE(?, employment_type),
+      career_level = COALESCE(?, career_level),
+      location = COALESCE(?, location),
+      content = COALESCE(?, content),
+      sort_order = COALESCE(?, sort_order),
+      is_active = COALESCE(?, is_active),
+      updated_at = NOW()
+    WHERE id=?
+    `,
+    [
+      req.body.title,
+      req.body.employment_type,
+      req.body.career_level,
+      req.body.location,
+      req.body.content,
+      req.body.sort_order,
+      req.body.is_active,
+      id
+    ]
+  );
+
+  await Audit.log({
+    contentType: Audit.CONTENT_TYPE.RECRUIT,
+    contentId: id,
+    action: Audit.ACTION.UPDATE,
+    actor: req.user,
+    before,
+    after: req.body,
+    req
+  });
+
+  res.json({ message: "채용공고 수정 완료" });
 });
+
 
 /* ============================================================
    📌 채용공고 삭제 (soft)
@@ -226,39 +213,27 @@ router.delete("/delete/:id", verifyToken, canDelete, async (req, res) => {
    📌 채용공고 목록 (관리자)
 ============================================================ */
 router.get("/list", verifyToken, async (req, res) => {
-  try {
-    const [rows] = await db.execute(
-      `SELECT * FROM recruit_posts ORDER BY sort_order ASC, created_at DESC`
-    );
-
-    res.json(rows);
-  } catch (err) {
-    console.error("📌 채용공고 목록 오류:", err);
-    res.status(500).json({ message: "목록 오류" });
-  }
+  const [rows] = await db.execute(
+    `SELECT * FROM recruit_posts ORDER BY sort_order ASC, created_at DESC`
+  );
+  res.json(rows);
 });
 
 /* ============================================================
    📌 채용공고 단건 (관리자)
 ============================================================ */
 router.get("/:id", verifyToken, async (req, res) => {
-  try {
-    const [[row]] = await db.execute(
-      `SELECT * FROM recruit_posts WHERE id=?`,
-      [req.params.id]
-    );
+  const [[row]] = await db.execute(
+    `SELECT * FROM recruit_posts WHERE id=?`,
+    [req.params.id]
+  );
 
-    if (!row) {
-      return res.status(404).json({ message: "채용공고 없음" });
-    }
-
-    res.json(row);
-  } catch (err) {
-    console.error("📌 채용공고 단건 오류:", err);
-    res.status(500).json({ message: "조회 오류" });
+  if (!row) {
+    return res.status(404).json({ message: "채용공고 없음" });
   }
-});
 
+  res.json(row);
+});
 
 /* ===============================
    관리자 – 인재 DB 목록
@@ -276,13 +251,11 @@ router.get("/talents", verifyToken, async (req, res) => {
    관리자 – 인재 DB 삭제
 =============================== */
 router.delete("/talent/:id", verifyToken, canDelete, async (req, res) => {
-  const id = Number(req.params.id);
-
-  await db.execute(`DELETE FROM recruit_talents WHERE id=?`, [id]);
+  await db.execute(`DELETE FROM recruit_talents WHERE id=?`, [req.params.id]);
 
   await Audit.log({
     contentType: Audit.CONTENT_TYPE.RECRUIT,
-    contentId: id,
+    contentId: req.params.id,
     action: Audit.ACTION.DELETE,
     actor: req.user,
     req
