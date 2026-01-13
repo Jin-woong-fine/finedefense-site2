@@ -8,6 +8,21 @@ import nodemailer from "nodemailer";
 
 const router = express.Router();
 
+
+/* ===============================
+   📧 Mail Transporter (전역 1회)
+=============================== */
+const transporter = nodemailer.createTransport({
+  host: "smtp.hiworks.com",
+  port: 465,
+  secure: true,
+  auth: {
+    user: process.env.HIWORKS_USER,
+    pass: process.env.HIWORKS_PASS
+  }
+});
+
+
 /* ============================================================
    📁 업로드 경로 설정
 ============================================================ */
