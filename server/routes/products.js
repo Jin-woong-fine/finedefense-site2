@@ -35,36 +35,34 @@ const upload = multer({ storage });
    📌 제품 등록 (EDITOR 이상)
 ========================================================== */
 router.post("/", verifyToken, verifyEditor, (req, res) => {
-  upload.array("images")(req, res, async (err) => {
+  upload.array("images")(req, res, async err => {
     if (err) {
       return res.status(400).json({ message: "Upload error", detail: err.message });
     }
 
     try {
-      const { title, summary, category, description_html, sort_order, lang } = req.body;
+      const {
+        title,
+        summary = "",
+        category,
+        description_html = "",
+        sort_order = 999,
+        lang
+      } = req.body;
 
       if (!title || !category || !lang) {
         return res.status(400).json({ message: "Missing required fields" });
       }
 
-      if (summary && summary.length > 255) {
-        return res.status(400).json({
-          message: "Summary is too long (max 255 characters)"
-        });
-      }
-
-      let thumbnail = null;
-      if (req.files?.length > 0) {
-        thumbnail = "/uploads/products/" + req.files[0].filename;
-      }
-
-      // 🔴 1️⃣ group_id 자동 생성
-      const [[row]] = await db.execute(
-        `SELECT IFNULL(MAX(group_id), 0) + 1 AS nextGroupId FROM products`
+      const [[g]] = await db.execute(
+        `SELECT IFNULL(MAX(group_id),0)+1 AS gid FROM products`
       );
-      const groupId = row.nextGroupId;
+      const groupId = g.gid;
 
-      // 🔴 2️⃣ 제품 INSERT (여기서 productId 생성)
+      const thumbnail = req.files?.[0]
+        ? `/uploads/products/${req.files[0].filename}`
+        : null;
+
       const [insert] = await db.execute(
         `INSERT INTO products
          (group_id, title, summary, category, thumbnail,
@@ -73,42 +71,22 @@ router.post("/", verifyToken, verifyEditor, (req, res) => {
         [
           groupId,
           title,
-          summary || "",
+          summary,
           category,
           thumbnail,
-          description_html || "",
-          sort_order || 999,
+          description_html,
+          sort_order,
           lang
         ]
       );
 
       const productId = insert.insertId;
 
-      // ⭐ AUDIT LOG (CREATE)
-      await Audit.log({
-        contentType: Audit.CONTENT_TYPE.PRODUCT,
-        contentId: productId,
-        action: Audit.ACTION.CREATE,
-        actor: req.user,
-        before: null,          // ✅ 명시적으로 선언
-        after: {
-          group_id: groupId,
-          title,
-          category,
-          lang,
-          sort_order: sort_order || 999,
-          thumbnail
-        },
-        req
-      });
-
-
-      // 🔴 3️⃣ 이미지 저장
-      if (req.files?.length > 0) {
-        const values = req.files.map((f, idx) => [
+      if (req.files?.length) {
+        const values = req.files.map((f, i) => [
           productId,
-          "/uploads/products/" + f.filename,
-          idx
+          `/uploads/products/${f.filename}`,
+          i
         ]);
 
         await db.query(
@@ -118,15 +96,25 @@ router.post("/", verifyToken, verifyEditor, (req, res) => {
         );
       }
 
-      // 🔴 4️⃣ 응답
-      return res.status(201).json({ message: "created", id: productId });
+      await Audit.log({
+        contentType: Audit.CONTENT_TYPE.PRODUCT,
+        contentId: productId,
+        action: Audit.ACTION.CREATE,
+        actor: req.user,
+        before: null,
+        after: { title, category, lang, sort_order, thumbnail },
+        req
+      });
+
+      res.status(201).json({ message: "created", id: productId });
 
     } catch (e) {
       console.error("POST error:", e);
-      return res.status(500).json({ message: "server error" });
+      res.status(500).json({ message: "server error" });
     }
   });
 });
+
 
 
 /* ==========================================================
@@ -320,145 +308,97 @@ router.get("/:id", async (req, res) => {
    ✏ 제품 수정 (모든 필드 + 이미지 완전 지원)
 ========================================================== */
 router.put("/:id", verifyToken, verifyEditor, (req, res) => {
-  upload.array("images")(req, res, async (err) => {
+  upload.array("images")(req, res, async err => {
     if (err) {
       return res.status(400).json({ message: "Upload error", detail: err.message });
     }
 
+    let before = null;
+
     try {
       const { id } = req.params;
-
-      // 🔴 1️⃣ lang은 제일 먼저 선언 (가장 중요)
-      const { lang } = req.body;
-
-      if (!lang) {
-        return res.status(400).json({ message: "lang is required" });
-      }
-
-      // 🔴 2️⃣ base 제품 (group_id) 찾기
-      const [[base]] = await db.execute(
-        `SELECT group_id FROM products WHERE id = ?`,
-        [id]
-      );
-
-      if (!base) {
-        return res.status(404).json({ message: "base product not found" });
-      }
-
-      // 🔴 3️⃣ 실제 수정 대상 (group_id + lang)
-      const [[target]] = await db.execute(
-        `SELECT id FROM products WHERE group_id = ? AND lang = ?`,
-        [base.group_id, lang]
-      );
-
-      if (!target) {
-        return res.status(404).json({ message: "target language product not found" });
-      }
-
-      const targetId = target.id;
-
-      // 🔴 4️⃣ 나머지 필드
       const {
+        lang,
         title,
-        summary,
+        summary = "",
         category,
-        sort_order,
-        description_html,
+        sort_order = 999,
+        description_html = "",
         old_images
       } = req.body;
 
-      if (!title || !category) {
+      if (!lang || !title || !category) {
         return res.status(400).json({ message: "Missing required fields" });
       }
 
-      if (summary && summary.length > 255) {
-        return res.status(400).json({
-          message: "요약(summary)은 최대 255자까지 입력 가능합니다."
-        });
-      }
-
-      // 🔴 5️⃣ 유지 이미지 목록 파싱
-      let oldList = [];
-      try {
-        oldList = old_images ? JSON.parse(old_images) : [];
-      } catch {
-        oldList = [];
-      }
-
-      // 🔴 6️⃣ DB 이미지 목록
-      const [dbImages] = await db.execute(
-        `SELECT url FROM product_images WHERE product_id = ? ORDER BY sort_order ASC`,
-        [targetId]
+      const [[base]] = await db.execute(
+        `SELECT group_id FROM products WHERE id=?`,
+        [id]
       );
+      if (!base) return res.status(404).json({ message: "not found" });
 
-      const dbList = dbImages.map(i =>
-        i.url.replace("/uploads/products/", "")
+      const [[target]] = await db.execute(
+        `SELECT * FROM products WHERE group_id=? AND lang=?`,
+        [base.group_id, lang]
       );
+      if (!target) return res.status(404).json({ message: "lang not found" });
 
-      const removed = dbList.filter(name => !oldList.includes(name));
+      before = {
+        title: target.title,
+        summary: target.summary,
+        category: target.category,
+        sort_order: target.sort_order,
+        description_html: target.description_html,
+        thumbnail: target.thumbnail
+      };
 
-
-
-      // ⭐ BEFORE 데이터 (audit)
-      const [[before]] = await db.execute(
-        `SELECT
+      await db.execute(
+        `UPDATE products
+         SET title=?, summary=?, category=?, sort_order=?,
+             description_html=?, updated_at=NOW()
+         WHERE id=?`,
+        [
           title,
           summary,
           category,
           sort_order,
           description_html,
-          thumbnail
-        FROM products
-        WHERE id = ?`,
-        [targetId]
-      );
-
-
-
-      // 🔴 7️⃣ 제품 텍스트 업데이트
-      await db.execute(
-        `UPDATE products
-        SET title = ?,
-            summary = ?,
-            category = ?,
-            sort_order = ?,
-            description_html = ?,
-            updated_at = NOW()
-        WHERE id = ?`,
-        [
-          title,
-          summary || "",
-          category,
-          sort_order || 999,
-          description_html || "",
-          targetId
+          target.id
         ]
       );
 
+      let keep = [];
+      try {
+        keep = old_images ? JSON.parse(old_images) : [];
+      } catch {}
 
-      // 🔴 8️⃣ 삭제된 이미지 처리
-      if (removed.length > 0) {
-        const urls = removed.map(f => "/uploads/products/" + f);
-        const placeholders = urls.map(() => "?").join(",");
+      const [imgs] = await db.execute(
+        `SELECT url FROM product_images WHERE product_id=?`,
+        [target.id]
+      );
 
+      const dbList = imgs.map(i => i.url.replace("/uploads/products/", ""));
+      const removed = dbList.filter(n => !keep.includes(n));
+
+      if (removed.length) {
+        const urls = removed.map(n => "/uploads/products/" + n);
         await db.query(
           `DELETE FROM product_images
-           WHERE product_id = ? AND url IN (${placeholders})`,
-          [targetId, ...urls]
+           WHERE product_id=? AND url IN (?)`,
+          [target.id, urls]
         );
 
-        removed.forEach(name => {
-          const filePath = path.join(uploadDir, name);
-          if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+        removed.forEach(n => {
+          const p = path.join(uploadDir, n);
+          if (fs.existsSync(p)) fs.unlinkSync(p);
         });
       }
 
-      // 🔴 9️⃣ 신규 이미지 추가
-      if (req.files?.length > 0) {
-        const values = req.files.map((f, idx) => [
-          targetId,
-          "/uploads/products/" + f.filename,
-          oldList.length + idx
+      if (req.files?.length) {
+        const values = req.files.map((f, i) => [
+          target.id,
+          `/uploads/products/${f.filename}`,
+          keep.length + i
         ]);
 
         await db.query(
@@ -468,36 +408,21 @@ router.put("/:id", verifyToken, verifyEditor, (req, res) => {
         );
       }
 
-      // 🔴 10️⃣ 이미지 순서 재정렬
-      await Promise.all(
-        oldList.map((filename, index) =>
-          db.query(
-            `UPDATE product_images
-             SET sort_order = ?
-             WHERE product_id = ? AND url = ?`,
-            [index, targetId, "/uploads/products/" + filename]
-          )
-        )
-      );
-
-      // 🔴 11️⃣ 썸네일 재설정
-      let newThumbnail = null;
-
-      if (oldList.length > 0) {
-        newThumbnail = "/uploads/products/" + oldList[0];
-      } else if (req.files?.length > 0) {
-        newThumbnail = "/uploads/products/" + req.files[0].filename;
-      }
+      const newThumb =
+        keep[0]
+          ? "/uploads/products/" + keep[0]
+          : req.files?.[0]
+            ? "/uploads/products/" + req.files[0].filename
+            : null;
 
       await db.execute(
-        `UPDATE products SET thumbnail = ? WHERE id = ?`,
-        [newThumbnail, targetId]
+        `UPDATE products SET thumbnail=? WHERE id=?`,
+        [newThumb, target.id]
       );
 
-      // ⭐ AUDIT LOG (UPDATE)
       await Audit.log({
         contentType: Audit.CONTENT_TYPE.PRODUCT,
-        contentId: targetId,
+        contentId: target.id,
         action: Audit.ACTION.UPDATE,
         actor: req.user,
         before,
@@ -506,23 +431,22 @@ router.put("/:id", verifyToken, verifyEditor, (req, res) => {
           summary,
           category,
           lang,
-          sort_order: sort_order || 999,
-          removedImages: removed,
-          addedImages: req.files?.map(f => f.originalname) || []
+          sort_order,
+          addedImages: req.files?.map(f => f.originalname) || [],
+          removedImages: removed
         },
         req
       });
 
-
-      // ✅ 끝
-      return res.json({ message: "updated" });
+      res.json({ message: "updated" });
 
     } catch (e) {
       console.error("PUT error:", e);
-      return res.status(500).json({ message: "server error", error: e.message });
+      res.status(500).json({ message: "server error" });
     }
   });
 });
+
 
 
 
@@ -637,68 +561,32 @@ router.post("/:id/translate", verifyToken, verifyEditor, async (req, res) => {
    🗑 제품 삭제 (ADMIN 이상만)
 ========================================================== */
 router.delete("/:id", verifyToken, verifyAdmin, async (req, res) => {
+  let before = null;
+
   try {
     const { id } = req.params;
 
-    // ⭐ BEFORE 데이터 (audit)
-    const [[before]] = await db.execute(
-      `SELECT * FROM products WHERE id = ?`,
+    const [[row]] = await db.execute(
+      `SELECT * FROM products WHERE id=?`,
+      [id]
+    );
+    if (!row) return res.status(404).json({ message: "not found" });
+
+    before = row;
+
+    const [imgs] = await db.execute(
+      `SELECT url FROM product_images WHERE product_id=?`,
       [id]
     );
 
-    if (!before) {
-      return res.status(404).json({ message: "product not found" });
-    }
-
-
-    // 1️⃣ group_id 조회
-    const [[base]] = await db.execute(
-      `SELECT group_id FROM products WHERE id = ?`,
-      [id]
-    );
-
-    if (!base) {
-      return res.status(404).json({ message: "product not found" });
-    }
-
-    // 2️⃣ 해당 group 전체 제품 조회 (kr + en)
-    const [products] = await db.execute(
-      `SELECT id FROM products WHERE group_id = ?`,
-      [base.group_id]
-    );
-
-    const productIds = products.map(p => p.id);
-
-    // 3️⃣ 이미지 조회
-    const [images] = await db.query(
-      `SELECT url FROM product_images WHERE product_id IN (?)`,
-      [productIds]
-    );
-
-    // 4️⃣ 이미지 파일 삭제
-    images.forEach(img => {
-      const filePath = path.join(
-        uploadDir,
-        img.url.replace("/uploads/products/", "")
-      );
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-      }
+    imgs.forEach(i => {
+      const p = path.join(uploadDir, i.url.replace("/uploads/products/", ""));
+      if (fs.existsSync(p)) fs.unlinkSync(p);
     });
 
-    // 5️⃣ DB 삭제
-    await db.query(
-      `DELETE FROM product_images WHERE product_id IN (?)`,
-      [productIds]
-    );
+    await db.execute(`DELETE FROM product_images WHERE product_id=?`, [id]);
+    await db.execute(`DELETE FROM products WHERE id=?`, [id]);
 
-    await db.query(
-      `DELETE FROM products WHERE id IN (?)`,
-      [productIds]
-    );
-
-
-    // ⭐ AUDIT LOG (DELETE)
     await Audit.log({
       contentType: Audit.CONTENT_TYPE.PRODUCT,
       contentId: id,
