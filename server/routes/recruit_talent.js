@@ -103,15 +103,6 @@ router.post(
         ]
       );
 
-        await Audit.log({
-        contentType: Audit.CONTENT_TYPE.RECRUIT,
-        contentId: result.insertId,
-        action: Audit.ACTION.CREATE,
-        actor: null,              // ⭐ 중요
-        after: { name, email },
-        req
-        });
-
       res.json({ message: "인재 DB 등록 완료" });
 
     } catch (err) {
