@@ -5,6 +5,8 @@
   <title>채용공고 작성 | Fine Defense Admin</title>
 
   <link rel="stylesheet" href="./css/admin.css">
+  <!-- Toast UI Editor -->
+<link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
 
   <!-- 세션 -->
   <script type="module" src="/js/session_manager.js"></script>
@@ -162,8 +164,8 @@
     </div>
 
     <div class="form-group">
-      <label>공고 내용</label>
-      <textarea id="content" placeholder="채용 상세 내용"></textarea>
+      <label>공고 내용 <span class="required">*</span></label>
+      <div id="editor"></div>
     </div>
 
     <div class="form-group checkbox-group">
@@ -186,8 +188,55 @@
 <script src="/kr/admin/js/sidebar.js"></script>
 <script src="./js/topbar_user_menu.js"></script>
 
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+
 <script>
 requireEditPermission();
+
+let editor;
+
+document.addEventListener("DOMContentLoaded", () => {
+  editor = new toastui.Editor({
+    el: document.querySelector("#editor"),
+    height: "420px",
+    initialEditType: "wysiwyg",
+    previewStyle: "vertical",
+    language: "ko",
+    usageStatistics: false,
+
+    hooks: {
+      addImageBlobHook: async (blob, callback) => {
+        try {
+          const formData = new FormData();
+          formData.append("image", blob); // ⚠️ multer field name = image
+
+          const res = await fetch("/api/uploads-editor/image", {
+            method: "POST",
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            },
+            body: formData
+          });
+
+          if (!res.ok) {
+            throw new Error("이미지 업로드 실패");
+          }
+
+          const result = await res.json();
+
+          // ⭐ 서버에서 내려준 URL 그대로 사용
+          callback(result.url, blob.name);
+
+        } catch (err) {
+          console.error(err);
+          alert("이미지 업로드에 실패했습니다.");
+        }
+      }
+    }
+  });
+});
+
+// 기존 코드 유지
 loadSidebar("recruit");
 
 const params = new URLSearchParams(location.search);
@@ -214,7 +263,7 @@ async function loadRecruit() {
   document.getElementById("career_level").value = r.career_level || "";
   document.getElementById("location").value = r.location || "";
   document.getElementById("sort_order").value = r.sort_order ?? 9999;
-  document.getElementById("content").value = r.content;
+  editor.setHTML(r.content || "");
   document.getElementById("is_active").checked = !!r.is_active;
 }
 
@@ -228,11 +277,11 @@ async function submitRecruit() {
     career_level: document.getElementById("career_level").value,
     location: document.getElementById("location").value,
     sort_order: Number(document.getElementById("sort_order").value || 9999),
-    content: document.getElementById("content").value,
+    content: editor.getHTML(),
     is_active: document.getElementById("is_active").checked ? 1 : 0
   };
 
-  if (!payload.title || !payload.content) {
+  if (!payload.title || !editor.getHTML().trim()) {
     alert("제목과 내용은 필수입니다.");
     return;
   }
