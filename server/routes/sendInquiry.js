@@ -62,7 +62,7 @@ router.post("/send", async (req, res) => {
     // 🔵 1) 관리자에게 메일
     await transporter.sendMail({
       from: `"Fine Defense Inquiry" <${process.env.HIWORKS_USER}>`,
-      to: "inquiry@finedefense.co.kr, jwpark@finedefense.co.kr",
+      to: "inquiry@finedefense.co.kr, jwpark@finedefense.co.kr, finedefense@finedefense.co.kr, jawon814@finedefense.co.kr, kimsc@finedefense.co.kr, gwpark@finedefense.co.kr",
       subject: `[${LANG.toUpperCase()}] New Inquiry`,
       html: adminMailHTML
     });

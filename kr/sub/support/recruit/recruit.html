@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1200">
+  <title>채용안내 | Fine Defense</title>
+
+  <!-- 공통 CSS -->
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/sub-banner.css">
+
+    <style>
+    :root {
+        --bg: #f5f5f7;
+        --card: #ffffff;
+        --text: #1d1d1f;
+        --subtext: #6e6e73;
+        --accent: #0071e3;
+        --border: #e5e5ea;
+    }
+
+    body {
+        background: var(--bg);
+        font-family: -apple-system, BlinkMacSystemFont,
+                    "Apple SD Gothic Neo", "Noto Sans KR",
+                    "Segoe UI", sans-serif;
+        margin: 0;
+        color: var(--text);
+    }
+
+    .recruit-wrapper {
+        max-width: 980px;
+        margin: 100px auto;
+        padding: 0 20px;
+    }
+
+    .section-title {
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 24px;
+        letter-spacing: -0.02em;
+    }
+
+    /* ===============================
+        채용공고 카드
+    =============================== */
+    .recruit-list {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+        margin-bottom: 80px;
+    }
+
+    .recruit-item {
+        background: var(--card);
+        padding: 28px 32px;
+        border-radius: 18px;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    }
+
+    .recruit-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+
+    .recruit-item h3 {
+        font-size: 20px;
+        margin: 0 0 8px;
+        font-weight: 600;
+    }
+
+    .recruit-meta {
+        font-size: 15px;
+        color: var(--subtext);
+    }
+
+    /* ===============================
+        지원서 카드
+    =============================== */
+    .apply-wrapper {
+        background: var(--card);
+        border-radius: 22px;
+        padding: 48px 56px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+    }
+
+    .apply-desc {
+        font-size: 15px;
+        color: var(--subtext);
+        margin-bottom: 40px;
+    }
+
+    /* ===============================
+        입력 필드
+    =============================== */
+    .form-group {
+        margin-bottom: 28px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        padding: 18px 16px;
+        font-size: 16px;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        background: #fff;
+        transition: border-color 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: var(--accent);
+    }
+
+    .form-group textarea {
+        resize: none;
+        height: 140px;
+    }
+
+    /* ===============================
+        파일 업로드
+    =============================== */
+    .file-group {
+        margin-bottom: 24px;
+    }
+
+    .file-group label {
+        display: block;
+        font-size: 15px;
+        font-weight: 600;
+        margin-bottom: 6px;
+    }
+
+    .file-desc {
+        font-size: 13px;
+        color: var(--subtext);
+        margin-top: 4px;
+    }
+
+    input[type="file"] {
+        border: none;
+        font-size: 14px;
+    }
+
+    /* ===============================
+        버튼
+    =============================== */
+    .btn-submit {
+        width: 100%;
+        padding: 18px;
+        font-size: 17px;
+        font-weight: 600;
+        border-radius: 16px;
+        border: none;
+        background: var(--accent);
+        color: #fff;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .btn-submit:hover {
+        background: #005ecb;
+    }
+
+    @media (max-width: 768px) {
+        .apply-wrapper {
+        padding: 36px 28px;
+        }
+
+        .section-title {
+        font-size: 26px;
+        }
+    }
+    </style>
+
+</head>
+
+<body>
+
+<!-- 관리자 세션바 -->
+<div id="adminBarContainer" data-include="/kr/components/admin-session-bar.html"></div>
+
+<!-- 공통 헤더 -->
+<div id="headerContainer" data-include="/kr/components/header.html"></div>
+
+<!-- 서브 배너 -->
+<section class="sub-banner">
+  <img src="/img/sub-banners/subbanner_support_6.png" alt="채용안내">
+  <div class="banner-text">
+    <h1>채용안내</h1>
+    <p>Fine Defense와 함께 성장할 인재를 기다립니다.</p>
+  </div>
+</section>
+
+<!-- breadcrumb -->
+<div class="breadcrumb">
+  <a href="/kr/index.html">홈</a> &gt;
+  <span class="crumb crumb-level1 active">고객지원</span> &gt;
+  <span class="crumb crumb-level2 active">채용안내</span>
+  <div id="side-tabs"></div>
+</div>
+
+<!-- 메인 -->
+<div class="recruit-wrapper">
+
+  <!-- 채용공고 -->
+  <div class="section-title">채용 공고</div>
+  <div class="recruit-list" id="recruitList">
+    <!-- 관리자 DB에서 로드 -->
+  </div>
+
+  <!-- 지원하기 -->
+  <div class="apply-wrapper">
+    <div class="section-title">지원하기</div>
+    <div class="apply-desc">
+      ※ 이력서는 PDF 형식을 권장합니다. (최대 3개 파일 업로드 가능)
+    </div>
+
+    <input type="hidden" id="recruit_id">
+
+    <div class="form-group">
+      <input type="text" id="name" placeholder=" " required>
+      <label for="name">이름</label>
+    </div>
+
+    <div class="form-group">
+      <input type="email" id="email" placeholder=" " required>
+      <label for="email">이메일</label>
+    </div>
+
+    <div class="form-group">
+      <textarea id="message" placeholder=" "></textarea>
+      <label for="message">자기소개 / 전달사항</label>
+    </div>
+
+    <!-- 파일 업로드 -->
+    <div class="file-group">
+      <label>이력서 (필수)</label>
+      <input type="file" id="file_resume" accept=".pdf,.jpg,.jpeg,.png" required>
+    </div>
+
+    <div class="file-group">
+      <label>자기소개서 (선택)</label>
+      <input type="file" id="file_cover" accept=".pdf,.jpg,.jpeg,.png">
+    </div>
+
+    <div class="file-group">
+      <label>기타 자료 (선택)</label>
+      <input type="file" id="file_portfolio" accept=".pdf,.jpg,.jpeg,.png">
+      <div class="file-desc">포트폴리오, 경력증빙 등</div>
+    </div>
+
+    <button class="btn-submit" onclick="submitApplication()">지원서 제출</button>
+  </div>
+
+</div>
+
+<!-- 공통 푸터 -->
+<div data-include="/kr/components/footer.html"></div>
+
+<!-- 공통 스크립트 -->
+<script src="/js/include.js"></script>
+<script src="/js/session_timer.js"></script>
+<script src="/js/language.js"></script>
+<script src="/js/nav.js"></script>
+
+<script>
+/* 채용공고 목록 로드 */
+async function loadRecruitList() {
+  const res = await fetch("/api/recruit/list");
+  const list = await res.json();
+
+  const wrap = document.getElementById("recruitList");
+  wrap.innerHTML = "";
+
+  list.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "recruit-item";
+    div.innerHTML = `
+      <h3>${item.title}</h3>
+      <div class="recruit-meta">
+        ${item.employment_type} · ${item.career_level} · ${item.location}
+      </div>
+    `;
+    div.onclick = () => selectRecruit(item.id, item.title);
+    wrap.appendChild(div);
+  });
+}
+
+function selectRecruit(id, title) {
+  document.getElementById("recruit_id").value = id;
+  alert(`선택된 채용공고: ${title}`);
+  window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+}
+
+/* 지원서 제출 */
+async function submitApplication() {
+  const formData = new FormData();
+  formData.append("recruit_id", document.getElementById("recruit_id").value);
+  formData.append("name", document.getElementById("name").value);
+  formData.append("email", document.getElementById("email").value);
+  formData.append("message", document.getElementById("message").value);
+
+  formData.append("resume", document.getElementById("file_resume").files[0]);
+  if (document.getElementById("file_cover").files[0])
+    formData.append("cover", document.getElementById("file_cover").files[0]);
+  if (document.getElementById("file_portfolio").files[0])
+    formData.append("portfolio", document.getElementById("file_portfolio").files[0]);
+
+  const res = await fetch("/api/recruit/apply", {
+    method: "POST",
+    body: formData
+  });
+
+  if (res.ok) {
+    alert("지원이 정상적으로 접수되었습니다.");
+    location.reload();
+  } else {
+    alert("지원 중 오류가 발생했습니다.");
+  }
+}
+
+loadRecruitList();
+</script>
+
+</body>
+</html>
