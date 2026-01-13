@@ -350,9 +350,6 @@
       const wrap = document.getElementById("recruitList");
       wrap.innerHTML = "";
 
-      // 공개 공고만 필터
-      const activeList = list.filter(item => item.is_active);
-
       if (activeList.length === 0) {
         wrap.innerHTML = "<p>현재 진행 중인 채용공고가 없습니다.</p>";
         return;
