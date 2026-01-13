@@ -339,31 +339,54 @@
 <script src="/js/nav.js"></script>
 
 <script>
-/* 채용공고 목록 로드 */
-async function loadRecruitList() {
-  const res = await fetch("/api/recruit/list");
-  const list = await res.json();
+  /* 채용공고 목록 로드 (공개 공고만) */
+  async function loadRecruitList() {
+    try {
+      const res = await fetch("/api/recruit/list");
+      if (!res.ok) return;
 
-  const wrap = document.getElementById("recruitList");
-  wrap.innerHTML = "";
+      const list = await res.json();
 
-  list.forEach(item => {
-    const div = document.createElement("div");
-    div.className = "recruit-item";
-    div.innerHTML = `
-      <h3>${item.title}</h3>
-      <div class="recruit-meta">
-        ${item.employment_type} · ${item.career_level} · ${item.location}
-      </div>
-    `;
+      const wrap = document.getElementById("recruitList");
+      wrap.innerHTML = "";
 
-    div.onclick = () => {
-      location.href = `/kr/support/recruit/recruit-view.html?id=${item.id}`;
-    };
+      // 공개 공고만 필터
+      const activeList = list.filter(item => item.is_active);
 
-    wrap.appendChild(div);
-  });
-}
+      if (activeList.length === 0) {
+        wrap.innerHTML = "<p>현재 진행 중인 채용공고가 없습니다.</p>";
+        return;
+      }
+
+      activeList.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "recruit-item";
+        div.innerHTML = `
+          <h3>${item.title}</h3>
+          <div class="recruit-meta">
+            ${item.employment_type || "-"} ·
+            ${item.career_level || "-"} ·
+            ${item.location || "-"}
+          </div>
+        `;
+
+        div.onclick = () => {
+          location.href =
+            `/kr/support/recruit/recruit-view.html?id=${item.id}`;
+        };
+
+        wrap.appendChild(div);
+      });
+
+    } catch (err) {
+      console.error("채용공고 로드 실패:", err);
+    }
+  }
+
+  loadRecruitList();
+
+
+
 
 /* 지원서 제출 */
 async function submitApplication() {

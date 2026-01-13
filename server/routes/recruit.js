@@ -32,6 +32,19 @@ router.put("/toggle/:id", verifyToken, async (req, res) => {
 });
 
 
+// 공개용 채용공고 목록
+router.get("/public/list", async (req, res) => {
+  const [rows] = await db.execute(`
+    SELECT id, title, employment_type, career_level, location
+    FROM recruit_posts
+    WHERE is_active = 1
+    ORDER BY sort_order ASC, created_at DESC
+  `);
+  res.json(rows);
+});
+
+
+
 /* ============================================================
    📌 채용공고 등록
 ============================================================ */
