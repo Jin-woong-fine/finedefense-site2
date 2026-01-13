@@ -43,6 +43,9 @@ import auditLogsRouter from "./routes/audit_logs.js";
 
 import recruitRoutes from "./routes/recruit.js";
 
+import recruitTalentRoutes from "./routes/recruit_talent.js";
+
+
 
 const app = express();
 
@@ -68,6 +71,10 @@ app.use("/api/audit", auditLogsRouter);
 
 // 채용공고 및 인재DB관리
 app.use("/api/recruit", recruitRoutes);
+
+// 채용공고 및 인재DB관리
+app.use("/api/recruit", recruitTalentRoutes);
+
 
 
 // ------------------------------------------------------
