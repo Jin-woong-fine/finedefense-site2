@@ -65,8 +65,6 @@ async function loadSidebar(activePage = "") {
         ]
       },
 
-      { title: "", link: "/kr/admin/inquiry-list.html", key: "inquiry" },
-
       {
         title: "고객지원",
         children: [
