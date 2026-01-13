@@ -7,6 +7,31 @@ import Audit from "../utils/auditLogger.js";
 const router = express.Router();
 
 
+// 🔓 공개용 채용공고 목록 (비로그인)
+router.get("/public/list", async (req, res) => {
+  try {
+    const [rows] = await db.execute(`
+      SELECT
+        id,
+        title,
+        employment_type,
+        career_level,
+        location
+      FROM recruit_posts
+      WHERE is_active = 1
+      ORDER BY sort_order ASC, created_at DESC
+    `);
+
+    res.json(rows);
+  } catch (err) {
+    console.error("공개 채용공고 목록 오류:", err);
+    res.status(500).json({ message: "error" });
+  }
+});
+
+
+
+
 /* ===============================
    관리자 – 채용공고 공개/비공개
 =============================== */

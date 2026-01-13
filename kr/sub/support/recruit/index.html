@@ -342,7 +342,7 @@
   /* 채용공고 목록 로드 (공개 공고만) */
   async function loadRecruitList() {
     try {
-      const res = await fetch("/api/recruit/list");
+      const res = await fetch("/api/recruit/public/list");
       if (!res.ok) return;
 
       const list = await res.json();
