@@ -4,24 +4,11 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import db from "../config/db.js";
-import nodemailer from "nodemailer";
+import transporter from "../utils/mailer.js";
+
+
 
 const router = express.Router();
-
-
-/* ===============================
-   📧 Mail Transporter (전역 1회)
-=============================== */
-const transporter = nodemailer.createTransport({
-  host: "smtp.hiworks.com",
-  port: 465,
-  secure: true,
-  auth: {
-    user: process.env.HIWORKS_USER,
-    pass: process.env.HIWORKS_PASS
-  }
-});
-
 
 /* ============================================================
    📁 업로드 경로 설정
@@ -126,10 +113,10 @@ router.post(
       try {
         await transporter.sendMail({
           from: `"Fine Defense Recruit" <${process.env.HIWORKS_USER}>`,
-          to: `
-            inquiry@finedefense.co.kr,
-            jwpark@finedefense.co.kr
-          `,
+      to: [
+        "inquiry@finedefense.co.kr",
+        "jwpark@finedefense.co.kr"
+      ],
           subject: "[채용] 인재 DB 신규 등록",
           html: `
             <h3>인재 DB 신규 등록</h3>
