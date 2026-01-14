@@ -126,24 +126,49 @@
     <div class="file-list">
       <h3 style="margin-bottom:10px;">첨부파일</h3>
 
-      <div class="file-item">
-        <span>📄 이력서</span>
-        <a id="file-resume" href="#" target="_blank" style="display:none;">다운로드</a>
-        <span id="file-resume-none">없음</span>
-      </div>
+    <div class="file-item">
+      <span>📄 이력서</span>
+      <a id="file-resume" href="#" target="_blank" style="display:none;">다운로드</a>
+      <button id="btn-preview-resume"
+              class="btn btn-small btn-gray"
+              style="display:none;"
+              onclick="previewFile(this.dataset.url)">
+        미리보기
+      </button>
+      <span id="file-resume-none">없음</span>
+    </div>
 
       <div class="file-item">
         <span>📄 자기소개서</span>
         <a id="file-cover" href="#" target="_blank" style="display:none;">다운로드</a>
+        <button id="btn-preview-cover"
+                class="btn btn-small btn-gray"
+                style="display:none;"
+                onclick="previewFile(this.dataset.url)">
+        미리보기
+      </button>
         <span id="file-cover-none">없음</span>
       </div>
 
       <div class="file-item">
         <span>📎 참고자료</span>
         <a id="file-portfolio" href="#" target="_blank" style="display:none;">다운로드</a>
+        <button id="btn-preview-portfolio"
+                class="btn btn-small btn-gray"
+                style="display:none;"
+                onclick="previewFile(this.dataset.url)">
+          미리보기
+        </button>        
         <span id="file-portfolio-none">없음</span>
       </div>
     </div>
+
+    <!-- 미리보기 -->
+    <div id="file-preview" style="margin-top:20px; display:none;">
+      <h3 style="margin-bottom:10px;">파일 미리보기</h3>
+      <div id="preview-container"></div>
+    </div>
+
 
     <!-- 액션 -->
     <div class="actions">
@@ -212,24 +237,40 @@ async function loadDetail() {
 
   // 파일 링크
   if (t.resume_path) {
+    const url = `/api/recruit/talent/file/${id}/resume`;
+
     const a = document.getElementById("file-resume");
-    a.href = `/api/recruit/talent/file/${id}/resume`;
+    a.href = url;
     a.style.display = "inline";
     document.getElementById("file-resume-none").style.display = "none";
-  }
 
+    const btn = document.getElementById("btn-preview-resume");
+    btn.dataset.url = url;
+    btn.style.display = "inline-block";
+  }
   if (t.cover_path) {
+    const url = `/api/recruit/talent/file/${id}/cover`;
+
     const a = document.getElementById("file-cover");
-    a.href = `/api/recruit/talent/file/${id}/cover`;
+    a.href = url;
     a.style.display = "inline";
     document.getElementById("file-cover-none").style.display = "none";
-  }
 
+    const btn = document.getElementById("btn-preview-cover");
+    btn.dataset.url = url;
+    btn.style.display = "inline-block";
+  }
   if (t.portfolio_path) {
+    const url = `/api/recruit/talent/file/${id}/portfolio`;
+
     const a = document.getElementById("file-portfolio");
-    a.href = `/api/recruit/talent/file/${id}/portfolio`;
+    a.href = url;
     a.style.display = "inline";
     document.getElementById("file-portfolio-none").style.display = "none";
+
+    const btn = document.getElementById("btn-preview-portfolio");
+    btn.dataset.url = url;
+    btn.style.display = "inline-block";
   }
 }
 
@@ -254,6 +295,34 @@ async function deleteThis() {
   alert("삭제되었습니다.");
   window.close();
 }
+
+
+function previewFile(url) {
+  const box = document.getElementById("file-preview");
+  const container = document.getElementById("preview-container");
+
+  container.innerHTML = "";
+  box.style.display = "block";
+
+  if (url.endsWith(".pdf")) {
+    container.innerHTML = `
+      <iframe src="${url}"
+              style="width:100%; height:600px; border:1px solid #ddd;">
+      </iframe>
+    `;
+  } else if (url.match(/\.(jpg|jpeg|png)$/i)) {
+    container.innerHTML = `
+      <img src="${url}"
+           style="max-width:100%; border:1px solid #ddd;" />
+    `;
+  } else {
+    container.innerHTML = "<p>미리보기를 지원하지 않는 파일입니다.</p>";
+  }
+}
+
+
+
+
 
 loadDetail();
 </script>
