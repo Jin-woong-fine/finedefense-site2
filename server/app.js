@@ -69,11 +69,14 @@ app.use(helmet());
 
 app.use("/api/audit", auditLogsRouter);
 
+
+// 인재DB관리가 채용공고보다 먼저!
+app.use("/api/recruit", recruitTalentRoutes);
+
 // 채용공고 및 인재DB관리
 app.use("/api/recruit", recruitRoutes);
 
-// 채용공고 및 인재DB관리
-app.use("/api/recruit", recruitTalentRoutes);
+
 
 
 
