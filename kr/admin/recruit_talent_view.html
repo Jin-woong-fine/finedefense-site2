@@ -187,9 +187,8 @@ async function loadDetail() {
     }
   });
 
-  // 🔥 핵심: 인증 실패는 여기서 단 한 번 처리
   if (res.status === 401 || res.status === 403) {
-    alert("세션이 만료되었거나 권한이 없습니다. 다시 로그인해주세요.");
+    alert("세션이 만료되었거나 권한이 없습니다.");
     location.replace("/kr/admin/login.html");
     return;
   }
@@ -199,6 +198,12 @@ async function loadDetail() {
     return;
   }
 
+  // 🔥 이 줄이 없어서 에러 난 거다
+  const t = await res.json();
+
+  // =========================
+  // 여기부터는 전부 정상
+  // =========================
   document.getElementById("name").innerText = t.name;
   document.getElementById("email").innerText = t.email;
   document.getElementById("created").innerText = t.created_at.slice(0, 10);
