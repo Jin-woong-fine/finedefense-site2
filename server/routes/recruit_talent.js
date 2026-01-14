@@ -8,6 +8,10 @@ import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
 
+console.log("🔥 recruit_talent.js ACTIVE");
+
+
+
 // 🔴 여기부터 중요
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
