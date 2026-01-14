@@ -169,18 +169,35 @@ const params = new URLSearchParams(location.search);
 const id = params.get("id");
 
 async function loadDetail() {
+  if (!id) {
+    alert("잘못된 접근입니다.");
+    return;
+  }
+
+  const token = localStorage.getItem("token");
+  if (!token) {
+    alert("로그인이 필요합니다.");
+    location.replace("/kr/admin/login.html");
+    return;
+  }
+
   const res = await fetch(`/api/recruit/talent/${id}`, {
     headers: {
-      Authorization: "Bearer " + localStorage.getItem("token")
+      Authorization: "Bearer " + token
     }
   });
+
+  // 🔥 핵심: 인증 실패는 여기서 단 한 번 처리
+  if (res.status === 401 || res.status === 403) {
+    alert("세션이 만료되었거나 권한이 없습니다. 다시 로그인해주세요.");
+    location.replace("/kr/admin/login.html");
+    return;
+  }
 
   if (!res.ok) {
     alert("데이터를 불러올 수 없습니다.");
     return;
   }
-
-  const t = await res.json();
 
   document.getElementById("name").innerText = t.name;
   document.getElementById("email").innerText = t.email;
