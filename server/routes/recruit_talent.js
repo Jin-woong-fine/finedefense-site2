@@ -188,4 +188,78 @@ router.post(
 
 
 
+/* ============================================================
+   🔐 인재 DB 목록 조회 (관리자)
+============================================================ */
+router.get("/talents", async (req, res) => {
+  try {
+    const [rows] = await db.execute(`
+      SELECT
+        id,
+        name,
+        email,
+        resume_path,
+        created_at
+      FROM recruit_talents
+      ORDER BY created_at DESC
+    `);
+
+    res.json(rows);
+
+  } catch (err) {
+    console.error("❌ 인재 DB 조회 오류:", err);
+    res.status(500).json({ message: "인재 DB 조회 실패" });
+  }
+});
+
+/* ============================================================
+   🔐 인재 DB 삭제 (관리자)
+============================================================ */
+router.delete("/talent/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const [[talent]] = await db.execute(
+      `
+      SELECT
+        resume_path,
+        cover_path,
+        portfolio_path
+      FROM recruit_talents
+      WHERE id = ?
+      `,
+      [id]
+    );
+
+    if (!talent) {
+      return res.status(404).json({ message: "인재 정보 없음" });
+    }
+
+    // 📁 파일 삭제
+    [talent.resume_path, talent.cover_path, talent.portfolio_path]
+      .filter(Boolean)
+      .forEach(file => {
+        const filePath = path.join(UPLOAD_BASE, file);
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
+      });
+
+    // 🗑 DB 삭제
+    await db.execute(
+      "DELETE FROM recruit_talents WHERE id = ?",
+      [id]
+    );
+
+    res.json({ success: true });
+
+  } catch (err) {
+    console.error("❌ 인재 DB 삭제 오류:", err);
+    res.status(500).json({ message: "삭제 실패" });
+  }
+});
+
+
+
+
 export default router;
