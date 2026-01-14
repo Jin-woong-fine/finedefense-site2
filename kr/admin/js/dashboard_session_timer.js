@@ -18,7 +18,7 @@ function startDashboardTimer() {
     const exp = getExpireTime();
     if (!exp) return;
 
-    const diff = exp * 1000 - Date.now();
+    const diff = exp - Date.now(); // exp는 이미 ms
 
     if (diff <= 0) {
       el.textContent = "00:00:00";
