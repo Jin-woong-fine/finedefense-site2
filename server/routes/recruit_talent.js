@@ -264,6 +264,83 @@ router.delete("/talent/:id", async (req, res) => {
 });
 
 
+/* ============================================================
+   🔐 인재 DB 상세 조회 (관리자)
+============================================================ */
+router.get("/talent/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const [[talent]] = await db.execute(
+      `
+      SELECT
+        id,
+        name,
+        email,
+        message,
+        resume_path,
+        cover_path,
+        portfolio_path,
+        ip_address,
+        created_at
+      FROM recruit_talents
+      WHERE id = ?
+      `,
+      [id]
+    );
+
+    if (!talent) {
+      return res.status(404).json({ message: "인재 정보 없음" });
+    }
+
+    res.json(talent);
+
+  } catch (err) {
+    console.error("❌ 인재 DB 상세 조회 오류:", err);
+    res.status(500).json({ message: "상세 조회 실패" });
+  }
+});
+
+
+/* ============================================================
+   🔐 인재 DB 첨부파일 다운로드 (관리자)
+============================================================ */
+router.get("/talent/file/:id/:type", async (req, res) => {
+  const { id, type } = req.params;
+
+  const fieldMap = {
+    resume: "resume_path",
+    cover: "cover_path",
+    portfolio: "portfolio_path"
+  };
+
+  if (!fieldMap[type]) {
+    return res.status(400).json({ message: "잘못된 파일 타입" });
+  }
+
+  try {
+    const [[row]] = await db.execute(
+      `SELECT ${fieldMap[type]} AS file FROM recruit_talents WHERE id = ?`,
+      [id]
+    );
+
+    if (!row || !row.file) {
+      return res.status(404).json({ message: "파일 없음" });
+    }
+
+    const filePath = path.join(UPLOAD_BASE, row.file);
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ message: "파일 누락" });
+    }
+
+    res.download(filePath);
+
+  } catch (err) {
+    console.error("❌ 파일 다운로드 오류:", err);
+    res.status(500).json({ message: "다운로드 실패" });
+  }
+});
+
 
 
 export default router;

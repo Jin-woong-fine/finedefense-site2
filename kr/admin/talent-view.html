@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>인재 DB 상세 | Fine Defense Admin</title>
+
+  <!-- 공통 관리자 CSS -->
+  <link rel="stylesheet" href="./css/admin.css">
+
+  <!-- 세션 매니저 -->
+  <script type="module" src="/js/session_manager.js"></script>
+  <script type="module" src="./js/dashboard_session_timer.js"></script>
+
+  <style>
+    .panel {
+      background: #fff;
+      padding: 28px 32px;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(15,38,121,0.08);
+      max-width: 900px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      row-gap: 14px;
+      column-gap: 20px;
+      margin-bottom: 26px;
+      font-size: 0.95rem;
+    }
+
+    .info-label {
+      color: #555;
+      font-weight: 600;
+    }
+
+    .info-value {
+      color: #111;
+    }
+
+    .message-box {
+      border: 1px solid #e1e6f5;
+      border-radius: 8px;
+      padding: 16px;
+      background: #f9fbff;
+      white-space: pre-wrap;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .file-list {
+      margin-top: 18px;
+    }
+
+    .file-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .file-item a {
+      color: #0f2679;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .file-item a:hover {
+      text-decoration: underline;
+    }
+
+    .actions {
+      margin-top: 28px;
+      display: flex;
+      gap: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div id="sidebar" data-active="recruit"></div>
+
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="title">인재 DB 상세</div>
+
+    <div style="display:flex; align-items:center; gap:12px;">
+      <span id="session-timer" class="session-timer">세션 계산중...</span>
+
+      <div class="topbar-user" id="topbarUser">
+        <span id="topbarUserName">관리자</span> ▾
+        <div class="user-dropdown" id="userDropdown"></div>
+      </div>
+
+      <button onclick="window.close()">닫기</button>
+    </div>
+  </div>
+
+  <section class="panel">
+
+    <!-- 기본 정보 -->
+    <div class="info-grid">
+      <div class="info-label">이름</div>
+      <div class="info-value" id="name">-</div>
+
+      <div class="info-label">이메일</div>
+      <div class="info-value" id="email">-</div>
+
+      <div class="info-label">등록일</div>
+      <div class="info-value" id="created">-</div>
+
+      <div class="info-label">IP 주소</div>
+      <div class="info-value" id="ip">-</div>
+    </div>
+
+    <!-- 자기소개 -->
+    <h3 style="margin-bottom:10px;">자기소개 / 전달사항</h3>
+    <div class="message-box" id="message">-</div>
+
+    <!-- 첨부파일 -->
+    <div class="file-list">
+      <h3 style="margin-bottom:10px;">첨부파일</h3>
+
+      <div class="file-item">
+        <span>📄 이력서</span>
+        <a id="file-resume" href="#" target="_blank" style="display:none;">다운로드</a>
+        <span id="file-resume-none">없음</span>
+      </div>
+
+      <div class="file-item">
+        <span>📄 자기소개서</span>
+        <a id="file-cover" href="#" target="_blank" style="display:none;">다운로드</a>
+        <span id="file-cover-none">없음</span>
+      </div>
+
+      <div class="file-item">
+        <span>📎 참고자료</span>
+        <a id="file-portfolio" href="#" target="_blank" style="display:none;">다운로드</a>
+        <span id="file-portfolio-none">없음</span>
+      </div>
+    </div>
+
+    <!-- 액션 -->
+    <div class="actions">
+      <button class="btn btn-danger" onclick="deleteThis()">삭제</button>
+      <button class="btn btn-gray" onclick="window.close()">닫기</button>
+    </div>
+
+  </section>
+</div>
+
+<script src="/kr/admin/js/common_auth.js"></script>
+<script src="/kr/admin/js/sidebar.js"></script>
+<script src="./js/topbar_user_menu.js"></script>
+
+<script>
+requireEditPermission();
+loadSidebar("recruit");
+
+/* ===============================
+   데이터 로드
+=============================== */
+const params = new URLSearchParams(location.search);
+const id = params.get("id");
+
+async function loadDetail() {
+  const res = await fetch(`/api/recruit/talent/${id}`, {
+    headers: {
+      Authorization: "Bearer " + localStorage.getItem("token")
+    }
+  });
+
+  if (!res.ok) {
+    alert("데이터를 불러올 수 없습니다.");
+    return;
+  }
+
+  const t = await res.json();
+
+  document.getElementById("name").innerText = t.name;
+  document.getElementById("email").innerText = t.email;
+  document.getElementById("created").innerText = t.created_at.slice(0, 10);
+  document.getElementById("ip").innerText = t.ip_address || "-";
+  document.getElementById("message").innerText = t.message || "-";
+
+  // 파일 링크
+  if (t.resume_path) {
+    const a = document.getElementById("file-resume");
+    a.href = `/api/recruit/talent/file/${id}/resume`;
+    a.style.display = "inline";
+    document.getElementById("file-resume-none").style.display = "none";
+  }
+
+  if (t.cover_path) {
+    const a = document.getElementById("file-cover");
+    a.href = `/api/recruit/talent/file/${id}/cover`;
+    a.style.display = "inline";
+    document.getElementById("file-cover-none").style.display = "none";
+  }
+
+  if (t.portfolio_path) {
+    const a = document.getElementById("file-portfolio");
+    a.href = `/api/recruit/talent/file/${id}/portfolio`;
+    a.style.display = "inline";
+    document.getElementById("file-portfolio-none").style.display = "none";
+  }
+}
+
+/* ===============================
+   삭제
+=============================== */
+async function deleteThis() {
+  if (!confirm("이 인재 정보를 삭제하시겠습니까?")) return;
+
+  const res = await fetch(`/api/recruit/talent/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: "Bearer " + localStorage.getItem("token")
+    }
+  });
+
+  if (!res.ok) {
+    alert("삭제 실패");
+    return;
+  }
+
+  alert("삭제되었습니다.");
+  window.close();
+}
+
+loadDetail();
+</script>
+
+</body>
+</html>
