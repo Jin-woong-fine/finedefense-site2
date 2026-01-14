@@ -291,7 +291,7 @@ function initBreadcrumbTabs() {
             { name: "1:1 문의", link: `${base}/support/inquiry/index.html` },
     //        { name: "자료실", link: `${base}/support/downloads/index.html` },
             { name: "기술지원", link: `${base}/support/Technical_support/index.html` },
-            { name: "채용안내 및 지원", link: `${base}/support/recruit/index.html` },
+            { name: "채용안내 및 인재DB등록", link: `${base}/support/recruit/index.html` },
           ]
         : [
             { name: "Inquiry", link: `${base}/support/inquiry/index.html` },
