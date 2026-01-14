@@ -4,8 +4,20 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import db from "../config/db.js";
-import transporter from "../utils/mailer.js";
+import nodemailer from "nodemailer";
+import dotenv from "dotenv";
 
+dotenv.config();   // ⭐⭐⭐ 이 줄이 핵심
+
+const transporter = nodemailer.createTransport({
+  host: "smtp.hiworks.com",
+  port: 465,
+  secure: true,
+  auth: {
+    user: process.env.HIWORKS_USER,
+    pass: process.env.HIWORKS_PASS
+  }
+});
 
 
 const router = express.Router();
