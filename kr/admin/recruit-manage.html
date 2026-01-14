@@ -227,6 +227,12 @@
 requireEditPermission();
 loadSidebar("recruit");
 
+
+function viewRecruit(id) {
+  location.href = `/kr/sub/support/recruit/recruit-view.html?id=${id}`;
+}
+
+
 /* ===============================
    TAB SWITCH
 =============================== */
@@ -271,7 +277,7 @@ async function loadRecruitPosts() {
         <td>
           <a href="javascript:void(0)"
             class="recruit-title"
-            onclick="editRecruit(${r.id})">
+            onclick="viewRecruit(${r.id})">
             ${r.title}
           </a>
         </td>
