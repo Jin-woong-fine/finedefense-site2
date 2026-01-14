@@ -18,13 +18,14 @@ function startDashboardTimer() {
     const exp = getExpireTime();
     if (!exp) return;
 
-    const diff = exp - Date.now(); // exp는 이미 ms
+    const diff = exp - Date.now();
 
     if (diff <= 0) {
-      el.textContent = "00:00:00";
-      clearSession();
-      alert("세션이 만료되었습니다.");
-      location.href = "/kr/admin/login.html";
+      if (location.pathname !== "/kr/admin/login.html") {
+        clearSession();
+        alert("세션이 만료되었습니다.");
+        location.replace("/kr/admin/login.html");
+      }
       return;
     }
 
