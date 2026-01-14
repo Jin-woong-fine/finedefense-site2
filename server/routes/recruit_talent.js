@@ -6,8 +6,16 @@ import fs from "fs";
 import db from "../config/db.js";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
+import { fileURLToPath } from "url";
 
-dotenv.config();   // ⭐⭐⭐ 이 줄이 핵심
+// 🔴 여기부터 중요
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// 👉 server/.env를 정확히 지정
+dotenv.config({
+  path: path.resolve(__dirname, "../.env")
+});
 
 const transporter = nodemailer.createTransport({
   host: "smtp.hiworks.com",
