@@ -1,5 +1,10 @@
 import nodemailer from "nodemailer";
 
+console.log("MAIL ENV CHECK", {
+  user: process.env.HIWORKS_USER,
+  pass: process.env.HIWORKS_PASS ? "SET" : "NOT SET"
+});
+
 const transporter = nodemailer.createTransport({
   host: "smtp.hiworks.com",
   port: 465,
