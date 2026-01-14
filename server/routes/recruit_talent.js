@@ -139,7 +139,9 @@ router.post(
           from: `"Fine Defense Recruit" <${process.env.HIWORKS_USER}>`,
       to: [
         "inquiry@finedefense.co.kr",
-        "jwpark@finedefense.co.kr"
+        "jwpark@finedefense.co.kr",
+        "kimsc@finedefense.co.kr",
+        "finedefense@finedefense.co.kr",
       ],
           subject: "[채용] 인재 DB 신규 등록",
           html: `
