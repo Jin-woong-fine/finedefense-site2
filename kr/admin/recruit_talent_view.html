@@ -97,7 +97,7 @@
         <div class="user-dropdown" id="userDropdown"></div>
       </div>
 
-      <button onclick="window.close()">닫기</button>
+      <button onclick="goBackToList()">목록으로</button>
     </div>
   </div>
 
@@ -293,7 +293,7 @@ async function deleteThis() {
   }
 
   alert("삭제되었습니다.");
-  window.close();
+  location.href = "/kr/admin/recruit-manage.html";
 }
 
 
@@ -348,6 +348,10 @@ async function previewFile(url) {
     console.error("미리보기 오류:", err);
     container.innerHTML = "<p>미리보기 중 오류가 발생했습니다.</p>";
   }
+}
+
+function goBackToList() {
+  location.href = "/kr/admin/recruit-manage.html";
 }
 
 
