@@ -297,28 +297,59 @@ async function deleteThis() {
 }
 
 
-function previewFile(url) {
+async function previewFile(url) {
   const box = document.getElementById("file-preview");
   const container = document.getElementById("preview-container");
 
   container.innerHTML = "";
   box.style.display = "block";
 
-  if (url.endsWith(".pdf")) {
-    container.innerHTML = `
-      <iframe src="${url}"
-              style="width:100%; height:600px; border:1px solid #ddd;">
-      </iframe>
-    `;
-  } else if (url.match(/\.(jpg|jpeg|png)$/i)) {
-    container.innerHTML = `
-      <img src="${url}"
-           style="max-width:100%; border:1px solid #ddd;" />
-    `;
-  } else {
-    container.innerHTML = "<p>미리보기를 지원하지 않는 파일입니다.</p>";
+  try {
+    const res = await fetch(url, {
+      method: "HEAD",
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token")
+      }
+    });
+
+    if (!res.ok) {
+      container.innerHTML = "<p>파일 정보를 불러올 수 없습니다.</p>";
+      return;
+    }
+
+    const type = res.headers.get("Content-Type") || "";
+
+    // ✅ PDF
+    if (type.includes("application/pdf")) {
+      container.innerHTML = `
+        <iframe
+          src="${url}"
+          style="width:100%; height:600px; border:1px solid #ddd;"
+        ></iframe>
+      `;
+      return;
+    }
+
+    // ✅ 이미지 (jpg, png, jpeg, gif 등)
+    if (type.startsWith("image/")) {
+      container.innerHTML = `
+        <img
+          src="${url}"
+          style="max-width:100%; border:1px solid #ddd;"
+        />
+      `;
+      return;
+    }
+
+    // ❌ 그 외 파일
+    container.innerHTML = "<p>미리보기를 지원하지 않는 파일 형식입니다.</p>";
+
+  } catch (err) {
+    console.error("미리보기 오류:", err);
+    container.innerHTML = "<p>미리보기 중 오류가 발생했습니다.</p>";
   }
 }
+
 
 
 

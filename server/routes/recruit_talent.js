@@ -333,13 +333,16 @@ router.get("/talent/file/:id/:type", async (req, res) => {
       return res.status(404).json({ message: "파일 누락" });
     }
 
-    res.download(filePath);
+    // 🔥 핵심 수정
+    res.setHeader("Content-Disposition", "inline");
+    res.sendFile(filePath);
 
   } catch (err) {
-    console.error("❌ 파일 다운로드 오류:", err);
-    res.status(500).json({ message: "다운로드 실패" });
+    console.error("❌ 파일 미리보기 오류:", err);
+    res.status(500).json({ message: "파일 처리 실패" });
   }
 });
+
 
 
 
