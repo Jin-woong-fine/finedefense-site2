@@ -143,6 +143,7 @@ router.post(
       to: [
         "inquiry@finedefense.co.kr",
         "jwpark@finedefense.co.kr",
+        "jawon814@finedefense.co.kr",
         "kimsc@finedefense.co.kr",
         "finedefense@finedefense.co.kr",
       ],
