@@ -635,14 +635,23 @@
   <script>
   async function loadLatestPosts() {
     try {
-      // ✅ KR 메인이므로 lang=kr
       const res = await fetch(`/api/posts/latest?lang=kr&limit=4`);
-      const list = await res.json();
+
+      if (!res.ok) {
+        throw new Error("API 응답 실패");
+      }
+
+      const json = await res.json();
+
+      // ✅ 여기 핵심: 실제 배열 추출
+      const list = Array.isArray(json)
+        ? json
+        : (json.data || json.rows || []);
 
       const grid = document.getElementById("newsGrid");
       grid.innerHTML = "";
 
-      if (!Array.isArray(list) || list.length === 0) {
+      if (list.length === 0) {
         grid.innerHTML = "<p>등록된 소식이 없습니다.</p>";
         return;
       }
@@ -650,11 +659,6 @@
       list.forEach(item => {
         const isNotice = item.category === "notice";
 
-        const label = isNotice
-          ? `<span class="badge notice">공지</span>`
-          : `<span class="badge news">뉴스</span>`;
-
-        // ✅ 디폴트 이미지
         const fallbackImg = isNotice
           ? "/img/default_img/default-notice.png"
           : "/img/default_img/default-news.png";
@@ -663,31 +667,19 @@
           ? fallbackImg
           : (item.main_image || fallbackImg);
 
-        const dateStr = new Date(item.created_at).toLocaleDateString("ko-KR", {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit"
-        });
+        const dateStr = new Date(item.created_at).toLocaleDateString("ko-KR");
 
-        // ✅ KR 페이지 경로로 수정
         const viewURL = isNotice
           ? `/kr/sub/pr/notice/notice-view.html?id=${item.id}`
           : `/kr/sub/pr/newsroom/news-view.html?id=${item.id}`;
 
-        const card = `
+        grid.innerHTML += `
           <div class="news-card" onclick="location.href='${viewURL}'">
-            <img
-              src="${imgURL}"
-              alt="${item.title}"
-              onerror="this.onerror=null; this.src='${fallbackImg}';"
-            >
-            ${label}
+            <img src="${imgURL}" onerror="this.src='${fallbackImg}'">
             <h3>${item.title}</h3>
             <span class="date">${dateStr}</span>
           </div>
         `;
-
-        grid.innerHTML += card;
       });
 
     } catch (err) {
