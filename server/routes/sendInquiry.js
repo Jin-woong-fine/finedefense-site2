@@ -9,13 +9,17 @@ const router = express.Router();
 
 const transporter = nodemailer.createTransport({
   host: "smtp.hiworks.com",
-  port: 465,
-  secure: true,
+  port: 587,
+  secure: false, // ⭐ 중요
   auth: {
     user: process.env.HIWORKS_USER,
     pass: process.env.HIWORKS_PASS
+  },
+  tls: {
+    rejectUnauthorized: false
   }
 });
+
 
 router.post("/send", async (req, res) => {
   try {
