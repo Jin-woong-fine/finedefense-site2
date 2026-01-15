@@ -23,11 +23,14 @@ dotenv.config({
 
 const transporter = nodemailer.createTransport({
   host: "smtp.hiworks.com",
-  port: 465,
-  secure: true,
+  port: 587,
+  secure: false, // ⭐ 587에서는 false
   auth: {
     user: process.env.HIWORKS_USER,
     pass: process.env.HIWORKS_PASS
+  },
+  tls: {
+    rejectUnauthorized: false
   }
 });
 
