@@ -3,7 +3,10 @@ import express from "express";
 import db from "../config/db.js";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
-dotenv.config();
+
+dotenv.config({
+  path: "/home/ubuntu/finedefense_homepage/server/.env"
+});
 
 const router = express.Router();
 
