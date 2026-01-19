@@ -311,25 +311,74 @@ function calculateBraid() {
   const C = parseFloat(document.getElementById("carriers").value);
   const P = parseFloat(document.getElementById("pitchInput").value);
   const Dc = parseFloat(document.getElementById("coreDia").value);
-  const PPI = (25.4 * (C / 2)) / P;
 
   if (!d || !E || !C || !P || !Dc) return;
 
-  // inch conversion
-  const d_in = d / 25.4;
-  const Dc_in = Dc / 25.4;
+  /* ===============================
+     공통 계산
+  =============================== */
+  const totalEnds = E * C;
+  const PPI = (25.4 * (C / 2)) / P;
 
-  // Braid angle
-  const tana = (2 * Math.PI * (Dc_in + 2 * d_in) * P) / C;
+  const d_in  = d  / 25.4;
+  const Dc_in = Dc / 25.4;
+  const P_in  = P  / 25.4;
+
+  // 정상 braid angle (carrier 수 미사용)
+  const tana = (Math.PI * (Dc_in + 2 * d_in)) / P_in;
   const a = Math.atan(tana) * 180 / Math.PI;
 
-  // Coverage
-  const F = E * P * d_in / Math.sin(a * Math.PI / 180);
-  const K = 100 * (2 * F - (F * F));
+  /* ===============================
+     자동 모드 판별
+  =============================== */
+  const isEMI =
+    d <= 0.25 &&
+    Dc <= 8 &&
+    P <= 20 &&
+    totalEnds <= 64;
 
-  // Estimated outer diameter (mm)
+  let coverageText = "";
+
+  /* ===============================
+     EMI MODE (얇은 동선)
+  =============================== */
+  if (isEMI) {
+    const F =
+      (E * d_in * (C / 2)) /
+      (Math.sin(a * Math.PI / 180) * Math.PI * (Dc_in + d_in));
+
+    let K = 100 * (2 * F - F * F);
+
+    // 안전 클램프
+    K = Math.max(0, Math.min(K, 100));
+
+    coverageText = K.toFixed(1) + " %";
+  }
+
+  /* ===============================
+     MECHANICAL / PROTECTIVE MODE
+  =============================== */
+  else {
+    const circumference = Math.PI * (Dc + 2 * d);
+    const projectedWidth =
+      totalEnds * d * Math.cos(a * Math.PI / 180);
+
+    let K = 100 * (projectedWidth / circumference);
+
+    // 물리적 상한
+    K = Math.max(0, Math.min(K, 150));
+
+    coverageText = K.toFixed(1) + " %";
+  }
+
+  /* ===============================
+     외경 계산 (공통)
+  =============================== */
   const Dout = Dc + 2 * d * Math.cos(a * Math.PI / 180);
 
+  /* ===============================
+     결과 출력
+  =============================== */
   document.getElementById("ppiResult").textContent =
     PPI.toFixed(1);
 
@@ -337,17 +386,15 @@ function calculateBraid() {
     a.toFixed(2) + " °";
 
   document.getElementById("coverage").textContent =
-    K.toFixed(1) + " %";
+    coverageText;
 
   document.getElementById("outerDia").textContent =
     Dout.toFixed(2) + " mm";
 
-  if (a < 18 || a >= 40) {
+  if (a < 18 || a > 40) {
     alert("Warning: Braid angle is outside the typical range (18°–40°).");
   }
 }
-
-
 
 function setWireDia() {
   const select = document.getElementById("wireDiaSelect");
@@ -357,7 +404,6 @@ function setWireDia() {
     input.value = select.value;
   }
 }
-
 </script>
 
 </body>
