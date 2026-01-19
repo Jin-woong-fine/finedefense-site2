@@ -266,39 +266,44 @@ th:first-child, td:first-child {
     ※ This calculator is provided for reference purposes only.  
     Actual braid coverage and outer diameter may vary depending on compaction and manufacturing conditions.
   </div>
-
 </div>
 
-<div class="calculator formula-block">
-  <h3>Calculation Method</h3>
+  <div class="calculator formula-block">
+    <h3>Calculation Method</h3>
 
-  <p>
-    The braid geometry is calculated based on standard helical braid theory
-    using braid pitch and carrier configuration.
-  </p>
+    <p>
+      The braid geometry is calculated based on standard helical braid theory.
+      Braid angle and outer diameter are derived from the braid pitch and
+      core geometry.
+    </p>
 
-  <p class="formula">
-    Braid angle:<br>
-    α = arctan [ (2π · (D<sub>c</sub> + 2d) · P) / C ]
-  </p>
+    <p class="formula">
+      Braid angle:<br>
+      α = arctan [ π · (D<sub>c</sub> + 2d) / P ]
+    </p>
 
-  <p class="formula">
-    Coverage:<br>
-    K = 100 · (2F − F²)<br>
-    F = (E · P · d) / sin α
-  </p>
+    <p class="formula">
+      Estimated outer diameter after braiding:<br>
+      D<sub>out</sub> = D<sub>c</sub> + 2 · d · cos α
+    </p>
 
-  <p class="formula">
-    Estimated outer diameter after braiding:<br>
-    D<sub>out</sub> = D<sub>c</sub> + 2 · d · cos α
-  </p>
+    <p>
+      The coverage value is automatically calculated using an internal model
+      selected based on braid geometry to ensure physically valid results.
+      Depending on wire diameter, core size, and braid density, the calculation
+      adapts between overlapping coverage and circumferential fill interpretation.
+    </p>
 
-  <p>
-    where d is the wire diameter, D<sub>c</sub> is the core diameter,
-    P is the braid pitch, C is the number of carriers,
-    and E is the number of ends per carrier.
-  </p>
-</div>
+    <p>
+      Actual braid coverage and outer diameter may vary depending on
+      compaction and manufacturing conditions.
+    </p>
+
+    <p>
+      where d is the wire diameter, D<sub>c</sub> is the core diameter,
+      and P is the braid pitch.
+    </p>
+  </div>
 
 
 
