@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="kr">
 <head>
 <meta charset="UTF-8">
 <title>Insulation Resistance Calculator</title>
@@ -187,13 +187,13 @@ th:first-child, td:first-child {
       <label>Insulation Material</label>
         <select id="mat" onchange="setMaterial()">
         <option value="">Select material</option>
-        <option data-rho="1e12" data-k="0.05">PVC</option>
-        <option data-rho="5e14" data-k="0.05">PP</option>
-        <option data-rho="1e15" data-k="0.05">PE (HDPE / LDPE)</option>
-        <option data-rho="1e15" data-k="0.05">XLPE</option>
-        <option data-rho="1e16" data-k="0.04">FEP</option>
-        <option data-rho="1e17" data-k="0.03">PTFE</option>
-        <option data-rho="1e12" data-k="0.08">Silicone Rubber</option>
+        <option value="1e12" data-k="0.05">PVC</option>
+        <option value="5e14" data-k="0.05">PP</option>
+        <option value="1e15" data-k="0.05">PE (HDPE / LDPE)</option>
+        <option value="1e15" data-k="0.05">XLPE</option>
+        <option value="1e16" data-k="0.04">FEP</option>
+        <option value="1e17" data-k="0.03">PTFE</option>
+        <option value="1e12" data-k="0.08">Silicone Rubber</option>
         </select>
       <input type="text" id="rho" placeholder="Custom ρ (Ω·m)">
         <div id="materialInfo" class="material-info">
@@ -293,11 +293,18 @@ function setMaterial() {
   const sel = document.getElementById("mat");
   const opt = sel.options[sel.selectedIndex];
 
-  const rhoVal = opt.getAttribute("data-rho");
-  const kVal   = opt.getAttribute("data-k");
+  const rhoVal = sel.value;          // ⭐ 핵심
+  const kVal   = opt.dataset.k;
   const name   = opt.textContent;
 
-  if (rhoVal) document.getElementById("rho").value = rhoVal;
+  if (rhoVal) {
+    const rhoInput = document.getElementById("rho");
+    rhoInput.value = rhoVal;
+
+    // ⭐ 3번은 바로 여기
+    rhoInput.dispatchEvent(new Event("input"));
+  }
+
   if (kVal) TEMP_COEFF = parseFloat(kVal);
 
   const info = document.getElementById("materialInfo");
@@ -308,9 +315,11 @@ function setMaterial() {
       `ρ = ${formatSci(rhoVal)} Ω·m, ` +
       `k = ${kVal} /°C (typical @ 20°C)`;
   } else {
-    info.textContent = "Select a material to view typical constants.";
+    info.textContent =
+      "Select a material to apply typical resistivity and temperature coefficient.";
   }
 }
+
 
 
 function formatSci(val) {
