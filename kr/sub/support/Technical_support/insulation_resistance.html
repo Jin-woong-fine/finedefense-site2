@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Insulation Resistance Calculator</title>
+
+<style>
+:root {
+  --accent: #007aff;
+  --border: #e5e5ea;
+  --bg: #ffffff;
+  --bg-subtle: #f5f5f7;
+  --text: #1c1c1e;
+  --text-muted: #6e6e73;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
+               "Apple SD Gothic Neo", system-ui, sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.6;
+  background: var(--bg);
+  margin: 0;
+  padding: 40px;
+}
+
+section {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+h1 {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.calculator {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 28px;
+}
+
+.calc-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 24px;
+  align-items: end;
+}
+
+.calc-row label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.calc-row input,
+.calc-row select {
+  margin-top: 6px;
+  padding: 10px 12px;
+  font-size: 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #fff;
+  appearance: none;
+}
+
+.calc-row select {
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--text-muted) 50%),
+    linear-gradient(135deg, var(--text-muted) 50%, transparent 50%);
+  background-position:
+    calc(100% - 18px) 50%,
+    calc(100% - 13px) 50%;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 32px;
+}
+
+.calc-row button {
+  padding: 12px 22px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+table {
+  width: 100%;
+  margin-top: 24px;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+th, td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: right;
+}
+
+th:first-child, td:first-child {
+  text-align: left;
+}
+
+.note {
+  margin-top: 14px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.formula-block {
+  margin-top: 32px;
+}
+
+.formula-block h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.formula-block p {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.formula {
+  color: var(--text);
+}
+</style>
+</head>
+
+<body>
+
+<section>
+<h1>Insulation Resistance Calculator</h1>
+
+<div class="calculator">
+
+  <div class="calc-row">
+    <div>
+      <label>Conductor Diameter (mm)</label>
+      <input type="number" id="di" step="0.01" placeholder="e.g. 1.2">
+    </div>
+
+    <div>
+      <label>Insulation Outer Diameter (mm)</label>
+      <input type="number" id="do" step="0.01" placeholder="e.g. 3.6">
+    </div>
+
+    <div>
+      <label>Cable Length (m)</label>
+      <input type="number" id="len" step="1" placeholder="e.g. 100">
+    </div>
+
+    <div>
+      <label>Insulation Material</label>
+        <select id="mat" onchange="setMaterial()">
+        <option value="">Select material</option>
+        <option data-rho="1e12" data-k="0.05">PVC</option>
+        <option data-rho="5e14" data-k="0.05">PP</option>
+        <option data-rho="1e15" data-k="0.05">PE (HDPE / LDPE)</option>
+        <option data-rho="1e15" data-k="0.05">XLPE</option>
+        <option data-rho="1e16" data-k="0.04">FEP</option>
+        <option data-rho="1e17" data-k="0.03">PTFE</option>
+        <option data-rho="1e12" data-k="0.08">Silicone Rubber</option>
+        </select>
+      <input type="number" id="rho" placeholder="Custom ρ (Ω·m)">
+    </div>
+
+    <div>
+      <label>Operating Temperature (°C)</label>
+      <input type="number" id="temp" step="1" value="20">
+    </div>
+
+    <div>
+      <button onclick="calculateIR()">Calculate</button>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Item</th>
+        <th>Result</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Insulation Resistance @ 20&nbsp;°C</td>
+        <td id="r20">-</td>
+      </tr>
+      <tr>
+        <td>Temperature Corrected Resistance</td>
+        <td id="rt">-</td>
+      </tr>
+      <tr>
+        <td>Resistance per km</td>
+        <td id="rkm">-</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="note">
+    ※ Temperature correction is based on an exponential approximation
+    commonly used for polymer insulation materials.<br>
+    ※ Calculated values are theoretical DC insulation resistance.
+  </div>
+
+  <div class="note">
+    ※ Silicone rubber insulation exhibits lower insulation resistance
+    and higher temperature dependency compared to thermoplastic materials.<br>
+    ※ Material constants represent typical values and may vary by compound.
+  </div>
+
+
+</div>
+
+<div class="calculator formula-block">
+  <h3>Calculation Method</h3>
+
+  <p class="formula">
+    R<sub>20</sub> = (ρ / 2πL) · ln(D<sub>o</sub> / D<sub>i</sub>)
+  </p>
+
+  <p class="formula">
+    R<sub>T</sub> = R<sub>20</sub> · e<sup>−k(T − 20)</sup>
+  </p>
+
+  <p>
+    where ρ is the volume resistivity at 20&nbsp;°C,
+    L is the cable length, D<sub>i</sub> is the conductor diameter,
+    D<sub>o</sub> is the insulation outer diameter,
+    and k is the temperature coefficient (default: 0.05&nbsp;/&nbsp;°C).
+  </p>
+</div>
+
+
+</section>
+
+<script>
+let TEMP_COEFF = 0.05; // 기본값
+
+function setMaterial() {
+  const sel = document.getElementById("mat");
+  const opt = sel.options[sel.selectedIndex];
+
+  const rhoVal = opt.getAttribute("data-rho");
+  const kVal   = opt.getAttribute("data-k");
+
+  if (rhoVal) document.getElementById("rho").value = rhoVal;
+  if (kVal) TEMP_COEFF = parseFloat(kVal);
+}
+
+
+function formatOhm(value) {
+  if (value >= 1e9) return (value / 1e9).toFixed(2) + " GΩ";
+  if (value >= 1e6) return (value / 1e6).toFixed(2) + " MΩ";
+  return value.toFixed(0) + " Ω";
+}
+
+function calculateIR() {
+  const Di = parseFloat(di.value) / 1000;
+  const Do = parseFloat(do.value) / 1000;
+  const L  = parseFloat(len.value);
+  const rhoVal = parseFloat(rho.value);
+  const T  = parseFloat(temp.value);
+
+  if (!Di || !Do || !L || !rhoVal || Do <= Di) {
+    alert("Please check input values.");
+    return;
+  }
+
+  // R at 20 °C
+  const R20 = (rhoVal / (2 * Math.PI * L)) * Math.log(Do / Di);
+
+  // Temperature correction
+  const RT = R20 * Math.exp(-TEMP_COEFF * (T - 20));
+
+  // per km (temperature corrected)
+  const Rkm = RT * (L / 1000);
+
+  r20.textContent = formatOhm(R20);
+  rt.textContent  = formatOhm(RT);
+  rkm.textContent = formatOhm(Rkm) + "·km";
+}
+</script>
+
+</body>
+</html>
