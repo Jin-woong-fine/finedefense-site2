@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- 메인 -->
+  <url>
+    <loc>https://www.finedefense.co.kr/en/</loc>
+    <lastmod>2026-01-20</lastmod>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- 제품 -->
+  <url>
+    <loc>https://www.finedefense.co.kr/en/sub/products/sub-towed.html</loc>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- 제품 -->
+  <url>
+    <loc>https://www.finedefense.co.kr/en/sub/products/sub-fixed.html</loc>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://www.finedefense.co.kr/en/sub/products/sub-connector.html</loc>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://www.finedefense.co.kr/en/sub/products/sub-custom.html</loc>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- 뉴스룸 -->
+  <url>
+    <loc>https://www.finedefense.co.kr/en/sub/newsroom/index.html</loc>
+    <priority>0.5</priority>
+  </url>
+
+</urlset>
