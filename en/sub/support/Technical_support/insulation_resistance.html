@@ -133,6 +133,30 @@ th:first-child, td:first-child {
 .formula {
   color: var(--text);
 }
+
+.material-info {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+.material-info strong {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.temp-warning {
+  margin-top: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #fff4e5;
+  color: #8a4b00;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+
+
 </style>
 </head>
 
@@ -171,7 +195,11 @@ th:first-child, td:first-child {
         <option data-rho="1e17" data-k="0.03">PTFE</option>
         <option data-rho="1e12" data-k="0.08">Silicone Rubber</option>
         </select>
-      <input type="number" id="rho" placeholder="Custom ρ (Ω·m)">
+      <input type="text" id="rho" placeholder="Custom ρ (Ω·m)">
+        <div id="materialInfo" class="material-info">
+        Select a material to apply typical resistivity and temperature coefficient.
+        </div>
+
     </div>
 
     <div>
@@ -204,21 +232,35 @@ th:first-child, td:first-child {
         <td>Resistance per km</td>
         <td id="rkm">-</td>
       </tr>
+        <tr>
+        <td>Temperature Coefficient (k)</td>
+        <td id="kval">-</td>
+        </tr>
     </tbody>
   </table>
 
-  <div class="note">
+    <div id="tempWarning" class="temp-warning" style="display:none;"></div>
+
+    <div class="note">
+        <strong>Material Constants (Typical @ 20&nbsp;°C)</strong><br>
+        PVC: ρ = 1×10<sup>12</sup> Ω·m, k = 0.05 /°C<br>
+        PP: ρ = 5×10<sup>14</sup> Ω·m, k = 0.05 /°C<br>
+        PE (HDPE / LDPE): ρ = 1×10<sup>15</sup> Ω·m, k = 0.05 /°C<br>
+        XLPE: ρ = 1×10<sup>15</sup> Ω·m, k = 0.05 /°C<br>
+        FEP: ρ = 1×10<sup>16</sup> Ω·m, k = 0.04 /°C<br>
+        PTFE: ρ = 1×10<sup>17</sup> Ω·m, k = 0.03 /°C<br>
+        Silicone Rubber: ρ = 1×10<sup>12</sup> Ω·m, k = 0.08 /°C
+    </div>
+
+
+
+    <div class="note">
     ※ Temperature correction is based on an exponential approximation
     commonly used for polymer insulation materials.<br>
-    ※ Calculated values are theoretical DC insulation resistance.
-  </div>
-
-  <div class="note">
-    ※ Silicone rubber insulation exhibits lower insulation resistance
-    and higher temperature dependency compared to thermoplastic materials.<br>
-    ※ Material constants represent typical values and may vary by compound.
-  </div>
-
+    ※ Calculated values represent theoretical DC insulation resistance at 20&nbsp;°C.<br>
+    ※ Silicone rubber exhibits lower insulation resistance and higher temperature
+    dependency compared to thermoplastic materials.
+    </div>
 
 </div>
 
@@ -253,9 +295,30 @@ function setMaterial() {
 
   const rhoVal = opt.getAttribute("data-rho");
   const kVal   = opt.getAttribute("data-k");
+  const name   = opt.textContent;
 
   if (rhoVal) document.getElementById("rho").value = rhoVal;
   if (kVal) TEMP_COEFF = parseFloat(kVal);
+
+  const info = document.getElementById("materialInfo");
+
+  if (rhoVal && kVal) {
+    info.innerHTML =
+      `<strong>${name}</strong><br>` +
+      `ρ = ${formatSci(rhoVal)} Ω·m, ` +
+      `k = ${kVal} /°C (typical @ 20°C)`;
+  } else {
+    info.textContent = "Select a material to view typical constants.";
+  }
+}
+
+
+function formatSci(val) {
+  const num = Number(val);
+  if (num === 0) return "0";
+  const exp = Math.floor(Math.log10(num));
+  const base = (num / Math.pow(10, exp)).toFixed(1);
+  return `${base}×10<sup>${exp}</sup>`;
 }
 
 
@@ -289,7 +352,24 @@ function calculateIR() {
   r20.textContent = formatOhm(R20);
   rt.textContent  = formatOhm(RT);
   rkm.textContent = formatOhm(Rkm) + "·km";
+  document.getElementById("kval").textContent =
+    TEMP_COEFF.toFixed(2) + " /°C";
+
+    const warning = document.getElementById("tempWarning");
+    warning.style.display = "none";
+
+    if (T >= 120 && TEMP_COEFF >= 0.07) {
+    warning.style.display = "block";
+    warning.innerHTML =
+        "⚠ <strong>High Temperature Notice</strong><br>" +
+        "Insulation resistance decreases significantly at elevated temperatures, " +
+        "especially for silicone rubber and elastomeric materials. " +
+        "Actual measured values may be substantially lower than calculated results.";
+    }
+
 }
+
+
 </script>
 
 </body>
