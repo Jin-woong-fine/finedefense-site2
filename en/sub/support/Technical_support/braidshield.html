@@ -202,10 +202,19 @@ th:first-child, td:first-child {
     font-size: 11px;
     color: var(--text-muted);
     margin-top: 4px;
+    opacity: 0.85;
   }
 
+  .wire-group {
+    display: flex;
+    flex-direction: column;
+    min-height: 96px; /* 다른 input 블록과 높이 맞춤 */
+  }
 
-
+  .wire-options select,
+  .wire-options input {
+    height: 42px;
+  }
 
 
 </style>
