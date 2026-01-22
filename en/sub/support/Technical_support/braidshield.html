@@ -249,8 +249,11 @@ td:first-child {
     <div>
       <label>Braid Mode</label>
       <select id="braidMode">
-        <option value="shielding" selected>
-          EMI / Shielding (IEC·MIL)
+        <option value="handbook" selected>
+          IEC Handbook (Design / Catalog)
+        </option>
+        <option value="shielding">
+          IEC Geometry (Process / R&D)
         </option>
         <option value="jis">
           JIS Method (Conservative)
@@ -346,7 +349,7 @@ td:first-child {
         <td id="angle">-</td>
       </tr>
       <tr>
-        <td>Coverage</td>
+        <td>Coverage (IEC Handbook)</td>
         <td id="coverage">-</td>
       </tr>
       <tr>
@@ -446,8 +449,33 @@ td:first-child {
     /* ===============================
       MODE 분기
     =============================== */
-    if (mode === "shielding") {
-      // IEC / MIL 차폐용 (겹침 인정)
+    if (mode === "handbook") {
+      /*
+        IEC Handbook / VBA empirical model
+        - Primary / default coverage definition
+      */
+
+      const P_vba = PPI;
+      const d3 = d_in;
+      const d4 = Dc_in;
+
+      const tana_vba =
+        (2 * Math.PI * (d4 + 2 * d3) * P_vba) / C;
+
+      const a_vba = Math.atan(tana_vba) * 180 / Math.PI;
+
+      const F_vba =
+        (E * P_vba * d3) /
+        Math.sin(a_vba * Math.PI / 180);
+
+      K = 100 * (2 * F_vba - F_vba * F_vba);
+      K = Math.max(0, Math.min(K, 100));
+
+      a = a_vba;
+      coverageNote = "IEC Handbook / empirical (VBA-based)";
+
+    } else if (mode === "shielding") {
+      // IEC Geometry (Process / R&D)
       const aEff = Math.min(Math.max(a, 35), 55);
 
       const F =
@@ -458,10 +486,9 @@ td:first-child {
       K = Math.max(0, Math.min(K, 100));
 
       a = aEff;
-      coverageNote = "IEC / MIL method (overlap included)";
+      coverageNote = "IEC Geometry (process reference, not catalog value)";
 
     } else if (mode === "jis") {
-      // JIS 방식 (겹침 미인정, 투영폭 기준)
       const circumference = Math.PI * (Dc + 2 * d);
       const projectedWidth =
         totalEnds * d * Math.cos(a * Math.PI / 180);
@@ -469,10 +496,9 @@ td:first-child {
       K = 100 * (projectedWidth / circumference);
       K = Math.max(0, Math.min(K, 100));
 
-      coverageNote = "JIS method (projected coverage only)";
+      coverageNote = "JIS projected coverage (conservative)";
 
-    } else {
-      // Mechanical / Structural
+    } else if (mode === "mechanical") {
       const circumference = Math.PI * (Dc + 2 * d);
       const projectedWidth =
         totalEnds * d * Math.cos(a * Math.PI / 180);
@@ -480,7 +506,7 @@ td:first-child {
       K = 100 * (projectedWidth / circumference);
       K = Math.max(0, Math.min(K, 150));
 
-      coverageNote = "Structural coverage (mechanical support)";
+      coverageNote = "Mechanical / structural coverage";
     }
 
     /* ===============================
@@ -515,11 +541,13 @@ td:first-child {
     document.getElementById("takeUp").textContent =
       takeUp.toFixed(1) + " %";
 
+    document.getElementById("takeUp").title =
+      "Geometrical take-up rate based on braid angle (solid wire basis)";
 
     /* ===============================
       각도 경고 (모드별)
     =============================== */
-    if (mode !== "mechanical" && (a < 30 || a > 55)) {
+    if (mode === "shielding" && (a < 30 || a > 55)) {
       alert("Warning: Braid angle is outside the typical shielding range (30°–55°).");
     }
   }
