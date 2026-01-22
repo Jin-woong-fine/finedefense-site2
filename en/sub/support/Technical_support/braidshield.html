@@ -13,7 +13,10 @@
   --text: #1c1c1e;
   --text-muted: #6e6e73;
 }
-* { box-sizing: border-box; }
+
+* {
+  box-sizing: border-box;
+}
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
@@ -23,10 +26,12 @@ body {
   line-height: 1.6;
 }
 
+/* ===== Typography ===== */
+
 h1 {
-font-size: 22px;
-font-weight: 600;
-margin-bottom: 20px;
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 20px;
 }
 
 h2 {
@@ -35,6 +40,22 @@ h2 {
   margin-bottom: 16px;
 }
 
+label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.hint {
+  display: block;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* ===== Layout ===== */
+
 .calculator {
   background: var(--bg-subtle);
   border: 1px solid var(--border);
@@ -42,27 +63,70 @@ h2 {
   padding: 28px;
 }
 
+/* Grid row */
 .calc-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 24px;
-  align-items: end;
+  align-items: stretch;
 }
 
-.calc-row label {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-muted);
+/* Each grid cell */
+.calc-row > div {
+  display: flex;
+  flex-direction: column;
 }
 
-.calc-row input {
-  margin-top: 6px;
+.calc-row > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;   /* 핵심 */
+}
+
+/* ===== Inputs & Selects ===== */
+
+.calc-row input,
+.calc-row select {
   padding: 10px 12px;
   font-size: 14px;
   border-radius: 10px;
   border: 1px solid var(--border);
+  background-color: #fff;
+  color: var(--text);
 }
 
+.calc-row label + input,
+.calc-row label + select {
+  margin-top: 6px;
+}
+
+
+/* Select appearance */
+.calc-row select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--text-muted) 50%),
+    linear-gradient(135deg, var(--text-muted) 50%, transparent 50%);
+  background-position:
+    calc(100% - 18px) 50%,
+    calc(100% - 13px) 50%;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 32px;
+}
+
+.calc-row select:focus,
+.calc-row input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.15);
+}
+
+/* Button */
 .calc-row button {
   padding: 12px 22px;
   background: var(--accent);
@@ -72,6 +136,35 @@ h2 {
   font-weight: 600;
   cursor: pointer;
 }
+
+/* ===== Wire Diameter Group ===== */
+
+.wire-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.wire-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.wire-options select,
+.wire-options input {
+  height: 42px;
+  margin: 0;
+}
+
+.wire-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  opacity: 0.85;
+}
+
+/* ===== Table ===== */
 
 table {
   width: 100%;
@@ -86,16 +179,35 @@ th, td {
   text-align: right;
 }
 
-th:first-child, td:first-child {
+th:first-child,
+td:first-child {
   text-align: left;
 }
+
+/* ===== Coverage Colors ===== */
+
+.coverage-high {
+  color: #2ecc71;
+  font-weight: 600;
+}
+
+.coverage-mid {
+  color: #f1c40f;
+  font-weight: 600;
+}
+
+.coverage-low {
+  color: #e74c3c;
+  font-weight: 600;
+}
+
+/* ===== Notes & Formula ===== */
 
 .note {
   margin-top: 14px;
   font-size: 12px;
   color: var(--text-muted);
 }
-
 
 .formula-block {
   margin-top: 32px;
@@ -118,104 +230,10 @@ th:first-child, td:first-child {
   font-family: system-ui, -apple-system, BlinkMacSystemFont;
 }
 
-.hint {
-  display: block;
-  font-size: 11px;
-  font-weight: 400;
-  color: var(--text-muted);
-  margin-top: 2px;
+.calc-row button {
+  align-self: stretch;
+  margin-top: 10px;
 }
-
-/* ===== Select styling (match input) ===== */
-.calc-row select {
-  margin-top: 6px;
-  padding: 10px 12px;
-  font-size: 14px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background-color: #fff;
-  color: var(--text);
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  cursor: pointer;
-}
-
-/* custom arrow */
-.calc-row select {
-  background-image:
-    linear-gradient(45deg, transparent 50%, var(--text-muted) 50%),
-    linear-gradient(135deg, var(--text-muted) 50%, transparent 50%);
-  background-position:
-    calc(100% - 18px) 50%,
-    calc(100% - 13px) 50%;
-  background-size:
-    5px 5px,
-    5px 5px;
-  background-repeat: no-repeat;
-  padding-right: 32px;
-}
-
-/* focus effect */
-.calc-row select:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 4px rgba(0,122,255,0.15);
-}
-
-  .coverage-high {
-    color: #2ecc71; /* green */
-    font-weight: 600;
-  }
-
-  .coverage-mid {
-    color: #f1c40f; /* yellow */
-    font-weight: 600;
-  }
-
-  .coverage-low {
-    color: #e74c3c; /* red */
-    font-weight: 600;
-  }
-
-  /* ===== Wire diameter grouped layout ===== */
-
-  .wire-group {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .wire-group label {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-muted);
-  }
-
-  .wire-options {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-top: 6px;
-  }
-
-  .wire-hint {
-    font-size: 11px;
-    color: var(--text-muted);
-    margin-top: 4px;
-    opacity: 0.85;
-  }
-
-  .wire-group {
-    display: flex;
-    flex-direction: column;
-    min-height: 96px; /* 다른 input 블록과 높이 맞춤 */
-  }
-
-  .wire-options select,
-  .wire-options input {
-    height: 42px;
-  }
-
 
 </style>
 </head>
