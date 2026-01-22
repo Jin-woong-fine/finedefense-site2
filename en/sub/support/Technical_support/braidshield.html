@@ -350,6 +350,10 @@ td:first-child {
         <td id="coverage">-</td>
       </tr>
       <tr>
+        <td>Wire Take-Up Rate</td>
+        <td id="takeUp">-</td>
+      </tr>
+      <tr>
         <td>Estimated Outer Diameter</td>
         <td id="outerDia">-</td>
       </tr>
@@ -430,6 +434,12 @@ td:first-child {
     const tana = (Math.PI * (Dc_in + 2 * d_in)) / P_in;
     let a = Math.atan(tana) * 180 / Math.PI;
 
+    // ===============================
+    // 연입률 (Wire Take-Up Rate)
+    // ===============================
+    const takeUp =
+      (1 / Math.cos(a * Math.PI / 180) - 1) * 100;
+
     let K = 0;
     let coverageNote = "";
 
@@ -501,6 +511,10 @@ td:first-child {
 
     document.getElementById("outerDia").textContent =
       Dout.toFixed(2) + " mm";
+
+    document.getElementById("takeUp").textContent =
+      takeUp.toFixed(1) + " %";
+
 
     /* ===============================
       각도 경고 (모드별)
