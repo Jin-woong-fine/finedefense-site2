@@ -163,6 +163,23 @@ th:first-child, td:first-child {
   box-shadow: 0 0 0 4px rgba(0,122,255,0.15);
 }
 
+  .coverage-high {
+    color: #2ecc71; /* green */
+    font-weight: 600;
+  }
+
+  .coverage-mid {
+    color: #f1c40f; /* yellow */
+    font-weight: 600;
+  }
+
+  .coverage-low {
+    color: #e74c3c; /* red */
+    font-weight: 600;
+  }
+
+
+
 
 </style>
 </head>
@@ -175,6 +192,14 @@ th:first-child, td:first-child {
 <div class="calculator">
 
   <div class="calc-row">
+    <div>
+      <label>Braid Mode</label>
+      <select id="braidMode">
+        <option value="shielding" selected>EMI / Shielding</option>
+        <option value="mechanical">Mechanical / Protective</option>
+      </select>
+    </div>
+
     <div>
     <label>Wire Diameter (mm)</label>
 
@@ -266,6 +291,7 @@ th:first-child, td:first-child {
     ※ This calculator is provided for reference purposes only.  
     Actual braid coverage and outer diameter may vary depending on compaction and manufacturing conditions.
   </div>
+
 </div>
 
   <div class="calculator formula-block">
@@ -316,6 +342,7 @@ function calculateBraid() {
   const C = parseFloat(document.getElementById("carriers").value);
   const P = parseFloat(document.getElementById("pitchInput").value);
   const Dc = parseFloat(document.getElementById("coreDia").value);
+  const mode = document.getElementById("braidMode").value;
 
   if (!d || !E || !C || !P || !Dc) return;
 
@@ -329,77 +356,67 @@ function calculateBraid() {
   const Dc_in = Dc / 25.4;
   const P_in  = P  / 25.4;
 
-  // 정상 braid angle (carrier 수 미사용)
+  // 기본 각도 계산
   const tana = (Math.PI * (Dc_in + 2 * d_in)) / P_in;
-  const a = Math.atan(tana) * 180 / Math.PI;
+  let a = Math.atan(tana) * 180 / Math.PI;
+
+  let K = 0;
 
   /* ===============================
-     자동 모드 판별
+     MODE 분기
   =============================== */
-  const isEMI =
-    d <= 0.25 &&
-    Dc <= 8 &&
-    P <= 20 &&
-    totalEnds <= 64;
+  if (mode === "shielding") {
+    // 현실적인 차폐 각도 클램프
+    const aEff = Math.min(Math.max(a, 35), 55);
 
-  let coverageText = "";
-
-  /* ===============================
-     EMI MODE (얇은 동선)
-  =============================== */
-  if (isEMI) {
     const F =
       (E * d_in * (C / 2)) /
-      (Math.sin(a * Math.PI / 180) * Math.PI * (Dc_in + d_in));
+      (Math.sin(aEff * Math.PI / 180) * Math.PI * (Dc_in + d_in));
 
-    let K = 100 * (2 * F - F * F);
-
-    // 안전 클램프
+    K = 100 * (2 * F - F * F);
     K = Math.max(0, Math.min(K, 100));
 
-    coverageText = K.toFixed(1) + " %";
+    a = aEff; // 표시 각도도 보정값 사용
   }
 
-  /* ===============================
-     MECHANICAL / PROTECTIVE MODE
-  =============================== */
   else {
+    // 구조용 (기존 로직)
     const circumference = Math.PI * (Dc + 2 * d);
     const projectedWidth =
       totalEnds * d * Math.cos(a * Math.PI / 180);
 
-    let K = 100 * (projectedWidth / circumference);
-
-    // 물리적 상한
+    K = 100 * (projectedWidth / circumference);
     K = Math.max(0, Math.min(K, 150));
-
-    coverageText = K.toFixed(1) + " %";
   }
 
   /* ===============================
-     외경 계산 (공통)
+     외경
   =============================== */
   const Dout = Dc + 2 * d * Math.cos(a * Math.PI / 180);
 
   /* ===============================
      결과 출력
   =============================== */
-  document.getElementById("ppiResult").textContent =
-    PPI.toFixed(1);
+  document.getElementById("ppiResult").textContent = PPI.toFixed(1);
+  document.getElementById("angle").textContent = a.toFixed(2) + " °";
 
-  document.getElementById("angle").textContent =
-    a.toFixed(2) + " °";
+  const covEl = document.getElementById("coverage");
+  covEl.textContent = K.toFixed(1) + " %";
 
-  document.getElementById("coverage").textContent =
-    coverageText;
+  // 색상 적용
+  covEl.className = "";
+  if (K >= 80) covEl.classList.add("coverage-high");
+  else if (K >= 50) covEl.classList.add("coverage-mid");
+  else covEl.classList.add("coverage-low");
 
   document.getElementById("outerDia").textContent =
     Dout.toFixed(2) + " mm";
 
-  if (a < 18 || a > 40) {
-    alert("Warning: Braid angle is outside the typical range (18°–40°).");
+  if (a < 18 || a > 55) {
+    alert("Warning: Braid angle is outside the practical range.");
   }
 }
+
 
 function setWireDia() {
   const select = document.getElementById("wireDiaSelect");
@@ -410,6 +427,7 @@ function setWireDia() {
   }
 }
 </script>
+
 
 </body>
 </html>
