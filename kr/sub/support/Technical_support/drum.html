@@ -111,7 +111,8 @@ button:hover { background:#0063d1; }
 
 <div class="note">
 • Calculation logic is based on actual winding behavior.  
-• Hub clearance is calculated automatically.
+• This tool is based on Fine Defense standard drum specifications.  
+• Results are for reference only; final selection is user's responsibility.
 </div>
 </section>
 
@@ -145,10 +146,10 @@ function populateDrums() {
 /* ===== Main Calculation ===== */
 document.getElementById('calcBtn').addEventListener('click', () => {
 
-  const cableOD = +cableOD.value;
-  const reqLen = +reqLength.value;
-  const packing = +packing.value / 100;
-  const idx = drumSelect.value;
+  const cableOD   = Number(document.getElementById('cableOD').value);
+  const reqLen    = Number(document.getElementById('reqLength').value);
+  const packing   = Number(document.getElementById('packing').value) / 100;
+  const idx       = document.getElementById('drumSelect').value;
 
   if (!cableOD || !reqLen || idx === '') {
     alert('모든 값을 입력해 주세요.');
@@ -157,7 +158,7 @@ document.getElementById('calcBtn').addEventListener('click', () => {
 
   const drum = drums[idx];
   const coreOD = drum.d;   // 동경
-  const width = drum.w2;   // 내폭
+  const width  = drum.w2;  // 내폭
 
   const lines = Math.floor(width / cableOD * packing);
   if (lines <= 0) {
@@ -192,17 +193,24 @@ document.getElementById('calcBtn').addEventListener('click', () => {
   const cableHeight = layers * cableOD;
   const finalOD = coreOD + 2 * cableHeight;
 
-  // 🔥 권공 자동 계산
-  const hub = (finalOD - (coreOD + 2 * cableHeight)) / 2;
+    /* ===== ③ 판단용 문구 (여기!) ===== */
+    let remark = '';
+    if (finalOD < drum.D * 0.9) {
+    remark = '여유 있음';
+    } else if (finalOD <= drum.D) {
+    remark = '타이트';
+    } else {
+    remark = '권취 불가';
+    }
 
-  output.innerHTML = `
-    <b>Selected Drum</b>: ${drum.reel_no}<br>
+    output.innerHTML = `
+    <b selected Drum</b>: ${drum.reel_no}<br>
     Required Layers: <b>${layers}</b><br>
     Total Wound Length: <b>${sum.toLocaleString()} m</b><br>
     Cable Layer Height: <b>${cableHeight.toFixed(1)} mm</b><br>
-    Final Drum OD: <b>${finalOD.toFixed(1)} mm</b><br>
-    Hub Clearance: <b>${hub.toFixed(1)} mm</b>
-  `;
+    Calculated Wound OD: <b>${finalOD.toFixed(1)} mm</b><br>
+    Drum Max OD: <b>${drum.D} mm</b>
+    `;
 });
 </script>
 
