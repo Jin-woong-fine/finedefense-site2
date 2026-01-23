@@ -203,7 +203,7 @@ document.getElementById('calcBtn').addEventListener('click', () => {
   const idx       = document.getElementById('drumSelect').value;
 
   if (!cableOD || !reqLen || idx === '') {
-    alert('모든 값을 입력해 주세요.');
+    alert('Please fill in all required fields.');
     return;
   }
 
@@ -213,7 +213,7 @@ document.getElementById('calcBtn').addEventListener('click', () => {
 
   const lines = Math.floor(width / cableOD * packing);
   if (lines <= 0) {
-    output.innerHTML = '선택한 드럼에 케이블을 권취할 수 없습니다.';
+    output.innerHTML = 'The selected drum cannot accommodate this cable.';
     return;
   }
 
@@ -250,13 +250,13 @@ document.getElementById('calcBtn').addEventListener('click', () => {
     let badgeClass = '';
 
     if (hub > 20) {
-    remark = '여유 있음';
+    remark = 'Adequate clearance';
     badgeClass = 'ok';
     } else if (hub >= 0) {
-    remark = '타이트';
+    remark = 'Tight fit';
     badgeClass = 'warn';
     } else {
-    remark = '권취 불가';
+    remark = 'Winding not possible';
     badgeClass = 'bad';
     }
 
@@ -301,7 +301,7 @@ document.getElementById('calcBtn').addEventListener('click', () => {
     </div>
 
     <div class="note" style="margin-top:14px;">
-        ※ 본 계산은 화인디펜스(Fine Defense) 드럼 기준이며, 권공 0 조건으로 산출되었습니다.
+        ※ This calculation is based on Fine Defense standard drum specifications.
     </div>
     `;
 
